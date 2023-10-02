@@ -1,0 +1,74 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+This repository provides an H.264 image encoder and decoder that
+leverages the specialized hardware in NVIDIA GPUs and the
+`Jetson <https://developer.nvidia.com/embedded-computing>`__ platform.
+The ``isaac_ros_h264_encoder`` package can compress an image into H.264
+data using the NVENC on the Jetson platform. The
+``isaac_ros_h264_decoder`` package can decode the H.264 data into
+original images using the NVDEC on the Jetson and x86 platform with
+NVIDIA GPUs.
+
+Image compression reduces the data footprint of images when written to
+storage or transmitted between computers. A 1080p camera at 30fps
+produces 177MB/s of data; image compression reduces this by
+approximately 10 times to 17MB/s of data, reducing the throughput needed
+to send this to another computer or write out to storage; a one minute
+1080p camera recording is reduced from ~10GB to ~1GB. This compression
+is provided by dedicated hardware acceleration (NvEnc) separate from
+other hardware engines such as the GPU.
+
+A common use case for image compression during the development of robots
+is to capture camera images to storage. This captured data is processed
+offline from the robot to produce training datasets for AI models, test
+datasets for perception functions, and test data for open-loop
+re-simulation of software in development with real data. The compression
+parameters are tuned to minimize visual quality reduction from lossy
+compression for AI model and perception function development.
+Compression reduces the amount of data written to storage, the time
+required to offload the recording, and footprint of the data at rest in
+a data lake.
+
+Compression can be used with event data recorders to capture camera
+images to storage when an event of interest occurs, often due to
+failures on the robot. This provides visual information to assist in the
+debugging of the event or to improve perception and robot functions.
+
+`H.264 <https://en.wikipedia.org/wiki/Advanced_Video_Coding>`__ is an
+efficient and popular compression algorithm with broad support across
+many platforms. The output of the ``isaac_ros_h264_encoder`` package on
+Jetson can then be decoded with hardware acceleration using the
+``isaac_ros_h264_decoder`` on Jetson and x86_64 systems, or by
+third-party H.264 decoder packages on non-NVIDIA platforms.
+
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_compression.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+
+Updates
+-------
+
+========== =========================================
+Date       Changes
+========== =========================================
+2023-05-25 Performance improvements
+2023-04-05 P-frame encoder and Tegra decoder support
+2022-10-19 Initial release
+========== =========================================
+
+.. |repo_name| replace:: Isaac ROS Compression

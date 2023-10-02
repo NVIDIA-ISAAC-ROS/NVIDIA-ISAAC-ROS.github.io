@@ -1,0 +1,160 @@
+==============
+|package_name|
+==============
+
+Quickstart
+----------
+
+1.  Set up your development environment by following the instructions
+    `here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md>`__.
+
+2.  Clone this repository and its dependencies under
+    ``~/workspaces/isaac_ros-dev/src``.
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common
+
+    .. code:: bash
+
+       git clone --recurse-submodules https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox && \
+           cd isaac_ros_nvblox && git lfs pull
+
+3.  Pull down a ROS Bag of sample data:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox && \ 
+         git lfs pull -X "" -I "nvblox_ros/test/test_cases/rosbags/nvblox_pol"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5.  Inside the container, install package-specific dependencies via
+    ``rosdep``:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev/ && \
+           rosdep install -i -r --from-paths src --rosdistro humble -y --skip-keys "libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv nvblox"
+
+6.  Build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+7.  (Optional) Run tests to verify complete and correct installation:
+
+    .. code:: bash
+
+       colcon test --executor sequential
+
+8.  In a **current terminal** inside the Docker container, run the
+    launch file for Nvblox with ``nav2``:
+
+    .. code:: bash
+
+       source /workspaces/isaac_ros-dev/install/setup.bash && \
+           ros2 launch nvblox_examples_bringup isaac_sim_example.launch.py
+
+9.  Open a **second terminal** inside the docker container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+10. In the **second terminal**, play the ROS Bag:
+
+    .. code:: bash
+
+       ros2 bag play src/isaac_ros_nvblox/nvblox_ros/test/test_cases/rosbags/nvblox_pol
+
+You should see the robot reconstructing a mesh, with the 2d esdf slice
+overlaid on top.
+
+
+Troubleshooting
+---------------
+
+*realsense-ros* packages don’t build with ROS 2 Humble
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please follow the workaround
+`here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/troubleshooting.md#realsense-driver-doesnt-work-with-ros2-humble>`__.
+
+Troubleshooting the Nvblox Realsense Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See our troubleshooting page
+`here <./docs/troubleshooting-nvblox-realsense.md>`__.
+
+Troubleshooting ROS 2 communication issues
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If it looks like you are dropping messages or you are not receiving any
+messages, please consult our troubleshooting page
+`here <./docs/troubleshooting-nvblox-ros2.md>`__.
+
+
+Packages Overview
+---------------------
+
+-  **isaac_ros_nvblox**: A meta-package.
+-  **nvblox_examples_bringup**: Launch files and configurations for
+   launching the examples.
+-  **nvblox_image_padding**: Node to pad and crop images for adjusting
+   the image size to the fixed input resolution that is required by the
+   `image segmentation
+   network <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_segmentation>`__.
+-  **nvblox_isaac_sim**: Contains scripts for launching Isaac Sim
+   configured for use with nvblox.
+-  **realsense_splitter**: Node for using the realsense camera with
+   inbuilt projector. See why this is needed
+   `here <./docs/troubleshooting-nvblox-realsense.md>`__.
+-  **semantic_label_conversion**: Package for converting semantic labels
+   coming from Isaac Sim to mask images used by nvblox
+   (`readme <./nvblox_examples/semantic_label_conversion/README.md>`__).
+-  **nvblox_msgs**: Custom messages for transmitting the output distance
+   map slice and mesh over ROS 2.
+-  **nvblox_nav2**: Contains a custom plugin that allows ROS 2 Nav2 to
+   consume nvblox distance map outputs.
+-  **nvblox_performance_measurement**: Multiple packages containing
+   tools for measuring nvblox performance
+   (`readme <./nvblox_performance_measurement/README.md>`__).
+-  **nvblox_ros**: The ROS 2 wrapper for the core reconstruction library
+   and the nvblox node.
+-  **nvblox_ros_common**: Package providing repository wide utility
+   functions.
+-  **nvblox_rviz_plugin**: A plugin for displaying nvblox’s (custom)
+   mesh type in RVIZ.
+-  **[submodule] nvblox**: The core (ROS independent) reconstruction
+   library.
+
+
+API
+----
+
+ROS 2 Parameters
+----------------
+
+Find all available ROS 2 parameters `here <./docs/parameters.md>`__.
+
+ROS 2 Topics and Services
+-------------------------
+
+Find all ROS 2 subscribers, publishers and services
+`here <./docs/topics-and-services.md>`__.
+
+.. |package_name| replace:: ``isaac_ros_nvblox``

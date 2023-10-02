@@ -1,0 +1,77 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+Isaac ROS Pose Estimation contains ROS 2 packages to predict the pose of
+an object. ``isaac_ros_dope`` provides a pose estimation method using 3D
+bounding cuboid dimensions of a known object in an input image.
+``isaac_ros_centerpose`` provides a pose estimation method using 3D
+bounding cuboid dimensions of unknown object instances in a known
+category of objects from an input image. ``isaac_ros_dope`` and
+``isaac_ros_centerpose`` use GPU acceleration for DNN inference to
+estimate the pose of an object. The output prediction can be used by
+perception functions when fusing with a corresponding depth to provide
+the 3D pose of an object and distance for navigation or manipulation.
+
+
+``isaac_ros_dope`` is used in a graph of nodes to estimate the pose of a
+known object with 3D bounding cuboid dimensions. To produce the
+estimate, a `DOPE <https://github.com/NVlabs/Deep_Object_Pose>`__ (Deep
+Object Pose Estimation) pre-trained model is required. Input images may
+need to be cropped and resized to maintain the aspect ratio and match
+the input resolution of DOPE. After DOPE has produced an estimate, the
+DNN decoder will use the specified object type to transform using belief
+maps to output object poses.
+
+NVLabs has provided a DOPE pre-trained model using the
+`HOPE <https://github.com/swtyree/hope-dataset>`__ dataset. HOPE stands
+for household objects for pose estimation and is a research-oriented
+dataset using toy grocery objects and 3D textured meshes of the objects
+for training on synthetic data. To use DOPE for other objects that are
+relevant to your application, it needs to be trained with another
+dataset targeting these objects. For example, DOPE has been trained to
+detect dollies for use with a mobile robot that navigates under, lifts,
+and moves that type of dolly.
+
+``isaac_ros_centerpose`` has similarities to ``isaac_ros_dope`` in that
+both estimate an object pose; however, ``isaac_ros_centerpose`` provides
+additional functionality. The
+`CenterPose <https://github.com/NVlabs/CenterPose>`__ DNN performs
+object detection on the image, generates 2D keypoints for the object,
+estimates the 6-DoF pose, and regresses relative 3D bounding cuboid
+dimensions. This is performed on a known object class without knowing
+the instance–for example, detecting a chair without having trained on
+images of all chairs. NVLabs has provided pre-trained models for the
+CenterPose model; however, as with the DOPE model, it needs to be
+trained with another dataset targeting objects that are specific to your
+application.
+
+Pose estimation is a compute-intensive task and not performed at the
+frame rate of an input camera. To make efficient use of resources,
+object pose is estimated for a single frame and used as an input to
+navigation. Additional object pose estimates are computed to further
+refine navigation in progress at a lower frequency than the input rate
+of a typical camera.
+
+Packages in this repository rely on accelerated DNN model inference
+using `Triton <https://github.com/triton-inference-server/server>`__ or
+`TensorRT <https://developer.nvidia.com/tensorrt>`__ from `Isaac ROS DNN
+Inference <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_inference>`__.
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_pose_estimation.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+.. |repo_name| replace:: Isaac ROS Pose Estimation

@@ -1,0 +1,52 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+
+Isaac ROS Freespace Segmentation contains an ROS 2 package to produce
+occupancy grids for navigation. By processing a freespace segmentation
+mask with the pose of the robot relative to the ground, Bi3D Freespace
+produces an occupancy grid for
+`Nav2 <https://github.com/ros-planning/navigation2>`__, which is used to
+avoid obstacles during navigation. This package is GPU accelerated to
+provide real-time, low latency results in a robotics application. Bi3D
+Freespace provides an additional occupancy grid source for mobile robots
+(ground based).
+
+
+``isaac_ros_bi3d`` is used in a graph of nodes to provide a freespace
+segmentation mask as one output from a time-synchronized input left and
+right stereo image pair. The freespace mask is used by
+``isaac_ros_bi3d_freespace`` with TF pose of the camera relative to the
+ground to compute planar freespace into an occupancy grid as input to
+`Nav2 <https://github.com/ros-planning/navigation2>`__.
+
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_freespace_segmentation.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+Updates
+-------
+
+========== ========================
+Date       Changes
+========== ========================
+2023-05-25 Performance improvements
+2023-04-05 Initial release
+========== ========================
+
+
+.. |repo_name| replace:: Isaac ROS Freespace Segmentation

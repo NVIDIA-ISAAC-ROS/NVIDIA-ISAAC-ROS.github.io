@@ -1,0 +1,77 @@
+==============
+|package_name|
+==============
+
+Quickstart
+----------
+
+Follow the steps below to run a sample benchmark for measuring
+performance of an Isaac ROS AprilTag node with ``ros2_benchmark``. This
+process can also be used to benchmark the other Isaac ROS nodes, and the
+``ros2_benchmark`` framework more generally supports benchmarking
+arbitrary graphs of ROS 2 nodes.
+
+1. Set up your development environment by following the instructions
+   `here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md>`__.
+
+2. Clone this repository and its its dependencies under
+   ``~/workspaces/isaac_ros-dev/src``.
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src &&
+        git clone https://github.com/NVIDIA-ISAAC-ROS/ros2_benchmark && \
+        git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark && \
+        git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common && \
+        git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros && \
+        git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline && \
+        git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_apriltag
+
+3. Pull down ``r2b Dataset 2023`` by following the instructions
+   `here <https://github.com/NVIDIA-ISAAC-ROS/ros2_benchmark/blob/main/README.md#datasets>`__
+   or fetch just the rosbag used in this Quickstart with the following
+   command.
+
+   .. code:: bash
+
+      mkdir -p ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/datasets/r2b_dataset/r2b_storage && \
+        cd ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/datasets/r2b_dataset/r2b_storage && \
+        wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/nvidia/isaac/r2bdataset2023/versions/1/files/r2b_storage/metadata.yaml' && \
+        wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/nvidia/isaac/r2bdataset2023/versions/1/files/r2b_storage/r2b_storage_0.db3'
+
+4. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+5. Inside the container, build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+6. (Optional) Run tests to verify complete and correct installation:
+
+   .. code:: bash
+
+      colcon test --executor sequential
+
+7. Start the Isaac ROS AprilTag benchmark:
+
+   .. code:: bash
+
+      launch_test src/isaac_ros_benchmark/scripts/isaac_ros_apriltag_node.py
+
+8. Once the benchmark is finished, the final performance measurements
+   are displayed in the terminal.
+
+   Additionally, the final results and benchmark metadata (e.g., system
+   information, benchmark configurations) are also exported as a JSON
+   file.
+
+
+.. |package_name| replace:: ``isaac_ros_benchmark``

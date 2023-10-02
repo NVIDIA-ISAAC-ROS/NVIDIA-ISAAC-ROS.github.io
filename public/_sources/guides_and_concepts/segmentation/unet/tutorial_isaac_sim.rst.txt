@@ -1,0 +1,91 @@
+Tutorial for DNN Image Segmentation with Isaac Sim
+==================================================
+
+
+Overview
+------------
+
+This tutorial walks you through a graph for `Image
+Segmentation <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_segmentation>`__
+of people using images from Isaac Sim.
+
+Last validated with `Isaac Sim
+2022.1.0 <https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/release_notes.html#id10>`__.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the `Quickstart section <../README.md#quickstart>`__ in the
+    main README till step 9.
+2.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+3.  Inside the container, build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+4.  Install and launch Isaac Sim following the steps in the `Isaac ROS
+    Isaac Sim Setup
+    Guide <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/isaac-sim-sil-setup.md>`__
+5.  Open up the Isaac ROS Common USD scene (using the “content” window)
+    located at:
+    ``omniverse://localhost/NVIDIA/Assets/Isaac/2022.1/Isaac/Samples/ROS2/Scenario/carter_warehouse_apriltags_worker.usd``.
+
+    And wait for it to load completely. >
+.. note::
+
+   To use a different
+    server, replace ``localhost`` with ``<your_nucleus_server>``
+6.  Go to the stage tab and select ``/World/Carter_ROS``, then in
+    properties tab -> Transform -> Translate -> X change ``-3.0`` to
+    ``0.0``.
+
+    
+7.  Change the left camera topic name. Go to the stage tab and select
+    ``/World/Carter_ROS/ROS_Cameras/ros2_create_camera_left_rgb``,
+    properties tab -> Compute Node -> Inputs -> topicName change
+    ``rgb_left`` to ``image``.
+
+    
+8.  Press **Play** to start publishing data from the Isaac Sim
+    application.
+
+    
+9.  Run the following launch files to start the inferencing:
+
+    .. code:: bash
+
+           ros2 launch isaac_ros_unet isaac_ros_unet_triton.launch.py model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax'
+
+10. Visualize and validate the output of the package by launching
+    ``rqt_image_view`` in another terminal:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+           ./scripts/run_dev.sh
+
+    Then launch ``rqt_image_view``:
+
+    .. code:: bash
+
+           ros2 run rqt_image_view rqt_image_view
+
+    Then inside the ``rqt_image_view`` GUI, change the topic to
+    ``/unet/colored_segmentation_mask`` to view a colorized segmentation
+    mask.
+
+    .. note::
+
+    The raw segmentation is also published to
+    ``/unet/raw_segmentation_mask``. However, the raw pixels correspond
+    to the class labels and so the output is unsuitable for human visual
+    inspection.

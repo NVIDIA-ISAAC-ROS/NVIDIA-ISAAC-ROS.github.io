@@ -1,0 +1,86 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+Isaac ROS DNN Inference contains ROS 2 packages for performing DNN
+inference, providing AI-based perception for robotics applications. DNN
+inference uses a pre-trained DNN model to ingest an input Tensor and
+output a prediction to an output Tensor.
+
+
+Above is a typical graph of nodes for DNN inference on image data. The
+input image is resized to match the input resolution of the DNN; the
+image resolution may be reduced to improve DNN inference performance
+,which typically scales directly with the number of pixels in the image.
+DNN inference requires input Tensors, so a DNN encoder node is used to
+convert from an input image to Tensors, including any data
+pre-processing that is required for the DNN model. Once DNN inference is
+performed, the DNN decoder node is used to convert the output Tensors to
+results that can be used by the application.
+
+TensorRT and Triton are two separate ROS nodes to perform DNN inference.
+The TensorRT node uses
+`TensorRT <https://developer.nvidia.com/tensorrt>`__ to provide
+high-performance deep learning inference. TensorRT optimizes the DNN
+model for inference on the target hardware, including Jetson and
+discrete GPUs. It also supports specific operations that are commonly
+used by DNN models. For newer or bespoke DNN models, TensorRT may not
+support inference on the model. For these models, use the Triton node.
+
+The Triton node uses the `Triton Inference
+Server <https://developer.nvidia.com/nvidia-triton-inference-server>`__,
+which provides a compatible frontend supporting a combination of
+different inference backends (e.g. ONNX Runtime, TensorRT Engine Plan,
+TensorFlow, PyTorch). In-house benchmark results measure little
+difference between using TensorRT directly or configuring Triton to use
+TensorRT as a backend.
+
+Some DNN models may require custom DNN encoders to convert the input
+data to the Tensor format needed for the model, and custom DNN decoders
+to convert from output Tensors into results that can be used in the
+application. Leverage the DNN encoder and DNN decoder node(s) for image
+bounding box detection and image segmentation, or your own custom
+node(s).
+
+.. note::
+
+   DNN inference can be performed on different types of input
+   data, including audio, video, text, and various sensor data, such as
+   LIDAR, camera, and RADAR. This package provides implementations for
+   DNN encode and DNN decode functions for images, which are commonly
+   used for perception in robotics. The DNNs operate on Tensors for
+   their input, output, and internal transformations, so the input image
+   needs to be converted to a Tensor for DNN inferencing.
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_dnn_inference.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+Updates
+-------
+
+========== ============================================================================================================================
+Date       Changes
+========== ============================================================================================================================
+2023-05-25 Performance improvements
+2023-04-05 Source available GXF extensions
+2022-10-19 Updated OSS licensing
+2022-08-31 Update to be compatible with JetPack 5.0.2
+2022-06-30 Added format string parameter in Triton/TensorRT, switched to NITROS implementation, removed parameters in DNN Image Encoder
+2021-11-03 Split DOPE and U-Net into separate repositories
+2021-10-20 Initial release
+========== ============================================================================================================================
+
+.. |repo_name| replace:: Isaac ROS DNN Inference

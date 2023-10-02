@@ -1,0 +1,66 @@
+==============
+|package_name|
+==============
+
+Quickstart
+----------
+
+Besides the above fully tested graphs, it is also possible to construct your own graphs with any of the Isaac ROS NITROS-accelerated nodes to enjoy the performance benefit of NITROS.
+
+The key to successfully constructing a NITROS-accelerated graph is to ensure that all NITROS-accelerated nodes start in the same process (which permits zero-copy between nodes). To do so, follow the steps below to create your own launch file:
+
+1. Create a Python ROS 2 launch file following the official `guide <https://docs.ros.org/en/humble/How-To-Guides/Launching-composable-nodes.html>`__.
+
+2. Create NITROS-accelerated nodes using ``ComposableNode``. Taking ``ArgusMonoNode`` and ``RectifyNode`` as an example, the nodes can be created as follows:
+
+   .. code:: python
+
+      argus_mono_node = ComposableNode(
+          name='argus_mono_node',
+          package='isaac_ros_argus_camera',
+          plugin='nvidia::isaac_ros::argus::ArgusMonoNode',
+      )
+
+      rectify_node = ComposableNode(
+          name='rectify_node',
+          package='isaac_ros_image_proc',
+          plugin='nvidia::isaac_ros::image_proc::RectifyNode',
+          parameters=[{
+              'output_width': 1920,
+              'output_height': 1200,
+          }],
+          remapping=[
+              ('image_raw', 'left/image_raw'),
+              ('camera_info', 'left/camerainfo')
+          ],
+      )
+
+3. Place the created nodes in ``ComposableNodeContainer``:
+
+   .. code:: python
+
+      nitros_container = ComposableNodeContainer(
+          name='nitros_container',
+          package='rclcpp_components',
+          executable='component_container_mt',
+          composable_node_descriptions=[argus_mono_node, rectify_node],
+      )
+
+   .. note::
+
+      It is crucial that the ``executable`` field is set to be ``component_container_mt`` so that the created nodes can be started and communicated correctly within the same process.
+
+4. Finally, place the created composable node container in ``LaunchDescription`` to finalize the launch script.
+
+   .. code:: python
+
+      return launch.LaunchDescription([nitros_container])
+
+API
+----
+
+.. note::
+
+    NOTE(jaiveers): Here is where the package-specific API would go. 
+
+.. |package_name| replace:: ``isaac_ros_nitros``

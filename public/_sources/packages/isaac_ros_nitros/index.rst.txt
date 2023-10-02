@@ -1,0 +1,61 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+ROS 2 Humble introduces new hardware-acceleration features, including
+type adaptation and type negotiation, that significantly increase
+performance for developers seeking to incorporate AI/machine learning
+and computer vision functionality into their ROS-based applications.
+
+Type adaptation (REP-2007) is common for hardware accelerators, which
+require a different data format to deliver optimal performance. Type
+adaptation allows ROS nodes to work in a format better suited to the
+hardware. Processing graphs can eliminate memory copies between the CPU
+and the memory accelerator using the adapted type. Unnecessary memory
+copies consume CPU compute, waste power, and slow down performance,
+especially as the image size increases.
+
+Type negotiation (REP-2009) allows different ROS nodes in a processing
+graph to advertise their supported types so that formats yielding ideal
+performance are chosen. The ROS framework performs this negotiation
+process and maintains compatibility with legacy nodes that don’t support
+negotiation.
+
+Accelerating processing graphs using type adaptation and negotiation
+makes the hardware accelerator zero-copy possible. This reduces
+software/CPU overhead and unlocks the potential of the underlying
+hardware. As roboticists migrate to more powerful compute platforms like
+NVIDIA Jetson Orin, they can expect to realize more of the performance
+gains enabled by the hardware.
+
+The NVIDIA implementation of type adaption and negotiation are called
+NITROS (NVIDIA Isaac Transport for ROS). ROS processing graphs made up
+of NITROS-based Isaac ROS hardware accelerated modules (a.k.a. GEMs or
+Isaac ROS nodes) can deliver promising performance and results.
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+Updates
+-------
+
+========== ==========================================
+Date       Changes
+========== ==========================================
+2023-05-25 CPU usage optimizations
+2023-04-05 Update to be compatible with JetPack 5.1.1
+2022-10-19 Minor updates and bugfixes
+2022-08-31 Update to be compatible with JetPack 5.0.2
+2022-06-30 Initial release
+========== ==========================================
+
+
+.. |repo_name| replace:: Isaac ROS NITROS

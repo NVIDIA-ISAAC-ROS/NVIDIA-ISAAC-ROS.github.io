@@ -1,0 +1,64 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+This repository provides NVIDIA hardware-accelerated packages for
+proximity segmentation. The ``isaac_ros_bi3d`` package uses the
+optimized `Bi3D DNN
+model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/bi3d_proximity_segmentation>`__
+to perform stereo-depth estimation via binary classification, which is
+used for proximity segmentation. Proximity segmentation can be used to
+determine whether an obstacle is within a proximity field and to avoid
+collisions with obstacles during navigation.
+
+
+`Bi3D <https://arxiv.org/abs/2005.07274>`__ is used in a graph of nodes
+to provide proximity segmentation from a time-synchronized input left
+and right stereo image pair. Images to Bi3D need to be rectified and
+resized to the appropriate input resolution. The aspect ratio of the
+image needs to be maintained; hence, a crop and resize may be required
+to maintain the input aspect ratio. The graph for DNN encode, to DNN
+inference, to DNN decode is part of the Bi3D node. Inference is
+performed using TensorRT, as the Bi3D DNN model is designed to use
+optimizations supported by TensorRT.
+
+Compared to other stereo disparity functions, proximity segmentation
+provides a prediction of whether an obstacle is within a proximity
+field, as opposed to continuous depth, while simultaneously predicting
+freespace from the ground plane, which other functions typically do not
+provide. Also unlike other stereo disparity functions in Isaac ROS,
+proximity segmentation runs on NVIDIA DLA (deep learning accelerator),
+which is separate and independent from the GPU. For more information on
+disparity, refer to `this
+page <https://en.wikipedia.org/wiki/Binocular_disparity>`__.
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_proximity_segmentation.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+Updates
+-------
+
+========== ==================================================================
+Date       Changes
+========== ==================================================================
+2023-05-25 Performance improvements
+2023-04-05 Source available GXF extensions
+2022-08-31 Update to use latest model and to be compatible with JetPack 5.0.2
+2022-06-30 Initial release
+========== ==================================================================
+
+
+.. |repo_name| replace:: Isaac ROS Proximity Segmentation

@@ -1,0 +1,77 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+Isaac ROS Nvblox contains ROS 2 packages for 3D reconstruction and cost
+maps for navigation. ``nvblox_nav2`` processes depth and pose to
+reconstruct a 3D scene in real-time and a 2D costmap for
+`Nav2 <https://github.com/ros-planning/navigation2>`__. The costmap is
+used in planning during navigation as a vision-based solution to avoid
+obstacles.
+
+``nvblox_nav2`` is designed to work with stereo cameras, which provide a
+depth image, and the corresponding pose uses GPU acceleration to compute
+3D reconstruction and 2D costmaps using
+`nvblox <https://github.com/nvidia-isaac/nvblox>`__.
+
+
+Above is a typical graph that uses ``nvblox_nav2``. The input color
+image corresponding to the depth image is processed with ``unet``, using
+the PeopleSemSegNet DNN model to estimate a segmentation mask for
+persons in the color image. Pose corresponding to the depth image is
+computed using ``visual_slam``. The resulting persons mask and pose is
+used with the color image and depth image to perform 3D scene
+reconstruction. The output costmap is provided through a cost map plugin
+into `Nav2 <https://github.com/ros-planning/navigation2>`__, with an
+optional colorized 3D reconstruction into a Rviz using the mesh
+visualization plugin.
+
+
+``nvblox_nav2`` builds the reconstructed map in the form of a TSDF
+(Truncated Signed Distance Function) stored in a 3D voxel grid. This
+approach is similar to 3D occupancy grid mapping approaches in which
+occupancy probabilities are stored at each voxel. However, TSDF-based
+approaches like nvblox store the (signed) distance to the closest
+surface at each voxel. The surface of the environment can then be
+extracted as the zero-level set of this voxelized function. Typically,
+TSDF-based reconstructions provide higher quality surface
+reconstructions.
+
+In addition to their use in reconstruction, distance fields are also
+useful for path planning because they provide an immediate means of
+checking whether potential future robot positions are in collision.
+
+People are common obstacles for mobile robots, and while part of a
+costmap, people should not be part of the 3D reconstruction. Planners
+that provide behavioral awareness by navigating differently depending on
+their proximity to people, benefit from a costmap for people. Person
+segmentation is computed using the color image, with the resulting mask
+applied to the depth image separating depth into scene depth and person
+depth images. The scene depth image is forwarded to TSDF mapping as
+explained above, the depth image for people is processed to an occupancy
+grid map.
+
+To relax the assumption that occupancy grid maps only capture static
+objects, Nvblox applies an occupancy decay step. At a fixed frequency,
+all voxel occupancy probabilities are decayed towards 0.5 over time.
+This means that the state of the map (occupied or free) becomes less
+certain after it has fallen out of the field of view, until it becomes
+unknown (0.5 occupancy probability).
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_nvblox.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+.. |repo_name| replace:: Isaac ROS Nvblox

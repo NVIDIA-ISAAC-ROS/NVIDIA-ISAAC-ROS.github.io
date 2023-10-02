@@ -1,0 +1,72 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+Isaac ROS Image Pipeline is a metapackage of functionality for image
+processing. Camera output often needs pre-processing to meet the input
+requirements of multiple different perception functions. This can
+include cropping, resizing, mirroring, correcting for lens distortion,
+and color space conversion. For stereo cameras, additional processing is
+required to produce disparity between left + right images and a point
+cloud for depth perception.
+
+This package is accelerated using the GPU and specialized hardware
+engines for image computation, replacing the CPU-based
+`image_pipeline metapackage <http://wiki.ros.org/image_pipeline>`__.
+Considerable effort has been made to ensure that replacing
+``image_pipeline`` with ``isaac_ros_image_pipeline`` on a Jetson or GPU
+is as painless a transition as possible.
+
+.. note::
+
+   Some image pre-processing functions use specialized
+   hardware engines, which offload the GPU to make more compute
+   available for other tasks.
+
+
+Rectify corrects for lens distortion from the received camera sensor
+message. The rectified image is resized to the input resolution for
+disparity, using a crop before resizing to maintain image aspect ratio.
+The image is color space converted to YUV from RGB using the luma
+channel (the Y in YUV) to compute disparity using
+`SGM <https://en.wikipedia.org/wiki/Semi-global_matching>`__. This
+common graph of nodes can be perfomed without the CPU processing a
+single pixel using ``isaac_ros_image_pipeline``; in comparison, using
+``image_pipeline``, the CPU would process each pixel ~3 times.
+
+The Isaac ROS Image Pipeline metapackage offloads the CPU from common
+image processing tasks so it can perform robotics functions best suited
+for the CPU.
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_image_pipeline.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+Updates
+-------
+
+========== =============================================================================================================================================================
+Date       Changes
+========== =============================================================================================================================================================
+2023-05-25 Improved stereo rectification
+2023-04-05 Source available GXF extensions
+2022-10-19 Updated OSS licensing
+2022-08-31 Image flip support and update to be compatible with JetPack 5.0.2
+2022-06-30 Migrated to NITROS based implementation
+2021-10-20 Migrated to `NVIDIA-ISAAC-ROS <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline>`__. Fixed handling of extrinsics in Rectify and Disparity nodes.
+2021-08-11 Initial release to `NVIDIA-AI-IOT <https://github.com/NVIDIA-AI-IOT/isaac_ros_image_pipeline>`__
+========== =============================================================================================================================================================
+
+.. |repo_name| replace:: Isaac ROS Image Pipeline

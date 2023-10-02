@@ -1,0 +1,46 @@
+====
+Bi3D
+====
+
+
+The `Bi3D DNN model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/bi3d_proximity_segmentation>`__
+performs stereo-depth estimation via binary classification, which is
+used for proximity segmentation. Proximity segmentation can be used to
+determine whether an obstacle is within a proximity field and to avoid
+collisions with obstacles during navigation.
+
+
+`Bi3D <https://arxiv.org/abs/2005.07274>`__ is used in a graph of nodes
+to provide proximity segmentation from a time-synchronized input left
+and right stereo image pair. Images to Bi3D need to be rectified and
+resized to the appropriate input resolution. The aspect ratio of the
+image needs to be maintained; hence, a crop and resize may be required
+to maintain the input aspect ratio. The graph for DNN encode, to DNN
+inference, to DNN decode is part of the Bi3D node. Inference is
+performed using TensorRT, as the Bi3D DNN model is designed to use
+optimizations supported by TensorRT.
+
+Compared to other stereo disparity functions, proximity segmentation
+provides a prediction of whether an obstacle is within a proximity
+field, as opposed to continuous depth, while simultaneously predicting
+freespace from the ground plane, which other functions typically do not
+provide. Also unlike other stereo disparity functions in Isaac ROS,
+proximity segmentation runs on NVIDIA DLA (deep learning accelerator),
+which is separate and independent from the GPU. For more information on
+disparity, refer to `this page <https://en.wikipedia.org/wiki/Binocular_disparity>`__.
+
+Examples
+~~~~~~~~~~~~~~~~~
+
+To continue your exploration, check out the following suggested
+examples:
+
+- :doc:`Zone detection for an autonomous mobile robot (AMR) </guides_and_concepts/stereo_disparity/bi3d/bi3d_example>` 
+- :doc:`Tutorial for Bi3D with Isaac Sim </guides_and_concepts/stereo_disparity/bi3d/tutorial_isaac_sim>`         
+- :doc:`Tutorial for Bi3D with Zed Camera </guides_and_concepts/stereo_disparity/bi3d/tutorial_zed>`              
+
+.. toctree::
+   :hidden:
+   :glob:
+
+   *

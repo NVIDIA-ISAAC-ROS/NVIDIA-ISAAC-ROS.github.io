@@ -1,0 +1,51 @@
+====
+ESS
+====
+
+`ESS <https://arxiv.org/pdf/1803.09719.pdf>`__ stands for Enhanced
+Semi-Supervised stereo disparity, developed by NVIDIA. The ESS DNN is
+used to predict the disparity for each pixel from stereo camera image
+pairs. This network has improvements over classic CV approaches that use
+epipolar geometry to compute disparity, as the DNN can learn to predict
+disparity in cases where epipolar geometry feature matching fails. The
+semi-supervised learning and stereo disparity matching makes the ESS DNN
+robust in environments unseen in the training datasets and with occluded
+objects. This DNN is optimized for and evaluated with color (RGB) global
+shutter stereo camera images, and accuracy may vary with monochrome
+stereo images used in analytic computer vision approaches to stereo
+disparity.
+
+The predicted
+`disparity <https://en.wikipedia.org/wiki/Binocular_disparity>`__ values
+represent the distance a point moves from one image to the other in a
+stereo image pair (a.k.a. the binocular image pair). The disparity is
+inversely proportional to the depth
+(i.e. ``disparity = focalLength x baseline / depth``). Given the `focal
+length <https://en.wikipedia.org/wiki/Focal_length>`__ and
+`baseline <https://en.wikipedia.org/wiki/Stereo_camera>`__ of the camera
+that generates a stereo image pair, the predicted disparity map from the
+``isaac_ros_ess`` package can be used to compute depth and generate a
+`point cloud <https://en.wikipedia.org/wiki/Point_cloud>`__.
+
+Examples
+~~~~~~~~~~~~~~~~~~~~~
+
+To continue exploring the DNN Stereo Disparity package, check out the
+following suggested examples:
+
+-  :doc:`Generating disparity maps from a stereo pair of image files </guides_and_concepts/stereo_disparity/ess/visualize_image>`
+-  :doc:`Tutorial with RealSense and isaac_ros_ess </guides_and_concepts/stereo_disparity/ess/tutorial_realsense>`
+-  :doc:`Tutorial with Isaac Sim </guides_and_concepts/stereo_disparity/ess/tutorial_isaac_sim>`
+
+Try NITROS-Accelerated Graph with Argus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have an Argus-compatible camera, you can launch the
+NITROS-accelerated graph by following the
+:doc:`tutorial </guides_and_concepts/stereo_disparity/ess/tutorial_nitros_graph>`.
+
+.. toctree::
+   :hidden:
+   :glob:
+
+   *

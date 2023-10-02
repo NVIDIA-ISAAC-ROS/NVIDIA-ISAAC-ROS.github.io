@@ -1,0 +1,184 @@
+==============
+|package_name|
+==============
+
+Quickstart
+----------
+
+1.  Set up your development environment by following the instructions
+    `here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md>`__.
+
+2.  Clone this repository and its dependencies under
+    ``~/workspaces/isaac_ros-dev/src``.
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src && 
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common && 
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros && 
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline &&
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_proximity_segmentation &&
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_freespace_segmentation
+
+3.  Pull down a rosbag of sample data:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_proximity_segmentation && 
+       git lfs pull -X "" -I "resources/rosbags/bi3dnode_rosbag"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common &&
+       ./scripts/run_dev.sh
+
+5.  Download model files for Bi3D (refer to the `Model
+    Preparation <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_proximity_segmentation/blob/main/README.md#model-preparation>`__
+    section for more information):
+
+    .. code:: bash
+
+       mkdir -p /tmp/models/bi3d &&
+       cd /tmp/models/bi3d &&
+       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/featnet.onnx' &&
+       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/segnet.onnx'
+
+6.  Convert the ``.onnx`` model files to TensorRT engine plan files
+    (refer to the `Model
+    Preparation <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_proximity_segmentation/blob/main/README.md#model-preparation>`__
+    section for more information):
+
+    If using Jetson (Generate engine plans with DLA support enabled):
+
+    .. code:: bash
+
+       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       --onnx=/tmp/models/bi3d/featnet.onnx \
+       --int8 --useDLACore=0 --allowGPUFallback &&
+       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       --onnx=/tmp/models/bi3d/segnet.onnx \
+       --int8 --useDLACore=0 --allowGPUFallback
+
+    If using x86_64:
+
+    .. code:: bash
+
+       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       --onnx=/tmp/models/bi3d/featnet.onnx --int8 &&
+       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       --onnx=/tmp/models/bi3d/segnet.onnx --int8
+
+    ..
+
+       .. note::
+
+       The engine plans generated using the x86_64 commands
+       will also work on Jetson, but performance will be reduced.
+
+7.  Build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev &&
+       colcon build --symlink-install &&
+       source install/setup.bash
+
+8.  (Optional) Run tests to verify complete and correct installation:
+
+    .. code:: bash
+
+       colcon test --executor sequential
+
+9.  Run the launch file to spin up a demo of this package:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_bi3d_freespace isaac_ros_bi3d_freespace.launch.py featnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       segnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       max_disparity_values:=10
+
+10. Open a **second** terminal inside the Docker container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+11. Play the rosbag file to simulate image streams from the cameras:
+
+    .. code:: bash
+
+       ros2 bag play --loop src/isaac_ros_proximity_segmentation/resources/rosbags/bi3dnode_rosbag
+
+12. Open a **third** terminal inside the Docker container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+13. Visualize the occupancy grid in RViz.
+
+    Start RViz:
+
+    .. code:: bash
+
+       rviz2
+
+    In the left pane, change **Fixed Frame** to ``base_link``.
+
+    In the left pane, click the **Add** button, then select **By topic**
+    followed by **Map** to add the occupancy grid.
+
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_bi3d_freespace isaac_ros_freespace_segmentation.launch.py base_link_frame:=<"name of base link"> camera_frame:=<"name of camera frame"> f_x:=<"focal length in pixels in x dimension"> f_y:=<"focal length in pixels in y dimension"> grid_width:=<"desired grid width"> grid_height:=<"desired grid height"> grid_resolution:=<"desired grid resolution">
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+=================== =============== ============= ===============================================================
+ROS Parameter       Type            Default       Description
+=================== =============== ============= ===============================================================
+``base_link_frame`` ``std::string`` ``base_link`` The name of the ``tf2`` frame attached to the robot base
+``camera_frame``    ``std::string`` ``camera``    The name of the ``tf2`` frame attached to the camera
+``f_x``             ``double``      ``0.0``       The focal length in pixels in x dimension
+``f_y``             ``double``      ``0.0``       The focal length in pixels in y dimension
+``grid_width``      ``int``         ``100``       The width of the output occupancy grid, in number of cells
+``grid_height``     ``int``         ``100``       The height of the output occupancy grid, in number of cells
+``grid_resolution`` ``double``      ``0.01``      The resolution of the output occupancy grid, in meters per cell
+=================== =============== ============= ===============================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+================================== ========================================================================================================================= ============================================================================
+ROS Topic                          Interface                                                                                                                 Description
+================================== ========================================================================================================================= ============================================================================
+``freespace_segmentation/mask_in`` `stereo_msgs/DisparityImage <https://github.com/ros2/common_interfaces/blob/humble/stereo_msgs/msg/DisparityImage.msg>`__ The input disparity image, with pixels corresponding to ground labelled as 0
+================================== ========================================================================================================================= ============================================================================
+
+..
+
+   **Limitation**: For all input images, both the height and width must be an even number of pixels.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+========================================= ================================================================================================================= =========================================================
+ROS Topic                                 Interface                                                                                                         Description
+========================================= ================================================================================================================= =========================================================
+``freespace_segmentation/occupancy_grid`` `nav_msgs/OccupancyGrid <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/OccupancyGrid.msg>`__ The output occupancy grid, with cells marked as 0 if free
+========================================= ================================================================================================================= =========================================================
+
+
+.. |package_name| replace:: ``isaac_ros_bi3d_freespace``

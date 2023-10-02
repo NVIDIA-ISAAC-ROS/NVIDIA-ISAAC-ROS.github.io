@@ -1,0 +1,268 @@
+==============
+|package_name|
+==============
+
+Quickstart
+----------
+
+1.  Set up your development environment by following the instructions
+    `here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md>`__.
+
+2.  Clone this repository and its dependencies under
+    ``~/workspaces/isaac_ros-dev/src``.
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src && 
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common && 
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros && 
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline &&
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_proximity_segmentation
+
+3.  Pull down a rosbag of sample data:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_proximity_segmentation && 
+       git lfs pull -X "" -I "resources/rosbags/bi3dnode_rosbag"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common &&
+       ./scripts/run_dev.sh
+
+5.  Download model files for Bi3D (refer to the `Model Preparation`_ section for more information):
+
+    .. code:: bash
+
+       mkdir -p /tmp/models/bi3d &&
+       cd /tmp/models/bi3d &&
+       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/featnet.onnx' &&
+       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/segnet.onnx'
+
+6.  Convert the ``.onnx`` model files to TensorRT engine plan files
+    (refer to the `Model Preparation`_ section for
+    more information):
+
+    If using Jetson (Generate engine plans with DLA support enabled):
+
+    .. code:: bash
+
+       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       --onnx=/tmp/models/bi3d/featnet.onnx \
+       --int8 --useDLACore=0 --allowGPUFallback &&
+       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       --onnx=/tmp/models/bi3d/segnet.onnx \
+       --int8 --useDLACore=0 --allowGPUFallback
+
+    If using x86_64:
+
+    .. code:: bash
+
+       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       --onnx=/tmp/models/bi3d/featnet.onnx --int8 &&
+       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       --onnx=/tmp/models/bi3d/segnet.onnx --int8
+
+    ..
+
+    .. note::
+
+       The engine plans generated using the x86_64 commands
+       will also work on Jetson, but performance will be reduced.
+
+7.  Build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev &&
+       colcon build --symlink-install &&
+       source install/setup.bash
+
+8.  (Optional) Run tests to verify complete and correct installation:
+
+    .. code:: bash
+
+       colcon test --executor sequential
+
+9.  Run the launch file to spin up a demo of this package:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_bi3d isaac_ros_bi3d.launch.py featnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       segnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       max_disparity_values:=10
+
+10. Open a **second** terminal inside the Docker container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+11. Play the rosbag file to simulate image streams from the cameras:
+
+    .. code:: bash
+
+       ros2 bag play --loop src/isaac_ros_proximity_segmentation/resources/rosbags/bi3dnode_rosbag
+
+12. Open two **new** terminals inside the Docker container for
+    visualization:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh && source install/setup.bash
+
+13. Visualize the output.
+
+    Start disparity visualizer:
+
+    .. code:: bash
+
+       ros2 run isaac_ros_bi3d isaac_ros_bi3d_visualizer.py --max_disparity_value 10
+
+    Start image visualizer:
+
+    .. code:: bash
+
+       ros2 run image_view image_view --ros-args -r image:=rgb_left
+
+Model Preparation
+-----------------
+
+Download Pre-trained Models (.onnx) from NGC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following steps show how to download pretrained Bi3D DNN inference
+models.
+
+1. The following model files must be downloaded to perform Bi3D
+   inference. From **File Browser** on the **Bi3D**
+   `page <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/bi3d_proximity_segmentation>`__,
+   select the following ``.onnx`` model files in the **FILE** list and
+   copy the ``wget`` command by clicking **…** in the **ACTIONS**
+   column:
+
+   -  ``featnet.onnx``
+   -  ``segnet.onnx``
+
+2. Run each of the copied commands in a terminal to download the ONNX
+   model file, as shown in the example below:
+
+   .. code:: bash
+
+      wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/featnet.onnx' &&
+      wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/segnet.onnx'
+
+-  Bi3D Featnet is a network that extracts features from stereo images.
+
+-  Bi3D Segnet is an encoder-decoder segmentation network that generates
+   a binary segmentation confidence map.
+
+Convert the Pre-trained Models (.onnx) to TensorRT Engine Plans
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``trtexec`` is used to convert pre-trained models (``.onnx``) to the
+TensorRT engine plan and is included in the Isaac ROS docker container
+under ``/usr/src/tensorrt/bin/trtexec``.
+
+   **Tip**: Use ``/usr/src/tensorrt/bin/trtexec -h`` for more
+   information on using the tool.
+
+Generating Engine Plans for Jetson
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: bash
+
+   /usr/src/tensorrt/bin/trtexec --onnx=<PATH_TO_ONNX_MODEL_FILE> --saveEngine=<PATH_TO_WHERE_TO_SAVE_ENGINE_PLAN> --useDLACore=<SET_CORE_TO_ENABLE_DLA> --int8 --allowGPUFallback
+
+Generating Engine Plans for x86_64
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: bash
+
+   /usr/src/tensorrt/bin/trtexec --onnx=<PATH_TO_ONNX_MODEL_FILE> --saveEngine=<PATH_TO_WHERE_TO_SAVE_ENGINE_PLAN> --int8
+
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_bi3d isaac_ros_bi3d.launch.py featnet_engine_file_path:=<PATH_TO_FEATNET_ENGINE> \
+   segnet_engine_file_path:=<PATH_TO_SEGNET_ENGINE \
+   max_disparity_values:=<MAX_NUMBER_OF_DISPARITY_VALUES_USED>
+
+Interpreting the Output
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``isaas_ros_bi3d`` package outputs a disparity image given a list of
+disparity values (planes). Each pixel of the output image that is not
+freespace is set to the value of the closest disparity plane (largest
+disparity value) that the pixel is deemed to be in front of. Each pixel
+that is predicted to be freespace is set to 0 (the furthest
+disparity/smallest disparity value). Freespace is defined as the region
+from the bottom of the image, up to the first pixel above which is not
+the ground plane. To find the boundary between freespace and
+not-freespace, one may start from the bottom of the image and, per
+column, find the first pixel that is not the ground plane. In the below
+example, the freespace of the image is shown in black:
+
+
+
+The prediction of freespace eliminates the need for ground plane removal
+in the output image as a post-processing step, which is often applied to
+other stereo disparity functions. The output of ``isaas_ros_bi3d`` can
+be used to check if any pixels within the image breach a given proximity
+field by checking the values of all pixels. If a pixel value (disparity
+value) is larger than the disparity plane defining the proximity field,
+then it has breached that field. If a pixel does not breach any of the
+provided disparty planes, it is assigned a value of 0.
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+============================ ======================== ============================ =========================================================================================================================================================================================================================================================================================================================
+ROS Parameter                Type                     Default                      Description
+============================ ======================== ============================ =========================================================================================================================================================================================================================================================================================================================
+``featnet_engine_file_path`` ``std::string``          ``'path_to_featnet_engine'`` The path to the Bi3D Featnet engine plan
+``segnet_engine_file_path``  ``std::string``          ``'path_to_segnet_engine'``  The path to the Bi3D Segnet engine plan
+``max_disparity_values``     ``int64_t``              ``64``                       The maximum number of disparity values used for Bi3D inference. Isaac ROS Proximity Segmentation supports up to a theoretical maximum of 64 disparity values during inference. However, the maximum length of disparities that a user may run in practice is dependent on the user’s hardware and availability of memory.
+``disparity_values``         ``std::vector<int64_t>`` ``{10, 20, 30, 40, 50, 60}`` The specific threshold disparity values used for Bi3D inference. The number of disparity values must not exceed the value set in the ``max_disparity_values`` ROS parameter.
+============================ ======================== ============================ =========================================================================================================================================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+========================== ================================================================================================================= ===========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+ROS Topic                  Interface                                                                                                         Description
+========================== ================================================================================================================= ===========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+``left_image_bi3d``        `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           1. The message must be a ROS ``sensor_msgs/Image`` of size **W=960, H=576** with ``rgb8`` image encoding. 2. There should only be a single publisher node publishing to ``left_image_bi3d``. Timing behaviour with multiple publishers is not guaranteed by Bi3DNode and inference may not be performed on correct image pairs. Bi3D will process input pairs on a first available basis. Use a separate instance of Bi3DNode for each unique scene (publisher) that you wish to process.
+``right_image_bi3d``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           1. The message must be a ROS ``sensor_msgs/Image`` of size **W=960, H=576** with ``rgb8`` image encoding. 2. There should only be a single publisher node publishing to ``right_image_bi3d``. Timing behaviour with multiple publishers is not guaranteed by Bi3DNode and inference may not be performed on correct image pairs. Bi3D will process inputs pairs on a first available basis. Use a separate instance of Bi3DNode for each unique scene (publisher) that you wish to process.
+``left_camera_info_bi3d``  `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ Focal length populated in the Bi3D output disparity is extracted from this topic.
+``right_camera_info_bi3d`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ Baeline populated in the Bi3D output disparity is extracted from this topic.
+========================== ================================================================================================================= ===========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+..
+
+   Note: The images on input topics (``left_image_bi3d`` and ``right_image_bi3d``) should be a color image in ``rgb8`` format.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+=================================== ================================================================================================================================================================================================== ========================================================================================================================================================================================================================================================================================================
+ROS Topic                           Interface                                                                                                                                                                                          Description
+=================================== ================================================================================================================================================================================================== ========================================================================================================================================================================================================================================================================================================
+``bi3d_node/bi3d_output``           `stereo_msgs/DisparityImage <https://github.com/ros2/common_interfaces/blob/humble/stereo_msgs/msg/DisparityImage.msg>`__                                                                          The proximity segmentation of Bi3D given as a disparity image. For pixels not deemed freespace, their value is set to the closest (largest) disparity plane that is breached. A pixel value is set to 0 if it doesn’t breach any disparity plane or if it is freespace. Output Resolution: 960x576 (WxH)
+``bi3d_node/bi3d_disparity_values`` `isaac_ros_bi3d_interfaces/Bi3DInferenceParametersArray <https://gitlab-master.nvidia.com/isaac_ros/isaac_ros_common/-/blob/dev/isaac_ros_bi3d_interfaces/msg/Bi3DInferenceParametersArray.msg>`__ The disparity values used for Bi3D inference. The timestamp is matched to the timestamp in the correpsonding output image from ``bi3d_node/bi3d_output``
+=================================== ================================================================================================================================================================================================== ========================================================================================================================================================================================================================================================================================================
+
+
+
+.. |package_name| replace:: ``isaac_ros_bi3d``

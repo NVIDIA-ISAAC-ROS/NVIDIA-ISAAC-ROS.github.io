@@ -1,0 +1,156 @@
+==============
+|package_name|
+==============
+
+Quickstart
+----------
+
+.. note::
+
+   The quickstart helps with getting raw inference (tensor)
+   results from the two nodes. To use the packages in a useful context
+   and get meaningful results from the package, please refer
+   `here`__.
+
+1.  Set up your development environment by following the instructions
+    `here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md>`__.
+2.  Clone this repository and its dependencies under
+    ``~/workspaces/isaac_ros-dev/src``.
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_inference
+
+3.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+4.  For this example, we will use ``PeopleSemSegNet ShuffleSeg``.
+    Download the ETLT file and the ``int8`` inference mode cache file:
+
+    .. code:: bash
+
+       mkdir -p /tmp/models/peoplesemsegnet_shuffleseg/1 && \
+         cd /tmp/models/peoplesemsegnet_shuffleseg && \
+         wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_etlt.etlt && \
+         wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_cache.txt
+
+5.  Convert the ETLT file to a TensorRT plan file:
+
+    .. code:: bash
+
+       /opt/nvidia/tao/tao-converter -k tlt_encode -d 3,544,960 -p input_2:0,1x3x544x960,1x3x544x960,1x3x544x960 -t int8 -c peoplesemsegnet_shuffleseg_cache.txt -e /tmp/models/peoplesemsegnet_shuffleseg/1/model.plan -o argmax_1 peoplesemsegnet_shuffleseg_etlt.etlt
+
+6.  Create a file named
+    ``/tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt`` by copying
+    the sample Triton config file:
+
+    .. code:: bash
+
+       cp /workspaces/isaac_ros-dev/src/isaac_ros_dnn_inference/resources/peoplesemsegnet_shuffleseg_config.pbtxt /tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt
+
+7.  Inside the container, build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+8.  (Optional) Run tests to verify complete and correct installation:
+
+    .. code:: bash
+
+       colcon test --executor sequential
+
+9.  Run the following launch files to spin up a demo of this package:
+    Launch Triton:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_triton isaac_ros_triton.launch.py model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1']
+
+    In **another** terminal, enter the Docker container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then, run a test node that sends tensors to Triton:
+
+    .. code:: bash
+
+       source install/setup.bash && \
+       ros2 run isaac_ros_dnn_inference_test run_test_publisher --ros-args -p dimensions:='[1, 3, 544, 960]'
+
+10. Visualize and validate the output of the package:
+
+    In a **third** terminal, enter the Docker container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then echo the inference result:
+
+    .. code:: bash
+
+       source install/setup.bash && \
+       ros2 topic echo /tensor_sub
+
+    The expected result should look like this:
+
+    .. code:: bash
+
+       header:
+         stamp:
+           sec: 0
+           nanosec: 0
+         frame_id: ''
+       tensors:
+       - name: output_tensor
+         shape:
+           rank: 4
+           dims:
+           - 1
+           - 544
+           - 960
+           - 1
+         data_type: 5
+         strides:
+         - 2088960
+         - 3840
+         - 4
+         - 4
+         data:
+         [...]
+         
+API
+----
+
+.. note::
+
+    NOTE(jaiveers): Here is where the package-specific API would go. 
+
+.. |package_name| replace:: ``isaac_ros_triton``

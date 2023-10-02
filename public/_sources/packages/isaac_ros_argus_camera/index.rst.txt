@@ -1,0 +1,92 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+The Isaac ROS Argus Camera module contains an ROS 2 package for sensor
+processing to output images. Image sensors are connected on CSI and GMSL
+hardware interfaces to Jetson platforms. This package uses dedicated
+hardware engines to accelerate image processing. Output images are used
+in graphs of nodes for AI and CV perception packages, image compression
+for capture to disk by event recorders, and live-stream visuals for
+remote robot teleoperation.
+
+Isaac ROS Argus Camera provides with several sensor capture and
+processing features, including AWB (auto-white-balance), AE
+(auto-exposure), and noise reduction. Leveraging hardware engines in
+Jetson, Argus provides multi-camera frame synchronization, with very
+high precision frame acquisition timestamping and jitter less than
+100us.
+
+
+In the example graph of nodes above, the Argus Camera module processes
+sensor image data from the camera for input to vision-based perception
+graphs, including DNN stereo disparity, AprilTag, VSLAM, and H.264
+encode. Each of the nodes in green is GPU accelerated for a
+high-performance compute graph from Argus camera to vision-based
+perception functions.
+
+
+Argus Camera uses dedicated hardware engines to access the full memory
+bandwidth in Jetson. Raw camera images are delivered via CSI or GMSL
+interfaces directly to the GPU accelerated memory. The ISP hardware
+processes the raw image directly into a GPU accelerated output image
+topic.
+
+Widely available USB and Ethernet plug-in cameras can be used for
+robotics applications, but there is performance cost for this
+convenience. The I/O interface (USB or Ethernet) places the image from
+the camera directly into CPU-accessible memory. The camera driver makes
+a copy from the I/O interface using the CPU to make the image available
+to other applications. The Camera driver wrapper node in ROS performs
+another memcpy with the CPU from the driver to publish the image in ROS.
+Before a USB or Ethernet image arrives as a published topic, two CPU
+memcpy actions have been perfromed for every pixel. In contrast, the
+Argus Camera module processes sensor data into output image topics in
+ROS without the CPU touching a single pixel in the image.
+
+.. note::
+
+   Argus Camera outputs sensor_msgs/Image at the sensor data
+   rate, subject to performance capabilites of the Jetson platform(s).
+   For example, a `Hawk
+   camera <https://www.leopardimaging.com/li-ar0234cs-stereo-gmsl2-hawk/>`__
+   configured for 30fps (frames per second) stereo 1920x1080 will output
+   time-synchronized left and right camera frames sensor_msgs/Image at
+   30fps.
+.. note::
+
+   Argus Camera is not supported on x86_64 platforms
+   with discrete GPUs that do not have a CSI or GMSL interface to
+   connect to a camera.
+.. note::
+
+   See
+   `Argus <https://docs.nvidia.com/jetson/l4t-multimedia/group__LibargusAPI.html>`__
+   for more information on camera processing.
+   
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+
+Updates
+-------
+
+========== ==========================================
+Date       Changes
+========== ==========================================
+2023-04-05 Update to be compatible with JetPack 5.1.1
+2022-10-19 Updated OSS licensing
+2022-08-31 Update to be compatible with JetPack 5.0.2
+2022-06-30 Support NITROS acceleration
+2022-03-18 Support CameraInfo from URL
+2021-10-20 Initial release
+========== ==========================================
+    
+.. |repo_name| replace:: Isaac ROS Argus Camera

@@ -1,0 +1,223 @@
+==============
+|package_name|
+==============
+
+Quickstart
+----------
+
+1.  Set up your development environment by following the instructions
+    `here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/docs/dev-env-setup.md>`__.
+
+2.  Clone this repository and its dependencies under
+    ``~/workspaces/isaac_ros-dev/src``:
+
+    .. code:: bash
+
+       mkdir -p ~/workspaces/isaac_ros-dev/src && cd ~/workspaces/isaac_ros-dev/src
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline
+
+    .. code:: bash
+
+       git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_stereo_disparity
+
+3.  Pull down a ROS Bag of sample data:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_disparity && \
+       git lfs pull -X "" -I "resources/rosbags/ess_rosbag"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && ./scripts/run_dev.sh
+
+5.  Download the pre-trained ESS model from the `ESS model
+    page <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`__:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_disparity/resources && \
+       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/dnn_stereo_disparity/versions/1.1.0/files/ess.etlt'
+
+6.  Convert the encrypted model (``.etlt``) to a TensorRT engine plan:
+
+    .. code:: bash
+
+       /opt/nvidia/tao/tao-converter -k ess -t fp16 -e /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_disparity/resources/ess.engine -o output_left /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_disparity/resources/ess.etlt
+
+7.  Build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build && \
+         source install/setup.bash
+
+    .. note::
+
+    We recommend rebuilding the package each time the source
+    files are edited. Before rebuilding, first clean the workspace by
+    running ``rm -r build install log``.
+
+8.  (Optional) Run tests to verify complete and correct installation:
+
+    .. code:: bash
+
+       colcon test --executor sequential
+
+9.  Launch the ESS Disparity Node:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_ess isaac_ros_ess.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_disparity/resources/ess.engine
+
+10. Open a **second terminal** and attach to the container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh && \
+         source install/setup.bash
+
+11. In the **second terminal**, visualize and validate the output of the
+    package:
+
+    .. code:: bash
+
+       ros2 run isaac_ros_ess isaac_ros_ess_visualizer.py --enable_rosbag
+
+Troubleshooting
+---------------
+
+Package not found while launching the visualizer script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Symptom
+^^^^^^^
+
+.. code:: bash
+
+   $ ros2 run isaac_ros_ess isaac_ros_ess_visualizer.py
+   Package 'isaac_ros_ess' not found
+
+Solution
+^^^^^^^^
+
+Use the ``colcon build --packages-up-to isaac_ros_ess`` command to build
+``isaac_ros_ess``; do not use the ``--symlink-install`` option. Run
+``source install/setup.bash`` after the build.
+
+Problem reserving CacheChange in reader
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Symptom
+^^^^^^^
+
+When using a ROS bag as input, ``isaac_ros_ess`` throws an error if the
+input topics are published too fast:
+
+.. code:: bash
+
+   [component_container-1] 2022-06-24 09:04:43.584 [RTPS_MSG_IN Error] (ID:281473268431152) Problem reserving CacheChange in reader: 01.0f.cd.10.ab.f2.65.b6.01.00.00.00|0.0.20.4 -> Function processDataMsg
+
+
+Solution
+^^^^^^^^
+
+Make sure that the ROS bag has a reasonable size and publish rate.
+
+API
+----
+
+Overview
+^^^^^^^^
+
+The ``isaac_ros_ess`` package offers functionality to generate a stereo
+disparity map from stereo images using a trained ESS model. Given a pair
+of stereo input images, the package generates a continuous disparity
+image for the left input image.
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_ess isaac_ros_ess.launch.py engine_file_path:=<your ESS engine plan absolute path>
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+==================== ========== ============== ===========================================================================================================================================================================================================
+ROS Parameter        Type       Default        Description
+==================== ========== ============== ===========================================================================================================================================================================================================
+``engine_file_path`` ``string`` N/A - Required The absolute path to the ESS engine file.
+``image_type``       ``string`` ``"RGB_U8"``.  The input image encoding type. Supports ``"RGB_U8"`` and ``"BGR_U8"``. Note that if this parameter is not specified and there is an upstream Isaac ROS NITROS node, the type will be decided automatically.
+==================== ========== ============== ===========================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+===================== ================================================================================================================= =================================
+ROS Topic             Interface                                                                                                         Description
+===================== ================================================================================================================= =================================
+``left/image_rect``   `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           The left image of a stereo pair.
+``right/image_rect``  `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           The right image of a stereo pair.
+``left/camera_info``  `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ The left camera model.
+``right/camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ The right camera model.
+===================== ================================================================================================================= =================================
+
+..
+
+   Note: The images on input topics (``left/image_rect`` and ``right/image_rect``) should be a color image either in ``rgb8`` or ``bgr8`` format.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============= ========================================================================================================================= ===========================================
+ROS Topic     Interface                                                                                                                 Description
+============= ========================================================================================================================= ===========================================
+``disparity`` `stereo_msgs/DisparityImage <https://github.com/ros2/common_interfaces/blob/humble/stereo_msgs/msg/DisparityImage.msg>`__ The continuous stereo disparity estimation.
+============= ========================================================================================================================= ===========================================
+
+Input Restrictions
+^^^^^^^^^^^^^^^^^^
+
+1. The input left and right images must have the **same dimension and
+   resolution**, and the resolution must be **no larger than
+   ``1920x1200``**.
+
+2. Each input pair (``left/image_rect``, ``right/image_rect``,
+   ``left/camera_info`` and ``right/camera_info``) should have the
+   **same timestamp**; otherwise, the synchronizing module inside the
+   ESS Disparity Node will drop the input with smaller timestamps.
+
+Output Interpretations
+^^^^^^^^^^^^^^^^^^^^^^
+
+1. The ``isaas_ros_ess`` package outputs a disparity image with the same
+   resolution as the input stereo pairs. The input images are rescaled
+   to the ESS model input size before inferencing and the output
+   prediction is rescaled back before publishing. To alter this
+   behavior, use input images with the model-native resolution:
+   ``W=960, H=576``.
+
+2. The left and right ``CameraInfo`` are used to composite a
+   ``stereo_msgs/DisparityImage``. If you only care about the disparity
+   image, and don’t need the baseline and focal length information, you
+   can pass dummy camera messages.
+
+.. |package_name| replace:: ``isaac_ros_ess``

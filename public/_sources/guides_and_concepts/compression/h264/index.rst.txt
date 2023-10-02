@@ -1,0 +1,27 @@
+=====================
+H264 Compression
+=====================
+
+Image compression reduces the data footprint of images when written to storage or transmitted between computers. A 1080p camera at 30fps produces 177MB/s of data; image compression reduces this by approximately 10 times to 17MB/s of data, reducing the throughput needed to send this to another computer or write out to storage; a one minute 1080p camera recording is reduced from ~10GB to ~1GB. This compression is provided by dedicated hardware acceleration (NvEnc) separate from other hardware engines such as the GPU.
+
+A common use case for image compression during the development of robots is to capture camera images to storage. This captured data is processed offline from the robot to produce training datasets for AI models, test datasets for perception functions, and test data for open-loop re-simulation of software in development with real data. The compression parameters are tuned to minimize visual quality reduction from lossy compression for AI model and perception function development. Compression reduces the amount of data written to storage, the time required to offload the recording, and footprint of the data at rest in a data lake.
+
+Compression can be used with event data recorders to capture camera images to storage when an event of interest occurs, often due to failures on the robot. This provides visual information to assist in the debugging of the event or to improve perception and robot functions.
+
+`H.264 <https://en.wikipedia.org/wiki/Advanced_Video_Coding>`__ is an efficient and popular compression algorithm with broad support across many platforms. The output of the ``isaac_ros_h264_encoder`` package on Jetson can then be decoded with hardware acceleration using the ``isaac_ros_h264_decoder`` on Jetson and x86_64 systems, or by third-party H.264 decoder packages on non-NVIDIA platforms.
+
+Examples
+~~~~~~~~~~~~~~~~~
+
+To continue exploring the Compression packages, check out the following
+suggested examples:
+
+-  :doc:`Tutorial with RealSense and H.264 data recording </guides_and_concepts/compression/h264/tutorial_realsense_encoder>`
+-  :doc:`Tutorial with Argus-compatible camera and H.264 data recording </guides_and_concepts/compression/h264/tutorial_nitros_graph>`
+-  :doc:`Tutorial with rosbag playback and software-based decoder </guides_and_concepts/compression/h264/tutorial_compatible_decode>`
+
+.. toctree::
+   :hidden:
+   :glob:
+
+   *

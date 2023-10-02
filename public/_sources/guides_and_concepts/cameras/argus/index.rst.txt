@@ -1,0 +1,23 @@
+=====
+Argus
+=====
+
+Argus Camera uses dedicated hardware engines to access the full memory bandwidth in Jetson. Raw camera images are delivered via CSI or GMSL interfaces directly to the GPU accelerated memory. The ISP hardware processes the raw image directly into a GPU accelerated output image topic.
+
+Widely available USB and Ethernet plug-in cameras can be used for robotics applications, but there is performance cost for this convenience. The I/O interface (USB or Ethernet) places the image from the camera directly into CPU-accessible memory. The camera driver makes a copy from the I/O interface using the CPU to make the image available to other applications. The Camera driver wrapper node in ROS performs another memcpy with the CPU from the driver to publish the image in ROS. Before a USB or Ethernet image arrives as a published topic, two CPU memcpy actions have been perfromed for every pixel. In contrast, the Argus Camera module processes sensor data into output image topics in ROS without the CPU touching a single pixel in the image.
+
+Reference Cameras
+~~~~~~~~~~~~~~~~~
+
+NVIDIA has worked with our camera partners to provide the modules listed
+below which are compatible with the Isaac ROS Argus Camera package.
+
+====================== ========= ==================== ======= ======= ========================================================================================================================================================================
+Camera Type            Connector Resolution/FrameRate H/V FOV Shutter Supplier, HW Part, Link to purchase
+====================== ========= ==================== ======= ======= ========================================================================================================================================================================
+Stereo Camera/Color    GMSL      1920x1200@60fps      121/73  Global  `LI-AR0234CS-STEREO-GMSL2 <https://www.leopardimaging.com/product/autonomous-camera/maxim-gmsl2-cameras/li-ar0234cs-stereo-gmsl2/li-ar0234cs-stereo-gmsl2/>`__
+Fisheye Camera/Color   GMSL      1920x1200@60fps      202/127 Global  `LI-AR0234CS-GMSL2-OWL <https://www.leopardimaging.com/product/autonomous-camera/maxim-gmsl2-cameras/li-ar0234cs-gmsl2-owl/li-ar0234cs-gmsl2-owl/>`__
+Monocular Camera/Color CSI       4056x3040@60fps      140/103 Global  `IMX477 -140FOH <https://www.leopardimaging.com/product/csi-2-mipi-modules-i-pex/csi-2-mipi-modules/rolling-shutter-mipi-cameras/12-33mp-imx477/li-imx477-mipi-140h/>`__
+Monocular Camera/Color CSI       3264x2464@21fps      90/90   Rolling `LI-NANO-CB-IMX219-090H <https://www.leopardimaging.com/product/nvidia-jetson-cameras/nvidia_nano_mipi_camera_kits/li-nano-cb-imx219-x/li-nano-cb-imx219-090h/>`__
+====================== ========= ==================== ======= ======= ========================================================================================================================================================================
+

@@ -1,0 +1,78 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+Isaac ROS AprilTag contains a ROS 2 package for detection of
+`AprilTags <https://april.eecs.umich.edu/software/apriltag#:~:text=AprilTag%20is%20a%20visual%20fiducial,tags%20relative%20to%20the%20camera.>`__,
+a type of fiducial marker that provides a point of reference or measure.
+AprilTag detections are GPU-accelerated for high performance.
+
+
+A common graph of nodes connects from an input camera through rectify
+and resize to AprilTag. Rectify warps the input camera image into a
+rectified, undistorted output image; this node may not be necessary if
+the camera driver provides rectified camera images. Resize is often used
+to downscale higher resolution cameras into the desired resolution for
+AprilTags if needed. The input resolution to AprilTag is selected by the
+required detection distance for the application, as a minimum number of
+pixels are required to perform an AprilTag detection and classification.
+For example, an 8mp input image of 3840×2160 may be much larger than
+necessary and a 4:1 downscale to 1920x1080 could make more efficienct
+use of compute resources and satisfy the required detection distance of
+the application. Each of the green nodes in the above diagram is GPU
+accelerated, allowing for a high-performance compute graph from Argus
+Camera to ApriTag. For USB and Ethernet cameras, the graph is
+accelerated from Rectify through AprilTag
+
+
+As illustrated above, detections are provided in an output array for the
+number of AprilTag detections in the input image. Each entry in the
+array contains the ID (two-dimensional bar code) for the AprilTag, the
+four corners ((x0, y0), (x1, y1), (x2, y2), (x3, y3)) and center (x, y)
+of the input image, and the pose of the AprilTag.
+
+.. note::
+
+   This package is a GPU-accelerated drop-in replacement for
+   the `CPU version of ROS
+   Apriltag <https://github.com/christianrauch/apriltag_ros>`__
+.. note::
+
+   For more information, including the paper and the reference
+   CPU implementation, refer to the `AprilTag
+   page <https://april.eecs.umich.edu/software/apriltag.html>`__
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_apriltag.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+
+Updates
+-------
+
+========== ==========================================================================================
+Date       Changes
+========== ==========================================================================================
+2023-05-25 Performance improvements
+2023-04-05 Source available GXF extensions
+2022-10-19 Updated OSS licensing
+2022-08-31 Update to be compatible with JetPack 5.0.2
+2022-06-30 Update to use NITROS for improved performance
+2021-11-15 Isaac Sim HIL documentation update
+2021-11-15 Added launch file to work with Isaac Sim
+2021-10-20 Migrated to `NVIDIA-ISAAC-ROS <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_apriltag>`__
+2021-08-11 Initial release to `NVIDIA-AI-IOT <https://github.com/NVIDIA-AI-IOT/isaac_ros_apriltag>`__
+========== ==========================================================================================
+    
+.. |repo_name| replace:: Isaac ROS AprilTag

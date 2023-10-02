@@ -1,0 +1,103 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+This repository provides a high-performance, best-in-class ROS 2 package
+for VSLAM (visual simultaneous localization and mapping). This package
+uses a stereo camera with an IMU to estimate odometry as an input to
+navigation. It is GPU accelerated to provide real-time, low-latency
+results in a robotics application. VSLAM provides an additional odometry
+source for mobile robots (ground based) and can be the primary odometry
+source for drones.
+
+VSLAM provides a method for visually estimating the position of a robot
+relative to its start position, known as VO (visual odometry). This is
+particularly useful in environments where GPS is not available (such as
+indoors) or intermittent (such as urban locations with structures
+blocking line of sight to GPS satellites). This method is designed to
+use left and right stereo camera frames and an IMU (inertial measurement
+unit) as input. It uses input stereo image pairs to find matching key
+points in the left and right images; using the baseline between the left
+and right camera, it can estimate the distance to the key point. Using
+two consecutive input stereo image pairs, VSLAM can track the 3D motion
+of key points between the two consecutive images to estimate the 3D
+motion of the camera–which is then used to compute odometry as an output
+to navigation. Compared to the classic approach to VSLAM, this method
+uses GPU acceleration to find and match more key points in real-time,
+with fine tuning to minimize overall reprojection error.
+
+Key points depend on distinctive features in the left and right camera
+image that can be repeatedly detected with changes in size, orientation,
+perspective, lighting, and image noise. In some instances, the number of
+key points may be limited or entirely absent; for example, if the camera
+field of view is only looking at a large solid colored wall, no key
+points may be detected. If there are insufficient key points, this
+module uses motion sensed with the IMU to provide a sensor for motion,
+which, when measured, can provide an estimate for odometry. This method,
+known as VIO (visual-inertial odometry), improves estimation performance
+when there is a lack of distinctive features in the scene to track
+motion visually.
+
+SLAM (simultaneous localization and mapping) is built on top of VIO,
+creating a map of key points that can be used to determine if an area is
+previously seen. When VSLAM determines that an area is previously seen,
+it reduces uncertainty in the map estimate, which is known as loop
+closure. VSLAM uses a statistical approach to loop closure that is more
+compute efficient to provide a real time solution, improving convergence
+in loop closure.
+
+
+There are multiple methods for estimating odometry as an input to
+navigation. None of these methods are perfect; each has limitations
+because of systematic flaws in the sensor providing measured
+observations, such as missing LIDAR returns absorbed by black surfaces,
+inaccurate wheel ticks when the wheel slips on the ground, or a lack of
+distinctive features in a scene limiting key points in a camera image. A
+practical approach to tracking odometry is to use multiple sensors with
+diverse methods so that systemic issues with one method can be
+compensated for by another method. With three separate estimates of
+odometry, failures in a single method can be detected, allowing for
+fusion of the multiple methods into a single higher quality result.
+VSLAM provides a vision- and IMU-based solution to estimating odometry
+that is different from the common practice of using LIDAR and wheel
+odometry. VSLAM can even be used to improve diversity, with multiple
+stereo cameras positioned in different directions to provide multiple,
+concurrent visual estimates of odometry.
+
+To learn more about VSLAM, refer to the `cuVSLAM
+SLAM <docs/cuvslam.md>`__ documentation.
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_visual_slam.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+Updates
+-------
+
+========== ==================================================
+Date       Changes
+========== ==================================================
+2023-05-25 cuVSLAM 11 with improved quality
+2023-04-05 Update Elbrus library and performance improvements
+2022-10-19 Updated OSS licensing
+2022-08-31 Update to be compatible with JetPack 5.0.2
+2022-06-30 Support for ROS 2 Humble
+2022-03-17 Documentation update for new features
+2022-03-11 Renamed to isaac_ros_visual_slam
+2021-11-15 Isaac Sim HIL documentation update
+2021-10-20 Initial release
+========== ==================================================
+
+.. |repo_name| replace:: Isaac ROS Visual SLAM

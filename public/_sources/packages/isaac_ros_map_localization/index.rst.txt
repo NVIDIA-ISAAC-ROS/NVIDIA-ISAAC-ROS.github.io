@@ -1,0 +1,92 @@
+===========
+|repo_name|
+===========
+
+Overview
+--------
+
+The Isaac ROS Map Localization module contains ROS 2 packages for lidar
+processing to estimate poses relative to a map. The Occupancy Grid
+Localizer processes a planar range scan to estimate pose in an occupancy
+grid map; this occurs in less than 1 second for most maps. This initial
+pose can be used to bootstrap navigation for mobile robots and has been
+integrated and tested with Nav2. This can remove the need for upwards of
+30 seconds to `manually estimate the position and
+direction <https://youtu.be/IrJmuow1r7g?t=1029>`__ of a robot with RViz,
+for example.
+
+The Occupancy Grid Localizer is designed to work with planar and 3D
+LIDARs. It uses
+`Flatscan <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_pointcloud_interfaces/msg/FlatScan.msg>`__
+for input to the GPU-accelerated computation estimating pose.
+`Flatscan <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_pointcloud_interfaces/msg/FlatScan.msg>`__
+allows for representation of 3D LIDARs, which have variable angular
+increments between multiple beams.
+
+
+LaserScan to Flatscan provides conversion from
+`LaserScan <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/LaserScan.msg>`__,
+which by definition has `equal angle
+increment <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/LaserScan.msg#L16>`__
+between beams, to
+`Flatscan <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_pointcloud_interfaces/msg/FlatScan.msg>`__.
+
+PointCloud to FlatScan provides conversion from
+`pointcloud <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__
+output from 3D LIDARs to
+`Flatscan <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_pointcloud_interfaces/msg/FlatScan.msg>`__.
+
+.. note::
+
+   Localization can be performed mulitiple times during
+   navigation.
+.. note::
+
+   The input FlatScan Message header/frame_id is
+   used to get the transform of the lidar with respect to the robot
+   base_link frame.
+.. note::
+
+   The output ``localization_result`` is the
+   transform of ``base_link`` with respect to the frame specified in the
+   ``loc_result_frame`` (map) ROS parameter.
+.. note::
+
+   Localization can
+   be triggered in one of two ways:
+
+   1. Buffer FlatScan messages received on a topic and trigger the
+      localization using an ``std_srvs/Empty`` service call.
+   2. Trigger localization every time a FlatScan message is sent to a
+      topic.
+
+Refer to the `Isaac ROS Occupancy Grid Localizer/Usage
+section`__ for more details.
+
+
+Performance
+-----------
+
+.. include:: ../../performance/tables/isaac_ros_map_localization.rst
+
+Packages
+--------
+
+.. toctree::
+    :glob:
+
+    **/index
+    
+
+Updates
+-------
+
+========== ============================================
+Date       Changes
+========== ============================================
+2023-05-25 Performance improvements
+2023-04-05 Added ``isaac_ros_occupancy_grid_localizer``
+========== ============================================
+
+
+.. |repo_name| replace:: Isaac ROS Map Localization
