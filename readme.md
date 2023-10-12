@@ -2,7 +2,7 @@
 
 Hardware-accelerated, deep learned semantic image segmentation
 
-![image](https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_image_segmentation_example.png/)![image](https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_image_segmentation_example_seg.png/)
+![image](https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ngc/nova_carter/Nova_Carter_Isaac_KV_540p_01_v002_DM.png/)![image](https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ngc/nova_carter/nova_carter_icon.png/)
 
 ## Overview
 
