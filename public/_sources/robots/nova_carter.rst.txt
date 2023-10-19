@@ -314,7 +314,7 @@ Repository Setup
 
    .. code:: bash
 
-      cd /ssd/workspaces && \
+      cd /mnt/nova_ssd/workspaces && \
          git clone --recurse-submodules :ir_clone:`<nova_carter>` && \
          git clone --recurse-submodules :ir_clone:`<isaac_ros_common>`
 
@@ -322,7 +322,7 @@ Repository Setup
 
    .. code:: bash
 
-      echo "export ISAAC_ROS_WS=/ssd/workspaces/isaac_ros-dev" >> ~/.bashrc && \
+      echo "export ISAAC_ROS_WS=/mnt/nova_ssd/workspaces/isaac_ros-dev" >> ~/.bashrc && \
          source ~/.bashrc
 
 3. Create the ``run_dev`` script configuration files in the ``$ISAAC_ROS_WS/src/isaac_ros_common/scripts`` dir:
@@ -430,7 +430,7 @@ Visualizing All Sensors on Foxglove
 The ``teleop.launch.py`` file can be used to launch all the sensors on the Nova Carter robot.
 
    .. note::
-      
+
       Streaming higher bandwidth data to Foxglove causes higher latency. You can choose an appropriate value for the `send_buffer_limit <https://github.com/foxglove/ros-foxglove-bridge#configuration>`__ parameter in Foxglove bridge to control latency vs. high bandwidth data visualization.
 
 1. Open a new terminal and `connect it to the robot <#connecting-the-pc-to-the-robot>`__.
@@ -510,7 +510,7 @@ The ``teleop.launch.py`` file can be used to launch all the sensors on the Nova 
 
    .. note:: The Owl cameras are enabled by default. Use ``launch_owls:=False`` to disable streaming the Owl cameras.
 
-5. Complete the `foxglove setup <#foxglove-setup>`__. The ``foxglove_layout_all_sensors.json`` foxglove layout file to visualize all sensors can be found in the :ir_repo:`nova_carter repository <nova_carter> <carter_navigation/foxglove_layouts/foxglove_layout_all_sensors.json>`. You should see the sensor data in Foxglove as shown below: 
+5. Complete the `foxglove setup <#foxglove-setup>`__. The ``foxglove_layout_all_sensors.json`` foxglove layout file to visualize all sensors can be found in the :ir_repo:`nova_carter repository <nova_carter> <carter_navigation/foxglove_layouts/foxglove_layout_all_sensors.json>`. You should see the sensor data in Foxglove as shown below:
 
    .. note:: If both the RPLIDARs visualizations do not show up, press ``Ctrl+R`` when in the Foxglove window to get the latest update.
 
@@ -666,16 +666,16 @@ This is a known bug. We'd recommend that you have the Nova Carter robot connecte
 Robot Does Not Move:
 -------------------------------------
 
-1. In a terminal inside the Docker container, run ``ros topic echo /cmd_vel``. 
+1. In a terminal inside the Docker container, run ``ros topic echo /cmd_vel``.
 
    Ensure that when you press the buttons or move the joysticks, the values on the topic change. If it does not show any data move to the next step.
-2. If you can see the expected values in the above command when pressing the joystick, check if the horizontal indicator light next to the power button on the robot is green. If it is not green, then the Segway ROS driver has gone into "locked state". 
+2. If you can see the expected values in the above command when pressing the joystick, check if the horizontal indicator light next to the power button on the robot is green. If it is not green, then the Segway ROS driver has gone into "locked state".
 
 You can fix this by running `ros2 service call /reset_chassis std_srvs/srv/Empty {}` in a new terminal that is attached to the Isaac ROS Docker container. The Segway driver has to be running to reset the chassis. Restarting the teleop, Nav2, or mapping launch files also resets the Segway driver.
 
 ``/cmd_vel`` Shows No Data when the Joystick Enable Button is Pressed
 ---------------------------------------------------------------------
-1. In a terminal inside the Docker container run ``ls /dev/input/js0`` . 
+1. In a terminal inside the Docker container run ``ls /dev/input/js0`` .
    If the connection was successful it prints out ``/dev/input/js0``. If the connection was **not** successful the command prints out ``ls: cannot access '/dev/input/js0': No such file or directory``.
 2. In a terminal inside the Docker container run ``ros topic echo /joy``. Ensure that when you press the buttons or move the joysticks, the values on the topic change.
 3. Ensure your joystick is connected by following the joystick pairing steps in this document.
@@ -683,8 +683,8 @@ You can fix this by running `ros2 service call /reset_chassis std_srvs/srv/Empty
 ``ros2 topic hz`` Shows a Lower than Expected Value
 ----------------------------------------------------
 
-   **Note**: ``ros2 topic hz`` is known to cause 100% CPU load for the first ~6 seconds after running the command. And the frame rate measured during this period is inaccurate compared to when the command is not running. Use the ``--window`` flag as shown below and wait for ~6 secs to get a more accurate measurement. 
-   
+   **Note**: ``ros2 topic hz`` is known to cause 100% CPU load for the first ~6 seconds after running the command. And the frame rate measured during this period is inaccurate compared to when the command is not running. Use the ``--window`` flag as shown below and wait for ~6 secs to get a more accurate measurement.
+
    **Note**: ``ros2 topic hz`` also triggers the type adaptation NITROS nodes.
 
 1. Run the following command to get a list of all the topics:

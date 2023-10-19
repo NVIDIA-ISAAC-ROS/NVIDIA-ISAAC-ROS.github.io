@@ -268,9 +268,9 @@
 </li>
 <li class="toctree-l5"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the demonstration scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with custom human paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a custom scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
@@ -504,7 +504,6 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-parameters">ROS Parameters</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-published">ROS Topics Published</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#input-restrictions">Input Restrictions</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#output-interpretations">Output Interpretations</a></li>
 </ul>
 </li>
@@ -1247,6 +1246,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#use-different-models">Use Different Models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
@@ -1657,36 +1657,34 @@ and <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaa
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tutorial requires a compatible RealSense camera from
-the list available <a class="reference internal" href="../../../../getting_started/hardware_setup/sensors/realsense_setup.html"><span class="doc">here</span></a>.</p>
+the list of available <a class="reference internal" href="../../../../getting_started/hardware_setup/sensors/realsense_setup.html"><span class="doc">cameras</span></a>.</p>
 </div>
 <section id="realsense-camera-firmware">
 <h2>RealSense Camera Firmware<a class="headerlink" href="#realsense-camera-firmware" title="Link to this heading"></a></h2>
 <p>This example is tested and compatible with RealSense camera firmware
-version 5.13.0.50 which is available
-<a class="reference external" href="https://dev.intelrealsense.com/docs/firmware-releases">here</a>.</p>
+<a class="reference external" href="https://dev.intelrealsense.com/docs/firmware-releases">version 5.13.0.50</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>We experienced issues with the latest RealSense firmware
-(version 5.14 at the time of publishing). It’s possible at some point
-that this starts working, but our recommendation is to install
-<em>exactly</em> 5.13.0.50.</p>
+<p>The latest RealSense firmware
+(version 5.14 at the time of publishing) might have issues. Our recommendation is to install
+<em>exactly</em> <a class="reference external" href="https://dev.intelrealsense.com/docs/firmware-releases">version 5.13.0.50</a>.</p>
 </div>
 </section>
 <section id="host-system-setup">
 <h2>Host System Setup<a class="headerlink" href="#host-system-setup" title="Link to this heading"></a></h2>
-<p>We have found ROS 2 message delivery to be unreliable under high load
+<p>The ROS 2 message delivery might be unreliable under high load
 without some small modifications to the QoS profile (especially on
-weaker machines). Before running this example run</p>
+weaker machines). Before running this example, run one of the following:</p>
+<p>To set the parameter temporarily, until reboot:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>net.core.rmem_max<span class="o">=</span><span class="m">8388608</span><span class="w"> </span>net.core.rmem_default<span class="o">=</span><span class="m">8388608</span>
 </pre></div>
 </div>
-<p>However this only sets these parameters until reboot. To set them
-permanently run:</p>
+<p>To set the parameter permanently, run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;net.core.rmem_max=8388608\nnet.core.rmem_default=8388608\n&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/sysctl.d/60-cyclonedds.conf
 </pre></div>
 </div>
-<p>More details on DDS tuning can be found
-<a class="reference external" href="https://docs.ros.org/en/rolling/How-To-Guides/DDS-tuning.html">here</a>.</p>
+<p>See
+<a class="reference external" href="https://docs.ros.org/en/rolling/How-To-Guides/DDS-tuning.html">DDS tuning</a> for more information.</p>
 </section>
 <section id="installing-the-dependencies">
 <span id="nvblox-realsense-dependencies"></span><h2>Installing the Dependencies<a class="headerlink" href="#installing-the-dependencies" title="Link to this heading"></a></h2>
@@ -1694,7 +1692,7 @@ permanently run:</p>
 <li><p>Complete steps 1 and 2 described in the
 <a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index.html"><span class="doc">Nvblox Quickstart Guide</span></a>
 to set up your development environment and clone the required repositories.</p></li>
-<li><p>Stop git tracking the <code class="docutils literal notranslate"><span class="pre">COLCON_IGNORE</span></code> file in the
+<li><p>Stop Git tracking the <code class="docutils literal notranslate"><span class="pre">COLCON_IGNORE</span></code> file in the
 <code class="docutils literal notranslate"><span class="pre">realsense_splitter</span></code> package and remove it.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/realsense_splitter<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>git<span class="w"> </span>update-index<span class="w"> </span>--assume-unchanged<span class="w"> </span>COLCON_IGNORE<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
@@ -1705,12 +1703,12 @@ to set up your development environment and clone the required repositories.</p><
 </ol>
 <blockquote>
 <div><p>Note: The <code class="docutils literal notranslate"><span class="pre">COLCON_IGNORE</span></code> file was added to remove the dependency
-to <code class="docutils literal notranslate"><span class="pre">realsense-ros</span></code> for users that do not want to run the RealSense
+to <code class="docutils literal notranslate"><span class="pre">realsense-ros</span></code> for users that don’t want to run the RealSense
 examples.</p>
 </div></blockquote>
 <ol class="arabic" start="3">
 <li><p>Complete the <a class="reference internal" href="../../../../getting_started/hardware_setup/sensors/realsense_setup.html"><span class="doc">Isaac ROS RealSense Setup</span></a>
-to set up <code class="docutils literal notranslate"><span class="pre">librealsense</span></code> <em>outside of the isaac_ros_common</em> docker,
+to set up <code class="docutils literal notranslate"><span class="pre">librealsense</span></code> <em>outside of the isaac_ros_common</em> Docker,
 clone <code class="docutils literal notranslate"><span class="pre">realsense_ros</span></code>, and to configure the container for use with
 RealSense.</p></li>
 <li><p>Download the code for <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_visual_slam">Isaac ROS Visual SLAM</a>
@@ -1729,7 +1727,7 @@ and <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaa
 </pre></div>
 </div>
 </li>
-<li><p>Inside the container, install package-specific dependencies via
+<li><p>Inside the container, install package-specific dependencies using
 <code class="docutils literal notranslate"><span class="pre">rosdep</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/workspaces/isaac_ros-dev/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>rosdep<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>-r<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>--rosdistro<span class="w"> </span>humble<span class="w"> </span>-y<span class="w"> </span>--skip-keys<span class="w"> </span><span class="s2">&quot;libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv nvblox&quot;</span>
@@ -1749,7 +1747,7 @@ and <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaa
 <h2>Example with RealSense Live Data<a class="headerlink" href="#example-with-realsense-live-data" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>Complete the sections above.</p></li>
-<li><p>Connect the RealSense device to your machine via USB 3 cable/port.</p></li>
+<li><p>Connect the RealSense device to your machine using a USB 3 cable/port.</p></li>
 <li><p>Run the ROS Docker container using the <code class="docutils literal notranslate"><span class="pre">run_dev.sh</span></code> script:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/workspaces/isaac_ros-dev/src/isaac_ros_common<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>./scripts/run_dev.sh
@@ -1761,7 +1759,7 @@ and <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaa
 </pre></div>
 </div>
 </li>
-<li><p>At this point, you can check that the RealSense camera is connected
+<li><p>Verify that the RealSense camera is connected
 by running <code class="docutils literal notranslate"><span class="pre">realsense-viewer</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>realsense-viewer
 </pre></div>
@@ -1776,7 +1774,7 @@ by running <code class="docutils literal notranslate"><span class="pre">realsens
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If you want to restrict odometry to a 2D plane
-(e.g. in case of running a robot in a flat environment),
+(for example, to run a robot in a flat environment),
 you can use the <code class="docutils literal notranslate"><span class="pre">flatten_odometry_to_2d</span></code> argument.</p>
 </div>
 </section>
@@ -1787,7 +1785,7 @@ you can use the <code class="docutils literal notranslate"><span class="pre">fla
 </section>
 <section id="troubleshooting">
 <h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
-<p>Refer to the
+<p>See
 <a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense.html"><span class="doc">RealSense Issues</span></a>.</p>
 </section>
 </section>

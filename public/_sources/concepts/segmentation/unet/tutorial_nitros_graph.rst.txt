@@ -13,9 +13,9 @@ If you have an :ir_repo:`Argus-compatible camera <isaac_ros_argus_camera>`,
 you can also use the launch file provided in this package to start a
 fully NITROS-accelerated image segmentation graph.
 
-To start the graph, follow the steps below:
+To start the graph:
 
-1. Follow the quickstart :ref:`here <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index:quickstart>` up to
+1. Follow the :ref:`quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index:quickstart>` up to
    step 7.
 
 2. Outside the container, clone additional repositories required to run
@@ -53,9 +53,8 @@ To start the graph, follow the steps below:
 
       ros2 launch isaac_ros_unet isaac_ros_argus_unet_triton.launch.py model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax'
 
-6. Visualize and validate the output of the package by launching
-   ``rqt_image_view`` in another terminal: In another terminal, enter
-   the Docker container again:
+6. In another terminal, visualize and validate the output of the package by launching
+    ``rqt_image_view``:
 
    .. code:: bash
 
@@ -68,8 +67,12 @@ To start the graph, follow the steps below:
 
       ros2 run rqt_image_view rqt_image_view
 
-   Then inside the ``rqt_image_view`` GUI, change the topic to
-   ``/unet/colored_segmentation_mask`` to view a colorized segmentation
-   mask. You may also view the raw segmentation, which is published to
+  To view a colorized segmentation
+  mask, inside the ``rqt_image_view`` GUI, change the topic to
+  ``/unet/colored_segmentation_mask``.
+
+  You can also view the raw segmentation, which is published to
    ``/unet/raw_segmentation_mask``, where the raw pixels correspond to
    the class labels making it unsuitable for human visual inspection.
+
+

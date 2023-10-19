@@ -15,42 +15,41 @@ and :ir_repo:`Isaac ROS Nvblox <isaac_ros_nvblox>`.
 .. note::
 
    This tutorial requires a compatible RealSense camera from
-   the list available :doc:`here </getting_started/hardware_setup/sensors/realsense_setup>`.
+   the list of available :doc:`cameras </getting_started/hardware_setup/sensors/realsense_setup>`.
 
 RealSense Camera Firmware
 -------------------------
 
 This example is tested and compatible with RealSense camera firmware
-version 5.13.0.50 which is available
-`here <https://dev.intelrealsense.com/docs/firmware-releases>`__.
+`version 5.13.0.50 <https://dev.intelrealsense.com/docs/firmware-releases>`__.
 
 .. note::
 
-   We experienced issues with the latest RealSense firmware
-   (version 5.14 at the time of publishing). It's possible at some point
-   that this starts working, but our recommendation is to install
-   *exactly* 5.13.0.50.
+   The latest RealSense firmware
+   (version 5.14 at the time of publishing) might have issues. Our recommendation is to install
+   *exactly* `version 5.13.0.50 <https://dev.intelrealsense.com/docs/firmware-releases>`__.
 
 Host System Setup
 -----------------
 
-We have found ROS 2 message delivery to be unreliable under high load
+The ROS 2 message delivery might be unreliable under high load
 without some small modifications to the QoS profile (especially on
-weaker machines). Before running this example run
+weaker machines). Before running this example, run one of the following:
+
+To set the parameter temporarily, until reboot:
 
 .. code:: bash
 
    sudo sysctl -w net.core.rmem_max=8388608 net.core.rmem_default=8388608
 
-However this only sets these parameters until reboot. To set them
-permanently run:
+To set the parameter permanently, run:
 
 .. code:: bash
 
    echo -e "net.core.rmem_max=8388608\nnet.core.rmem_default=8388608\n" | sudo tee /etc/sysctl.d/60-cyclonedds.conf
 
-More details on DDS tuning can be found
-`here <https://docs.ros.org/en/rolling/How-To-Guides/DDS-tuning.html>`__.
+See
+`DDS tuning <https://docs.ros.org/en/rolling/How-To-Guides/DDS-tuning.html>`__ for more information.
 
 ..  _nvblox-realsense-dependencies:
 
@@ -61,7 +60,7 @@ Installing the Dependencies
    :doc:`Nvblox Quickstart Guide </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index>`
    to set up your development environment and clone the required repositories.
 
-2. Stop git tracking the ``COLCON_IGNORE`` file in the
+2. Stop Git tracking the ``COLCON_IGNORE`` file in the
    ``realsense_splitter`` package and remove it.
 
    .. code:: bash
@@ -73,15 +72,15 @@ Installing the Dependencies
 ..
 
    Note: The ``COLCON_IGNORE`` file was added to remove the dependency
-   to ``realsense-ros`` for users that do not want to run the RealSense
+   to ``realsense-ros`` for users that don't want to run the RealSense
    examples.
 
 3. Complete the :doc:`/getting_started/hardware_setup/sensors/realsense_setup`
-   to set up ``librealsense`` *outside of the isaac_ros_common* docker,
+   to set up ``librealsense`` *outside of the isaac_ros_common* Docker,
    clone ``realsense_ros``, and to configure the container for use with
    RealSense.
 
-4. Download the code for :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>` 
+4. Download the code for :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>`
    and :ir_repo:`Isaac ROS NITROS <isaac_ros_nitros>`.
 
    .. code:: bash
@@ -100,7 +99,7 @@ Installing the Dependencies
       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-6. Inside the container, install package-specific dependencies via
+6. Inside the container, install package-specific dependencies using
    ``rosdep``:
 
    .. code:: bash
@@ -121,7 +120,7 @@ Example with RealSense Live Data
 
 1. Complete the sections above.
 
-2. Connect the RealSense device to your machine via USB 3 cable/port.
+2. Connect the RealSense device to your machine using a USB 3 cable/port.
 
 3. Run the ROS Docker container using the ``run_dev.sh`` script:
 
@@ -136,7 +135,7 @@ Example with RealSense Live Data
 
       source /workspaces/isaac_ros-dev/install/setup.bash
 
-5. At this point, you can check that the RealSense camera is connected
+5. Verify that the RealSense camera is connected
    by running ``realsense-viewer``:
 
    .. code:: bash
@@ -151,8 +150,8 @@ Example with RealSense Live Data
 
 .. note::
 
-   If you want to restrict odometry to a 2D plane 
-   (e.g. in case of running a robot in a flat environment), 
+   If you want to restrict odometry to a 2D plane
+   (for example, to run a robot in a flat environment),
    you can use the ``flatten_odometry_to_2d`` argument.
 
 Example with RealSense Recorded Data
@@ -164,5 +163,5 @@ If you want to run the example on recorded data refer to the
 Troubleshooting
 ---------------
 
-Refer to the
+See
 :doc:`/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense`.

@@ -5,21 +5,20 @@ Human Reconstruction in Isaac Sim
    :align: center
    :width: 600px
 
-In this tutorial we'll demonstrate how one can perform human
+This tutorial demonstrates how to perform human
 reconstruction in nvblox with Isaac Sim. The detected humans are then
 visible in a separate dynamic costmap that can be used for navigation
-with `Nav2 <https://github.com/ros-planning/navigation2>`__. If you want to know how human reconstruction works behind the
-scenes refer to the :doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+with `Nav2 <https://github.com/ros-planning/navigation2>`__. If you want to know more about human reconstruction works, see :doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
 
 .. note::
 
-   Due to a known issue, the animation of humans in the scene will not happen.
+   Due to a known issue, there is no animation of humans in the scene.
 
 Tutorial Walkthrough
 --------------------
 
-In this part, we demonstrate how to use Isaac Sim for human
-reconstruction in nvblox. We use the ground truth semantic segmentation
+Use Isaac Sim for human
+reconstruction in nvblox. nvblox uses the ground truth semantic segmentation
 coming from the simulation as input to detect humans. This demonstration
 relies on the extensions
 `omni.anim.people <https://docs.omniverse.nvidia.com/isaacsim/latest/features/warehouse_logistics/ext_omni_anim_people.html>`__
@@ -27,16 +26,18 @@ and
 `omni.anim.navigation <https://docs.omniverse.nvidia.com/extensions/latest/ext_navigation-mesh.html>`__
 to make humans navigate in the environment while the robot is moving.
 
-Running the demonstration scene
+Running the Demonstration Scene
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Before continuing this tutorial, make sure that the
-:doc:`tutorial_isaac_sim` is working fine.
+This section uses the default human paths.
 
-1. Open the Isaac Sim terminal and export the needed environment variables 
+Before continuing this example, you must have successfully completed the
+:doc:`tutorial_isaac_sim`.
+
+1. Open the Isaac Sim terminal and export the necessary environment variables
    as explained in steps 2-3 of the :doc:`Isaac Sim Setup Guide </getting_started/isaac_sim/index>`.
 
-2. Start the simulation by running the below command in the terminal opened in the previous step:
+2. Start the simulation by running the following command in the terminal:
 
    .. code:: bash
 
@@ -44,16 +45,16 @@ Before continuing this tutorial, make sure that the
 
    .. note::
 
-      The ``start_isaac_sim`` script is explained in detail
-      :ir_repo:`here <isaac_ros_nvblox> <nvblox_examples/nvblox_isaac_sim/omniverse_scripts/README.md>`.
+      For more information on the ``start_isaac_sim`` script, see the
+      :ir_repo:`README <isaac_ros_nvblox> <nvblox_examples/nvblox_isaac_sim/omniverse_scripts/README.md>`.
    .. note::
 
-      Because the animation requires to execute Python
-      scripts, running the scene with the UI will pop a window up asking
+      Because the animation requires execution of Python
+      scripts, running the scene with the UI asks you
       to confirm that you want to enable script execution. Click Yes to
       make it possible to start the scene and the human animation.
 
-3. *In another terminal* run the ROS Docker container using the ``run_dev.sh`` script:
+3. *In another terminal*, run the ROS Docker container using the ``run_dev.sh`` script:
 
    .. code:: bash
 
@@ -75,13 +76,12 @@ Before continuing this tutorial, make sure that the
       ros2 launch nvblox_examples_bringup isaac_sim_humans_example.launch.py
 
 
-Running with custom human paths
+Running with Custom Human Paths
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The above section launches the default human paths. If you want to have other paths
-taken by the humans, you can either:
+To have non-default paths taken by the humans, you can:
 
--  Change the default human animation file manually directly on the
+-  Change the default human animation file directly on the
    server
 -  Use the randomization options of the above script. To do so:
 
@@ -91,21 +91,22 @@ taken by the humans, you can either:
           --with_people --scenario_path=/Isaac/Samples/NvBlox/carter_warehouse_navigation_with_people.usd \
           --gpu_physics_enabled --anim_people_waypoint_dir <path_to_folder> --with_people --random_command_generation
 
-   This will launch the scene headless (without visualization) and
-   generate a new ``human_cmd_file.txt`` in ``<path_to_folder>``. By
-   default, it will generate 5 waypoints per human, but it is possible
+   This launches the scene headless (without visualization) and
+   generates a new ``human_cmd_file.txt`` in ``<path_to_folder>``. By
+   default, it generates 5 waypoints per human, but it is possible
    to change this with the option
-   ``--num_waypoints=<number_of_waypoints>``. Then you can either
-   manually upload the script file to replace the default one, or use
+   ``--num_waypoints=<number_of_waypoints>``.
+
+   You can then upload the script file to replace the default one, or use
    the same command as step 2. by adding
    ``--use_generated_command_file --anim_people_waypoint_dir <path_to_folder>``
    to automatically set the script file.
 
 
-Running on a custom scene
+Running on a Custom Scene
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you want to test the reconstruction on another scene:
+To test the reconstruction on another scene:
 
 -  Complete the `Running the demonstration scene`_ section.
 

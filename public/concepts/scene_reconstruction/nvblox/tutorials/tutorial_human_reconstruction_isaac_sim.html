@@ -268,9 +268,9 @@
 </li>
 <li class="toctree-l5 current"><a class="current reference internal" href="#">Human Reconstruction in Isaac Sim</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="#running-the-demonstration-scene">Running the demonstration scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#running-with-custom-human-paths">Running with custom human paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#running-on-a-custom-scene">Running on a custom scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
@@ -504,7 +504,6 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-parameters">ROS Parameters</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-published">ROS Topics Published</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#input-restrictions">Input Restrictions</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#output-interpretations">Output Interpretations</a></li>
 </ul>
 </li>
@@ -1247,6 +1246,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#use-different-models">Use Different Models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
@@ -1649,19 +1649,18 @@
 <figure class="align-center">
 <a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/isaac_sim_nvblox_humans.gif/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/isaac_sim_nvblox_humans.gif/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/isaac_sim_nvblox_humans.gif/" style="width: 600px;" /></a>
 </figure>
-<p>In this tutorial we’ll demonstrate how one can perform human
+<p>This tutorial demonstrates how to perform human
 reconstruction in nvblox with Isaac Sim. The detected humans are then
 visible in a separate dynamic costmap that can be used for navigation
-with <a class="reference external" href="https://github.com/ros-planning/navigation2">Nav2</a>. If you want to know how human reconstruction works behind the
-scenes refer to the <a class="reference internal" href="../technical_details.html"><span class="doc">Technical Details</span></a>.</p>
+with <a class="reference external" href="https://github.com/ros-planning/navigation2">Nav2</a>. If you want to know more about human reconstruction works, see <a class="reference internal" href="../technical_details.html"><span class="doc">Technical Details</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Due to a known issue, the animation of humans in the scene will not happen.</p>
+<p>Due to a known issue, there is no animation of humans in the scene.</p>
 </div>
 <section id="tutorial-walkthrough">
 <h2>Tutorial Walkthrough<a class="headerlink" href="#tutorial-walkthrough" title="Link to this heading"></a></h2>
-<p>In this part, we demonstrate how to use Isaac Sim for human
-reconstruction in nvblox. We use the ground truth semantic segmentation
+<p>Use Isaac Sim for human
+reconstruction in nvblox. nvblox uses the ground truth semantic segmentation
 coming from the simulation as input to detect humans. This demonstration
 relies on the extensions
 <a class="reference external" href="https://docs.omniverse.nvidia.com/isaacsim/latest/features/warehouse_logistics/ext_omni_anim_people.html">omni.anim.people</a>
@@ -1669,30 +1668,31 @@ and
 <a class="reference external" href="https://docs.omniverse.nvidia.com/extensions/latest/ext_navigation-mesh.html">omni.anim.navigation</a>
 to make humans navigate in the environment while the robot is moving.</p>
 <section id="running-the-demonstration-scene">
-<h3>Running the demonstration scene<a class="headerlink" href="#running-the-demonstration-scene" title="Link to this heading"></a></h3>
-<p>Before continuing this tutorial, make sure that the
-<a class="reference internal" href="tutorial_isaac_sim.html"><span class="doc">Static Reconstruction in Isaac Sim</span></a> is working fine.</p>
+<h3>Running the Demonstration Scene<a class="headerlink" href="#running-the-demonstration-scene" title="Link to this heading"></a></h3>
+<p>This section uses the default human paths.</p>
+<p>Before continuing this example, you must have successfully completed the
+<a class="reference internal" href="tutorial_isaac_sim.html"><span class="doc">Static Reconstruction in Isaac Sim</span></a>.</p>
 <ol class="arabic">
-<li><p>Open the Isaac Sim terminal and export the needed environment variables
+<li><p>Open the Isaac Sim terminal and export the necessary environment variables
 as explained in steps 2-3 of the <a class="reference internal" href="../../../../getting_started/isaac_sim/index.html"><span class="doc">Isaac Sim Setup Guide</span></a>.</p></li>
-<li><p>Start the simulation by running the below command in the terminal opened in the previous step:</p>
+<li><p>Start the simulation by running the following command in the terminal:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./python.sh<span class="w"> </span>~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/nvblox_isaac_sim/omniverse_scripts/start_isaac_sim.py<span class="w"> </span>--with_people<span class="w"> </span>--gpu_physics_enabled<span class="w"> </span>--scenario_path<span class="o">=</span>/Isaac/Samples/NvBlox/carter_warehouse_navigation_with_people.usd
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">start_isaac_sim</span></code> script is explained in detail
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/blob/main/nvblox_examples/nvblox_isaac_sim/omniverse_scripts/README.md">here</a>.</p>
+<p>For more information on the <code class="docutils literal notranslate"><span class="pre">start_isaac_sim</span></code> script, see the
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/blob/main/nvblox_examples/nvblox_isaac_sim/omniverse_scripts/README.md">README</a>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Because the animation requires to execute Python
-scripts, running the scene with the UI will pop a window up asking
+<p>Because the animation requires execution of Python
+scripts, running the scene with the UI asks you
 to confirm that you want to enable script execution. Click Yes to
 make it possible to start the scene and the human animation.</p>
 </div>
 </li>
-<li><p><em>In another terminal</em> run the ROS Docker container using the <code class="docutils literal notranslate"><span class="pre">run_dev.sh</span></code> script:</p>
+<li><p><em>In another terminal</em>, run the ROS Docker container using the <code class="docutils literal notranslate"><span class="pre">run_dev.sh</span></code> script:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/workspaces/isaac_ros-dev/src/isaac_ros_common<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>./scripts/run_dev.sh
 </pre></div>
@@ -1713,11 +1713,10 @@ make it possible to start the scene and the human animation.</p>
 </ol>
 </section>
 <section id="running-with-custom-human-paths">
-<h3>Running with custom human paths<a class="headerlink" href="#running-with-custom-human-paths" title="Link to this heading"></a></h3>
-<p>The above section launches the default human paths. If you want to have other paths
-taken by the humans, you can either:</p>
+<h3>Running with Custom Human Paths<a class="headerlink" href="#running-with-custom-human-paths" title="Link to this heading"></a></h3>
+<p>To have non-default paths taken by the humans, you can:</p>
 <ul>
-<li><p>Change the default human animation file manually directly on the
+<li><p>Change the default human animation file directly on the
 server</p></li>
 <li><p>Use the randomization options of the above script. To do so:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./python.sh<span class="w"> </span>~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/nvblox_isaac_sim/omniverse_scripts/start_isaac_sim.py<span class="w"> </span><span class="se">\</span>
@@ -1725,12 +1724,12 @@ server</p></li>
 <span class="w">  </span>--gpu_physics_enabled<span class="w"> </span>--anim_people_waypoint_dir<span class="w"> </span>&lt;path_to_folder&gt;<span class="w"> </span>--with_people<span class="w"> </span>--random_command_generation
 </pre></div>
 </div>
-<p>This will launch the scene headless (without visualization) and
-generate a new <code class="docutils literal notranslate"><span class="pre">human_cmd_file.txt</span></code> in <code class="docutils literal notranslate"><span class="pre">&lt;path_to_folder&gt;</span></code>. By
-default, it will generate 5 waypoints per human, but it is possible
+<p>This launches the scene headless (without visualization) and
+generates a new <code class="docutils literal notranslate"><span class="pre">human_cmd_file.txt</span></code> in <code class="docutils literal notranslate"><span class="pre">&lt;path_to_folder&gt;</span></code>. By
+default, it generates 5 waypoints per human, but it is possible
 to change this with the option
-<code class="docutils literal notranslate"><span class="pre">--num_waypoints=&lt;number_of_waypoints&gt;</span></code>. Then you can either
-manually upload the script file to replace the default one, or use
+<code class="docutils literal notranslate"><span class="pre">--num_waypoints=&lt;number_of_waypoints&gt;</span></code>.</p>
+<p>You can then upload the script file to replace the default one, or use
 the same command as step 2. by adding
 <code class="docutils literal notranslate"><span class="pre">--use_generated_command_file</span> <span class="pre">--anim_people_waypoint_dir</span> <span class="pre">&lt;path_to_folder&gt;</span></code>
 to automatically set the script file.</p>
@@ -1738,8 +1737,8 @@ to automatically set the script file.</p>
 </ul>
 </section>
 <section id="running-on-a-custom-scene">
-<h3>Running on a custom scene<a class="headerlink" href="#running-on-a-custom-scene" title="Link to this heading"></a></h3>
-<p>If you want to test the reconstruction on another scene:</p>
+<h3>Running on a Custom Scene<a class="headerlink" href="#running-on-a-custom-scene" title="Link to this heading"></a></h3>
+<p>To test the reconstruction on another scene:</p>
 <ul class="simple">
 <li><p>Complete the <a class="reference internal" href="#running-the-demonstration-scene">Running the demonstration scene</a> section.</p></li>
 <li><p>Make sure you use the same robot USD so that the topic names and Isaac Sim ROS

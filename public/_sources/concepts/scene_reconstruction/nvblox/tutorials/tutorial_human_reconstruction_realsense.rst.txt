@@ -5,9 +5,9 @@ Human Reconstruction with RealSense
     :width: 600px
     :align: center
 
-In this tutorial we'll demonstrate how one can perform dynamic human
-reconstruction in nvblox using RealSense data. If you want to know how
-human reconstruction works behind the scenes refer to the
+This tutorial demonstrates how to perform dynamic human
+reconstruction in nvblox using RealSense data. For more information on how
+human reconstruction works, see
 :doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
 
 
@@ -16,20 +16,20 @@ Setup Isaac ROS Image Segmentation
 
 .. note::
 
-   Currently we recommend the heavier
-   ``PeopleSemSegNet`` over the lighter ``PeopleSemSegNet ShuffleSeg``
-   model provided in :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`
-   for better segmentation performance on a Desktop. If used on a Jetson, 
-   using the lighter ``PeopleSemSegNet ShuffleSeg`` model is recommended for 
-   overall inference speed/prediction accuracy trade-off.
+   If you are on a desktop machine, we recommend using the
+   ``PeopleSemSegNet`` over the ``PeopleSemSegNet ShuffleSeg``
+   model that is provided in :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`
+   for better segmentation performance. If you are on a Jetson,
+   using the ``PeopleSemSegNet ShuffleSeg`` model is recommended for
+   overall inference speed and prediction accuracy trade-off.
 
 The following steps show you how to run ``PeopleSemSegNet`` in ROS.
-Refer to
-:ir_repo:`this document <isaac_ros_image_segmentation>` 
+See
+:ir_repo:`this document <isaac_ros_image_segmentation>`
 to run the ``PeopleSemSegNet ShuffleSeg`` network.
 
 1.  Complete all steps of the :doc:`tutorial_realsense`
-    and make sure it is working fine.
+    and make sure it is working.
 
 2.  Clone the segmentation repository and its dependencies under
     ``~/workspaces/isaac_ros-dev/src``.
@@ -50,7 +50,7 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
 
        git clone :ir_clone:`<isaac_ros_image_pipeline.git>`
 
-3.  Pull down a ROS Bag of sample data:
+3.  Pull down a rosbag of sample data:
 
     .. code:: bash
 
@@ -123,7 +123,7 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
 
        colcon test --executor sequential
 
-10. Run this following launch file to get the ROS node running:
+10. Run the following launch file to get the ROS node running:
 
     .. code:: bash
 
@@ -136,7 +136,7 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
        cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-12. Play the ROS bag in one of the terminals:
+12. Play the rosbag in one of the terminals:
 
     .. code:: bash
 
@@ -148,14 +148,18 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
 
        ros2 run rqt_image_view rqt_image_view
 
-13. Verify that the output looks similar to :ir_repo:`this image. <isaac_ros_image_segmentation> <resources/peoplesemsegnet_shuffleseg_rqt.png>`
+13. Verify that the output looks similar to this image:
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/peoplesemsegnet_shuffleseg_rqt.png>`
+       :width: 600px
+       :align: center
 
 Example with RealSense Live Data
 --------------------------------
 
 1. Complete the `Setup Isaac ROS Image Segmentation`_ section above.
 
-2. Connect the RealSense device to your machine via USB 3 cable/port.
+2. Connect the RealSense device to your machine using a USB 3 cable/port.
 
 3. Run the ROS Docker container using the ``run_dev.sh`` script:
 
@@ -170,7 +174,7 @@ Example with RealSense Live Data
 
       source /workspaces/isaac_ros-dev/install/setup.bash
 
-5. At this point, you can check that the RealSense camera is connected
+5. Verify that the RealSense camera is connected
    by running ``realsense-viewer``:
 
    .. code:: bash
@@ -185,19 +189,19 @@ Example with RealSense Live Data
 
 .. note::
 
-   If you want to restrict odometry to a 2D plane 
-   (e.g. in case of running a robot in a flat environment), 
+   If you want to restrict odometry to a 2D plane
+   (for example, to run a robot in a flat environment),
    you can use the ``flatten_odometry_to_2d`` argument.
 
 
 Example with RealSense Recorded Data
 ------------------------------------
 
-If you want to run the example on recorded data refer to the
+If you want to run the example on recorded data see
 :doc:`tutorial_realsense_record`.
 
 Troubleshooting
 ---------------
 
-Refer to the
+See
 :doc:`/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense`.

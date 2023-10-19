@@ -268,9 +268,9 @@
 </li>
 <li class="toctree-l5"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the demonstration scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with custom human paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a custom scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
@@ -504,7 +504,6 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-parameters">ROS Parameters</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-published">ROS Topics Published</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#input-restrictions">Input Restrictions</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#output-interpretations">Output Interpretations</a></li>
 </ul>
 </li>
@@ -1247,6 +1246,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#use-different-models">Use Different Models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
@@ -1649,28 +1649,28 @@
 <figure class="align-center">
 <a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_nvblox_humans.gif/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_nvblox_humans.gif/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_nvblox_humans.gif/" style="width: 600px;" /></a>
 </figure>
-<p>In this tutorial we’ll demonstrate how one can perform dynamic human
-reconstruction in nvblox using RealSense data. If you want to know how
-human reconstruction works behind the scenes refer to the
+<p>This tutorial demonstrates how to perform dynamic human
+reconstruction in nvblox using RealSense data. For more information on how
+human reconstruction works, see
 <a class="reference internal" href="../technical_details.html"><span class="doc">Technical Details</span></a>.</p>
 <section id="setup-isaac-ros-image-segmentation">
 <h2>Setup Isaac ROS Image Segmentation<a class="headerlink" href="#setup-isaac-ros-image-segmentation" title="Link to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Currently we recommend the heavier
-<code class="docutils literal notranslate"><span class="pre">PeopleSemSegNet</span></code> over the lighter <code class="docutils literal notranslate"><span class="pre">PeopleSemSegNet</span> <span class="pre">ShuffleSeg</span></code>
-model provided in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_segmentation">Isaac ROS Image Segmentation</a>
-for better segmentation performance on a Desktop. If used on a Jetson,
-using the lighter <code class="docutils literal notranslate"><span class="pre">PeopleSemSegNet</span> <span class="pre">ShuffleSeg</span></code> model is recommended for
-overall inference speed/prediction accuracy trade-off.</p>
+<p>If you are on a desktop machine, we recommend using the
+<code class="docutils literal notranslate"><span class="pre">PeopleSemSegNet</span></code> over the <code class="docutils literal notranslate"><span class="pre">PeopleSemSegNet</span> <span class="pre">ShuffleSeg</span></code>
+model that is provided in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_segmentation">Isaac ROS Image Segmentation</a>
+for better segmentation performance. If you are on a Jetson,
+using the <code class="docutils literal notranslate"><span class="pre">PeopleSemSegNet</span> <span class="pre">ShuffleSeg</span></code> model is recommended for
+overall inference speed and prediction accuracy trade-off.</p>
 </div>
 <p>The following steps show you how to run <code class="docutils literal notranslate"><span class="pre">PeopleSemSegNet</span></code> in ROS.
-Refer to
+See
 <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_segmentation">this document</a>
 to run the <code class="docutils literal notranslate"><span class="pre">PeopleSemSegNet</span> <span class="pre">ShuffleSeg</span></code> network.</p>
 <ol class="arabic">
 <li><p>Complete all steps of the <a class="reference internal" href="tutorial_realsense.html"><span class="doc">Static Reconstruction with RealSense</span></a>
-and make sure it is working fine.</p></li>
+and make sure it is working.</p></li>
 <li><p>Clone the segmentation repository and its dependencies under
 <code class="docutils literal notranslate"><span class="pre">~/workspaces/isaac_ros-dev/src</span></code>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/workspaces/isaac_ros-dev/src
@@ -1686,7 +1686,7 @@ and make sure it is working fine.</p></li>
 </pre></div>
 </div>
 </li>
-<li><p>Pull down a ROS Bag of sample data:</p>
+<li><p>Pull down a rosbag of sample data:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/workspaces/isaac_ros-dev/src/isaac_ros_image_segmentation<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>git<span class="w"> </span>lfs<span class="w"> </span>pull<span class="w"> </span>-X<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>-I<span class="w"> </span><span class="s2">&quot;resources/rosbags/&quot;</span>
 </pre></div>
@@ -1752,7 +1752,7 @@ version_policy:<span class="w"> </span><span class="o">{</span>
 </pre></div>
 </div>
 </li>
-<li><p>Run this following launch file to get the ROS node running:</p>
+<li><p>Run the following launch file to get the ROS node running:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_unet<span class="w"> </span>isaac_ros_unet_triton.launch.py<span class="w"> </span>model_name:<span class="o">=</span>peoplesemsegnet<span class="w"> </span>model_repository_paths:<span class="o">=[</span><span class="s1">&#39;/workspaces/isaac_ros-dev/models&#39;</span><span class="o">]</span><span class="w"> </span>input_binding_names:<span class="o">=[</span><span class="s1">&#39;input_1:0&#39;</span><span class="o">]</span><span class="w"> </span>output_binding_names:<span class="o">=[</span><span class="s1">&#39;argmax_1&#39;</span><span class="o">]</span><span class="w"> </span>network_output_type:<span class="o">=</span><span class="s1">&#39;argmax&#39;</span>
 </pre></div>
 </div>
@@ -1763,7 +1763,7 @@ version_policy:<span class="w"> </span><span class="o">{</span>
 </pre></div>
 </div>
 </li>
-<li><p>Play the ROS bag in one of the terminals:</p>
+<li><p>Play the rosbag in one of the terminals:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>bag<span class="w"> </span>play<span class="w"> </span>-l<span class="w"> </span>src/isaac_ros_image_segmentation/resources/rosbags/unet_sample_data/
 </pre></div>
 </div>
@@ -1772,14 +1772,18 @@ version_policy:<span class="w"> </span><span class="o">{</span>
 </pre></div>
 </div>
 </li>
-<li><p>Verify that the output looks similar to <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_segmentation/blob/main/resources/peoplesemsegnet_shuffleseg_rqt.png">this image.</a></p></li>
+<li><p>Verify that the output looks similar to this image:</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/peoplesemsegnet_shuffleseg_rqt.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/peoplesemsegnet_shuffleseg_rqt.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/peoplesemsegnet_shuffleseg_rqt.png/" style="width: 600px;" /></a>
+</figure>
+</li>
 </ol>
 </section>
 <section id="example-with-realsense-live-data">
 <h2>Example with RealSense Live Data<a class="headerlink" href="#example-with-realsense-live-data" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>Complete the <a class="reference internal" href="#setup-isaac-ros-image-segmentation">Setup Isaac ROS Image Segmentation</a> section above.</p></li>
-<li><p>Connect the RealSense device to your machine via USB 3 cable/port.</p></li>
+<li><p>Connect the RealSense device to your machine using a USB 3 cable/port.</p></li>
 <li><p>Run the ROS Docker container using the <code class="docutils literal notranslate"><span class="pre">run_dev.sh</span></code> script:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/workspaces/isaac_ros-dev/src/isaac_ros_common<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>./scripts/run_dev.sh
@@ -1791,7 +1795,7 @@ version_policy:<span class="w"> </span><span class="o">{</span>
 </pre></div>
 </div>
 </li>
-<li><p>At this point, you can check that the RealSense camera is connected
+<li><p>Verify that the RealSense camera is connected
 by running <code class="docutils literal notranslate"><span class="pre">realsense-viewer</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>realsense-viewer
 </pre></div>
@@ -1806,18 +1810,18 @@ by running <code class="docutils literal notranslate"><span class="pre">realsens
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If you want to restrict odometry to a 2D plane
-(e.g. in case of running a robot in a flat environment),
+(for example, to run a robot in a flat environment),
 you can use the <code class="docutils literal notranslate"><span class="pre">flatten_odometry_to_2d</span></code> argument.</p>
 </div>
 </section>
 <section id="example-with-realsense-recorded-data">
 <h2>Example with RealSense Recorded Data<a class="headerlink" href="#example-with-realsense-recorded-data" title="Link to this heading"></a></h2>
-<p>If you want to run the example on recorded data refer to the
+<p>If you want to run the example on recorded data see
 <a class="reference internal" href="tutorial_realsense_record.html"><span class="doc">RealSense Data Recording for Nvblox</span></a>.</p>
 </section>
 <section id="troubleshooting">
 <h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
-<p>Refer to the
+<p>See
 <a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense.html"><span class="doc">RealSense Issues</span></a>.</p>
 </section>
 </section>
