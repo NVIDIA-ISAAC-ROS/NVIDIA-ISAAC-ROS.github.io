@@ -268,9 +268,9 @@
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the demonstration scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with custom human paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a custom scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
@@ -504,7 +504,6 @@
 <li class="toctree-l6"><a class="reference internal" href="isaac_ros_h264_decoder/index.html#ros-parameters">ROS Parameters</a></li>
 <li class="toctree-l6"><a class="reference internal" href="isaac_ros_h264_decoder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l6"><a class="reference internal" href="isaac_ros_h264_decoder/index.html#ros-topics-published">ROS Topics Published</a></li>
-<li class="toctree-l6"><a class="reference internal" href="isaac_ros_h264_decoder/index.html#input-restrictions">Input Restrictions</a></li>
 <li class="toctree-l6"><a class="reference internal" href="isaac_ros_h264_decoder/index.html#output-interpretations">Output Interpretations</a></li>
 </ul>
 </li>
@@ -1247,6 +1246,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../isaac_ros_pose_estimation/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#use-different-models">Use Different Models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
@@ -1649,14 +1649,13 @@
 </figure>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_compression">Isaac ROS Compression</a> provides an H.264 image encoder and decoder that
-leverages the specialized hardware in NVIDIA GPUs and the
+<p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_compression">Isaac ROS Compression</a> provides H.264 image encoder
+and decoder that leverages the specialized hardware in NVIDIA GPUs and the
 <a class="reference external" href="https://developer.nvidia.com/embedded-computing">Jetson</a> platform.
 The <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> package can compress an image into H.264
-data using the NVENC on the Jetson platform. The
+data using the NVENC. The
 <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_decoder</span></code> package can decode the H.264 data into
-original images using the NVDEC on the Jetson and x86 platform with
-NVIDIA GPUs.</p>
+original images using the NVDEC.</p>
 <p>Image compression reduces the data footprint of images when written to
 storage or transmitted between computers. A 1080p camera at 30fps
 produces 177MB/s of data; image compression reduces this by
@@ -1681,8 +1680,8 @@ failures on the robot. This provides visual information to assist in the
 debugging of the event or to improve perception and robot functions.</p>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Advanced_Video_Coding">H.264</a> is an
 efficient and popular compression algorithm with broad support across
-many platforms. The output of the <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> package on
-Jetson can then be decoded with hardware acceleration using the
+many platforms. The output of the <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> package can then
+be decoded with hardware acceleration using the
 <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_decoder</span></code> on Jetson and x86_64 systems, or by
 third-party H.264 decoder packages on non-NVIDIA platforms.</p>
 <p>This package is powered by <a class="reference external" href="https://developer.nvidia.com/blog/improve-perception-performance-for-ros-2-applications-with-nvidia-isaac-transport-for-ros/">NVIDIA Isaac Transport for ROS (NITROS)</a>,
@@ -1699,8 +1698,8 @@ resulting in more CPU load, and less encode performance.</p>
 </section>
 <section id="h-264-compared-to-jpeg-image-transport-plugins">
 <h2>H.264 compared to JPEG image_transport_plugins<a class="headerlink" href="#h-264-compared-to-jpeg-image-transport-plugins" title="Link to this heading"></a></h2>
-<p>ROS <a class="reference external" href="https://index.ros.org/p/image_transport_plugins">image_transport_plugins</a> use the JPEG standard for image compression on the CPU, where each frame is compressed spatially within the 2D image. <cite>isaac_ros_h264_encoder</cite> uses the H.264 standard for video compression, which allows it to compress more efficiently than JPEG by using more advanced spatial and temporal compression. <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> uses the GPU for higher performance, while offloading compute work from the CPU.</p>
-<p>H264 video compression of individual images, or I-frame (inter-frame) are smaller in size than equivalent quality JPEG images; H.264 uses improved compression functions for smooth areas and less artifacts in high frequencies areas of the image. H.264 adds temporal compression on a sequence of images by using a P-frame (predicted frame) from a previous I or P frame.  P-frames benefit on image similarity from frame to frame as occurs from a camera stream. P-frames are ~25% the size of an I-Frame. A sequence of images is compressed to one I-Frame followed by one or more P-Frames.  P-Frames require less computation improving frame rate of compression.</p>
+<p>ROS <a class="reference external" href="https://index.ros.org/p/image_transport_plugins">image_transport_plugins</a> use the JPEG standard for image compression on the CPU, where each frame is compressed spatially within the 2D image. <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> uses the H.264 standard for video compression, which allows it to compress more efficiently than JPEG by using more advanced spatial and temporal compression. <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> uses the GPU for higher performance, while offloading compute work from the CPU.</p>
+<p>H.264 video compression of individual images, or I-frame (inter-frame) are smaller in size than equivalent quality JPEG images; H.264 uses improved compression functions for smooth areas and less artifacts in high frequencies areas of the image. H.264 adds temporal compression on a sequence of images by using a P-frame (predicted frame) from a previous I or P frame.  P-frames benefit on image similarity from frame to frame as occurs from a camera stream. P-frames are ~25% the size of an I-Frame. A sequence of images is compressed to one I-Frame followed by one or more P-Frames.  P-Frames require less computation improving frame rate of compression.</p>
 <p>As a result, <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> can perform compression to smaller sizes with the same quality as JPEG <code class="docutils literal notranslate"><span class="pre">image_transport_plugins</span></code>, at higher frame rates (throughput), while simultaneously offloading the CPU from this compute for compression.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1886,7 +1885,7 @@ This will streamline your development environment setup with the correct version
 </thead>
 <tbody>
 <tr class="row-even"><td><p>2023-10-18</p></td>
-<td><p>Added support on <code class="docutils literal notranslate"><span class="pre">x86_64</span></code> for <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> and <code class="docutils literal notranslate"><span class="pre">aarch64</span></code> for <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_decoder</span></code></p></td>
+<td><p>Added support on <code class="docutils literal notranslate"><span class="pre">x86_64</span></code> for <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>2023-05-25</p></td>
 <td><p>Performance improvements</p></td>

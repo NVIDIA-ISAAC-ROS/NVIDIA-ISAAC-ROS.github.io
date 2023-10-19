@@ -268,9 +268,9 @@
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the demonstration scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with custom human paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a custom scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="../nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
@@ -504,7 +504,6 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-parameters">ROS Parameters</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-published">ROS Topics Published</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#input-restrictions">Input Restrictions</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#output-interpretations">Output Interpretations</a></li>
 </ul>
 </li>
@@ -1247,6 +1246,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#use-different-models">Use Different Models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
@@ -1659,8 +1659,8 @@ to create a local occupancy grid.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tutorial requires a compatible RealSense camera from
-the list available
-<a class="reference internal" href="../../../getting_started/hardware_setup/sensors/realsense_setup.html#camera-compatibility"><span class="std std-ref">here</span></a>.</p>
+the list of available
+<a class="reference internal" href="../../../getting_started/hardware_setup/sensors/realsense_setup.html#camera-compatibility"><span class="std std-ref">cameras</span></a>.</p>
 </div>
 </section>
 <section id="tutorial-walkthrough">
@@ -1683,11 +1683,11 @@ the list available
 </pre></div>
 </div>
 </li>
-<li><p>Please set your camera as shown in the image below, which is on a
+<li><p>Set your camera as shown in the image below, which is on a
 tripod ~10cm tall and parallel to the ground. Or you can change the
-static transform in launch file
+static transform in the launch file
 <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_freespace_segmentation/blob/main/isaac_ros_bi3d_freespace/launch/isaac_ros_bi3d_freespace_realsense.launch.py#L144-157">here</a>,
-according to the placement of your camera with respect to a
+according to the placement of your camera with respect to an
 occupancy grid origin frame.</p></li>
 </ol>
 <blockquote>
@@ -1696,7 +1696,7 @@ occupancy grid origin frame.</p></li>
 </figure>
 </div></blockquote>
 <ol class="arabic" start="6">
-<li><p>Run the launch file, which launches the example:</p>
+<li><p>Run the launch file, to launch the example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_bi3d_freespace<span class="w"> </span>isaac_ros_bi3d_freespace_realsense.launch.py<span class="w"> </span>featnet_engine_file_path:<span class="o">=</span>/tmp/models/bi3d/bi3dnet_featnet.plan<span class="w"> </span><span class="se">\</span>
 segnet_engine_file_path:<span class="o">=</span>/tmp/models/bi3d/bi3dnet_segnet.plan<span class="w"> </span><span class="se">\</span>
 max_disparity_values:<span class="o">=</span><span class="m">16</span>
@@ -1710,7 +1710,7 @@ max_disparity_values:<span class="o">=</span><span class="m">16</span>
 </div>
 </li>
 <li><p>Optionally, you can run the visualizer script to visualize the
-disparity image.</p>
+disparity image:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_bi3d<span class="w"> </span>isaac_ros_bi3d_visualizer.py<span class="w"> </span>--disparity_topic<span class="w"> </span>bi3d_mask
 </pre></div>
 </div>
@@ -1732,13 +1732,13 @@ to the <a class="reference internal" href="../../../repositories_and_packages/is
 </pre></div>
 </div>
 </li>
-<li><p>Visualize the occupancy grid in RViz.</p>
+<li><p>Visualize the occupancy grid in RViz:</p>
 <p>Start RViz:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rviz2
 </pre></div>
 </div>
 <p>In the left pane, change the <strong>Fixed Frame</strong> to <code class="docutils literal notranslate"><span class="pre">base_link</span></code>.</p>
-<p>In the left pane, click the <strong>Add</strong> button, then select <strong>By topic</strong>
+<p>In the left pane, click <strong>Add</strong>, select <strong>By topic</strong>
 followed by <strong>Map</strong> to add the occupancy grid. You should see an
 output similar to the one shown at the top of this page.</p>
 </li>

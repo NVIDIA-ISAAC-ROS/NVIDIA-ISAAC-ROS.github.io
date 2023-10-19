@@ -268,9 +268,9 @@
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the demonstration scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with custom human paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a custom scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
@@ -504,7 +504,6 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-parameters">ROS Parameters</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-published">ROS Topics Published</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#input-restrictions">Input Restrictions</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#output-interpretations">Output Interpretations</a></li>
 </ul>
 </li>
@@ -1247,6 +1246,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#use-different-models">Use Different Models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
@@ -1646,8 +1646,7 @@
   <section id="bi3d">
 <h1>Bi3D<a class="headerlink" href="#bi3d" title="Link to this heading"></a></h1>
 <p>The <a class="reference external" href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/bi3d_proximity_segmentation">Bi3D DNN model</a>
-performs stereo-depth estimation via binary classification, which is
-used for depth segmentation. Depth segmentation can be used to
+performs stereo-depth estimation using binary classification for depth segmentation. Depth segmentation can be used to
 determine whether an obstacle is within a proximity field and to avoid
 collisions with obstacles during navigation.</p>
 <figure class="align-center">
@@ -1657,19 +1656,18 @@ collisions with obstacles during navigation.</p>
 to provide depth segmentation from a time-synchronized input left
 and right stereo image pair. Images to Bi3D need to be rectified and
 resized to the appropriate input resolution. The aspect ratio of the
-image needs to be maintained; hence, a crop and resize may be required
+image needs to be maintained. A crop and resize might be required
 to maintain the input aspect ratio. The graph for DNN encode, to DNN
 inference, to DNN decode is part of the Bi3D node. Inference is
-performed using TensorRT, as the Bi3D DNN model is designed to use
+performed using TensorRT, because the Bi3D DNN model is designed to use
 optimizations supported by TensorRT.</p>
 <p>Compared to other stereo disparity functions, depth segmentation
 provides a prediction of whether an obstacle is within a proximity
-field, as opposed to continuous depth, while simultaneously predicting
-freespace from the ground plane, which other functions typically do not
-provide. Also unlike other stereo disparity functions in Isaac ROS,
+field, while simultaneously predicting
+freespace from the ground plane. Also unlike other stereo disparity functions in Isaac ROS,
 depth segmentation runs on NVIDIA DLA (deep learning accelerator),
 which is separate and independent from the GPU. For more information on
-disparity, refer to <a class="reference external" href="https://en.wikipedia.org/wiki/Binocular_disparity">this page</a>.</p>
+disparity, refer to <a class="reference external" href="https://en.wikipedia.org/wiki/Binocular_disparity">Binocular disparity</a>.</p>
 <section id="repositories-and-packages">
 <h2>Repositories and Packages<a class="headerlink" href="#repositories-and-packages" title="Link to this heading"></a></h2>
 <p>The Isaac ROS implementations of this technology are available here:</p>

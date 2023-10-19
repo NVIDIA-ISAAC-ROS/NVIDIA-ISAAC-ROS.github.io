@@ -268,9 +268,9 @@
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the demonstration scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with custom human paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a custom scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="../../scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
@@ -504,7 +504,6 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-parameters">ROS Parameters</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-published">ROS Topics Published</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#input-restrictions">Input Restrictions</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#output-interpretations">Output Interpretations</a></li>
 </ul>
 </li>
@@ -1247,6 +1246,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#use-different-models">Use Different Models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
@@ -1651,15 +1651,15 @@
 </figure>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>Using hardware-accelerated Isaac ROS compression on Jetson to H.264
+<p>Using hardware-accelerated Isaac ROS compression to H.264
 encode data for playback through Isaac ROS H.264 decoder on
-NVIDIA-powered x86_64 is fast and efficient. However, you may have need
-to decode recorded data on x86_64 systems that are not NVIDIA-powered.
+NVIDIA-powered systems is fast and efficient. However, you may have need
+to decode recorded data on systems that are not NVIDIA-powered.
 Fortunately, the output of the <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> package can
 easily be reformatted to work with other available ROS 2 decoder
 packages.</p>
 <p>This tutorial shows you how to replay a rosbag recorded on a Jetson
-using a third-party H.264 decoder <a class="reference external" href="https://github.com/KDharmarajanDev/h264_image_transport">image_transport
+using a third-party H.264 decoder <a class="reference external" href="https://github.com/clydemcqueen/h264_image_transport">image_transport
 plugin</a>
 used in <a class="reference external" href="https://github.com/berkeleyAutomation/FogROS2">FogROS2</a>.</p>
 <p>The launch file here replays a target rosbag recorded with
@@ -1673,7 +1673,7 @@ decoder to be displayed in an image view window.</p>
 <li><p>Complete the quickstart <a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#quickstart"><span class="std std-ref">here</span></a>.</p></li>
 <li><p>Clone the following third-party repository into your workspace:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/workspaces/isaac_ros-dev/src
-git<span class="w"> </span>clone<span class="w"> </span>https://github.com/KDharmarajanDev/h264_image_transport.git
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/clydemcqueen/h264_image_transport.git
 
 <span class="c1"># Install dependencies for the third-party package</span>
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libavdevice-dev<span class="w"> </span>libavformat-dev<span class="w"> </span>libavcodec-dev<span class="w"> </span>libavutil-dev<span class="w"> </span>libswscale-dev

@@ -268,9 +268,9 @@
 </li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the demonstration scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with custom human paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a custom scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
 <li class="toctree-l6"><a class="reference internal" href="tutorials/tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
@@ -504,7 +504,6 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-parameters">ROS Parameters</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#ros-topics-published">ROS Topics Published</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#input-restrictions">Input Restrictions</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html#output-interpretations">Output Interpretations</a></li>
 </ul>
 </li>
@@ -1247,6 +1246,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#use-different-models">Use Different Models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#troubleshooting">Troubleshooting</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
@@ -1646,7 +1646,7 @@
              
   <section id="technical-details">
 <h1>Technical Details<a class="headerlink" href="#technical-details" title="Link to this heading"></a></h1>
-<p>In this document we describe how nvblox works for its different mapping modes.</p>
+<p>This document describes how nvblox works for its different mapping modes.</p>
 <section id="static-reconstruction">
 <h2>Static Reconstruction<a class="headerlink" href="#static-reconstruction" title="Link to this heading"></a></h2>
 <p>Nvblox builds a reconstructed map in the form of a TSDF
@@ -1658,14 +1658,12 @@ surface at each voxel. The surface of the environment can then be
 extracted as the zero-level set of this voxelized function. Typically,
 TSDF-based reconstructions provide higher quality surface
 reconstructions.</p>
-<p>In addition to their use in (surface) reconstruction, distance fields
-are also useful for path planning. In particular, they provide an
+<p>Distance fields are useful for path planning. They provide an
 immediate means of checking potential future robot positions for
-collisions with the reconstructed environment. Therefore, in addition
-to the surface reconstruction (the TSDF), nvblox allows construction
-of the full (non-truncated) distance field, typically called the ESDF
-(Euclidean Signed Distance Function) in robotics literature.</p>
-<p>The dual utility of distance functions for both reconstruction and
+collisions with the reconstructed environment. nvblox provides for construction
+of the full (non-truncated) distance field, also known as the ESDF
+(Euclidean Signed Distance Function).</p>
+<p>The dual utility of distance functions for reconstruction and
 planning motivates their use in nvblox.</p>
 <figure class="align-center">
 <a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/system_diagram_technical_details.jpg/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/system_diagram_technical_details.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/system_diagram_technical_details.jpg/" style="width: 500px;" /></a>
@@ -1673,8 +1671,8 @@ planning motivates their use in nvblox.</p>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>The diagram above indicates data and processes in nvblox. In the default
-configuration nvblox builds TSDF, color, mesh, and ESDF <em>layers</em>. Each
+<p>The diagram above indicates data and processes in nvblox. By default,
+nvblox builds TSDF, color, mesh, and ESDF <em>layers</em>. Each
 <em>layer</em> is an independent, but aligned and co-located, voxel grid
 containing data of the appropriate type. For example, voxels on the TSDF
 layer store distance and weight data, while the color layer voxels store
@@ -1682,9 +1680,9 @@ color values.</p>
 </section>
 <section id="human-reconstruction">
 <h2>Human Reconstruction<a class="headerlink" href="#human-reconstruction" title="Link to this heading"></a></h2>
-<p>In addition to TSDF mapping of the environment we also provide
+<p>There are
 additional options for mapping scenes containing people. In this
-configuration humans are separated from the TSDF reconstruction into a
+configuration, humans are separated from the TSDF reconstruction into a
 separate <em>layer</em> containing an occupancy grid representing reconstructed
 humans.</p>
 <p>Human segmentation is applied to each processed color frame with
@@ -1692,10 +1690,10 @@ humans.</p>
 The depth masker module uses the segmentation mask from the color image
 to separate the depth-map into human and non-human parts. While the
 non-human labeled part of the depth frame is still forwarded to TSDF
-mapping as explained above, the human labeled part is processed to an
+mapping, the human labeled part is processed to an
 occupancy grid map.</p>
 <p>To relax the assumption that occupancy grid maps only capture static
-objects we apply an occupancy decay step. At a fixed frequency, all
+objects, an occupancy decay step must be applied. At a fixed frequency, all
 voxel occupancy probabilities are decayed towards <code class="docutils literal notranslate"><span class="pre">0.5</span></code> over time.
 This means that the state of the map (occupied or free) becomes less
 certain after it has fallen out of the field of view, until it becomes
@@ -1725,11 +1723,11 @@ to generate a mask image for separating human detections into a dynamic occupanc
 the general dynamic reconstruction pipeline maintains a (high-confidence)
 freespace layer dedicated to detecting dynamic objects.
 Whenever an object enters freespace, it is identified as dynamic and
-then integrated into the dynamic occupancy layer, in a similar manner to
+then integrated into the dynamic occupancy layer, similar to
 the human reconstruction pipeline described above.</p>
-<p>This enables the pipeline not only to separately reconstruct humans
-(or other specific objects that the DNN was trained for),
-but all moving objects regardless of their class or category.</p>
+<p>This enables the pipeline to separately reconstruct humans
+(or other specific objects that the DNN was trained for)
+and all moving objects regardless of their class or category.</p>
 <figure class="align-center">
 <a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/system_diagram_dynamics.jpg/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/system_diagram_dynamics.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/system_diagram_dynamics.jpg/" style="width: 500px;" /></a>
 </figure>

@@ -17,7 +17,7 @@ Tutorial with Isaac Sim
    :alt: Tutorial Visual
    :align: center
 
-This tutorial walks you through steps to send missions from `Mission Dispatch <https://gitlab-master.nvidia.com/isaac_amr_platform/mission_dispatch>`_ to Isaac ROS Mission Client using the `VDA5050 protocol <https://github.com/VDA5050/VDA5050/blob/main/VDA5050_EN.md>`_. The Mission Client is attached to an Isaac Sim environment running the `Nav2 stack <https://navigation.ros.org/>`_. The summary of steps are as follows:
+This tutorial walks you through steps to send missions from `Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch>`_ to Isaac ROS Mission Client using the `VDA5050 protocol <https://github.com/VDA5050/VDA5050/blob/main/VDA5050_EN.md>`_. The Mission Client is attached to an Isaac Sim environment running the `Nav2 stack <https://navigation.ros.org/>`_. The summary of steps are as follows:
 
 1. Set up Isaac Sim
 2. Run Mission Client
@@ -113,14 +113,14 @@ Tutorial Walkthrough
       Start the API and database server with the official Docker container.
 
       .. code-block:: bash
-
-          docker run -it --network host nvcr.io/nvstaging/isaac/mission-database:isaac_ros
+        
+          docker run -it --network host nvcr.io/nvidia/isaac/mission-database:isaac_ros
 
       To see what configuration options are, run:
 
       .. code-block:: bash
 
-          docker run -it --network host nvcr.io/nvstaging/isaac/mission-database:isaac_ros --help
+          docker run -it --network host nvcr.io/nvidia/isaac/mission-database:isaac_ros --help
 
       # For example, if you want to change the port for the user API from the default 5000 to 5002, add `--port 5002` configuration option in the command.
 
@@ -130,13 +130,13 @@ Tutorial Walkthrough
 
       .. code-block:: bash
 
-          docker run -it --network host nvcr.io/nvstaging/isaac/mission-dispatch:isaac_ros
+          docker run -it --network host nvcr.io/nvidia/isaac/mission-dispatch:isaac_ros
 
       # To see what the configuration options are, add --help option after the command.
 
 .. note::
 
-    Read `this tutorial <https://gitlab-master.nvidia.com/isaac_amr_platform/mission_dispatch#getting-started-with-deployment-recommended>`_ for more deployment options for Mission Dispatch.
+    Read `this tutorial <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`_ for more deployment options for Mission Dispatch.
 
 12. Open `http://localhost:5000/docs` in a web browser.
 13. Use the `POST /robots` endpoint to create robot objects. See the video below for steps.
