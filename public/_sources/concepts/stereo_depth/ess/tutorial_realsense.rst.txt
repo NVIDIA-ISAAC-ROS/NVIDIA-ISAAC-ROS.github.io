@@ -1,0 +1,49 @@
+Tutorial for DNN Stereo Depth Estimation using a RealSense camera
+=================================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/ess/realsense_example.png>`
+    :align: center
+
+Overview
+------------
+
+This tutorial demonstrates how to perform stereo-camera-based
+reconstruction using a
+`RealSense <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__
+camera and
+:ir_repo:`isaac_ros_ess <isaac_ros_dnn_stereo_depth> <isaac_ros_ess>`.
+
+.. note::
+
+   This tutorial requires a compatible RealSense camera from
+   the list available
+   :doc:`here </getting_started/hardware_setup/sensors/realsense_setup>`
+
+Tutorial Walkthrough
+--------------------
+
+1. Complete the :doc:`realsense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
+2. Complete steps 1-2, 4-6 described in the
+   :ref:`ESS Quickstart Guide <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index:quickstart>`.
+3. Open a new terminal and launch the Docker container using the
+   ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+5. Run the launch file, which launches the example and waits for 10
+   seconds:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_ess isaac_ros_ess_realsense.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine threshold:=0.8

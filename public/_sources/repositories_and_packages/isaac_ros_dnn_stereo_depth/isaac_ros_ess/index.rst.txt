@@ -1,0 +1,257 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_dnn_stereo_depth> <isaac_ros_ess>`
+
+Quickstart
+----------
+
+1.  Set up your development environment by following the instructions
+    :doc:`here </getting_started/dev_env_setup>`.
+
+2.  Clone this repository and its dependencies under
+    ``~/workspaces/isaac_ros-dev/src``:
+
+    .. code:: bash
+
+       mkdir -p ~/workspaces/isaac_ros-dev/src && cd ~/workspaces/isaac_ros-dev/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_nitros>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_dnn_stereo_depth>`
+
+3.  Pull down a ROS Bag of sample data:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth && \
+       git lfs pull -X "" -I "resources/rosbags/ess_rosbag"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && ./scripts/run_dev.sh
+
+5.  Download the pre-trained ESS model from the `ESS model
+    page <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`__:
+
+    For ESS:
+
+      .. code:: bash
+
+          cd /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources && \
+          wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/dnn_stereo_disparity/versions/3.0.0/files/ess.etlt'
+
+    For Light ESS:
+
+      .. code:: bash
+
+          cd /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources && \
+          wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/dnn_stereo_disparity/versions/3.0.0/files/light_ess.etlt'
+
+
+6.  Convert the encrypted model (``.etlt``) to a TensorRT engine plan:
+
+    For ESS:
+
+      .. code:: bash
+
+          /opt/nvidia/tao/tao-converter -k ess -t fp16 -e /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine -o output_left,output_conf /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.etlt
+
+    For Light ESS:
+
+      .. code:: bash
+
+          /opt/nvidia/tao/tao-converter -k ess -t fp16 -e /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine -o output_left,output_conf /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/light_ess.etlt
+
+7.  Build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build && \
+         source install/setup.bash
+
+    .. note::
+
+      We recommend rebuilding the package each time the source
+      files are edited. Before rebuilding, first clean the workspace by
+      running ``rm -r build install log``.
+
+8.  (Optional) Run tests to verify complete and correct installation:
+
+    .. code:: bash
+
+       colcon test --executor sequential
+
+9.  Launch the ESS Disparity Node:
+
+     To run ESS at a threshold of 0.9 run:
+
+     .. code:: bash
+
+       ros2 launch isaac_ros_ess isaac_ros_ess.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine threshold:=0.9
+
+     To run ESS at a threshold of 0.0 run:
+
+     .. code:: bash
+
+       ros2 launch isaac_ros_ess isaac_ros_ess.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine threshold:=0.0
+
+10. Open a **second terminal** and attach to the container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+11. In the **second terminal**, visualize and validate the output of the
+    package:
+
+    .. code:: bash
+
+       source install/setup.bash && \
+         ros2 run isaac_ros_ess isaac_ros_ess_visualizer.py --enable_rosbag
+
+    With ESS and threshold set to 0.9, the expected result is:
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/warehouse_conf0.9.png>`
+       :align: center
+
+    With ESS and threshold set to 0.0, the expected result is:
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/ess_warehouse_0.0.png>`
+       :align: center
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+
+   Tutorial with RealSense </concepts/stereo_depth/ess/tutorial_realsense>
+
+   Tutorial with Zed </concepts/stereo_depth/ess/tutorial_zed>
+
+   Tutorial with Isaac Sim </concepts/stereo_depth/ess/tutorial_isaac_sim>
+
+   Tutorial with NITROS Graph </concepts/stereo_depth/ess/tutorial_nitros_graph>
+
+   Visualize ESS Output </concepts/stereo_depth/ess/visualize_image>
+
+Troubleshooting
+---------------
+
+.. include:: /repositories_and_packages/isaac_ros_dnn_stereo_depth/_snippets/troubleshooting.rst
+
+API
+----
+
+Overview
+~~~~~~~~
+
+The ``isaac_ros_ess`` package offers functionality to generate a stereo
+disparity map from stereo images using a trained ESS model. Given a pair
+of stereo input images, the package generates a continuous disparity
+image for the left input image.
+
+Usage
+~~~~~
+
+.. code:: bash
+
+   ros2 launch isaac_ros_ess isaac_ros_ess.launch.py engine_file_path:=<your ESS engine plan absolute path>
+
+ESSDisparityNode
+~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+==================== ========== ============== ===========================================================================================================================================================================================================
+ROS Parameter        Type       Default        Description
+==================== ========== ============== ===========================================================================================================================================================================================================
+``engine_file_path`` ``string`` N/A - Required The absolute path to the ESS engine file.
+``threshold``        ``double`` 0.9            Threshold value ranges between 0.0 and 1.0 for filtering disparity with confidence. Pixels with confidence less than threshold will be marked as invalid in the disparity output. Value 0.0 means a fully dense disparity output.
+``image_type``       ``string`` ``"RGB_U8"``.  The input image encoding type. Supports ``"RGB_U8"`` and ``"BGR_U8"``. Note that if this parameter is not specified and there is an upstream Isaac ROS NITROS node, the type will be decided automatically.
+==================== ========== ============== ===========================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+===================== ================================================================================================================= =================================
+ROS Topic             Interface                                                                                                         Description
+===================== ================================================================================================================= =================================
+``left/image_rect``   `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           The left image of a stereo pair.
+``right/image_rect``  `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           The right image of a stereo pair.
+``left/camera_info``  `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ The left camera model.
+``right/camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ The right camera model.
+===================== ================================================================================================================= =================================
+
+.. note::
+
+   The images on input topics (``left/image_rect`` and ``right/image_rect``) should be a color image either in ``rgb8`` or ``bgr8`` format.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============= ========================================================================================================================= ===========================================
+ROS Topic     Interface                                                                                                                 Description
+============= ========================================================================================================================= ===========================================
+``disparity`` `stereo_msgs/DisparityImage <https://github.com/ros2/common_interfaces/blob/humble/stereo_msgs/msg/DisparityImage.msg>`__ The continuous stereo disparity estimation.
+============= ========================================================================================================================= ===========================================
+
+Input Restrictions
+^^^^^^^^^^^^^^^^^^
+
+1. The input left and right images must have the **same dimension and
+   resolution**, and the resolution must be **no larger than
+   1920x1200**.
+
+2. Each input pair (``left/image_rect``, ``right/image_rect``,
+   ``left/camera_info`` and ``right/camera_info``) should have the
+   **same timestamp**; otherwise, the synchronizing module inside the
+   ESS Disparity Node will drop the input with smaller timestamps.
+
+Output Interpretations
+^^^^^^^^^^^^^^^^^^^^^^
+
+1. The ``isaac_ros_ess`` package outputs a disparity image with dimension same as the ESS model output dimension.
+
+   ================== ================
+   ESS Model          Output Dimension
+   ================== ================
+   ``ess.etlt``       960 x 576
+   ``light_ess.etlt`` 480 x 288
+   ================== ================
+
+   The input images are rescaled to the ESS model input dimension
+   before inferencing. There are two outputs from the ESS model
+   with the same dimension: disparity output and confidence output.
+   The disparity is filtered with confidence using a pre-configured threshold.
+   Pixels with confidence less than the threshold is replaced with -1.0 as
+   invalid before the inference result is published. For fully dense disparity output
+   without confidence thresholding, set the threshold to 0.0.
+
+2. The left and right ``CameraInfo`` are used to composite a
+   ``stereo_msgs/DisparityImage``. If you only care about the disparity
+   image, and don't need the baseline and focal length information, you
+   can pass dummy camera messages.
+
+.. |package_name| replace:: ``isaac_ros_ess``

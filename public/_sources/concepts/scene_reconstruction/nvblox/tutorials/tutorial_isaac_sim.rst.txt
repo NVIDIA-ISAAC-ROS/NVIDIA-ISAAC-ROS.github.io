@@ -1,0 +1,63 @@
+Static Reconstruction in Isaac Sim
+===================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/isaac_sim_nvblox_nav2.gif>`
+   :align: center
+   :width: 600px
+
+This tutorial walks you through generating a 3D reconstruction with
+nvblox using image and LiDAR data from Isaac Sim. The reconstruction is
+displayed as a 3D mesh in RVIZ. Nvblox also converts the reconstruction
+into a 2D costmap, which is fed into the Nav2 stack for path planning.
+
+Tutorial Walkthrough
+--------------------
+
+1. Complete the 
+   :doc:`Nvblox Quickstart </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index>`.
+
+2. Install Isaac Sim,
+   open the Isaac Sim terminal and export the needed environment variables 
+   as explained in steps 1-3 of the :doc:`Isaac Sim Setup Guide </getting_started/isaac_sim/index>`.
+
+3. Start the simulation by running the below command in the terminal opened in the previous step:
+
+   .. code:: bash
+
+      ./python.sh ~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/nvblox_isaac_sim/omniverse_scripts/start_isaac_sim.py --gpu_physics_enabled
+
+   .. note::
+
+      The ``start_isaac_sim`` script is explained in detail
+      :ir_repo:`here <isaac_ros_nvblox> <nvblox_examples/nvblox_isaac_sim/omniverse_scripts/README.md>`.
+
+4. *In another terminal* launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+5.  Inside the container, build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+6. Launch the pre-composed graph launch file:
+
+   .. code:: bash
+
+      ros2 launch nvblox_examples_bringup isaac_sim_example.launch.py
+
+7. Click on the **2D Goal Pose** button. You should see the mesh and
+   costmap, as well as the robot moving towards the goal location, as
+   shown at the top of this page.
+
+Troubleshooting
+---------------
+
+Refer to the
+:doc:`/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_isaac_sim`.

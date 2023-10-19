@@ -1,0 +1,104 @@
+Isaac ROS Buildfarm
+===================
+
+NVIDIA Jetson platforms run on JetPack OS which is based on Ubuntu Linux. JetPack 5.x is
+built on top of Ubuntu 20.04 Focal, meaning that Debian packages for ROS 2 Humble 
+built by the ROS 2 Buildfarm for Ubuntu 22.04 Jammy are unsupported. 
+
+Since the official ROS 2 Buildfarm only builds for Ubuntu 22.04 Jammy, 
+the Isaac ROS Buildfarm is setup to build ROS 2 packages from source for Ubuntu 20.04 Focal.
+
+Setup
+-----
+
+The Isaac ROS Buildfarm is a fork of the official Buildfarm with several modifications to build
+nearly all ROS 2 packages for Ubuntu 20.04 Focal. NVIDIA's semi-global CDN distributes these 
+community-contributed packages and soon prebuilt Isaac ROS Debian packages.
+
+To setup the CDN as an apt source, perform the following steps:
+
+Set Locale
+~~~~~~~~~~
+
+.. code:: shell
+
+   locale  # check for UTF-8
+
+   sudo apt update && sudo apt install locales
+   sudo locale-gen en_US en_US.UTF-8
+   sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+   export LANG=en_US.UTF-8
+
+   locale  # verify settings
+
+Install Dependencies
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: shell
+
+   sudo apt update && sudo apt install gnupg wget
+   sudo apt install software-properties-common
+   sudo add-apt-repository universe
+
+Setup Source
+~~~~~~~~~~~~
+
+First, register the GPG key with ``apt``. Two options are listed below, one
+for ``.com`` (US CDN) and one for ``.cn`` (China CDN) - choose whichever you
+prefer.
+
+.. code:: shell
+
+   wget -qO - https://isaac.download.nvidia.com/isaac-ros/repos.key | sudo apt-key add -
+
+.. code:: shell
+
+   wget -qO - https://isaac.download.nvidia.cn/isaac-ros/repos.key | sudo apt-key add -
+
+Now add the repository to your ``apt`` sources.
+
+.. code:: shell
+
+   echo 'deb https://isaac.download.nvidia.com/isaac-ros/ubuntu/main focal main' | sudo tee -a /etc/apt/sources.list"
+
+.. code:: shell
+
+   echo 'deb https://isaac.download.nvidia.cn/isaac-ros/ubuntu/main focal main' | sudo tee -a /etc/apt/sources.list"
+
+This should allow for as-normal installation of almost all ROS 2
+packages. We guarantee support for any ROS 2 packages on which Isaac ROS
+is dependent.
+
+Install ROS 2 Packages
+----------------------
+
+.. code:: shell
+
+   sudo apt update
+
+Per ROS 2 documentation:
+
+Desktop Install (Recommended): ROS, RViz, demos, tutorials.
+
+.. code:: shell
+
+   sudo apt install ros-humble-desktop
+
+and/or
+
+.. code:: shell
+
+   sudo apt install ros-humble-desktop-full
+
+ROS-Base Install (Bare Bones): Communication libraries, message
+packages, command line tools. No GUI tools.
+
+.. code:: shell
+
+   sudo apt install ros-humble-ros-base
+
+Development tools: Compilers and other tools to build ROS packages
+
+.. code:: shell
+
+   sudo apt install ros-dev-tools

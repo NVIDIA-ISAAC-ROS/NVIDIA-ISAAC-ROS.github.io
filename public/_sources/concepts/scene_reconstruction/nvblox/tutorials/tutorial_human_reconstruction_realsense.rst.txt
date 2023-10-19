@@ -1,0 +1,203 @@
+Human Reconstruction with RealSense
+===================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_nvblox_humans.gif>`
+    :width: 600px
+    :align: center
+
+In this tutorial we'll demonstrate how one can perform dynamic human
+reconstruction in nvblox using RealSense data. If you want to know how
+human reconstruction works behind the scenes refer to the
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+
+Setup Isaac ROS Image Segmentation
+------------------------------------
+
+.. note::
+
+   Currently we recommend the heavier
+   ``PeopleSemSegNet`` over the lighter ``PeopleSemSegNet ShuffleSeg``
+   model provided in :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`
+   for better segmentation performance on a Desktop. If used on a Jetson, 
+   using the lighter ``PeopleSemSegNet ShuffleSeg`` model is recommended for 
+   overall inference speed/prediction accuracy trade-off.
+
+The following steps show you how to run ``PeopleSemSegNet`` in ROS.
+Refer to
+:ir_repo:`this document <isaac_ros_image_segmentation>` 
+to run the ``PeopleSemSegNet ShuffleSeg`` network.
+
+1.  Complete all steps of the :doc:`tutorial_realsense`
+    and make sure it is working fine.
+
+2.  Clone the segmentation repository and its dependencies under
+    ``~/workspaces/isaac_ros-dev/src``.
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_image_segmentation>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_dnn_inference>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_image_pipeline.git>`
+
+3.  Pull down a ROS Bag of sample data:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_image_segmentation && \
+           git lfs pull -X "" -I "resources/rosbags/"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5.  Download the ``PeopleSemSegNet`` ETLT file and the\ ``int8``
+    inference mode cache file:
+
+    .. code:: bash
+
+       mkdir -p /workspaces/isaac_ros-dev/models/peoplesemsegnet/1
+       cd /workspaces/isaac_ros-dev/models/peoplesemsegnet
+       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_quantized_vanilla_unet_v2.0/files/peoplesemsegnet_vanilla_unet_dynamic_etlt_int8.cache'
+       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_quantized_vanilla_unet_v2.0/files/peoplesemsegnet_vanilla_unet_dynamic_etlt_int8_fp16.etlt'
+
+6.  Convert the ETLT file to a TensorRT plan file:
+
+    .. code:: bash
+
+       /opt/nvidia/tao/tao-converter -k tlt_encode -d 3,544,960 -p input_1:0,1x3x544x960,1x3x544x960,1x3x544x960 -t int8 -c peoplesemsegnet_vanilla_unet_dynamic_etlt_int8.cache -e /workspaces/isaac_ros-dev/models/peoplesemsegnet/1/model.plan -o argmax_1 peoplesemsegnet_vanilla_unet_dynamic_etlt_int8_fp16.etlt
+
+7.  Create the Triton configuration file called
+    ``/workspaces/isaac_ros-dev/models/peoplesemsegnet/config.pbtxt``
+    with the following content:
+
+    .. code:: bash
+
+       name: "peoplesemsegnet"
+       platform: "tensorrt_plan"
+       max_batch_size: 0
+       input [
+         {
+           name: "input_1:0"
+           data_type: TYPE_FP32
+           dims: [ 1, 3, 544, 960 ]
+         }
+       ]
+       output [
+         {
+           name: "argmax_1"
+           data_type: TYPE_INT32
+           dims: [ 1, 544, 960, 1 ]
+         }
+       ]
+       version_policy: {
+         specific {
+           versions: [ 1 ]
+         }
+       }
+
+8.  Inside the container, build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+9.  (Optional) Run tests to verify complete and correct installation:
+
+    .. code:: bash
+
+       colcon test --executor sequential
+
+10. Run this following launch file to get the ROS node running:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_unet isaac_ros_unet_triton.launch.py model_name:=peoplesemsegnet model_repository_paths:=['/workspaces/isaac_ros-dev/models'] input_binding_names:=['input_1:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax'
+
+11. Open *two* other terminals, and enter the Docker container in both:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+12. Play the ROS bag in one of the terminals:
+
+    .. code:: bash
+
+       ros2 bag play -l src/isaac_ros_image_segmentation/resources/rosbags/unet_sample_data/
+
+    And visualize the output in the other terminal:
+
+    .. code:: bash
+
+       ros2 run rqt_image_view rqt_image_view
+
+13. Verify that the output looks similar to :ir_repo:`this image. <isaac_ros_image_segmentation> <resources/peoplesemsegnet_shuffleseg_rqt.png>`
+
+Example with RealSense Live Data
+--------------------------------
+
+1. Complete the `Setup Isaac ROS Image Segmentation`_ section above.
+
+2. Connect the RealSense device to your machine via USB 3 cable/port.
+
+3. Run the ROS Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Source the workspace:
+
+   .. code:: bash
+
+      source /workspaces/isaac_ros-dev/install/setup.bash
+
+5. At this point, you can check that the RealSense camera is connected
+   by running ``realsense-viewer``:
+
+   .. code:: bash
+
+      realsense-viewer
+
+6. If successful, run the launch file to spin up the example:
+
+   .. code:: bash
+
+      ros2 launch nvblox_examples_bringup realsense_humans_example.launch.py
+
+.. note::
+
+   If you want to restrict odometry to a 2D plane 
+   (e.g. in case of running a robot in a flat environment), 
+   you can use the ``flatten_odometry_to_2d`` argument.
+
+
+Example with RealSense Recorded Data
+------------------------------------
+
+If you want to run the example on recorded data refer to the
+:doc:`tutorial_realsense_record`.
+
+Troubleshooting
+---------------
+
+Refer to the
+:doc:`/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense`.

@@ -1,0 +1,78 @@
+Dynamic Reconstruction with RealSense
+=====================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_dynamic_example.gif>`
+    :width: 600px
+    :align: center
+
+In this tutorial we'll demonstrate how one can perform reconstruction
+of a scene with moving elements in nvblox, using a RealSense camera.
+
+The algorithm used for nvblox dynamic reconstruction is based on the following paper:
+
+* | Lukas Schmid, Olov Andersson, Aurelio Sulser, Patrick Pfreundschuh, and Roland Siegwart.
+  | "**Dynablox: Real-time Detection of Diverse Dynamic Objects in Complex Environments**"
+  | in *IEEE Robotics and Automation Letters (RA-L)*,
+    Vol. 8, No. 10, pp. 6259 - 6266, October 2023. 
+  | [ `IEEE <https://ieeexplore.ieee.org/document/10218983>`__ | `ArXiv <https://arxiv.org/abs/2304.10049>`__ | `Video <https://www.youtube.com/watch?v=NA13fRWlqRQ>`__]
+
+If you want to know more about our approach to dynamic reconstruction in nvblox refer to the
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+.. note::
+
+  Dynamic reconstruction requires accurate pose estimation.
+  Objects moving slower than the odometry drift can not be detected as dynamic.
+
+
+Example with RealSense Live Data
+--------------------------------
+
+Before continuing this example, make sure that the :doc:`tutorial_realsense` is working fine.
+
+1. Connect the RealSense device to your machine via USB 3 cable/port.
+
+2. Run the ROS Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      ./scripts/run_dev.sh
+
+3. Source the workspace:
+
+   .. code:: bash
+
+      source /workspaces/isaac_ros-dev/install/setup.bash
+
+4. At this point, you can check that the RealSense camera is connected by running ``realsense-viewer``:
+
+   .. code:: bash
+
+      realsense-viewer
+
+5. If successful, run the launch file to spin up the example:
+
+   .. code:: bash
+
+      ros2 launch nvblox_examples_bringup realsense_dynamics_example.launch.py
+
+
+.. note::
+
+   If you want to restrict odometry to a 2D plane 
+   (e.g. in case of running a robot in a flat environment), 
+   you can use the ``flatten_odometry_to_2d`` argument.
+
+
+Example with RealSense Recorded Data
+------------------------------------
+
+If you want to run the example on recorded data refer to the
+:doc:`tutorial_realsense_record`.
+
+Troubleshooting
+---------------
+
+Refer to the
+:doc:`/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense`.

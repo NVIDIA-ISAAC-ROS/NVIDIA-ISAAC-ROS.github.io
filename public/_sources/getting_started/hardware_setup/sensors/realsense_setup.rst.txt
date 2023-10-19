@@ -1,0 +1,77 @@
+=========================
+Isaac ROS RealSense Setup
+=========================
+
+Camera Compatibility
+--------------------
+
+================= ==============
+RealSense Model   Supported?
+================= ==============
+D455              ✓
+D435i             ✓
+D415              ✗
+================= ==============
+
+.. note::
+
+  For best results, you must update the camera's firmware.
+
+Setup Instructions
+------------------
+
+.. note::
+
+  This tutorial assumes that you have completed following the instructions :doc:`Developer Environment Setup </getting_started/dev_env_setup>`.
+
+1. Clone the ``librealsense`` repository and setup ``udev`` rules. Remove any connected RealSense cameras when prompted:
+
+  .. code:: bash
+
+    cd /tmp && \
+    git clone https://github.com/IntelRealSense/librealsense && \
+    cd librealsense && \
+    ./scripts/setup_udev_rules.sh
+
+2. Clone the ``isaac_ros_common`` and the ``4.51.1`` release of the ``realsense-ros`` repository:
+
+  .. note::
+
+    ``${ISAAC_ROS_WS}`` is defined to point to ``/ssd/workspaces/isaac_ros-dev/`` or ``~/workspaces/isaac_ros-dev/``.
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src
+    git clone :ir_clone:`<isaac_ros_common>`
+    git clone https://github.com/IntelRealSense/realsense-ros.git -b 4.51.1
+
+3. Plug in your RealSense camera before launching the Docker container in the next step.
+
+4. Configure the container created by ``isaac_ros_common/scripts/run_dev.sh`` to include ``librealsense``. Create the ``.isaac_ros_common-config`` file in the ``isaac_ros_common/scripts`` directory:
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts && \
+    touch .isaac_ros_common-config && \
+    echo CONFIG_IMAGE_KEY=ros2_humble.realsense > .isaac_ros_common-config
+
+5. Launch the Docker container:
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+    ./scripts/run_dev.sh ${ISAAC_ROS_WS}
+
+  This rebuilds the container image using ``Dockerfile.realsense`` in one of its layered stage. Rebuilding can take several minutes.
+
+6. After the container image is rebuilt and you are inside the container, you can run ``realsense-viewer`` to verify that the RealSense camera is connected.
+
+  .. code:: bash
+
+    realsense-viewer
+
+  If you turn on the "Stereo Module" in the GUI, you should see something like the following:
+
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/realsense_viewer.png>`
+   :align: center

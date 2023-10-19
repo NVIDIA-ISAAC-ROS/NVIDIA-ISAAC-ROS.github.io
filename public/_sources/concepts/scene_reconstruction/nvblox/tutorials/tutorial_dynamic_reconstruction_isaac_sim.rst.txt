@@ -1,0 +1,99 @@
+Dynamic Reconstruction in Isaac Sim
+===================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/isaac_sim_dynamic_example.gif>`
+   :align: center
+   :width: 600px
+
+In this tutorial we'll demonstrate how one can perform general
+dynamic reconstruction in nvblox with Isaac Sim.
+
+The algorithm used for nvblox dynamic reconstruction is based on the following paper:
+
+* | Lukas Schmid, Olov Andersson, Aurelio Sulser, Patrick Pfreundschuh, and Roland Siegwart.
+  | "**Dynablox: Real-time Detection of Diverse Dynamic Objects in Complex Environments**"
+  | in *IEEE Robotics and Automation Letters (RA-L)*,
+    Vol. 8, No. 10, pp. 6259 - 6266, October 2023. 
+  | [ `IEEE <https://ieeexplore.ieee.org/document/10218983>`__ | `ArXiv <https://arxiv.org/abs/2304.10049>`__ | `Video <https://www.youtube.com/watch?v=NA13fRWlqRQ>`__]
+
+If you want to know more about general dynamic reconstruction in nvblox refer to the
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+.. note::
+
+   Due to a known issue, the animation of humans in the scene will not happen.
+
+.. note::
+
+  Dynamic reconstruction requires accurate pose estimation.
+  Objects moving slower than the odometry drift can not be detected as dynamic.
+
+Tutorial Walkthrough
+--------------------
+
+Before continuing this example, make sure that the
+:doc:`tutorial_isaac_sim` is working fine.
+
+1. Download the code for :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>`
+   and :ir_repo:`Isaac ROS NITROS <isaac_ros_nitros>`.
+
+   .. code:: bash
+
+    cd ~/workspaces/isaac_ros-dev/src && \
+      git clone :ir_clone:`<isaac_ros_visual_slam.git>`
+
+
+   .. code:: bash
+
+    git clone :ir_clone:`<isaac_ros_nitros>`
+
+
+.. note::
+
+   In this tutorial we are running ``Isaac ROS Visual SLAM`` for pose estimation instead
+   of using the Isaac Sim poses. This has shown to be more robust for
+   dynamic detection due to a known issue in Isaac Sim. 
+
+2. Open the Isaac Sim terminal and export the needed environment variables 
+   as explained in steps 2-3 of the :doc:`Isaac Sim Setup Guide </getting_started/isaac_sim/index>`.
+
+3. Start the simulation by running the below command in the terminal opened in the previous step:
+
+   .. code:: bash
+
+    ./python.sh ~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/nvblox_isaac_sim/omniverse_scripts/start_isaac_sim.py --with_people --gpu_physics_enabled --scenario_path=/Isaac/Samples/NvBlox/carter_warehouse_navigation_with_dynamics.usd
+
+   .. note::
+
+      The ``start_isaac_sim`` script is explained in detail
+      :ir_repo:`here <isaac_ros_nvblox> <nvblox_examples/nvblox_isaac_sim/omniverse_scripts/README.md>`.
+      
+4. *In another terminal* run the ROS Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+    cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      ./scripts/run_dev.sh
+
+5.  Inside the container, build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+6. Launch the pre-composed graph launch file:
+
+   .. code:: bash
+
+    ros2 launch nvblox_examples_bringup isaac_sim_dynamics_example.launch.py run_vslam:=True global_frame:=odom_vslam
+
+
+7. Use the **2D Goal Pose** button to navigate the robot around.
+
+Troubleshooting
+---------------
+
+Refer to the
+:doc:`/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_isaac_sim`.

@@ -1,0 +1,54 @@
+Tutorial With RealSense
+=======================
+
+This tutorial demonstrates how to perform depth-camera based
+reconstruction using a
+`Realsense <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__
+camera and
+:ir_repo:`disparity_node <isaac_ros_image_pipeline> <isaac_ros_stereo_image_proc/src/disparity_node.cpp>`.
+
+.. note::
+
+   This tutorial requires a compatible RealSense camera from
+   the list available
+   :doc:`here </getting_started/hardware_setup/sensors/realsense_setup>`
+
+1. Complete the :doc:`RealSense Setup Tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
+
+2. Clone the ``isaac_ros_image_pipeline``:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+3. Open a new terminal and launch the Docker container using the
+   ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+5. Run the launch file, which launches the example, and wait for 10
+   seconds.
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_stereo_image_proc isaac_ros_stereo_image_pipeline_realsense.launch.py
+
+Here is a screenshot of the result from running the example:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_pipeline/realsense_example.png>`
+    :align: center

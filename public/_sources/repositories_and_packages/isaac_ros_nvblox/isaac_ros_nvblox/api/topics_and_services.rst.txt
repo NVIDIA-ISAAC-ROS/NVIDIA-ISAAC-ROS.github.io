@@ -1,0 +1,98 @@
+ROS Topics and Services
+=======================
+
+Find all topics and services of the ``nvblox_node`` and the
+``nvblox_human_node`` below.
+
+.. note::
+
+   The human reconstruction tutorials
+   (:doc:`Isaac Sim </concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim>` /
+   :doc:`realsense </concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_realsense>`)
+   launch the ``nvblox_human_node``, while the static reconstruction tutorials
+   (:doc:`Isaac Sim </concepts/scene_reconstruction/nvblox/tutorials/tutorial_isaac_sim>` /
+   :doc:`realsense </concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense>`)
+   as well as the dynamic reconstruction tutorials
+   (:doc:`Isaac Sim </concepts/scene_reconstruction/nvblox/tutorials/tutorial_dynamic_reconstruction_isaac_sim>` /
+   :doc:`realsense </concepts/scene_reconstruction/nvblox/tutorials/tutorial_dynamic_reconstruction_realsense>`)
+   launch the ``nvblox_node``. The ``nvblox_human_node`` inherits from the ``nvblox_node``
+   and is adding additional topic subscriptions for the mask
+   image containing the human semantic segmentation.
+
+
+ROS Topics Subscribed
+---------------------
+
+===================== ==================================================================================================================================== ================================================================================================================================================================================================================
+ROS Topic             Interface                                                                                                                            Description
+===================== ==================================================================================================================================== ================================================================================================================================================================================================================
+``pointcloud``        `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__                  Input 3D LIDAR pointcloud. Make sure to set the lidar intrinsic parameters if using this input, as it uses those to convert the pointcloud into a depth image.
+``color/image``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Image.msg>`__                              Optional input color image to be integrated. Must be paired with a ``camera_info`` message below. Only used to color the mesh.
+``color/camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/CameraInfo.msg>`__                    Optional topic along with the color image above. Contains intrinsics of the color camera.
+``depth/image``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                              The input depth image to be integrated. Must be paired with a ``camera_info`` message below. Supports both floating-point (depth in meters) and ``uint16`` (depth in millimeters, OpenNI format).
+``depth/camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                    Required topic along with the depth image. Contains intrinsic calibration parameters of the depth camera.
+``transform``         `geometry_message/TransformStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/TransformStamped.msg>`__ Odometry as stamped transform messages. Not required if ``use_tf_transforms`` is set to true.
+``pose``              `geometry_message/PoseStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseStamped.msg>`__           Odometry as stamped pose messages. Not required if ``use_tf_transforms`` is set to true.
+===================== ==================================================================================================================================== ================================================================================================================================================================================================================
+
+Additionally subscribed topics by the ``nvblox_human_node``:
+
+==================== ================================================================================================================= ===================================================================================================================================================================================================================================================================================================
+ROS Topic            Interface                                                                                                         Description
+==================== ================================================================================================================= ===================================================================================================================================================================================================================================================================================================
+``mask/image``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Image.msg>`__           The mask image with the human segmentation (non-human pixels = 0 and human pixels = 1). In the :doc:`/concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_realsense` tutorial this is published by :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`.
+``mask/camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ Required topic along with the mask image. Contains intrinsic calibration parameters of the mask camera.
+==================== ================================================================================================================= ===================================================================================================================================================================================================================================================================================================
+
+
+ROS Topics Published
+--------------------
+
+================================= ======================================================================================================================= =========================================================================================================================================================================================================================
+ROS Topic                         Interface                                                                                                               Description
+================================= ======================================================================================================================= =========================================================================================================================================================================================================================
+``~/mesh``                        :ir_repo:`nvblox_msgs/Mesh <isaac_ros_nvblox> <nvblox_msgs/msg/Mesh.msg>`                                               A visualization topic showing the mesh produced from the TSDF in a form that can be seen in RViz using ``nvblox_rviz_plugin``. Set ``mesh_update_rate_hz`` to control its update rate.
+``~/mesh_marker``                 `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/humble/visualization_msgs/msg/Marker.msg>`__ A visualization topic showing the mesh using a marker message.
+``~/static_esdf_pointcloud``      `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__     A pointcloud of the static 2D ESDF (Euclidean Signed Distance Field), with intensity as the metric distance to the nearest obstacle. Set ``esdf_update_rate_hz`` to control its update rate.
+``~/static_map_slice``            :ir_repo:`nvblox_msgs/DistanceMapSlice <isaac_ros_nvblox> <nvblox_msgs/msg/DistanceMapSlice.msg>`                       A 2D slice of the static ESDF, to be consumed by ``nvblox_nav2`` package for interfacing with Nav2. Set ``esdf_update_rate_hz`` to control its update rate.
+``~/static_occupancy``            `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__     A pointcloud of the static occupancy map (only voxels with occupation ``probability > 0.5``). Set ``static_occupancy_publication_rate_hz`` to control its publication rate.
+``~/map_slice_bounds``            `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/humble/visualization_msgs/msg/Marker.msg>`__ A visualization topic showing the mesh slice bounds that can be set with the parameters ``esdf_2d_min_height`` and ``esdf_2d_min_height``.
+``~/back_projected_depth``        `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__     A pointcloud of the back projected latest depth image in the global frame.
+``~/dynamic_occupancy``           `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__     A pointcloud of the human/dynamic occupancy map (only voxels with occupation ``probability > 0.5``).
+``~/dynamic_esdf_pointcloud``     `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__     A pointcloud of the human/dynamic 2D ESDF (Euclidean Signed Distance Field), with intensity as the metric distance to the nearest human. Set ``esdf_update_rate_hz`` to control its update rate.
+``~/dynamic_map_slice``           :ir_repo:`nvblox_msgs/DistanceMapSlice <isaac_ros_nvblox> <nvblox_msgs/msg/DistanceMapSlice.msg>`                       A 2D slice of the human/dynamic ESDF, to be consumed by ``nvblox_nav2`` package for interfacing with Nav2. Set ``esdf_update_rate_hz`` to control its update rate.
+``~/dynamic_points``              `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__     Pointcloud visualizing the back-projected pixels of the latest human/dynamic masked depth frame (without temporal fusion).
+``~/dynamic_depth_frame_overlay`` `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Image.msg>`__                 Debug image showing the dynamic/human mask overlaid on the depth image. Note: The overlay is showing the mask before postprocessing.
+``~/freespace``                   `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__     Pointcloud visualizing all non high confidence freespace voxels inside a 5x5x1 m box around the depth camera.
+``~/combined_esdf_pointcloud``    `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__     A pointcloud of the combined static and human/dynamic 2D ESDF (minimal distance of both), with intensity as the metric distance to the nearest obstacle or human. Set ``esdf_update_rate_hz`` to control its update rate.
+``~/combined_map_slice``          :ir_repo:`nvblox_msgs/DistanceMapSlice <isaac_ros_nvblox> <nvblox_msgs/msg/DistanceMapSlice.msg>`                       A 2D slice of the combined static and human/dynamic ESDF (minimal distance of both), to be consumed by ``nvblox_nav2`` package for interfacing with Nav2. Set ``esdf_update_rate_hz`` to control its update rate.
+================================= ======================================================================================================================= =========================================================================================================================================================================================================================
+
+Additionally published topics by the ``nvblox_human_node``: 
+
+================================= ======================================================================================================================= ===================================================================================================================================================
+ROS Topic                         Interface                                                                                                               Description
+================================= ======================================================================================================================= ===================================================================================================================================================
+``~/human_voxels``                `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/humble/visualization_msgs/msg/Marker.msg>`__ The pointcloud published at ``~/dynamic_points`` mapped to the corresponding voxels. Set ``human_debug_publish_rate_h`` to control its update rate.
+``~/dynamic_color_frame_overlay`` `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Image.msg>`__                 Debug image showing the human mask overlaid on the color image.
+================================= ======================================================================================================================= ===================================================================================================================================================
+
+
+ROS Services Advertised
+-----------------------
+
+============== ================================================================================= =========================================================================================================================================
+ROS Service    Interface                                                                         Description
+============== ================================================================================= =========================================================================================================================================
+``~/save_ply`` :ir_repo:`nvblox_msgs/FilePath <isaac_ros_nvblox> <nvblox_msgs/srv/FilePath.srv>` Will save the mesh as the PLY (standard polygon file format, which can be viewed with MeshLab or CloudCompare) at the specified location.
+``~/save_map`` :ir_repo:`nvblox_msgs/FilePath <isaac_ros_nvblox> <nvblox_msgs/srv/FilePath.srv>` Will serialize the entire map, including TSDF, ESDF, etc., at the given location.
+``~/load_map`` :ir_repo:`nvblox_msgs/FilePath <isaac_ros_nvblox> <nvblox_msgs/srv/FilePath.srv>` Will overwrite the current map in the node with a map loaded from the given path.
+============== ================================================================================= =========================================================================================================================================
+
+Example service calls from the command line:
+
+.. code:: bash
+
+   ros2 service call /nvblox_node/save_ply nvblox_msgs/srv/FilePath "{file_path: '/home/USERNAME/super_cool_map.ply'}"
+   ros2 service call /nvblox_node/save_map nvblox_msgs/srv/FilePath "{file_path: '/home/USERNAME/super_cool_map.nvblx'}"
+   ros2 service call /nvblox_node/load_map nvblox_msgs/srv/FilePath "{file_path: '/home/USERNAME/super_cool_map.nvblx'}"

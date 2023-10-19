@@ -1,0 +1,41 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nova> <isaac_ros_hesai>`
+
+API
+----
+
+HesaiNode
+~~~~~~~~~
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+================== ==================================================================================================================================================================== ====================================================
+ROS Topic          Interface                                                                                                                                                            Description
+================== ==================================================================================================================================================================== ====================================================
+``pointcloud``     `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__                                                  The point cloud from the Hesai lidar
+================== ==================================================================================================================================================================== ====================================================
+
+Output PointCloud2 Format
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Isaac ROS Hesai Node publishes to the ``PointCloud2 msg`` with the following fields:
+
+================== ========== ===============
+Field Description  Type       Number of Bytes                                                                                                                                                    Description
+================== ========== ===============
+X point position   Float      4
+Y point position   Float      4
+Z point position   Float      4
+RGB(Ignore)        Float      4
+================== ========== ===============
+
+.. note::
+
+    The RGB data in this message should be ignored. It is present to allow for a common colored pointcloud interface with Isaac ROS NITROS.
+    The points are in clock wise order starting from the Hesai logo on the lidar.
+
+.. |package_name| replace:: ``isaac_ros_hesai``

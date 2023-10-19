@@ -1,0 +1,114 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_pipeline> <isaac_ros_stereo_image_proc>`
+
+Quickstart
+----------
+
+1. Set up your development environment by following the instructions
+   :doc:`here </getting_started/dev_env_setup>`.
+2. Clone this repository and its dependencies under
+   ``~/workspaces/isaac_ros-dev/src``.
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_common>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_nitros>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+3. Build the RealSense camera package for Humble, using :doc:`this doc </getting_started/hardware_setup/sensors/realsense_setup>`.
+
+4. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+5. Inside the container, build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+6. (Optional) Run tests to verify complete and correct installation:
+
+   .. code:: bash
+
+      colcon test --executor sequential
+
+7. Start ``isaac_ros_stereo_image_proc`` using the prebuilt launch file (Using
+   RealSense camera as an example):
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_stereo_image_proc isaac_ros_stereo_image_pipeline_realsense.launch.py
+
+..
+
+.. note::
+
+   For RealSense camera package issues, please
+   refer to the section
+   :ref:`here <troubleshooting/hardware_setup:Realsense driver does not work with ROS 2 Humble>`.
+
+   Other supported cameras can be found
+   :ref:`here <repositories_and_packages/isaac_ros_argus_camera/index:Reference Cameras>`.
+
+   For camera calibration, please refer to :doc:`this guide </getting_started/hardware_setup/sensors/camera_calibration>`.
+
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+   
+   Tutorial with Isaac Sim </concepts/stereo_depth/sgm/tutorial_isaac_sim>
+
+   Tutorial with RealSense </concepts/stereo_depth/sgm/tutorial_realsense>
+
+   Tutorial with Zed </concepts/stereo_depth/sgm/tutorial_zed>
+
+API
+----
+
+Overview
+^^^^^^^^
+
+The ``isaac_ros_stereo_image_proc`` package offers functionality for
+handling image pairs from a binocular/stereo camera setup, calculating
+the disparity between the two images, and producing a point cloud with
+depth information. It largely replaces the ``stereo_image_proc``
+package.
+
+
+Available Components
+^^^^^^^^^^^^^^^^^^^^
+
+======================== ======================================================================================================================================================================================================= ==================================================== ===================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+Component                Topics Subscribed                                                                                                                                                                                       Topics Published                                     Parameters
+======================== ======================================================================================================================================================================================================= ==================================================== ===================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+``DisparityNode``        ``left/image_rect``, ``left/camera_info``: The left camera stream ``right/image_rect``, ``right/camera_info``: The right camera stream                                                                  ``disparity``: The disparity between the two cameras ``max_disparity``: The maximum value for disparity per pixel, which is 64 by default. With ORIN backend, this value must be 128 or 256. ``backends``: The VPI backend to use, which is CUDA by default (options: “CUDA”, “XAVIER”, “ORIN”) ``confidence_threshold``: The confidence threshold for VPI SGM algorithm ``window_size``: The window size for SGM disparity calculation ``num_passes``: The number of passes SGM takes to compute result ``p1``: Penalty on disparity changes of +/- 1 between neighbor pixels ``p2``: Penalty on disparity changes of more than 1 between neighbor pixels ``p2_alpha``: Alpha for P2 ``quality``: Quality of disparity output. It's only applicable when using XAVIER backend. The higher the value, better the quality and possibly slower performance. **Refer to**\ `this VPI doc <https://docs.nvidia.com/vpi/group__VPI__StereoDisparityEstimator.html>`__\ **for more details on the parameters**
+``PointCloudNode``       ``left/image_rect_color``: The coloring for the point cloud ``left/camera_info``: The left camera info ``right/camera_info``: The right camera info ``disparity`` The disparity between the two cameras ``points2``: The output point cloud                  ``use_color``: Whether or not the output point cloud should have color. The default value is false. ``unit_scaling``: The amount to scale the ``xyz`` points by
+``DisparityToDepthNode`` ``disparity`` The disparity image                                                                                                                                                                       ``depth`` The resultant depth image                  N/A
+======================== ======================================================================================================================================================================================================= ==================================================== ===================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+
+.. |package_name| replace:: ``isaac_ros_stereo_image_proc``

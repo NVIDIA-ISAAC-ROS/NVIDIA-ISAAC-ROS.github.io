@@ -1,0 +1,69 @@
+Tutorial for Freespace Segmentation with Isaac Sim
+==================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/Isaac_sim_tutorial.gif>`
+    :width: 600px
+    :align: center
+
+Overview
+------------
+
+This tutorial demonstrates how to use a `Isaac
+Sim <https://developer.nvidia.com/isaac-sim>`__ and
+:ir_repo:`isaac_ros_bi3d_freespace <isaac_ros_freespace_segmentation> <isaac_ros_bi3d_freespace>`
+to create a local occupancy grid.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete steps 1-7 listed in the quickstart
+    :ref:`here <repositories_and_packages/isaac_ros_freespace_segmentation/isaac_ros_bi3d_freespace/index:quickstart>`.
+2.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`
+
+3.  Disable the clock reset when simulation is stopped. Go to the
+    *Stage* tab and select ``/World/ROS_Clock/isaac_read_simulation_time``,
+    then untick the *Reset On Stop* checkbox.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/Isaac_sim_disable_clock_reset.png>`
+        :width: 500px
+        :align: center
+
+4.  Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 600px
+
+5.  Open a second terminal and attach to the container:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       ./scripts/run_dev.sh
+
+6.  In the second terminal, start the ``isaac_ros_bi3d`` node using the
+    launch files:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_bi3d_freespace isaac_ros_bi3d_freespace_isaac_sim.launch.py \
+       featnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       segnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       max_disparity_values:=32
+
+    You should see a RViz window, as shown below:
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/Isaac_sim_rviz.png>`
+        :width: 500px
+        :align: center
+
+7.  Optionally, you can run the visualizer script to visualize the
+    disparity image.
+
+    .. code:: bash
+
+       ros2 run isaac_ros_bi3d isaac_ros_bi3d_visualizer.py --disparity_topic bi3d_mask
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/Visualizer_isaac_sim.png>`
+        :width: 500px
+        :align: center

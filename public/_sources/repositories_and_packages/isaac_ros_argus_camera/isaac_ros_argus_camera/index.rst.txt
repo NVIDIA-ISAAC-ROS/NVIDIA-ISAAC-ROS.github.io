@@ -1,0 +1,209 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_argus_camera> <isaac_ros_argus_camera>`
+
+Quickstart
+----------
+1. Set up your development environment by following the instructions
+   :doc:`here </getting_started/dev_env_setup>`.
+
+2. Clone this repository and its dependencies under
+   ``~/workspaces/isaac_ros-dev/src``.
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_common>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_nitros>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_argus_camera>`
+
+3. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Inside the container, build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+5. (Optional) Run tests to verify complete and correct installation:
+
+   .. code:: bash
+
+      colcon test --executor sequential
+
+6. Run the following launch files to spin up a demo of this package:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_argus_camera isaac_ros_argus_camera_mono.launch.py
+
+7. Use ``image_saver`` to save the output images:
+
+   .. code:: bash
+
+      ros2 run image_view image_saver --ros-args -r image:=/left/image_raw -p filename_format:="left_image.jpg"
+
+
+Troubleshooting
+---------------
+
+Argus fails to create capture session
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Symptoms
+^^^^^^^^
+
+The Isaac ROS Argus node can fail to create a capture session inside the
+container after the ``nvargus`` daemon has crashed. By default, the
+``nvargus`` daemon is running in background, but it may crash due to
+other Argus clients. This will prevent Argus camera nodes from creating
+capture sessions. You may see messages with errors similar to
+``Failed to create capture session``.
+
+Solution
+^^^^^^^^
+
+Exit the Docker container and restart the ``nvargus`` daemon by running
+``sudo systemctl restart nvargus-daemon.service``
+
+
+API
+----
+
+Launch monocular camera
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+   ros2 launch isaac_ros_argus_camera isaac_ros_argus_camera_mono.launch.py
+
+Launch stereo camera
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+   ros2 launch isaac_ros_argus_camera isaac_ros_argus_camera_stereo.launch.py
+
+ROS Parameters
+~~~~~~~~~~~~~~
+
+============================ ========== ============= ===========================================================================================================================================================================================
+ROS Parameter                Type       Default       Description
+============================ ========== ============= ===========================================================================================================================================================================================
+``camera_id``                ``uint``   ``0``         The video device index E.g. ``/dev/video0``
+``module_id``                ``uint``   ``0``         The camera module index in the device tree when there is more than one of the same camera module connected
+``mode``                     ``uint``   ``0``         The resolution mode supported by the camera sensor and driver.
+``camera_type``              ``uint``   ``1``         0 for Monocular type camera; 1 for Stereo type camera
+``fsync_type``               ``uint``   ``1``         Specifies what kind of Frame Synchronization to use, supported values are 0 for internal and 1 for external. For e3653 boards (carter 2.3) choose 0, for p3762 boards (carter 2.4) choose 1
+``camera_info_url``          ``string`` N/A           Optional URL of a camera info ``.ini`` file for monocular camera to read intrinsic information
+``left_camera_info_url``     ``string`` N/A           Optional URL of a camera info ``.ini`` file for the left imager of a stereo camera to read intrinsic information
+``right_camera_info_url``    ``string`` N/A           Optional URL of a camera info ``.ini`` file for the right imager of a stereo camera to read intrinsic information
+``camera_link_frame_name``   ``string`` ``camera``    The frame name associated with the origin of the camera body.
+``optical_frame_name``       ``string`` ``left_cam``  The frame name associated with the imager inside camera body (for monocular camera).
+``left_optical_frame_name``  ``string`` ``left_cam``  The frame name associated with the left imager inside camera body (for stereo camera).
+``right_optical_frame_name`` ``string`` ``right_cam`` The frame name associated with the right imager inside camera body (for stereo camera).
+============================ ========== ============= ===========================================================================================================================================================================================
+
+
+..
+
+.. note::
+
+   To run the stereo camera, two video devices should present
+   for the left and right sensors, respectively (e.g. ``/dev/video0``
+   and ``/dev/video1``).
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+==================== ================================================================================================================= =================================
+ROS Topic            Interface                                                                                                         Description
+==================== ================================================================================================================= =================================
+``left/image_raw``   `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           The left image of a stereo pair.
+``right/image_raw``  `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           The right image of a stereo pair.
+``left/camerainfo``  `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ The left camera model.
+``right/camerainfo`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ The right camera model.
+==================== ================================================================================================================= =================================
+
+Launch testing
+~~~~~~~~~~~~~~
+
+Monocular camera
+^^^^^^^^^^^^^^^^
+
+.. code:: bash
+
+   launch_test src/isaac_ros_argus_camera/isaac_ros_argus_camera/test/isaac_ros_argus_camera_mono_test.py
+
+Stereo camera
+^^^^^^^^^^^^^
+
+.. code:: bash
+
+   launch_test src/isaac_ros_argus_camera/isaac_ros_argus_camera/test/isaac_ros_argus_camera_stereo_test.py
+
+Output Color Space Format
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Isaac ROS Argus node supports the ``YUV444`` and ``YUV420``
+colorspaces from ``libargus`` and converts it to the ``RGB888``
+colorspace as output.
+
+.. _CameraInfo Message:
+
+``CameraInfo`` Message
+~~~~~~~~~~~~~~~~~~~~~~
+
+The Isaac ROS Argus node uses the Argus Ext API to retrieve calibration
+parameters from the camera through the Linux device driver and convert
+it into
+`CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+messages. Refer to `this
+page <https://docs.nvidia.com/jetson/l4t-multimedia/classArgus_1_1Ext_1_1ISyncSensorCalibrationData.html>`__
+for the data structure of the calibration parameters.
+
+.. note::
+
+   Each camera module should have stored the calibration
+   parameters in internal memory like EEPROM, and the device driver must
+   support the Argus Ext API to extract those parameters. Contact your
+   camera vendor to get the required drivers.
+.. note::
+
+   If your camera
+   does not support the Argus Ext API, you can also specify a URL to a
+   camera info ``.ini`` file parsable by the ROS
+   `CameraInfoManager <http://wiki.ros.org/camera_info_manager>`__ using
+   the ``camera_info_url`` parameter on the Isaac ROS Argus node. This
+   will allow you to provide parameters you may have calibrated using
+   the ROS Camera Calibration package, for example.
+.. note::
+
+   When the
+   ``camera_info_url`` is provided, the loaded parameters override the
+   ``CameraInfo`` from Argus Ext API.
+
+
+.. |package_name| replace:: ``isaac_ros_argus_camera``

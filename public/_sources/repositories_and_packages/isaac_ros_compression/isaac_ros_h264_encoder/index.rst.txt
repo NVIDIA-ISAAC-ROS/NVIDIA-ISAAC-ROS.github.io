@@ -1,0 +1,87 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_compression> <isaac_ros_h264_encoder>`
+
+Quickstart
+----------
+
+Please see the quickstart from :ref:`isaac_ros_h264_decoder <repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index:quickstart>`.
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+   
+    Tutorial with RealSense </concepts/compression/h264/tutorial_realsense_encoder>
+
+    Tutorial with NITROS Graph </concepts/compression/h264/tutorial_nitros_graph>
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_h264_encoder isaac_ros_h264_encoder.launch.py input_width:=<"your input image width"> input_height:=<"your input image height">
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+=================== =============== ========== =====================================================================================================================================================================================================================================================================================================================
+ROS Parameter       Type            Default    Description
+=================== =============== ========== =====================================================================================================================================================================================================================================================================================================================
+``input_width``     ``uint32_t``    ``1920``   The width of the input image.
+``input_height``    ``uint32_t``    ``1200``   The height of the input image.
+``qp``              ``uint32_t``    ``20``     The encoder constant QP value.
+``hw_preset``       ``uint32_t``    ``0``      The encoder hardware preset type. The value can be an integer from ``0`` to ``3``, representing ``Ultrafast``, ``Fast``, ``Medium`` and, ``Slow``, respectively.
+``profile``         ``uint32_t``    ``0``      The profile to be used for encoding. The value can be an integer from ``0`` to ``2``, representing ``Main``, ``Baseline``, and ``High``, respectively.
+``iframe_interval`` ``int32_t``     ``5``      Interval between two I frames, in number of frames. E.g., ``iframe_interval=5`` represents ``IPPPPI...``, ``iframe_interval=1`` represents I frame only
+``config``          ``std::string`` ``pframe`` A preset combination of ``qp``, ``hw_preset``, ``profile`` and ``iframe_interval``. The value can be ``iframe``, ``pframe`` or ``custom``. When ``iframe`` or ``pframe`` is used, the default value of these four parameters will be applied. Only when this field is ``custom`` will the custom values will be used.
+=================== =============== ========== =====================================================================================================================================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+============= ======================================================================================================= ================
+ROS Topic     Type                                                                                                    Description
+============= ======================================================================================================= ================
+``image_raw`` `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__ Raw input image.
+============= ======================================================================================================= ================
+
+.. warning::
+
+   All input images are required to have height and width that are both an even number of pixels.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+==================== =========================================================================================================================== =======================
+ROS Topic            Interface                                                                                                                   Description
+==================== =========================================================================================================================== =======================
+``image_compressed`` `sensor_msgs/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__ H.264 compressed image.
+==================== =========================================================================================================================== =======================
+
+Input Restrictions
+^^^^^^^^^^^^^^^^^^
+
+1. The input image resolution must be the same as the dimension you
+   provided, and the resolution must be **no larger than
+   ``1920x1200``**.
+2. The input image should be in ``rgb8`` or ``bgr8`` format, and it will
+   be converted to ``nv12`` format before being sent to the encoder.
+
+Output Interpretations
+^^^^^^^^^^^^^^^^^^^^^^
+
+1. The encoder could perform All-I frame or P-frame encoding and output
+   the H.264 compressed data. The input and output are one-to-one
+   mapped.
+
+.. |package_name| replace:: ``isaac_ros_h264_encoder``

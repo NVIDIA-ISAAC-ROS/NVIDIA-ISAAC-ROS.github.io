@@ -1,0 +1,96 @@
+===========================
+Developer Environment Setup
+===========================
+
+The development flow currently supported by Isaac ROS is to build on your target platform. You can setup ROS 2 Humble in your host machine with the :doc:`Isaac ROS Buildfarm <isaac_ros_buildfarm_cdn>` and setup dependencies with ``rosdep``
+OR you can use the Isaac ROS Dev Docker-based development environment through ``run_dev.sh``.
+
+We **strongly** recommend that you set up your :doc:`developer environment <dev_env_setup>` with Isaac ROS Dev Docker images.
+This will streamline your development environment setup with the correct versions of dependencies on both Jetson and x86_64 platforms.
+Working within the Isaac ROS Dev Docker containers will also automatically give you access to our :doc:`Isaac ROS Buildfarm <isaac_ros_buildfarm_cdn>`.
+
+.. note::
+
+   All Isaac ROS Quickstarts, tutorials, and examples have been designed with the **Isaac ROS Docker images** as a prerequisite.
+
+
+For more information on the Isaac ROS Dev Docker-based development environment and how to customize it for your needs, check out :doc:`this guide </repositories_and_packages/isaac_ros_common/index>`.
+
+.. note::
+
+   Before you begin, verify that you have sufficient storage
+   space available on your device. We recommend at least **30 GB**, to
+   account for the size of the container and datasets.
+
+   On Jetson platforms, NVMe SSD storage is **required** for
+   sufficient and fast storage. See :doc:`here </getting_started/hardware_setup/compute/jetson_storage>`
+
+1. **On x86_64 platforms**: Install the ``nvidia-container-runtime``
+   using the
+   `instructions <https://github.com/NVIDIA/nvidia-container-runtime#installation>`__.
+
+   **On Jetson platforms**: Follow :doc:`this instruction </getting_started/hardware_setup/compute/jetson_storage>`
+   to first set your Jetson up with SSD, then come back to this document and resume from Step 3.
+
+2. Configure ``nvidia-container-runtime`` as the default runtime for
+   Docker.
+
+   Using your text editor of choice, add the following items to
+   ``/etc/docker/daemon.json``.
+
+   .. code:: json
+
+      {
+          "runtimes": {
+              "nvidia": {
+                  "path": "nvidia-container-runtime",
+                  "runtimeArgs": []
+              }
+          },
+          "default-runtime": "nvidia"
+      }
+
+3. Then, restart Docker:
+
+   .. code:: bash
+
+      sudo systemctl daemon-reload && sudo systemctl restart docker
+
+4. Install `Git LFS <https://git-lfs.github.com/>`__ to pull
+   down all large files:
+
+   .. code:: bash
+
+      sudo apt-get install git-lfs
+
+   .. code:: bash
+
+      git lfs install --skip-repo
+
+5. Create a ROS 2 workspace for experimenting with Isaac ROS:
+
+      **For Jetson setup with SSD as optional storage**:
+
+      .. code:: bash
+
+         mkdir -p  /ssd/workspaces/isaac_ros-dev/src
+         echo "export ISAAC_ROS_WS=/ssd/workspaces/isaac_ros-dev/" >> ~/.bashrc
+         source ~/.bashrc
+
+   .. code:: bash
+
+      mkdir -p  ~/workspaces/isaac_ros-dev/src
+      echo "export ISAAC_ROS_WS=${HOME}/workspaces/isaac_ros-dev/" >> ~/.bashrc
+      source ~/.bashrc
+
+   We expect to use the ``ISAAC_ROS_WS`` environmental variable
+   to refer to this ROS 2 workspace directory, in the future.
+
+
+To further customize your development environment, check out :ref:`this guide <repositories_and_packages/isaac_ros_common/index:Isaac ROS Docker Development Environment>`.
+
+
+Troubleshooting
+---------------
+
+Check out our :doc:`troubleshooting </troubleshooting/dev_env>` section for issues with setting up your development environment.

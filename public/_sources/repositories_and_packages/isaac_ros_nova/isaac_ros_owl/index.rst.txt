@@ -1,0 +1,48 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nova> <isaac_ros_owl>`
+
+API
+----
+
+OwlNode
+~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+=========================== ================ =================== ===========================================================================================================================================================================================
+ROS Parameter               Type             Default             Description
+=========================== ================ =================== ===========================================================================================================================================================================================
+``camera_id``               ``uint``         ``0``               The video device index E.g. ``/dev/video0``
+``module_id``               ``uint``         ``0``               The camera module index in the device tree when there is more than one of the same camera module connected
+``mode``                    ``uint``         ``0``               The resolution mode supported by the camera sensor and driver.
+``fsync_type``              ``uint``         ``1``               Specifies what kind of Frame Synchronization to use, supported values are 0 for internal and 1 for external. For e3653 boards (carter 2.3) choose 0, for p3762 boards (carter 2.4) choose 1
+``camera_type``             ``uint``         ``0``               0 for Monocular type camera.
+``camera_link_frame_name``  ``string``       ``camera``          The frame name associated with the origin of the camera body.
+``optical_frame_name``      ``string``       ``left_cam``        The frame name associated with the imager inside camera body (for monocular camera).
+``camera_info_url``         ``string``       N/A                 Optional URL of a camera info ``.ini`` file to read intrinsic information.
+=========================== ================ =================== ===========================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+========================== ================================================================================================================================ ===================================
+ROS Topic                  Interface                                                                                                                        Description
+========================== ================================================================================================================================ ===================================
+``correlated_timestamp``   :ir_repo:`isaac_ros_nova_interfaces::msg::FlatScan <isaac_ros_common> <isaac_ros_nova_interfaces/msg/CorrelatedTimestamp.msg>`   Timestamp correlation data.
+========================== ================================================================================================================================ ===================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+==================== ================================================================================================================= =================================
+ROS Topic            Interface                                                                                                         Description
+==================== ================================================================================================================= =================================
+``left/image_raw``   `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           The OWL image.
+``left/camerainfo``  `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ The OWL camera info.
+==================== ================================================================================================================= =================================
+
+.. |package_name| replace:: ``isaac_ros_owl``

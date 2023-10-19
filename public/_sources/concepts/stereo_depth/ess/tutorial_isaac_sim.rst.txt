@@ -1,0 +1,48 @@
+Tutorial for DNN Stereo Depth Estimation with Isaac Sim
+=======================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/ess/Rviz.png>`
+    :align: center
+    :width: 800px
+
+Overview
+------------
+
+This tutorial walks you through a graph to :ir_repo:`estimate depth <isaac_ros_dnn_stereo_depth>`
+with stereo images from Isaac Sim.
+
+Tutorial Walkthrough
+--------------------
+
+1. Complete steps 1-7 listed in the quickstart
+   :ref:`here <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index:quickstart>`.
+
+2. Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`
+   
+3. Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 800px
+
+4. Open a second terminal and attach to the container:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      ./scripts/run_dev.sh
+
+5. In the second terminal, start the ``isaac_ros_ess`` node using the launch files:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_ess isaac_ros_ess_isaac_sim.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine
+
+6. Optionally, you can run the visualizer script to visualize the disparity image.
+
+   .. code:: bash
+
+      ros2 run isaac_ros_ess isaac_ros_ess_visualizer.py
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/ess/Visualizer_isaac_sim.png>`
+      :align: center

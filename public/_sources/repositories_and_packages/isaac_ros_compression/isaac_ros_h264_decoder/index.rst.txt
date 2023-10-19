@@ -1,0 +1,187 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_compression> <isaac_ros_h264_decoder>`
+
+Quickstart
+----------
+
+This quickstart shows an example of how to use the
+``isaac_ros_h264_decoder`` with a pre-recorded rosbag, which contains
+compressed H.264 images generated from ``isaac_ros_h264_encoder`` with
+two Argus cameras as the input source. You will be able to visualize the
+decoded images after the last step.
+
+1. Set up your development environment by following the instructions
+   :doc:`here </getting_started/dev_env_setup>`.
+2. Clone this repository and its dependencies under
+   ``~/workspaces/isaac_ros-dev/src``.
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_common>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_nitros>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_compression>`
+
+3. Pull down a rosbag of sample data:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_compression && \ 
+      git lfs pull -X "" -I "resources/rosbags/h264_compressed_sample.bag"
+
+4. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      ./scripts/run_dev.sh
+
+5. Inside the container, build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+      colcon build --symlink-install && \
+      source install/setup.bash
+
+6. (Optional) Run tests to verify complete and correct installation:
+
+   .. code:: bash
+
+      colcon test --executor sequential
+
+7. Run the following launch files to run the demo of this
+   ``isaac_ros_h264_decoder``:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_h264_decoder isaac_ros_h264_decoder_rosbag.launch.py rosbag_path:=/workspaces/isaac_ros-dev/src/isaac_ros_compression/resources/rosbags/h264_compressed_sample.bag
+
+8. Open a second terminal and attach to the container:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      ./scripts/run_dev.sh
+
+9. Visualize and validate the output of the package:
+
+   .. code:: bash
+
+      ros2 run image_view image_view --ros-args -r image:=/left/image_uncompressed
+
+   .. code:: bash
+
+      ros2 run image_view image_view --ros-args -r image:=/right/image_uncompressed
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+      
+   Tutorial with Compatible Decoder </concepts/compression/h264/tutorial_compatible_decode>
+
+
+Troubleshooting
+---------------
+
+Symptom
+^^^^^^^
+
+Launching the decoder node using
+``ros2 launch isaac_ros_h264_decoder isaac_ros_h264_decoder_rosbag.launch.py``,
+produces the below error message:
+
+x86_64 Platform:
+
+.. code:: bash
+
+   [component_container_mt-2] 2023-04-04 22:19:02.609 WARN  /workspaces/isaac_ros-dev/ros_ws/src/isaac_ros_compression/isaac_ros_h264_decoder/gxf/codec/components/decoder.cpp@310: Decoder output is empty, current frame will be dropped
+
+Jetson Platform:
+
+.. code:: bash
+
+   [component_container_mt-2] 2023-04-04 06:39:57.766 WARN  gxf/std/greedy_scheduler.cpp@235: Error while executing entity 20 named 'KIWPUYFVJT_decoder_response': GXF_FAILURE
+   [component_container_mt-2] [ERROR] (/usr/src/jetson_multimedia_api/samples/common/classes/NvV4l2ElementPlane.cpp:178) <dec0> Capture Plane:Error while DQing buffer: Invalid argument
+   [component_container_mt-2] 2023-04-04 06:39:57.766 ERROR /workspaces/isaac_ros-dev/ros_ws/src/isaac_ros_compression/isaac_ros_h264_decoder/gxf/codec/components/decoder_request.cpp@530: Failed to dequeue buffer from capture plane
+   [component_container_mt-2] 2023-04-04 06:39:57.766 ERROR gxf/std/entity_executor.cpp@509: Failed to tick codelet  in entity: KIWPUYFVJT_decoder_response code: GXF_FAILURE
+   [component_container_mt-2] 2023-04-04 06:39:57.766 ERROR gxf/std/entity_executor.cpp@203: Entity with eid 35 not found!
+
+Solution
+^^^^^^^^
+
+You may see these errors when decoder receives P-frames first. Decoder
+can not decode P-frames until it has received the first I-frame. You can
+start the decoder before playing the rosbag to avoid these errors.
+
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_h264_decoder isaac_ros_h264_decoder.launch.py
+
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+==================== =========================================================================================================================== ==========================
+ROS Topic            Interface                                                                                                                   Description
+==================== =========================================================================================================================== ==========================
+``image_compressed`` `sensor_msgs/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__ The H.264 compressed image
+==================== =========================================================================================================================== ==========================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+====================== ======================================================================================================= ==========================================
+ROS Topic              Type                                                                                                    Description
+====================== ======================================================================================================= ==========================================
+``image_uncompressed`` `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__ The uncompressed image with RGB8 encoding.
+====================== ======================================================================================================= ==========================================
+
+
+Input Restrictions
+^^^^^^^^^^^^^^^^^^
+
+1. The input resolution must be **no larger than ``1920x1200``** and
+   must be the same as the original image resolution.
+
+
+Output Interpretations
+^^^^^^^^^^^^^^^^^^^^^^
+
+1. The ``isaas_ros_h264_decoder`` package outputs a uncompressed image
+   with the same resolution as the original image. The output image will
+   be in ``RGB8`` format.
+
+
+.. |package_name| replace:: ``isaac_ros_h264_decoder``

@@ -1,0 +1,309 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_pose_estimation> <isaac_ros_dope>`
+
+Quickstart
+----------
+
+
+.. warning::
+
+   Step 7 must be performed on ``x86_64``. The resultant
+   model should be copied over to the ``Jetson``. Also note that the
+   process of model preparation differs significantly from the other
+   repositories.
+
+1.  Set up your development environment by following the instructions :doc:`here </getting_started/dev_env_setup>`
+
+2.  Clone this repository and its dependencies under
+    ``~/workspaces/isaac_ros-dev/src``.
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_nitros>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_pose_estimation>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_dnn_inference>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+3.  Pull down a ROS Bag of sample data:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation && \
+         git lfs pull -X "" -I "resources/rosbags/"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5.  Make a directory to place models (inside the Docker container):
+
+    .. code:: bash
+
+       mkdir -p /tmp/models/
+
+6.  Select a DOPE model by visiting the DOPE model collection available
+    on the official `DOPE
+    GitHub <https://github.com/NVlabs/Deep_Object_Pose>`__ repository
+    `here <https://drive.google.com/open?id=1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__.
+    The model is assumed to be downloaded to ``~/Downloads`` outside the
+    Docker container.
+
+    This example will use ``Ketchup.pth``, which should be downloaded
+    into ``/tmp/models`` inside the Docker container:
+   
+    .. note::
+
+      This should be run outside the Docker container
+
+    On ``x86_64``:
+
+    .. code:: bash
+
+       cd ~/Downloads && \
+       docker cp Ketchup.pth isaac_ros_dev-x86_64-container:/tmp/models
+
+7.  Convert the PyTorch file into an ONNX file: **Warning**: this step
+    must be performed on ``x86_64``. The resultant model will be assumed
+    to have been copied to the ``Jetson`` in the same output location
+    (``/tmp/models/Ketchup.onnx``)
+
+    .. code:: bash
+
+       python3 /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_dope/scripts/dope_converter.py --format onnx --input /tmp/models/Ketchup.pth
+
+    If you are planning on using Jetson, copy the generated ``.onnx``
+    model into the Jetson, and then copy it over into ``aarch64`` Docker
+    container.
+
+    We will assume that you already performed the transfer of the model
+    onto the Jetson in the directory ``~/Downloads``.
+
+    Enter the Docker container in Jetson:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Make a directory called ``/tmp/models`` in Jetson:
+
+    .. code:: bash
+
+       mkdir -p /tmp/models
+
+    **Outside** the container, copy the generated ``onnx`` model:
+
+    .. code:: bash
+
+       cd ~/Downloads && \
+       docker cp Ketchup.onnx isaac_ros_dev-aarch64-container:/tmp/models
+
+8.  Inside the container, build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+9.  (Optional) Run tests to verify complete and correct installation:
+
+    .. code:: bash
+
+       colcon test --executor sequential
+
+10. Run the following launch files to spin up a demo of this package:
+
+    Launch ``isaac_ros_dope``:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_dope isaac_ros_dope_tensor_rt.launch.py model_file_path:=/tmp/models/Ketchup.onnx engine_file_path:=/tmp/models/Ketchup.plan
+
+    Then open **another** terminal, and enter the Docker container
+    again:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then, play the ROS bag:
+
+    .. code:: bash
+
+       ros2 bag play -l src/isaac_ros_pose_estimation/resources/rosbags/dope_rosbag/
+
+11. Open another terminal window and attach to the same container. You
+    should be able to get the poses of the objects in the images through
+    ``ros2 topic echo``:
+
+    In a **third** terminal, enter the Docker container again:
+
+    .. code:: bash
+
+       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    .. code:: bash
+
+       ros2 topic echo /poses
+
+    ..
+
+    .. note::
+
+       We are echoing ``/poses`` because we remapped the
+       original topic ``/dope/pose_array`` to ``poses`` in the launch
+       file.
+
+    Now visualize the pose array in RViz2:
+
+    .. code:: bash
+
+       rviz2
+
+    Then click on the ``Add`` button, select ``By topic`` and choose
+    ``PoseArray`` under ``/poses``. Finally, change the display to show
+    an axes by updating ``Shape`` to be ``Axes``, as shown in the
+    screenshot below. Make sure to update the ``Fixed Frame`` to
+    ``tf_camera``.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/dope_rviz2.png>`
+      :width: 600px
+      :align: center
+
+.. note::
+
+   For best results, crop or resize input images to the same dimensions your DNN model is expecting.
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+   
+   Tutorial with Triton </concepts/pose_estimation/dope/tutorial_triton>
+
+   Tutorial with Custom Model </concepts/pose_estimation/dope/tutorial_custom_model>
+
+   Tutorial with Custom Size </concepts/pose_estimation/dope/tutorial_custom_size>
+
+Use Different Models
+--------------------
+
+Click :doc:`here </concepts/dnn_inference/model_preparation>` for more information on how to use NGC models.
+
+Alternatively, consult the ``DOPE`` model repository to try other models.
+
+============================================================================= ============================================================================
+Model Name                                                                    Use Case
+============================================================================= ============================================================================
+`DOPE <https://drive.google.com/open?id=1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__ The DOPE model repository. This should be used if ``isaac_ros_dope`` is used
+============================================================================= ============================================================================
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~~
+
+Two launch files are provided to use this package. The first launch file launches ``isaac_ros_tensor_rt``, whereas the other one uses ``isaac_ros_triton``, along with
+the necessary components to perform encoding on images and decoding of the ``DOPE`` network's output.
+
+.. warning::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+====================================== ====================
+Launch File                            Components Used
+====================================== ====================
+``isaac_ros_dope_tensor_rt.launch.py`` :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TensorRTNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index>`, :doc:`DopeDecoderNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`
+``isaac_ros_dope_triton.launch.py``    :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`DopeDecoderNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`
+====================================== ====================
+
+.. warning::
+
+   There is also a ``config`` file that should be modified in
+   ``isaac_ros_dope/config/dope_config.yaml``.
+
+DopeDecoderNode
+~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+====================== ========== ==================== =========================================================================================================================================================================================
+ROS Parameter          Type       Default              Description
+====================== ========== ==================== =========================================================================================================================================================================================
+``configuration_file`` ``string`` ``dope_config.yaml`` The name of the configuration file to parse. Note: The node will look for that file name under ``isaac_ros_dope/config``
+``object_name``        ``string`` ``Ketchup``          The object class the DOPE network is detecting and the DOPE decoder is interpreting. This name should be listed in the configuration file along with its corresponding cuboid dimensions.
+====================== ========== ==================== =========================================================================================================================================================================================
+
+Configuration File
+^^^^^^^^^^^^^^^^^^
+
+The DOPE configuration file, which can be found at ``isaac_ros_dope/config/dope_config.yaml`` may need to modified. Specifically, you will need to specify an object type in the ``DopeDecoderNode`` that is listed in the ``dope_config.yaml`` file, so the DOPE decoder node will pick the right parameters to transform the belief maps from the inference node to object poses. The ``dope_config.yaml`` file uses the camera intrinsics of RealSense by default - if you are using a different camera, you will need to modify the camera_matrix field with the new, scaled ``(640x480)`` camera intrinsics.
+
+.. note::
+
+   The ``object_name`` should correspond to one of the objects listed in the DOPE configuration file, with the corresponding model used.
+
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+==================== ==================================================================================================================================================================== ====================================================================================
+ROS Topic            Interface                                                                                                                                                            Description
+==================== ==================================================================================================================================================================== ====================================================================================
+``belief_map_array`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The tensor that represents the belief maps, which are outputs from the DOPE network.
+==================== ==================================================================================================================================================================== ====================================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+=================== =================================================================================================================== =======================================================================================================
+ROS Topic           Interface                                                                                                           Description
+=================== =================================================================================================================== =======================================================================================================
+``dope/pose_array`` `geometry_msgs/PoseArray <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseArray.msg>`__ An array of poses of the objects detected by the DOPE network and interpreted by the DOPE decoder node.
+=================== =================================================================================================================== =======================================================================================================
+
+.. |package_name| replace:: ``isaac_ros_dope``

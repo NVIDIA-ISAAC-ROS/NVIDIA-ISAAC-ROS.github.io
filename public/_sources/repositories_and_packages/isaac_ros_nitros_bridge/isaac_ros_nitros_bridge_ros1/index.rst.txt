@@ -1,0 +1,51 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nitros_bridge> <isaac_ros_nitros_bridge_ros1>`
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   roslaunch isaac_ros_ros1_converter r2b_converter.launch
+
+ROS Parameters
+^^^^^^^^^^^^^^
+============== ======= ======= =============================================
+ROS Parameter  Type    Default Description
+============== ======= ======= =============================================
+``num_blocks`` ``int`` ``40``  The number of pre-allocated GPU memory blocks
+============== ======= ======= =============================================
+
+.. _ros-topics-subscribed-1:
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+=========================== ====================================================================================================================================================================================== =======================================================
+ROS Topic                   Type                                                                                                                                                                                   Description
+=========================== ====================================================================================================================================================================================== =======================================================
+``ros1_input_image``        `sensor_msgs/Image <https://github.com/ros/common_msgs/blob/noetic-devel/sensor_msgs/msg/Image.msg>`__                                                                                 Input ROS1 image to be converted to NITROS bridge image
+``ros1_input_bridge_image`` :ir_repo:`isaac_ros_nitros_bridge_msgs/NitrosBridgeImage <isaac_ros_noetic_interfaces> <isaac_ros_nitros_bridge_msgs/msg/NitrosBridgeImage.msg>`                                       Input NITROS bridge image to be converted to ROS1 image
+=========================== ====================================================================================================================================================================================== =======================================================
+
+ **Limitation**: All input images are required to have height and width that are both an even number of pixels.
+
+.. _ros-topics-published-1:
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============================ ====================================================================================================================================================================================== ====================================================
+ROS Topic                    Interface                                                                                                                                                                              Description
+============================ ====================================================================================================================================================================================== ====================================================
+``ros1_output_image``        `sensor_msgs/Image <https://github.com/ros/common_msgs/blob/noetic-devel/sensor_msgs/msg/Image.msg>`__                                                                                 Output ROS1 image converted from NITROS bridge image
+``ros1_output_bridge_image`` :ir_repo:`isaac_ros_nitros_bridge_msgs/NitrosBridgeImage <isaac_ros_noetic_interfaces> <isaac_ros_nitros_bridge_msgs/msg/NitrosBridgeImage.msg>`                                       Output NITROS bridge image converted from ROS1 image
+============================ ====================================================================================================================================================================================== ====================================================
+
+.. |package_name| replace:: ``isaac_ros_nitros_bridge_ros1``
