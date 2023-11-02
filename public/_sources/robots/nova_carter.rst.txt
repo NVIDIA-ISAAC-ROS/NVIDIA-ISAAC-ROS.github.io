@@ -314,7 +314,7 @@ Repository Setup
 
    .. code:: bash
 
-      cd /mnt/nova_ssd/workspaces && \
+      cd /mnt/nova_ssd/workspaces/isaac_ros-dev/src && \
          git clone --recurse-submodules :ir_clone:`<nova_carter>` && \
          git clone --recurse-submodules :ir_clone:`<isaac_ros_common>`
 
@@ -368,13 +368,6 @@ Repository Setup
 
       vcs import --recursive src < src/nova_carter/nova_carter.repos
 
-8. Build the ROS packages in the Docker container:
-
-   .. code:: bash
-
-      cd /workspaces/isaac_ros-dev && \
-         colcon build --symlink-install --packages-up-to carter_navigation isaac_ros_vda5050_nav2_client_bringup isaac_ros_hesai isaac_ros_occupancy_grid_localizer isaac_ros_pointcloud_utils isaac_ros_segway_rmp isaac_ros_hawk isaac_ros_owl isaac_ros_correlated_timestamp_driver isaac_ros_image_proc isaac_ros_ess isaac_ros_visual_slam isaac_ros_nvblox nvblox_nav2 isaac_ros_depth_image_proc sllidar_ros2
-
 Demo Applications
 =================
 
@@ -401,16 +394,21 @@ Joystick Driving with 4 Owl Fisheye Cameras
 
       cd $ISAAC_ROS_WS/src/isaac_ros_common && \
         ./scripts/run_dev.sh $ISAAC_ROS_WS
+5. Build the ROS packages in the Docker container:
 
-5. Run the launch file:
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install --packages-up-to carter_navigation isaac_ros_vda5050_nav2_client_bringup isaac_ros_hesai isaac_ros_occupancy_grid_localizer isaac_ros_pointcloud_utils isaac_ros_segway_rmp isaac_ros_hawk isaac_ros_owl isaac_ros_correlated_timestamp_driver isaac_ros_image_proc isaac_ros_ess isaac_ros_visual_slam isaac_ros_nvblox nvblox_nav2 isaac_ros_depth_image_proc sllidar_ros2
+6. Run the launch file:
 
    .. code:: bash
 
       cd /workspaces/isaac_ros-dev && \
          source install/setup.bash && \
          ros2 launch carter_navigation teleop.launch.py
-6. Complete the `foxglove setup <#foxglove-setup>`__ guide.
-7. The ``joystick_owl.json`` foxglove layout file can be found in the :ir_repo:`nova_carter repository <nova_carter> <carter_navigation/foxglove_layouts/joystick_owl.json>`. You should now be able to see the 4 Owl fisheye camera streams.
+7. Complete the `foxglove setup <#foxglove-setup>`__ guide.
+8. The ``joystick_owl.json`` foxglove layout file can be found in the :ir_repo:`nova_carter repository <nova_carter> <carter_navigation/foxglove_layouts/joystick_owl.json>`. You should now be able to see the 4 Owl fisheye camera streams.
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_joystick_owl.png>`
    :width: 800px
