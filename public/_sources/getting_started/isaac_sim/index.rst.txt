@@ -30,7 +30,9 @@ In both the configurations, Isaac Sim always runs on a ``x86_64`` machine provid
 
       This tutorial assumes the Native environment for Isaac Sim.
 
-2. Follow the `instructions <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html#isaac-sim-setup-native-workstation-launcher>`__
+2. Follow the `Running Native ROS instructions <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html>`__ to ensure that ROS 2 and the required packages are installed to successfully enable the ROS 2 Bridge in Omniverse Isaac Sim. 
+
+3. Follow the `instructions <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html#isaac-sim-setup-native-workstation-launcher>`__
    to launch Isaac Sim App Selector window.
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_main_app_selector.png>`
@@ -38,16 +40,9 @@ In both the configurations, Isaac Sim always runs on a ``x86_64`` machine provid
       :align: center
 
 
-3. Click **Open in Terminal** button. It should open a terminal window and run the following commands.
-
-   .. code:: bash
-
-      export RMW_IMPLEMENTATION=rmw_fastrtps_cpp && 
-      LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/exts/omni.isaac.ros2_bridge/humble/lib
+4. If you don't have a system level ROS 2 install, follow the steps outlined `here <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html#running-native-ros>`__ under ``ROS2 -> No system level install -> Humble``.
    
-   .. note::
-
-      If you have a native installation of ROS2, you can skip the update to ``LD_LIBRARY_PATH`` environment variable.
+   If you have a system level ROS 2 install, click **Open in Terminal** button. It should open a terminal window and then follow the steps outlined `here <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html#running-native-ros>`__ under ``ROS2 -> Ubuntu 22.04 -> Humble``. Ensure your ROS 2 install is sourced before proceeding.
 
    Optionally, if ``ROS_DOMAIN_ID`` is needed to create a `separate logical network <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html#overview>`__, run the the following commands.
 
@@ -56,19 +51,19 @@ In both the configurations, Isaac Sim always runs on a ``x86_64`` machine provid
       export ROS_DOMAIN_ID=<your_domain_id>
 
 
-4. Launch Isaac Sim.
+5. Launch Isaac Sim.
 
    .. code:: bash
 
       ./isaac-sim.sh
 
-5. Open Isaac ROS Sample scene as shown below.
+6. Open Isaac ROS Sample scene as shown below.
    
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_ros_sample_scene.png>`
       :width: 400px
       :align: center
 
-6. Continue with the next steps in your specific Isaac ROS package
+7. Continue with the next steps in your specific Isaac ROS package
    tutorial.
 
    .. note::

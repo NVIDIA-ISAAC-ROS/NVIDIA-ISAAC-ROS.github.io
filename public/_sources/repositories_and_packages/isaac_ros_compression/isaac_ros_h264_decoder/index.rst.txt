@@ -15,24 +15,15 @@ decoded images after the last step.
 
 1. Set up your development environment by following the instructions
    :doc:`here </getting_started/dev_env_setup>`.
-2. Clone this repository and its dependencies under
-   ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
-   .. code:: bash
+    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
 
-   .. code:: bash
+    .. code:: bash
 
-      git clone :ir_clone:`<isaac_ros_common>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_nitros>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_image_pipeline>`
+       git clone :ir_clone:`<isaac_ros_common>`
 
    .. code:: bash
 
@@ -42,45 +33,39 @@ decoded images after the last step.
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_compression && \ 
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_compression && \ 
       git lfs pull -X "" -I "resources/rosbags/h264_compressed_sample.bag"
 
 4. Launch the Docker container using the ``run_dev.sh`` script:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
       ./scripts/run_dev.sh
 
-5. Inside the container, build and source the workspace:
+5. Install this package's dependencies.
+
+   :ir_apt:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-      colcon build --symlink-install && \
-      source install/setup.bash
+      sudo apt-get install -y ros-humble-isaac-ros-h264-decoder
 
-6. (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-      colcon test --executor sequential
-
-7. Run the following launch files to run the demo of this
+6. Run the following launch files to run the demo of this
    ``isaac_ros_h264_decoder``:
 
    .. code:: bash
 
       ros2 launch isaac_ros_h264_decoder isaac_ros_h264_decoder_rosbag.launch.py rosbag_path:=/workspaces/isaac_ros-dev/src/isaac_ros_compression/resources/rosbags/h264_compressed_sample.bag
 
-8. Open a second terminal and attach to the container:
+7. Open a second terminal and attach to the container:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
       ./scripts/run_dev.sh
 
-9. Visualize and validate the output of the package:
+8. Visualize and validate the output of the package:
 
    .. code:: bash
 

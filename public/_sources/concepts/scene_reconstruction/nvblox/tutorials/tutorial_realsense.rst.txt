@@ -65,7 +65,7 @@ Installing the Dependencies
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/realsense_splitter && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_nvblox/nvblox_examples/realsense_splitter && \
         git update-index --assume-unchanged COLCON_IGNORE && \
         rm COLCON_IGNORE
 
@@ -80,26 +80,14 @@ Installing the Dependencies
    clone ``realsense_ros``, and to configure the container for use with
    RealSense.
 
-4. Download the code for :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>`
-   and :ir_repo:`Isaac ROS NITROS <isaac_ros_nitros>`.
+4. Launch the Docker container using the ``run_dev.sh`` script:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src && \
-        git clone :ir_clone:`<isaac_ros_visual_slam>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_nitros>`
-
-5. Launch the Docker container using the ``run_dev.sh`` script:
-
-   .. code:: bash
-
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-6. Inside the container, install package-specific dependencies using
+5. Inside the container, install package-specific dependencies using
    ``rosdep``:
 
    .. code:: bash
@@ -107,7 +95,13 @@ Installing the Dependencies
       cd /workspaces/isaac_ros-dev/ && \
         rosdep install -i -r --from-paths src --rosdistro humble -y --skip-keys "libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv nvblox"
 
-7. Build and source the workspace:
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-stereo-image-proc ros-humble-isaac-ros-visual-slam
+
+6. Build and source the workspace:
 
    .. code:: bash
 
@@ -126,7 +120,7 @@ Example with RealSense Live Data
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
 4. Source the workspace:

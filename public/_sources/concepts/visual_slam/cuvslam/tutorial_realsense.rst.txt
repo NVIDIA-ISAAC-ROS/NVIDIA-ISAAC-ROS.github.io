@@ -1,4 +1,4 @@
-Tutorial for Visual SLAM using a RealSense camera with integrated IMU
+Tutorial for Visual SLAM Using a RealSense Camera with Integrated IMU
 =====================================================================
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/realsense.gif>`
@@ -8,7 +8,7 @@ Tutorial for Visual SLAM using a RealSense camera with integrated IMU
 Overview
 ------------
 
-This tutorial walks you through setting up 
+This tutorial walks you through setting up
 :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>` with
 a `Realsense camera <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__.
 
@@ -17,31 +17,31 @@ a `Realsense camera <https://www.intel.com/content/www/us/en/architecture-and-te
    The :ir_repo:`launch file <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_realsense.launch.py>`
    provided in this tutorial is designed for a RealSense camera with
    integrated IMU. If you want to run this tutorial with a RealSense
-   camera without an IMU (like RealSense D435), then change
+   camera without an IMU (like RealSense D435), then change the
    ``enable_imu_fusion`` parameter in the launch file to ``False``.
 
 .. note::
 
    This tutorial requires a compatible RealSense camera from
-   the list available
-   :ref:`here <getting_started/hardware_setup/sensors/realsense_setup:camera compatibility>`.
+   the list of available
+   :ref:`cameras <getting_started/hardware_setup/sensors/realsense_setup:camera compatibility>`.
 
-Tutorial Walkthrough - VSLAM execution
+Tutorial Walkthrough - VSLAM Execution
 --------------------------------------
 
 1. Complete the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
 
 2. Complete the quickstart :ref:`here <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`.
 
-3. Follow this
-   `page <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model#how-to-obtain-the-parameters-for-your-imu>`__
-   to obtain `IMU Noise
+3. Follow the
+   `IMU page <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model#how-to-obtain-the-parameters-for-your-imu>`__
+   to obtain the `IMU Noise
    Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__
-   parameters. Parameters can be obtained either through datasheet for the IMU
-   or from a ROS package like
+   parameters. Parameters can be obtained through the datasheet for the IMU
+   or from a ROS package such as
    `this <https://github.com/CruxDevStuff/allan_ros2>`__.
 
-4. [Terminal 1] Run ``realsense-camera`` node and ``visual_slam`` node
+4. [Terminal 1] Run ``realsense-camera`` node and ``visual_slam`` node.
 
    Make sure you have your RealSense camera attached to the system, and
    then start the Isaac ROS container.
@@ -52,7 +52,7 @@ Tutorial Walkthrough - VSLAM execution
 
    ..
 
-      Or if you did not add the command in 
+      Or if you did not add the command in
       :ref:`step 1-3 of the quickstart section <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`:
 
       .. code:: bash
@@ -68,7 +68,7 @@ Tutorial Walkthrough - VSLAM execution
         colcon build --symlink-install && \
         source install/setup.bash
 
-6. [Terminal 1] Run the launch file, which launches the example and wait
+6. [Terminal 1] Run the launch file, which launches the example and waits
    for 5 seconds:
 
    .. code:: bash
@@ -84,7 +84,7 @@ Tutorial Walkthrough - VSLAM execution
 
       isaac_ros_container
 
-   First check if you can see all the ROS2 topics expected.
+   Verify that you can see all the ROS2 topics expected.
 
    .. code:: bash
 
@@ -188,7 +188,7 @@ Tutorial Walkthrough - VSLAM execution
          average rate: 200.173
                  min: 0.004s max: 0.006s std dev: 0.00028s window: 20
 
-   Lastly, check if you are getting the output from the ``visual_slam``
+   Verify that you are getting the output from the ``visual_slam``
    node at the same rate as the input.
 
    .. code:: bash
@@ -197,7 +197,7 @@ Tutorial Walkthrough - VSLAM execution
 
    ..
 
-      Example output
+      Example output:
 
       .. code:: bash
 
@@ -215,25 +215,25 @@ Tutorial Walkthrough - VSLAM execution
 Tutorial Walkthrough - Visualization
 ------------------------------------
 
-At this point, you have two options for checking the ``visual_slam``
-output.
+You have two options for checking the ``visual_slam``
+output:
 
 -  **Live visualization**: Run RViz2 live while running
    ``realsense-camera`` node and ``visual_slam`` nodes.
 -  **Offline visualization**: Record rosbag file and check the recorded
-   data offline (possibly on a different machine)
+   data offline (possibly on a different machine).
 
-Running RViz2 on a remote PC over the network is tricky and is very
-difficult especially when you have image message topics to subscribe due
-to added burden on ROS 2 network transport.
+Running ``RViz2`` on a remote PC over the network can be challenging and can be
+difficult especially when you have image message topics to subscribe because
+of the added burden on the ROS 2 network transport.
 
-Working on RViz2 in a X11-forwarded window is also difficult because of
+Working on RViz2 in a X11-forwarded window can also be difficult because of
 the network speed limitation.
 
-Therefore, if you are running ``visual_slam`` on Jetson, it is generally
-recommended **NOT** to evaluate with live visualization (1).
+Typically, if you are running ``visual_slam`` on Jetson, it is generally
+recommended that you **NOT** evaluate with live visualization (1).
 
-Live visualization
+Live Visualization
 ~~~~~~~~~~~~~~~~~~
 
 1. [Terminal 2] Open RViz2 from the second terminal:
@@ -242,22 +242,22 @@ Live visualization
 
       rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/realsense.cfg.rviz
 
-   As you move the camera, the position and orientation of the frames
-   should correspond to how the camera moved relative to its starting
+   As you move the camera, verify that the position and orientation of the frames
+   corresponds to how the camera moved relative to its starting
    pose.
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/realsense.gif>`
       :align: center
       :width: 600px
 
-   
-Offline visualization
+
+Offline Visualization
 ~~~~~~~~~~~~~~~~~~~~~
 
-1. [Terminal 2] Save rosbag file
+1. [Terminal 2] Save a rosbag file.
 
-   Record the output in your rosbag file (along with the input data for
-   later visual inspection).
+   Record the output in your rosbag file, along with the input data for
+   later visual inspection.
 
    .. code:: bash
 
@@ -277,7 +277,7 @@ Offline visualization
         /visual_slam/vis/observations_cloud \
         /visual_slam/vis/pose_graph_edges /visual_slam/vis/pose_graph_edges2 \
         /visual_slam/vis/pose_graph_nodes
-      ros2 bag info ${ROSBAG_NAME} 
+      ros2 bag info ${ROSBAG_NAME}
 
    If you plan to run the rosbag on a remote machine (PC) for
    evaluation, you can send the rosbag file to your remote machine.
@@ -287,22 +287,22 @@ Offline visualization
       export IP_PC=192.168.1.100
       scp -r ${ROSBAG_NAME} ${PC_USER}@${IP_PC}:/home/${PC_USER}/workspaces/isaac_ros-dev/
 
-2. [Terminal A] Launch RViz2
+2. [Terminal 1] Launch RViz2.
 
       If you are SSHing into Jetson from your PC, make sure you enabled
-      X forwarding by adding ``-X`` option with SSH command.
+      X forwarding by adding ``-X`` option with SSH command:
 
       .. code:: bash
 
          ssh -X ${USERNAME_ON_JETSON}@${IP_JETSON}
 
-   Launch the Isaac ROS container.
+   Launch the Isaac ROS container:
 
    .. code:: bash
 
       isaac_ros_container
 
-   Run RViz with a configuration file for visualizing set of messages
+   Run RViz with a configuration file for visualizing a set of messages
    from Visual SLAM node.
 
    .. code:: bash
@@ -310,7 +310,7 @@ Offline visualization
       cd /workspaces/isaac_ros-dev
       rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/vslam_keepall.cfg.rviz
 
-3. [Terminal B] Playback the recorded rosbag
+3. [Terminal 2] Playback the recorded rosbag.
 
    Attach another terminal to the running container.
 
@@ -322,9 +322,9 @@ Offline visualization
 
    .. code:: bash
 
-      ros2 bag play ${ROSBAG_NAME} 
+      ros2 bag play ${ROSBAG_NAME}
 
-   RViz should start showing visualization like the following.
+   RViz starts showing a visualization similar to the following:
 
     .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/RViz_0217-cube_vslam-keepall.png>`
         :align: center

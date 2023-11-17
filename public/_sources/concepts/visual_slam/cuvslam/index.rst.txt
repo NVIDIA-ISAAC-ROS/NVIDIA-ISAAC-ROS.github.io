@@ -18,41 +18,40 @@ Landmarks and PoseGraph are stored in a data structure that does not
 increase its size in the case where the same landmark is visited more
 than once.
 
-Imagine a robot moving around and returning to the same place. Since
-odometry always has some accumulated drift, we see a deviation in
-trajectory from the ground truth. SLAM can be used to solve this
+Imagine a robot moving around and returning to the same place. Because
+odometry always has some accumulated drift, a deviation in
+trajectory from the ground truth can be seen. SLAM can be used to solve this
 problem.
 
 During the robot's motion, SLAM stores all landmarks and it continuously
-verifies if each landmark has been seen before. When cuVSLAM recognizes
+verifies whether each landmark has been seen before. When cuVSLAM recognizes
 several landmarks, it determines their position from the data structure.
 
-At this moment, a connection is added to the PoseGraph which makes a
-loop from the free trail of the poses; this event is termed 'loop
+At the moment of recognition, a connection is added to the PoseGraph, which makes a
+loop from the free trail of the poses. This event is called a 'loop
 closure'. Immediately after that, cuVSLAM performs a graph optimization
 that leads to the correction of the current odometric pose and all
 previous poses in the graph.
 
-The procedure for adding landmarks is designed such that if we do not
-see a landmark in the place where it was expected, then such landmarks
-are marked for eventual deletion. This allows you to use cuVSLAM over a
-changing terrain.
+The procedure for adding landmarks is designed such that if a landmark is not
+in the expected location, then it is marked for eventual deletion. This allows
+you to use cuVSLAM over a changing terrain.
 
 Along with visual data, cuVSLAM can use Inertial Measurement Unit (IMU)
 measurements. It automatically switches to IMU when VO is unable to
-estimate a pose - for example, when there is dark lighting or long solid
-surfaces in front of a camera. Using an IMU usually leads to a
-significant performance improvement in cases of poor visual conditions.
+estimate a pose. For example, when there is dark lighting or long solid
+surfaces in front of a camera. Typically, using an IMU leads to a
+significant performance improvement in poor visual conditions.
 
-In case of severe degradation of image input (lights being turned off,
-dramatic motion blur on a bump while driving, and other possible
-scenarios), below mentioned motion estimation algorithms will ensure
-acceptable quality for pose tracking:
+For severe degradation of image input (such as lights being turned off,
+dramatic motion blur on a bump while driving), you can explore the
+following motion estimation algorithms
+to ensure acceptable quality for pose tracking:
 
 -  The IMU readings integrator provides acceptable pose tracking quality
    for about ~< 1 seconds.
 
--  In case of IMU failure, the constant velocity integrator continues to
+-  For IMU failure, the constant velocity integrator continues to
    provide the last linear and angular velocities reported by Stereo VIO
    before failure. This provides acceptable pose tracking quality for
    ~0.5 seconds.
@@ -67,17 +66,16 @@ List of Useful Visualizations
 -  ``visual_slam/vis/pose_graph_nodes`` - Pose graph nodes
 -  ``visual_slam/vis/pose_graph_edges`` - Pose graph edges
 
-Saving the map
+Saving the Map
 --------------
 
-Naturally, we would like to save the stored landmarks and pose graph in
-a map. We have implemented a ROS 2 action to save the map to the disk
-called ``SaveMap``.
+Optimally, save the stored landmarks and pose graph in
+a map using the ROS 2 ``SaveMap`` action that saves the map to the disk.
 
 Loading and Localization in the Map
 -----------------------------------
 
-Once the map has been saved to the disk, it can be used later to
+After the map has been saved to the disk, it can be used to
 localize the robot. To load the map into the memory, we have made a ROS
 2 action called ``LoadMapAndLocalize``. It requires a map file path and
 a prior pose, which is an initial guess of where the robot is in the

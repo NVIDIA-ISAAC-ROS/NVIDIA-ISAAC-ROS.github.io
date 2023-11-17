@@ -10,24 +10,15 @@ Quickstart
 1.  Set up your development environment by following the instructions
     :doc:`here </getting_started/dev_env_setup>`.
 
-2.  Clone this repository and its dependencies under
-    ``~/workspaces/isaac_ros-dev/src``:
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
     .. code:: bash
 
-       mkdir -p ~/workspaces/isaac_ros-dev/src && cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
 
     .. code:: bash
 
        git clone :ir_clone:`<isaac_ros_common>`
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_nitros>`
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_image_pipeline>`
 
     .. code:: bash
 
@@ -37,16 +28,24 @@ Quickstart
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_dnn_stereo_depth && \
        git lfs pull -X "" -I "resources/rosbags/ess_rosbag"
 
 4.  Launch the Docker container using the ``run_dev.sh`` script:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && ./scripts/run_dev.sh
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && ./scripts/run_dev.sh
 
-5.  Download the pre-trained ESS model from the `ESS model
+5.  Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-ess ros-humble-isaac-ros-test
+
+6.  Download the pre-trained ESS model from the `ESS model
     page <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`__:
 
     For ESS:
@@ -64,7 +63,7 @@ Quickstart
           wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/dnn_stereo_disparity/versions/3.0.0/files/light_ess.etlt'
 
 
-6.  Convert the encrypted model (``.etlt``) to a TensorRT engine plan:
+7.  Convert the encrypted model (``.etlt``) to a TensorRT engine plan:
 
     For ESS:
 
@@ -78,27 +77,7 @@ Quickstart
 
           /opt/nvidia/tao/tao-converter -k ess -t fp16 -e /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine -o output_left,output_conf /workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/light_ess.etlt
 
-7.  Build and source the workspace:
-
-    .. code:: bash
-
-       cd /workspaces/isaac_ros-dev && \
-         colcon build && \
-         source install/setup.bash
-
-    .. note::
-
-      We recommend rebuilding the package each time the source
-      files are edited. Before rebuilding, first clean the workspace by
-      running ``rm -r build install log``.
-
-8.  (Optional) Run tests to verify complete and correct installation:
-
-    .. code:: bash
-
-       colcon test --executor sequential
-
-9.  Launch the ESS Disparity Node:
+8.  Launch the ESS Disparity Node:
 
      To run ESS at a threshold of 0.9 run:
 
@@ -112,14 +91,14 @@ Quickstart
 
        ros2 launch isaac_ros_ess isaac_ros_ess.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine threshold:=0.0
 
-10. Open a **second terminal** and attach to the container:
+9.  Open a **second terminal** and attach to the container:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-11. In the **second terminal**, visualize and validate the output of the
+10. In the **second terminal**, visualize and validate the output of the
     package:
 
     .. code:: bash

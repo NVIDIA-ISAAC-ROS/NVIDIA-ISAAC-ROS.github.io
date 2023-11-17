@@ -4,21 +4,25 @@ Instructions to Generate Disparity Maps for Stereo Images
 These are instructions for generating a disparity map for a given stereo
 image pair.
 
-In addition to supporting the ROS Bag input type, the
-``isaac_ros_ess_visualizer.py`` script also supports raw input images
-and camera info files. Follow the steps to generate a disparity
-estimation from raw inputs:
+The ``isaac_ros_ess_visualizer.py`` script supports:
 
-1. Complete the :ref:`Quickstart <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index:quickstart>` guide first.
+* rosbag input type
+* Raw input images
+* Camera info files
+
+
+To generate a disparity estimation from raw inputs:
+
+1. Complete the :ref:`Quickstart <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index:quickstart>` guide.
 
 2. Pull the example data:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_dnn_stereo_depth && \
       git lfs pull -X "" -I "resources/examples"
 
-3. Launch the ESS Disparity Node:
+3. Launch the ESS Disparity Node using one of the following options:
 
      To run ESS at a threshold of 0.7 run:
 
@@ -39,7 +43,7 @@ estimation from raw inputs:
       ros2 run isaac_ros_ess isaac_ros_ess_visualizer.py --raw_inputs
 
 
-   With threshold set to 0.7 you should see:
+   With threshold set to 0.7, you should see:
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/ess/ess3.0_output_threshold.0.7.png>`
       :align: center

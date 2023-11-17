@@ -9,24 +9,15 @@ Quickstart
 
 1.  Set up your development environment by following the instructions
     :doc:`here </getting_started/dev_env_setup>`.
-2.  Clone this repository and its dependencies under
-    ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
 
     .. code:: bash
 
        git clone :ir_clone:`<isaac_ros_common>`
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_nitros>`
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_apriltag>`
 
     .. code:: bash
 
@@ -36,57 +27,51 @@ Quickstart
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_apriltag && \ 
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_apriltag && \ 
          git lfs pull -X "" -I "resources/rosbags/quickstart.bag"
 
 4.  Launch the Docker container using the ``run_dev.sh`` script:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-5.  Inside the container, build and source the workspace:
+5.  Install this package's dependencies.
 
-    .. code:: bash
+   :ir_apt:
 
-       cd /workspaces/isaac_ros-dev && \
-         colcon build --symlink-install && \
-         source install/setup.bash
+   .. code:: bash
 
-6.  (Optional) Run tests to verify complete and correct installation:
+      sudo apt-get install -y ros-humble-isaac-ros-apriltag
 
-    .. code:: bash
-
-       colcon test --executor sequential
-
-7.  Run the following launch files to spin up a demo of this package:
+6.  Run the following launch files to spin up a demo of this package:
 
     .. code:: bash
 
        ros2 launch isaac_ros_apriltag isaac_ros_apriltag.launch.py
 
-8.  Open a **second** terminal inside the docker container:
+7.  Open a **second** terminal inside the docker container:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-9.  Run the rosbag file to simulate an image stream:
+8.  Run the rosbag file to simulate an image stream:
 
     .. code:: bash
 
        ros2 bag play --loop src/isaac_ros_apriltag/resources/rosbags/quickstart.bag
 
-10. Open a **third** terminal inside the docker container:
+9.  Open a **third** terminal inside the docker container:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-11. Observe the AprilTag detection output ``/tag_detections`` on a
+10. Observe the AprilTag detection output ``/tag_detections`` on a
     separate terminal with the command:
 
     .. code:: bash

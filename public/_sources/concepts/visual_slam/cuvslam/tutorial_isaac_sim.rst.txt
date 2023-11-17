@@ -16,13 +16,13 @@ using images from Isaac Sim.
 Tutorial Walkthrough
 --------------------
 
-1.  Complete the quickstart :ref:`here <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`.
+1.  Complete the :ref:`quickstart <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`.
 
 2.  Launch the Docker container using the ``run_dev.sh`` script:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
 3.  Inside the container, build and source the workspace:
@@ -33,7 +33,7 @@ Tutorial Walkthrough
          colcon build --symlink-install && \
          source install/setup.bash
 
-4.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`
+4.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`.
 
 5.  Press **Play** to start publishing data from the Isaac Sim.
 
@@ -48,7 +48,7 @@ Tutorial Walkthrough
 
        ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam_isaac_sim.launch.py
 
-7.  In a separate terminal, send the signal to move the robot about as follows
+7.  In a separate terminal, send the signal to move the robot about as follows:
 
     .. code:: bash
 
@@ -76,7 +76,7 @@ Tutorial Walkthrough
         :align: center
         :width: 600px
 
-Saving and using the map
+Saving and Using the Map
 ------------------------
 
 As soon as you start the visual SLAM node, it starts storing the
@@ -84,9 +84,11 @@ landmarks and the pose graph. You can save them in a map and store the
 map onto a disk. Make a call to the ``SaveMap`` ROS 2 Action with the
 following command:
 
-   Note: ``/path/to/save/the/map`` must be a new empty directory
-   every time you call this action as this action will overwrite the
-   existing contents.
+  .. note::
+
+    ``/path/to/save/the/map`` must be a new empty directory
+    every time you call this action because this action overwrites the
+    existing contents.
 
 .. code:: bash
 
@@ -101,12 +103,12 @@ following command:
     :align: center
     :width: 600px
 
-Now, you will try to load and localize in the previously saved map.
-First, stop the ``visual_slam`` node launched for creating and saving the
+Try to load and localize in the previously saved map.
+Stop the ``visual_slam`` node launched for creating and saving the
 map, then relaunch it.
 
 Use the following command to load the map from the disk and provide an
-approximate start location(prior):
+approximate start location (prior):
 
 .. code:: bash
 
@@ -117,7 +119,7 @@ approximate start location(prior):
     :align: center
     :width: 600px
 
-Once the above step returns success, you have successfully loaded and
+After the above step returns success, you have successfully loaded and
 localized your robot in the map. If it results in failure, there might
 be a possibility that the current landmarks from the approximate start
 location are not matching with stored landmarks and you need to provide

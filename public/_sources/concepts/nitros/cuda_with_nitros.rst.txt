@@ -211,3 +211,27 @@ output image's data vector is resized to ensure it will appropriately
 fit the actual image data. Finally, the image's data bytes are copied
 over without any additional processing, and the output message is
 published with a standard publisher.
+
+Custom NITROS DNN Image Encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ir_repo:`isaac_ros_managed_nitros_examples/custom_nitros_dnn_image_encoder <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_dnn_image_encoder/package.xml>`
+package contains an advanced example of Managed NITROS functionality
+for encoding images as tensors for DNN inference.
+
+.. note::
+
+   This example is currently limited to ``x86_64`` platforms.
+
+.. note::
+
+   To build and run this example, complete the following steps:
+
+   1. Delete the :ir_repo:`COLCON_IGNORE file <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_dnn_image_encoder/COLCON_IGNORE` in this example's package
+   2. Add the ``cvcuda`` suffix to the Isaac ROS Dev base image key used by ``run_dev.sh``, as explained in :ref:`this guide <repositories_and_packages/isaac_ros_common/index:Isaac ROS Docker Development Environment>`
+
+As shown in the included :ir_repo:`launch file <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_dnn_image_encoder/launch/custom_image_isaac_ros_dope_tensor_rt.launch.py>`,
+this package's ``ImageEncoderNode`` has identical functionality to the standard :ir_repo:`Isaac ROS DNN Image Encoder Node <isaac_ros_dnn_inference> <isaac_ros_dnn_image_encoder/src/dnn_image_encoder_node.cpp>`.
+
+This example leverages NVIDIA's `CV-CUDA library <https://developer.nvidia.com/cv-cuda>`__ to perform the core image normalization operations.
+CUDA with NITROS unlocks the full value of libraries like CV-CUDA for high performance robotics applications.
