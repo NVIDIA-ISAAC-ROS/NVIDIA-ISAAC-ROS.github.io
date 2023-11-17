@@ -8,50 +8,33 @@ Tutorial to Run NITROS-Accelerated Graph with Argus Camera
        argus_node("ArgusStereoNode (Raw Image)") --> left_encoder_node("EncoderNode (Compressed Image)");
        argus_node --> right_encoder_node("EncoderNode (Compressed Image)");
 
-In this tutorial, we'll demonstrate how you can perform H.264 encoding
-using a :ir_repo:`Argus-compatible camera <isaac_ros_argus_camera>`
-and :ir_repo:`isaac_ros_h264_encoder <isaac_ros_compression>`,
-and save the compressed images into a rosbag.
+In this tutorial, you perform H.264 encoding
+using an :ir_repo:`Argus-compatible camera <isaac_ros_argus_camera>`
+and an :ir_repo:`isaac_ros_h264_encoder <isaac_ros_compression>`.
+Then you save the compressed images into a rosbag.
 
 1. Follow the quickstart :ref:`here <repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index:quickstart>` up to
    step 6.
 
-2. Outside the container, clone an additional repository required to run
-   Argus-compatible camera under ``~/workspaces/isaac_ros-dev/src``.
+2. Inside the container, install the ``isaac_ros_argus_camera`` package.
+
+   :ir_apt:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src
+      sudo apt-get install -y ros-humble-isaac-ros-argus-camera
 
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_argus_camera>`
-
-3. Inside the container, build and source the workspace:
-
-   .. code:: bash
-
-      cd /workspaces/isaac_ros-dev && \
-        colcon build && \
-        source install/setup.bash
-
-4. (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-      colcon test --executor sequential
-
-5. Run the launch file. This launch file will launch the example and
-   record ``CompressedImage`` and ``CameraInfo`` topic data into a
-   rosbag to your current folder.
+3. Run the launch file. This launch file launches the example and
+   records ``CompressedImage`` and ``CameraInfo`` topic data into a
+   rosbag in your current folder.
 
    .. code:: bash
 
       ros2 launch isaac_ros_h264_encoder isaac_ros_h264_encoder_argus.launch.py
 
-6. (Optional) If you want to decode and visualize the images from the
+4. (Optional) If you want to decode and visualize the images from the
    rosbag, you can place the recorded rosbag into an x86 machine
-   equipped with NVIDIA GPU, then follow steps 7 & 8 in the 
+   equipped with NVIDIA GPU, then follow steps 7 and 8 in the
    :ref:`Quickstart section <repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index:quickstart>`. (Change the rosbag path and
    input dimension accordingly in step 7):
 
@@ -59,7 +42,7 @@ and save the compressed images into a rosbag.
 
       ros2 launch isaac_ros_h264_decoder isaac_ros_h264_decoder_rosbag.launch.py rosbag_path:=<"path to your rosbag folder">
 
-   Here is a screenshot of the result example:
+   For example, the result looks like:
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/compression/h264/argus_example.png>`
       :align: center

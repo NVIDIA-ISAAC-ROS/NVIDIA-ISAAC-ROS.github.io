@@ -35,38 +35,40 @@ Tutorial Walkthrough
         :align: center
         :width: 400px
 
-3.  Press **Play** to start publishing data from the Isaac Sim.
+3.  Select ``/World/Carter_v2_4_ROS/ros_lidars/front_2d_lidar_render_product`` in the *Stage* pane and set ``enabled`` to True.
+   
+4.  Press **Play** to start publishing data from the Isaac Sim.
 
     .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
         :align: center
         :width: 600px
 
-4. Follow the instructions at the link to set up your :doc:`development environment </getting_started/dev_env_setup>`.
+5. Follow the instructions at the link to set up your :doc:`development environment </getting_started/dev_env_setup>`.
 
-5. Clone this repository and its dependencies under `~/workspaces/isaac_ros-dev/src`:
+6. Clone this repository and its dependencies under `${ISAAC_ROS_WS}/src`:
 
     .. code-block:: bash
 
-        cd ~/workspaces/isaac_ros-dev/src
+        cd ${ISAAC_ROS_WS}/src
         git clone :ir_clone:`<isaac_ros_common>`
         git clone :ir_clone:`<isaac_ros_mission_client>`
 
-6. Start MQTT broker.
+7. Start MQTT broker.
 
     The MQTT broker is used for communication between the Mission Dispatch and the robots. There are many ways to run an MQTT broker, including as a system daemon, a standalone application, or a Docker container. The following example uses `mosquitto` as the MQTT broker. Start the `mosquitto` broker by running the following:
 
       .. code-block:: bash
 
-          cd ~/workspaces/isaac_ros-dev/src/isaac_ros_mission_client
+          cd ${ISAAC_ROS_WS}/src/isaac_ros_mission_client
           docker run -it --network host -v ${PWD}/utils/mosquitto.sh:/mosquitto.sh -d eclipse-mosquitto:latest sh mosquitto.sh 1883 9001
 
-7. Launch the Docker container using the `run_dev.sh` script:
+8. Launch the Docker container using the `run_dev.sh` script:
 
     .. code-block:: bash
 
-        cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && ./scripts/run_dev.sh
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && ./scripts/run_dev.sh
 
-8. Inside the container, build and source the workspace:
+9.  Inside the container, build and source the workspace:
 
     .. code-block:: bash
 
@@ -74,19 +76,19 @@ Tutorial Walkthrough
             colcon build --symlink-install && \
             source install/setup.bash
 
-9. (Optional) Run tests to verify complete and correct installation:
+10. (Optional) Run tests to verify complete and correct installation:
 
     .. code-block:: bash
 
         colcon test --executor sequential
 
-10. Run the following launch files to spin up ``mission_client`` and Nav2:
+11. Run the following launch files to spin up ``mission_client`` and Nav2:
 
     .. code-block:: bash
 
         ros2 launch isaac_ros_vda5050_nav2_client_bringup isaac_ros_vda5050_nav2_client.launch.py
 
-11. Start `Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`__ with Docker.
+12. Start `Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`__ with Docker.
 
     - On the Postgres database:
 

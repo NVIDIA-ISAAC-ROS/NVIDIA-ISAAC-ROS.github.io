@@ -1,4 +1,4 @@
-Tutorial for Visual SLAM using a ZED camera
+Tutorial for Visual SLAM Using a ZED Camera
 ===========================================
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/zed_rviz.gif>`
@@ -13,44 +13,37 @@ This tutorial walks you through setting up :ir_repo:`Isaac ROS Visual SLAM <isaa
 a `ZED <https://www.stereolabs.com/>`__ camera.
 
 .. note::
-   
+
    The :ir_repo:`launch file <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_zed.launch.py>`
    provided in this tutorial is designed for a ZED camera with
    integrated IMU. If you want to run this tutorial with a ZED camera
-   without an IMU (like ZED), then change ``enable_imu_fusion`` parameter in
+   without an IMU (like ZED), then change the ``enable_imu_fusion`` parameter in
    the launch file to ``False``.
-   
-.. note::
-   
-   This tutorial requires a
-   compatible ZED camera from the list available
-   :ref:`here <getting_started/hardware_setup/sensors/zed_setup:Camera Compatibility>`
 
-Tutorial Walkthrough - VSLAM execution
+.. note::
+
+   This tutorial requires a
+   compatible ZED camera from the list of available
+   :ref:`cameras <getting_started/hardware_setup/sensors/zed_setup:Camera Compatibility>`.
+
+Tutorial Walkthrough - VSLAM Execution
 --------------------------------------
 
-1.  Complete the :doc:`ZED setup tutorial </getting_started/hardware_setup/sensors/zed_setup>`. 
+1.  Complete the :doc:`ZED setup tutorial </getting_started/hardware_setup/sensors/zed_setup>`.
 
 2.  Complete the :ref:`Quickstart section <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`.
 
-3. Follow this
-   `page <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model#how-to-obtain-the-parameters-for-your-imu>`__
+3. Follow the
+   `IMU page <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model#how-to-obtain-the-parameters-for-your-imu>`__
    to obtain `IMU Noise
    Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__
-   parameters. Parameters can be obtained either through datasheet for the IMU
+   parameters. Parameters can be obtained through the datasheet for the IMU
    or from a ROS package like
    `this <https://github.com/CruxDevStuff/allan_ros2>`__.
 
-4. ``[Terminal 1]`` Clone the ``isaac_ros_image_pipeline`` repository:
+4. ``[Terminal 1]`` Run ``ZED`` node and ``visual_slam`` node
 
-   .. code:: bash
-
-      cd ${ISAAC_ROS_WS}/src && \
-        git clone :ir_clone:`<isaac_ros_image_pipeline>`
-
-5. ``[Terminal 1]`` Run ``ZED`` node and ``visual_slam`` node
-
-   Make sure you have your ZED camera is attached to the system, and
+   Make sure that you have your ZED camera attached to the system, and
    then start the Isaac ROS container.
 
    .. code:: bash
@@ -59,7 +52,7 @@ Tutorial Walkthrough - VSLAM execution
 
    ..
 
-   Or if you did not add the command in :ref:`step 1-3 of the quickstart
+   Or, if you did not add the command in :ref:`step 1-3 of the quickstart
    section <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`:
 
    .. code:: bash
@@ -67,31 +60,31 @@ Tutorial Walkthrough - VSLAM execution
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh ${ISAAC_ROS_WS}
 
-6. ``[Terminal 1]`` Inside the container, build and source the workspace:
+5. ``[Terminal 1]`` Inside the container, install ``isaac_ros_stereo_image_proc``
+
+   :ir_apt:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
-        source install/setup.bash
+      sudo apt-get install -y ros-humble-isaac-ros-stereo-image-proc
 
-7. ``[Terminal 1]`` Run the launch file, which launches the example and wait
+6. ``[Terminal 1]`` Run the launch file, which launches the example and waits
    for 5 seconds:
 
    .. code:: bash
 
       ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam_zed.launch.py
 
-8. ``[Terminal 2]`` Attach a second terminal to check the operation.
+7. ``[Terminal 2]`` Attach a second terminal to check the operation.
 
-   Attach another terminal to the running container for issuing other
+   Attach Terminal 2 to the running container so that you can issue other
    ROS2 commands.
 
    .. code:: bash
 
       isaac_ros_container
 
-   First check if you can see all the ROS2 topics expected.
+   Verify that you can see all the expected ROS2 topics.
 
    .. code:: bash
 
@@ -202,25 +195,26 @@ Tutorial Walkthrough - VSLAM execution
 Tutorial Walkthrough - Visualization
 ------------------------------------
 
-At this point, you have two options for checking the ``visual_slam``
-output.
+You have the following two options for checking the ``visual_slam``
+output:
 
 -  **Live visualization**: Run ``RViz2`` live while running ``ZED`` node and
    ``visual_slam`` nodes.
--  **Offline visualization**: Record rosbag file and check the recorded
-   data offline (possibly on a different machine)
+-  **Offline visualization**: Record a rosbag file and check the recorded
+   data offline (possibly on a different machine).
 
-Running ``RViz2`` on a remote PC over the network is tricky and is very
-difficult especially when you have image message topics to subscribe due
-to added burden on ROS 2 network transport.
+Running ``RViz2`` on a remote PC over the network can be challenging and can be
+difficult especially when you have image message topics to subscribe because
+of the added burden on the ROS 2 network transport.
 
-Working on ``RViz2`` in a X11-forwarded window is also difficult because of
+Working on ``RViz2`` in a X11-forwarded window can also be difficult because of
 the network speed limitation.
 
-Therefore, if you are running ``visual_slam`` on Jetson, it is generally
-recommended **NOT** to evaluate with live visualization (1).
+Typically, if you are running ``visual_slam`` on Jetson, it is generally
+recommended that you **NOT** evaluate with live visualization (1).
 
-Live visualization
+
+Live Visualization
 ~~~~~~~~~~~~~~~~~~
 
 1. ``[Terminal 2]`` Open ``RViz2`` from the second terminal:
@@ -229,8 +223,8 @@ Live visualization
 
       rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/zed.cfg.rviz
 
-   As you move the camera, the position and orientation of the frames
-   should correspond to how the camera moved relative to its starting
+   As you move the camera, verify that the position and orientation of the frames
+   corresponds to how the camera moved relative to its starting
    pose.
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/zed_rviz.gif>`
@@ -238,13 +232,13 @@ Live visualization
     :alt: After Localization
     :width: 600px
 
-Offline visualization
+Offline Visualization
 ~~~~~~~~~~~~~~~~~~~~~
 
-1. ``[Terminal 2]`` Save rosbag file
+1. ``[Terminal 2]`` Save a rosbag file.
 
-   Record the output in your rosbag file (along with the input data for
-   later visual inspection).
+   Record the output in your rosbag file, along with the input data for
+   later visual inspection.
 
    .. code:: bash
 
@@ -262,40 +256,40 @@ Offline visualization
         /visual_slam/vis/observations_cloud \
         /visual_slam/vis/pose_graph_edges /visual_slam/vis/pose_graph_edges2 \
         /visual_slam/vis/pose_graph_nodes
-      ros2 bag info ${ROSBAG_NAME} 
+      ros2 bag info ${ROSBAG_NAME}
 
    If you plan to run the rosbag on a remote machine (PC) for
-   evaluation, you can send the rosbag file to your remote machine.
+   evaluation, you can send the rosbag file to your remote machine:
 
    .. code:: bash
 
       export IP_PC=192.168.1.100
       scp -r ${ROSBAG_NAME} ${PC_USER}@${IP_PC}:/home/${PC_USER}/workspaces/isaac_ros-dev/
 
-2. ``[Terminal A]`` Launch ``RViz2``
+2. ``[Terminal 1]`` Launch ``RViz2``:
 
       If you are SSHing into Jetson from your PC, make sure you enabled
-      X forwarding by adding ``-X`` option with SSH command.
+      X forwarding by adding ``-X`` option with SSH command:
 
       .. code:: bash
 
          ssh -X ${USERNAME_ON_JETSON}@${IP_JETSON}
 
-   Launch the Isaac ROS container.
+   Launch the Isaac ROS container:
 
    .. code:: bash
 
       isaac_ros_container
 
-   Run ``RViz2`` with a configuration file for visualizing set of messages
-   from Visual SLAM node.
+   Run ``RViz2`` with a configuration file for visualizing a set of messages
+   from Visual SLAM node:
 
    .. code:: bash
 
       cd /workspaces/isaac_ros-dev
       rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/vslam_keepall.cfg.rviz
 
-3. ``[Terminal B]`` Playback the recorded rosbag
+3. ``[Terminal 2]`` Playback the recorded rosbag:
 
    Attach another terminal to the running container.
 
@@ -307,9 +301,9 @@ Offline visualization
 
    .. code:: bash
 
-      ros2 bag play ${ROSBAG_NAME} 
+      ros2 bag play ${ROSBAG_NAME}
 
-   ``RViz2`` should start showing the following visual:
+   ``RViz2`` starts showing a visual similar to the following:
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/RViz_0217-cube_vslam-keepall.png>`
     :align: center

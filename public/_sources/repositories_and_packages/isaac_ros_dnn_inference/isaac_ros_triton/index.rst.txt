@@ -19,12 +19,11 @@ Quickstart
 
 1.  Set up your development environment by following the instructions
     :doc:`here </getting_started/dev_env_setup>`.
-2.  Clone this repository and its dependencies under
-    ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone ``isaac_ros_common``, ``isaac_ros_image_segmentation``, and this repository under ``${ISAAC_ROS_WS}/src``.
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
 
     .. code:: bash
 
@@ -32,28 +31,28 @@ Quickstart
 
     .. code:: bash
 
-       git clone :ir_clone:`<isaac_ros_nitros>`
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_image_pipeline>`
+       git clone :ir_clone:`<isaac_ros_image_segmentation>`
 
     .. code:: bash
 
        git clone :ir_clone:`<isaac_ros_dnn_inference>`
 
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_image_segmentation>`
-
 3.  Launch the Docker container using the ``run_dev.sh`` script:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-4.  This example uses ``PeopleSemSegNet ShuffleSeg``.
+4.  Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-triton
+
+5.  This example uses ``PeopleSemSegNet ShuffleSeg``.
     Download the ETLT file and the ``int8`` inference mode cache file:
 
     .. code:: bash
@@ -63,13 +62,13 @@ Quickstart
          wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_etlt.etlt && \
          wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_cache.txt
 
-5.  Convert the ETLT file to a TensorRT plan file:
+6.  Convert the ETLT file to a TensorRT plan file:
 
     .. code:: bash
 
        /opt/nvidia/tao/tao-converter -k tlt_encode -d 3,544,960 -p input_2:0,1x3x544x960,1x3x544x960,1x3x544x960 -t int8 -c peoplesemsegnet_shuffleseg_cache.txt -e /tmp/models/peoplesemsegnet_shuffleseg/1/model.plan -o argmax_1 peoplesemsegnet_shuffleseg_etlt.etlt
 
-6.  Create a file named
+7.  Create a file named
     ``/tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt`` by copying
     the sample Triton config file:
 
@@ -77,21 +76,7 @@ Quickstart
 
        cp /workspaces/isaac_ros-dev/src/isaac_ros_dnn_inference/resources/peoplesemsegnet_shuffleseg_config.pbtxt /tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt
 
-7.  Inside the container, build and source the workspace:
-
-    .. code:: bash
-
-       cd /workspaces/isaac_ros-dev && \
-         colcon build --symlink-install && \
-         source install/setup.bash
-
-8.  (Optional) Run tests to verify complete and correct installation:
-
-    .. code:: bash
-
-       colcon test --executor sequential
-
-9.  Run the following launch files to spin up a demo of this package:
+8.  Run the following launch files to spin up a demo of this package:
     Launch Triton:
 
     .. code:: bash
@@ -102,7 +87,7 @@ Quickstart
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
     Then, play the ROS bag from ``isaac_ros_image_segmentation``:
@@ -111,13 +96,13 @@ Quickstart
 
        ros2 bag play -l src/isaac_ros_image_segmentation/resources/rosbags/unet_sample_data/
 
-10. Visualize and validate the output of the package:
+9.  Visualize and validate the output of the package:
 
     In a **third** terminal, enter the Docker container:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
     Then echo the inference result:

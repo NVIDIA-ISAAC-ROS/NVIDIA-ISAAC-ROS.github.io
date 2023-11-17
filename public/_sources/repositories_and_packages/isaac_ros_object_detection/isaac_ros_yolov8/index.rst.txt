@@ -9,41 +9,36 @@ Quickstart
 
 1. Set up your development environment by following the instructions
    :doc:`here </getting_started/dev_env_setup>`.
-2. Clone this repository and its dependencies under
-   ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
-   .. code:: bash
+    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
 
    .. code:: bash
 
       git clone :ir_clone:`<isaac_ros_object_detection>`
 
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_dnn_inference>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_image_pipeline>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_nitros>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_common>`
-
 3. Launch the Docker container using the ``run_dev.sh`` script:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-4. Download the model of your choice from `Ultralytics YOLOv8 <https://github.com/ultralytics/ultralytics#models>`__.
+4. Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-yolov8
+
+5. Download the model of your choice from `Ultralytics YOLOv8 <https://github.com/ultralytics/ultralytics#models>`__.
    
    .. warning::
 
@@ -56,7 +51,7 @@ Quickstart
       cd /tmp && \
          wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s.pt
 
-5. Export to `ONNX <https://onnx.ai/>`__ following instructions `here <https://docs.ultralytics.com/modes/export/>`__.
+6. Export to `ONNX <https://onnx.ai/>`__ following instructions `here <https://docs.ultralytics.com/modes/export/>`__.
    
    .. warning::
       
@@ -99,7 +94,7 @@ Quickstart
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
    Make a directory called ``/tmp`` in Jetson:
@@ -115,21 +110,7 @@ Quickstart
       cd ~/Downloads && \
       docker cp yolov8s.onnx isaac_ros_dev-aarch64-container:/tmp
 
-6. Inside the container, build and source the workspace:
-
-   .. code:: bash
-
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
-        source install/setup.bash
-
-7. (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-      colcon test --executor sequential
-
-8. Run the following launch file to perform YOLOv8 detection using TensorRT:
+7.  Run the following launch file to perform YOLOv8 detection using TensorRT:
    
    .. code:: bash
 
@@ -142,7 +123,7 @@ Quickstart
 
       The output bounding boxes here will be published on the ``/detections/output`` topic.
 
-9.  Run the image publisher node to publish input images for inference. 
+8.  Run the image publisher node to publish input images for inference. 
     A sample image (``people_cycles.jpg``) is provided :ir_repo:`here <isaac_ros_object_detection> <resources/people_cycles.jpg>`:
 
     .. code:: bash
@@ -150,7 +131,7 @@ Quickstart
        cd /workspaces/isaac_ros-dev/src/isaac_ros_object_detection && \
           ros2 run image_publisher image_publisher_node resources/people_cycles.jpg --ros-args --remap /image_raw:=/image 
 
-10. Visualize and validate the output of the package in the
+9.  Visualize and validate the output of the package in the
     ``rqt_image_view`` window. Inside the RQT image window that should have popped up, the output should look like:
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/people-cycling-results.png>`

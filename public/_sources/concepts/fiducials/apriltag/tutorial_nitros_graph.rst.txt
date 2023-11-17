@@ -18,56 +18,35 @@ To start the graph, follow the steps below:
 1. Follow the :ref:`Isaac ROS AprilTag Quickstart section <repositories_and_packages/isaac_ros_apriltag/isaac_ros_apriltag/index:quickstart>` up to
    step 2.
 
-2. Clone additional repositories required to run Argus-compatible camera
-   under ``~/workspaces/isaac_ros-dev/src``.
+2. Launch the Docker container using the ``run_dev.sh`` script:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_argus_camera>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_image_pipeline>`
-
-3. Launch the Docker container using the ``run_dev.sh`` script:
-
-   .. code:: bash
-
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-4. Inside the container, build and source the workspace:
+3. Inside the container, install the ``isaac_ros_argus_camera`` package.
+
+   :ir_apt:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
-        source install/setup.bash
+      sudo apt-get install -y ros-humble-isaac-ros-argus-camera
 
-5. (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-      colcon test
-
-6. Run the following launch files to start the graph:
+4. Run the following launch files to start the graph:
 
    .. code:: bash
 
       ros2 launch isaac_ros_apriltag isaac_ros_argus_apriltag_pipeline.launch.py
 
-7. Open a **second** terminal inside the docker container:
+5. Open a **second** terminal inside the docker container:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-8. Observe the AprilTag detection output ``/tag_detections`` on a
+6. Observe the AprilTag detection output ``/tag_detections`` on a
    separate terminal with the command:
 
    .. code:: bash

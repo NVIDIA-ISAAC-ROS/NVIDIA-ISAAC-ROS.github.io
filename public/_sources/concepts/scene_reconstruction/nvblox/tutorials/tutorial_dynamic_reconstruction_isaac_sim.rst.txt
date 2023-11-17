@@ -34,20 +34,6 @@ Tutorial Walkthrough
 Before continuing this example, you must have successfully completed the
 :doc:`tutorial_isaac_sim`.
 
-1. Download the code for :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>`
-   and :ir_repo:`Isaac ROS NITROS <isaac_ros_nitros>`.
-
-   .. code:: bash
-
-    cd ~/workspaces/isaac_ros-dev/src && \
-      git clone :ir_clone:`<isaac_ros_visual_slam>`
-
-
-   .. code:: bash
-
-    git clone :ir_clone:`<isaac_ros_nitros>`
-
-
 .. note::
 
    This tutorial runs ``Isaac ROS Visual SLAM`` for pose estimation, instead
@@ -60,7 +46,7 @@ Before continuing this example, you must have successfully completed the
 
    .. code:: bash
 
-    ./python.sh ~/workspaces/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_examples/nvblox_isaac_sim/omniverse_scripts/start_isaac_sim.py --with_people --gpu_physics_enabled --scenario_path=/Isaac/Samples/NvBlox/carter_warehouse_navigation_with_dynamics.usd
+    ./python.sh ${ISAAC_ROS_WS}/src/isaac_ros_nvblox/nvblox_examples/nvblox_isaac_sim/omniverse_scripts/start_isaac_sim.py --with_people --gpu_physics_enabled --scenario_path=/Isaac/Samples/NvBlox/carter_warehouse_navigation_with_dynamics.usd
 
    .. note::
 
@@ -71,16 +57,16 @@ Before continuing this example, you must have successfully completed the
 
    .. code:: bash
 
-    cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
       ./scripts/run_dev.sh
 
-4.  Inside the container, build and source the workspace:
+4.  Inside the container, install ``isaac_ros_visual_slam``
 
-    .. code:: bash
+   :ir_apt:
 
-       cd /workspaces/isaac_ros-dev && \
-         colcon build --symlink-install && \
-         source install/setup.bash
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-visual-slam
 
 5. Launch the pre-composed graph launch file:
 

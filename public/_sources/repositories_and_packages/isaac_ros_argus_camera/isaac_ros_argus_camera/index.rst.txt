@@ -9,24 +9,15 @@ Quickstart
 1. Set up your development environment by following the instructions
    :doc:`here </getting_started/dev_env_setup>`.
 
-2. Clone this repository and its dependencies under
-   ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
-   .. code:: bash
+    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
 
-   .. code:: bash
+    .. code:: bash
 
-      git clone :ir_clone:`<isaac_ros_common>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_nitros>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_image_pipeline>`
+       git clone :ir_clone:`<isaac_ros_common>`
 
    .. code:: bash
 
@@ -36,30 +27,24 @@ Quickstart
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-4. Inside the container, build and source the workspace:
+4. Install this package's dependencies.
+
+   :ir_apt:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
-        source install/setup.bash
+      sudo apt-get install -y ros-humble-isaac-ros-argus-camera
 
-5. (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-      colcon test --executor sequential
-
-6. Run the following launch files to spin up a demo of this package:
+5. Run the following launch files to spin up a demo of this package:
 
    .. code:: bash
 
       ros2 launch isaac_ros_argus_camera isaac_ros_argus_camera_mono.launch.py
 
-7. Use ``image_saver`` to save the output images:
+6. Use ``image_saver`` to save the output images:
 
    .. code:: bash
 

@@ -1,0 +1,117 @@
+Tutorial for DNN Image Segmentation with NITROS Bridge
+======================================================
+
+Overview
+--------
+
+This tutorial walks you through how to run the ``isaac_ros_unet`` on ROS 2 Humble, while playing rosbag and getting the results from ROS Noetic through ``isaac_ros_nitros_bridge``.
+The tutorial is based on the `ROS1 Bridge documentation <https://github.com/ros2/ros1_bridge>`__.
+
+.. note::
+   ROS actions are not supported by the `ROS1 Bridge <https://github.com/ros2/ros1_bridge>`__
+
+Steps
+-----
+
+.. include:: _snippets/setup_ros1_steps.rst
+
+Now, we can setup ``isaac_ros_unet`` and run it with ``isaac_ros_nitros_bridge``.
+
+#. Clone ``isaac_ros_unet`` and its dependencies under ``/workspaces/isaac_ros-dev/isaac_ros-dev/src``:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev/isaac_ros-dev/src && \
+       git clone :ir_clone:`<isaac_ros_image_segmentation>` && \
+       git clone :ir_clone:`<isaac_ros_dnn_inference>` && \
+       git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+
+#. Complete :doc:`isaac_ros_unet</repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>` Quickstart 
+   step 5-6 to download image segmentation models and convert it to TensorRT engine.
+
+
+#.  Create a file called ``/tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt`` by copying the sample Triton config file:
+
+    .. code:: bash
+
+       cp /workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_image_segmentation/resources/peoplesemsegnet_shuffleseg_config.pbtxt /tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt
+
+#.  Inside the container, build ``isaac_ros_unet`` and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
+         colcon build --symlink-install --packages-up-to isaac_ros_unet && \
+         source install/setup.bash
+
+#. Run the following launch files to spin up a demo of this package:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_unet isaac_ros_unet_triton.launch.py model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax' input_image_width:=1200 input_image_height:=632
+
+
+#. **Attach a fourth terminal** to the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+       ./scripts/run_dev.sh ${HOME}/workspaces
+
+#. Launch the image converter launch file of ``isaac_ros_nitros_bridge``:
+
+    .. code:: bash
+
+      cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
+        source install/setup.bash && \
+        ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_image_converter.launch.py ros1_ws_path:=/workspaces/isaac_ros-dev/isaac_ros_1-dev/ pub_image_name:=image sub_image_name:=unet/colored_segmentation_mask
+
+
+#. **Attach a fourth terminal** to the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+       ./scripts/run_dev.sh ${HOME}/workspaces
+
+#. Pull down a rosbag of image segmentation sample:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev/isaac_ros_1-dev/src/isaac_ros_nitros_bridge && \ 
+        git lfs pull -X "" -I "resources/unet_sample_data_ros1.bag"
+
+#. Play the rosbag under ROS Noetic:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev/isaac_ros_1-dev/ && \ 
+        source install_isolated/setup.bash && \
+        rosbag play -l "src/isaac_ros_nitros_bridge/resources/unet_sample_data_ros1.bag"
+
+#. **Attach a fifth terminal** to the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+       ./scripts/run_dev.sh ${HOME}/workspaces
+
+#. Source ``ros_noetic``, download ``rviz`` for ROS Noetic:
+
+    .. code:: bash
+
+       source /opt/ros/noetic/setup.bash && \
+         sudo apt-get update && sudo apt-get install ros-noetic-rviz
+
+#. Run ``rviz`` under ROS Noetic, add the colorized segmentation topic ``/ros1_output_image`` sent from ROS 2 humble and visualize:
+
+    .. code:: bash
+
+      rviz
+
+#. You should be able to see the colorized segmentation:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/peoplesemsegnet_shuffleseg_rqt.png>`
+      :width: 320px
+      :align: center

@@ -10,33 +10,43 @@ Quickstart
 1.  Set up your development environment by following the instructions
     :doc:`here </getting_started/dev_env_setup>`.
 
-2.  Clone this repository and its dependencies under
-    ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src &&
-       git clone :ir_clone:`<isaac_ros_common &&>`
-       git clone :ir_clone:`<isaac_ros_nitros &&>`
-       git clone :ir_clone:`<isaac_ros_image_pipeline &&>`
-       git clone :ir_clone:`<isaac_ros_depth_segmentation &&>`
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
        git clone :ir_clone:`<isaac_ros_freespace_segmentation>`
 
 3.  Pull down a rosbag of sample data:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_depth_segmentation &&
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_depth_segmentation &&
        git lfs pull -X "" -I "resources/rosbags/bi3dnode_rosbag"
 
 4.  Launch the Docker container using the ``run_dev.sh`` script:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common &&
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common &&
        ./scripts/run_dev.sh
 
-5.  Download model files for Bi3D (refer to the 
+5.  Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-bi3d-freespace
+
+6.  Download model files for Bi3D (refer to the 
     :ref:`Model Preparation <repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index:model preparation>`
     section for more information):
 
@@ -47,7 +57,7 @@ Quickstart
        wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/featnet.onnx' &&
        wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/segnet.onnx'
 
-6.  Convert the ``.onnx`` model files to TensorRT engine plan files
+7.  Convert the ``.onnx`` model files to TensorRT engine plan files
     (refer to the
     :ref:`Model Preparation <repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index:model preparation>`
     section for more information):
@@ -78,21 +88,7 @@ Quickstart
        The engine plans generated using the x86_64 commands
        will also work on Jetson, but performance will be reduced.
 
-7.  Build and source the workspace:
-
-    .. code:: bash
-
-       cd /workspaces/isaac_ros-dev &&
-       colcon build --symlink-install &&
-       source install/setup.bash
-
-8.  (Optional) Run tests to verify complete and correct installation:
-
-    .. code:: bash
-
-       colcon test --executor sequential
-
-9.  Run the launch file to spin up a demo of this package:
+8.  Run the launch file to spin up a demo of this package:
 
     .. code:: bash
 
@@ -101,14 +97,14 @@ Quickstart
        max_disparity_values:=10
 
 
-10. Open a **second** terminal inside the Docker container:
+9.  Open a **second** terminal inside the Docker container:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-11. Visualize the occupancy grid in RViz.
+10. Visualize the occupancy grid in RViz.
 
     Start RViz:
 

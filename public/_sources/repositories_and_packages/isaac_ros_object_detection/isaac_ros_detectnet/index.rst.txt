@@ -9,62 +9,43 @@ Quickstart
 
 1. Set up your development environment by following the instructions
    :doc:`here </getting_started/dev_env_setup>`.
-2. Clone this repository and its dependencies under
-   ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
-   .. code:: bash
+    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
 
    .. code:: bash
 
       git clone :ir_clone:`<isaac_ros_object_detection>`
 
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_dnn_inference>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_image_pipeline>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_nitros>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_common>`
-
 3. Pull down a ROS Bag of sample data:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_object_detection/isaac_ros_detectnet && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_object_detection/isaac_ros_detectnet && \
         git lfs pull -X "" -I "resources/rosbags"
 
 4. Launch the Docker container using the ``run_dev.sh`` script:
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-5. Inside the container, build and source the workspace:
+5. Install this package's dependencies.
+
+   :ir_apt:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
-        source install/setup.bash
+      sudo apt-get install -y ros-humble-isaac-ros-detectnet
 
-6. (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-      colcon test --executor sequential
-
-7. Run the quickstart setup script which will download the `PeopleNet
+6. Run the quickstart setup script which will download the `PeopleNet
    Model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__
    from NVIDIA GPU Cloud(NGC)
 
@@ -73,14 +54,14 @@ Quickstart
       cd /workspaces/isaac_ros-dev/src/isaac_ros_object_detection/isaac_ros_detectnet && \
         ./scripts/setup_model.sh --height 632 --width 1200 --config-file resources/quickstart_config.pbtxt
 
-8. Run the following launch file to spin up a demo of this package:
+7. Run the following launch file to spin up a demo of this package:
 
    .. code:: bash
 
       cd /workspaces/isaac_ros-dev && \
         ros2 launch isaac_ros_detectnet isaac_ros_detectnet_quickstart.launch.py
 
-9. Visualize and validate the output of the package in the
+8. Visualize and validate the output of the package in the
    ``rqt_image_view`` window. After about a minute, your output should
    look like this:
 

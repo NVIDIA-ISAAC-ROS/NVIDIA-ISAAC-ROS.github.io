@@ -9,20 +9,15 @@ Quickstart
 
 1. Set up your development environment by following the instructions
    :doc:`here </getting_started/dev_env_setup>`.
-2. Clone this repository and its dependencies under
-   ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
-   .. code:: bash
+    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
 
-   .. code:: bash
+    .. code:: bash
 
-      git clone :ir_clone:`<isaac_ros_common>`
-
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_nitros>`
+       git clone :ir_clone:`<isaac_ros_common>`
 
    .. code:: bash
 
@@ -34,31 +29,25 @@ Quickstart
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-5. Inside the container, build and source the workspace:
+5. Install this package's dependencies.
+
+   :ir_apt:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
-        source install/setup.bash
+      sudo apt-get install -y ros-humble-isaac-ros-image-proc
 
-6. (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-      colcon test --executor sequential
-
-7. Start ``isaac_ros_image_proc`` using the prebuilt executable (Using
+6. Start ``isaac_ros_image_proc`` using the prebuilt executable (Using
    RealSense camera as an example):
 
    .. code:: bash
 
       ros2 run isaac_ros_image_proc isaac_ros_image_proc --ros-args -r /image_raw:=/camera/color/image_raw --ros-args -r /camera_info:=/camera/color/camera_info
 
-8. In a separate terminal, spin up a **calibrated** camera publisher to
+7. In a separate terminal, spin up a **calibrated** camera publisher to
    ``/image_raw`` and ``/camera_info`` using any package(for example,
    ``realsense2_camera``):
 
@@ -66,15 +55,13 @@ Quickstart
 
       ros2 launch realsense2_camera rs_launch.py
 
-9. Observe the image output in grayscale and color on ``/image_mono``
+8. Observe the image output in grayscale and color on ``/image_mono``
    and ``/image_rect_color``, respectively:
 
    .. code:: bash
 
       ros2 run image_view image_view --ros-args -r image:=image_mono  
       ros2 run image_view image_view --ros-args -r image:=image_rect_color  
-
-..
 
 .. note::
 

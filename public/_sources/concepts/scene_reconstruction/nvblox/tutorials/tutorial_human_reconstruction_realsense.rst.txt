@@ -31,40 +31,40 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
 1.  Complete all steps of the :doc:`tutorial_realsense`
     and make sure it is working.
 
-2.  Clone the segmentation repository and its dependencies under
-    ``~/workspaces/isaac_ros-dev/src``.
+2.  Clone the segmentation repository under
+    ``${ISAAC_ROS_WS}/src``.
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src
+       cd ${ISAAC_ROS_WS}/src
 
     .. code:: bash
 
        git clone :ir_clone:`<isaac_ros_image_segmentation>`
 
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_dnn_inference>`
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_image_pipeline>`
-
 3.  Pull down a rosbag of sample data:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_image_segmentation && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_image_segmentation && \
            git lfs pull -X "" -I "resources/rosbags/"
 
 4.  Launch the Docker container using the ``run_dev.sh`` script:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-5.  Download the ``PeopleSemSegNet`` ETLT file and the\ ``int8``
+5.  Inside the container, install ``isaac_ros_image_segmentation``
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-image-segmentation
+
+6.  Download the ``PeopleSemSegNet`` ETLT file and the\ ``int8``
     inference mode cache file:
 
     .. code:: bash
@@ -74,13 +74,13 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
        wget 'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_quantized_vanilla_unet_v2.0/files/peoplesemsegnet_vanilla_unet_dynamic_etlt_int8.cache'
        wget 'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_quantized_vanilla_unet_v2.0/files/peoplesemsegnet_vanilla_unet_dynamic_etlt_int8_fp16.etlt'
 
-6.  Convert the ETLT file to a TensorRT plan file:
+7.  Convert the ETLT file to a TensorRT plan file:
 
     .. code:: bash
 
        /opt/nvidia/tao/tao-converter -k tlt_encode -d 3,544,960 -p input_1:0,1x3x544x960,1x3x544x960,1x3x544x960 -t int8 -c peoplesemsegnet_vanilla_unet_dynamic_etlt_int8.cache -e /workspaces/isaac_ros-dev/models/peoplesemsegnet/1/model.plan -o argmax_1 peoplesemsegnet_vanilla_unet_dynamic_etlt_int8_fp16.etlt
 
-7.  Create the Triton configuration file called
+8.  Create the Triton configuration file called
     ``/workspaces/isaac_ros-dev/models/peoplesemsegnet/config.pbtxt``
     with the following content:
 
@@ -109,7 +109,7 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
          }
        }
 
-8.  Inside the container, build and source the workspace:
+9.  Inside the container, build and source the workspace:
 
     .. code:: bash
 
@@ -117,26 +117,26 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
          colcon build --symlink-install && \
          source install/setup.bash
 
-9.  (Optional) Run tests to verify complete and correct installation:
+10. (Optional) Run tests to verify complete and correct installation:
 
     .. code:: bash
 
        colcon test --executor sequential
 
-10. Run the following launch file to get the ROS node running:
+11. Run the following launch file to get the ROS node running:
 
     .. code:: bash
 
        ros2 launch isaac_ros_unet isaac_ros_unet_triton.launch.py model_name:=peoplesemsegnet model_repository_paths:=['/workspaces/isaac_ros-dev/models'] input_binding_names:=['input_1:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax'
 
-11. Open *two* other terminals, and enter the Docker container in both:
+12. Open *two* other terminals, and enter the Docker container in both:
 
     .. code:: bash
 
-       cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-12. Play the rosbag in one of the terminals:
+13. Play the rosbag in one of the terminals:
 
     .. code:: bash
 
@@ -148,7 +148,7 @@ to run the ``PeopleSemSegNet ShuffleSeg`` network.
 
        ros2 run rqt_image_view rqt_image_view
 
-13. Verify that the output looks similar to this image:
+14. Verify that the output looks similar to this image:
 
     .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/peoplesemsegnet_shuffleseg_rqt.png>`
        :width: 600px
@@ -165,7 +165,7 @@ Example with RealSense Live Data
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
 4. Source the workspace:

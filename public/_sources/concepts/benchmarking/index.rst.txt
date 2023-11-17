@@ -110,7 +110,7 @@ Required Models
 Some of the benchmark graphs require loading model files. Models used by
 a benchmark graph are listed in the benchmark script's header. By
 default models are expected to be accessible by a benchmark script under
-``~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models``.
+``${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models``.
 
 Before benchmarking a node that contains a DNN, the DNN must be
 downloaded and converted to a ``.plan`` file for the host system. You can do this
@@ -126,39 +126,39 @@ using the instructions provided in the table below:
    * - :ref:`Bi3D <repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index:Model Preparation>`
      - .. code-block:: bash 
           
-          mkdir -p ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/bi3d && \
-            cd ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/bi3d && \
+          mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/bi3d && \
+            cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/bi3d && \
             wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/featnet.onnx' && \
             wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/segnet.onnx'
 
    * - `ESS <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`__
      - .. code-block:: bash 
       
-          mkdir -p ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/ess && \
-            cd ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/ess && \
+          mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/ess && \
+            cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/ess && \
             wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/dnn_stereo_disparity/versions/3.0.0/files/ess.etlt'
 
    * - `DOPE <https://github.com/NVlabs/Deep_Object_Pose>`__ `Ketchup <https://drive.google.com/drive/folders/1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__
-     - ``mkdir -p ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/ketchup && cd ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/ketchup``\ Download ``Ketchup.pth`` model from `here <https://drive.google.com/drive/folders/1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__ to the current directory. Start the Isaac ROS Docker container before running the next step: ``~/workspaces/isaac_ros-dev/scripts/run_dev.sh && python3 /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_dope/scripts/dope_converter.py --format onnx --input Ketchup.pth --output ketchup.onnx``\ Create a file ``config.pbtxt`` in the current directory by using the configurations provided in setup 4 :doc:`here </concepts/pose_estimation/dope/tutorial_triton>`
+     - ``mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/ketchup && cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/ketchup``\ Download ``Ketchup.pth`` model from `here <https://drive.google.com/drive/folders/1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__ to the current directory. Start the Isaac ROS Docker container before running the next step: ``${ISAAC_ROS_WS}/scripts/run_dev.sh && python3 /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_dope/scripts/dope_converter.py --format onnx --input Ketchup.pth --output ketchup.onnx``\ Create a file ``config.pbtxt`` in the current directory by using the configurations provided in setup 4 :doc:`here </concepts/pose_estimation/dope/tutorial_triton>`
 
    * - `PeopleNet <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__
      - .. code-block:: bash 
       
-          mkdir -p ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/peoplenet && \
-            cd ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/peoplenet && \
+          mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/peoplenet && \
+            cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/peoplenet && \
             wget 'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplenet/versions/pruned_quantized_v2.3.2/files/resnet34_peoplenet_pruned_int8.etlt' && \
             wget 'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplenet/versions/pruned_quantized_v2.3.2/files/resnet34_peoplenet_pruned_int8.txt' && \
             wget 'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplenet/versions/pruned_quantized_v2.3.2/files/labels.txt' && \
-            cp ~/workspaces/isaac_ros-dev/src/isaac_ros_object_detection/isaac_ros_detectnet/resources/peoplenet_config.pbtxt config.pbtxt
+            cp ${ISAAC_ROS_WS}/src/isaac_ros_object_detection/isaac_ros_detectnet/resources/peoplenet_config.pbtxt config.pbtxt
 
    * - `PeopleSemSegNet ShuffleSeg <https://ngc.nvidia.com/catalog/models/nvidia:tao:peoplesemsegnet>`__
      - .. code-block:: bash 
       
-          mkdir -p ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/peoplesemsegnet_shuffleseg && \
-            cd ~/workspaces/isaac_ros-dev/src/ros2_benchmark/assets/models/peoplesemsegnet_shuffleseg && \
+          mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/peoplesemsegnet_shuffleseg && \
+            cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/peoplesemsegnet_shuffleseg && \
             wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_etlt.etlt && \
             wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_cache.txt && \
-            cp ~/workspaces/isaac_ros-dev/src/isaac_ros_dnn_inference/resources/peoplesemsegnet_shuffleseg_config.pbtxt config.pbtxt
+            cp ${ISAAC_ROS_WS}/src/isaac_ros_dnn_inference/resources/peoplesemsegnet_shuffleseg_config.pbtxt config.pbtxt
 
 List of Isaac ROS Benchmarks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

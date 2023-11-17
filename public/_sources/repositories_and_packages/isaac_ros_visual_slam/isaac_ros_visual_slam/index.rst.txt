@@ -13,15 +13,20 @@ Quickstart
    Note: ``${ISAAC_ROS_WS}`` is defined to point to either ``/ssd/workspaces/isaac_ros-dev/`` or
    ``~/workspaces/isaac_ros-dev/``.
 
-2. Clone this repository and its dependencies under
-   ``${ISAAC_ROS_WS}/src``.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
 
-   .. code:: bash
+    .. code:: bash
 
-      cd ${ISAAC_ROS_WS}/src
-      git clone :ir_clone:`<isaac_ros_visual_slam>`
-      git clone :ir_clone:`<isaac_ros_common>`
-      git clone :ir_clone:`<isaac_ros_nitros>`
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_visual_slam>`
+
 
 3. [Terminal 1] Launch the Docker container
 
@@ -30,19 +35,13 @@ Quickstart
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh ${ISAAC_ROS_WS}
 
-4. [Terminal 1] Inside the container, build and source the workspace:
+4. [Terminal 1] Install this package's dependencies.
+
+   :ir_apt:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
-        source install/setup.bash
-
-   (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-         colcon test --executor sequential
+      sudo apt-get install -y ros-humble-isaac-ros-visual-slam
 
    Run the following launch files in the current terminal (Terminal 1):
 
@@ -50,7 +49,7 @@ Quickstart
 
       ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam.launch.py
 
-5. [Terminal 2] Attach another terminal to the running container for
+1. [Terminal 2] Attach another terminal to the running container for
    RViz2
 
    Attach another terminal to the running container for RViz2.
@@ -70,7 +69,7 @@ Quickstart
    If you are SSHing in from a remote machine, the RViz2 window
    should be forwarded to your remote machine.
 
-6. [Terminal 3] Attach the 3rd terminal to start the rosbag
+2. [Terminal 3] Attach the 3rd terminal to start the rosbag
 
    .. code:: bash
 
@@ -84,7 +83,7 @@ Quickstart
       source /workspaces/isaac_ros-dev/install/setup.bash && \
         ros2 bag play src/isaac_ros_visual_slam/isaac_ros_visual_slam/test/test_cases/rosbags/small_pol_test/
 
-7. Result:
+3. Result:
 
    RViz should start displaying the point clouds and poses like below:
 

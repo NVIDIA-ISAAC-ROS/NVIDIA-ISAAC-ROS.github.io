@@ -1,5 +1,5 @@
 ==========================================================
-Decoding Jetson H.264 images on non-NVIDIA powered systems
+Decoding Jetson H.264 Images on Non-NVIDIA Powered Systems
 ==========================================================
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/compression/h264/image_view_h264_decoded.png>`
@@ -11,10 +11,10 @@ Overview
 
 Using hardware-accelerated Isaac ROS compression to H.264
 encode data for playback through Isaac ROS H.264 decoder on
-NVIDIA-powered systems is fast and efficient. However, you may have need
+NVIDIA-powered systems is fast and efficient. However, you may need
 to decode recorded data on systems that are not NVIDIA-powered.
 Fortunately, the output of the ``isaac_ros_h264_encoder`` package can
-easily be reformatted to work with other available ROS 2 decoder
+be reformatted to work with other available ROS 2 decoder
 packages.
 
 This tutorial shows you how to replay a rosbag recorded on a Jetson
@@ -22,10 +22,10 @@ using a third-party H.264 decoder `image_transport
 plugin <https://github.com/clydemcqueen/h264_image_transport>`__
 used in `FogROS2 <https://github.com/berkeleyAutomation/FogROS2>`__.
 
-The launch file here replays a target rosbag recorded with
-``isaac_ros_h264_encoder`` through a node to reformat the compressed
-messages for compatibility before being decoded by the third-party
-decoder to be displayed in an image view window.
+The launch file replays a target rosbag recorded with
+``isaac_ros_h264_encoder``. It is recorded through a node that reformats the compressed
+messages for compatibility. Then the third-party
+decoder is used to display it in an image view window.
 
 Tutorial Walkthrough
 --------------------
@@ -35,7 +35,7 @@ Tutorial Walkthrough
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src
+      cd ${ISAAC_ROS_WS}/src
       git clone https://github.com/clydemcqueen/h264_image_transport.git
 
       # Install dependencies for the third-party package
@@ -45,7 +45,7 @@ Tutorial Walkthrough
 
    .. code:: bash
 
-      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
 4. Inside the container, build the third-party ``h264_image_transport``
@@ -58,7 +58,7 @@ Tutorial Walkthrough
           h264_image_transport isaac_ros_to_h264_msgs_packet && \
         source install/setup.bash
 
-5. Launch the graph which brings up an image viewer to show the decoded
+5. Launch the graph to bring up an image viewer that shows the decoded
    output.
 
    .. code:: bash
