@@ -23,15 +23,7 @@ Tutorial Walkthrough
        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-3.  Inside the container, build and source the workspace:
-
-    .. code:: bash
-
-       cd /workspaces/isaac_ros-dev && \
-         colcon build --symlink-install && \
-         source install/setup.bash
-
-4.  Run the setup script to download the `PeopleNet
+3.  Run the setup script to download the `PeopleNet
     Model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__
     from NVIDIA GPU Cloud(NGC) and convert it to a ``.etlt`` file
 
@@ -40,20 +32,20 @@ Tutorial Walkthrough
        cd /workspaces/isaac_ros-dev/src/isaac_ros_object_detection/isaac_ros_detectnet && \
          ./scripts/setup_model.sh --height 720 --width 1280 --config-file resources/isaac_sim_config.pbtxt
 
-5.  Launch the pre-composed pipeline launch file:
+4.  Launch the pre-composed pipeline launch file:
 
     .. code:: bash
 
        cd /workspaces/isaac_ros-dev && \
          ros2 launch isaac_ros_detectnet isaac_ros_detectnet_isaac_sim.launch.py
 
-6.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`
+5.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`
 
-7.  Press **Play** to start publishing data from the Isaac Sim.
+6.  Press **Play** to start publishing data from the Isaac Sim.
 
     .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
         :align: center
         :width: 600px
     
-8.  You should see the image from Isaac Sim with the rectangles
+7.  You should see the image from Isaac Sim with the rectangles
     overlaid over detected people in the frame.

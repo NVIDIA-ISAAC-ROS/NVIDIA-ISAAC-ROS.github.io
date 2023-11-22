@@ -17,22 +17,15 @@ Quickstart
    To use the packages in other useful contexts, please refer
    :doc:`here </repositories_and_packages/isaac_ros_dnn_inference/index>`.
 
-1. Follow steps 1-5 of the :doc:`Quickstart with Triton </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`
-2. Inside the container, build and source the workspace:
+1. Follow steps 1-6 of the :doc:`Quickstart with Triton </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`
+
+2. Install this package's dependencies.
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
-        source install/setup.bash
+      sudo apt-get install -y ros-humble-isaac-ros-tensor-rt
 
-3. (Optional) Run tests to verify complete and correct installation:
-
-   .. code:: bash
-
-      colcon test --executor sequential
-
-4. Run the following launch files to spin up a demo of this package. Launch TensorRT:
+3. Run the following launch files to spin up a demo of this package. Launch TensorRT:
 
     .. code:: bash
 
@@ -51,7 +44,7 @@ Quickstart
 
        ros2 bag play -l src/isaac_ros_image_segmentation/resources/rosbags/unet_sample_data/
 
-5. Visualize and validate the output of the package:
+4. Visualize and validate the output of the package:
 
     In a **third** terminal, enter the Docker container:
 
@@ -64,7 +57,6 @@ Quickstart
 
     .. code:: bash
 
-       source install/setup.bash && \
        ros2 topic echo /tensor_sub
 
     The expected result should look like this:
