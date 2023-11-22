@@ -25,23 +25,15 @@ Tutorial Walkthrough
        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-3.  Inside the container, build and source the workspace:
+3.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`
 
-    .. code:: bash
-
-       cd /workspaces/isaac_ros-dev && \
-         colcon build --symlink-install && \
-         source install/setup.bash
-
-4.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`.
-
-5.  Press **Play** to start publishing data from the Isaac Sim.
+4.  Press **Play** to start publishing data from the Isaac Sim.
 
     .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
         :align: center
         :width: 600px
 
-6.  In a separate terminal, start ``isaac_ros_visual_slam`` using the
+5.  In a separate terminal, start ``isaac_ros_visual_slam`` using the
     launch files:
 
     .. code:: bash
@@ -54,7 +46,7 @@ Tutorial Walkthrough
 
        ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.2}}""
 
-8.  In a separate terminal, spin up RViz with default configuration file
+7.  In a separate terminal, spin up RViz with default configuration file
     to see the rich visualizations as the robot moves.
 
     .. code:: bash
@@ -65,7 +57,7 @@ Tutorial Walkthrough
         :align: center
         :width: 600px
 
-9.  To see the odometry messages, in a separate terminal echo the contents of the ``/visual_slam/tracking/odometry`` topic with the
+8.  To see the odometry messages, in a separate terminal echo the contents of the ``/visual_slam/tracking/odometry`` topic with the
     following command:
 
     .. code:: bash
