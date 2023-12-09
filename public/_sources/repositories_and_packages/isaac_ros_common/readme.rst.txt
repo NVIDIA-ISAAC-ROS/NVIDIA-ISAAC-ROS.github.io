@@ -24,7 +24,9 @@ Please visit the :doc:`Isaac ROS Documentation </repositories_and_packages/isaac
 Latest
 ------
 
-.. include:: _snippets/latest.rst
+.. latest_update::
+    
+    .. include:: _snippets/updates.rst
 
 
 .. |repo_name| replace:: Isaac ROS Common

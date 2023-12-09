@@ -1478,6 +1478,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#id6">Solution</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#no-opt-ros-humble-install-directory-in-docker-container">No <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/install</span></code> directory in Docker container</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Symptom</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id8">Solution</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="hardware_setup.html">Hardware Setup</a><ul>
@@ -1550,7 +1555,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../blog/index.html">Blogs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../blog/index.html#isaac-ros-webinar-series">Isaac ROS Webinar Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../blog/index.html#isaac-ros-training-webinar-series">Isaac ROS Training Webinar Series</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../blog/index.html#nvidia-developer-blogs">NVIDIA Developer Blogs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../blog/index.html#ros-discourse">ROS Discourse</a></li>
 </ul>
@@ -1853,6 +1858,43 @@ and add like this.</p>
 </div>
 </section>
 </section>
+<section id="no-opt-ros-humble-install-directory-in-docker-container">
+<h2>No <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/install</span></code> directory in Docker container<a class="headerlink" href="#no-opt-ros-humble-install-directory-in-docker-container" title="Link to this heading"></a></h2>
+<section id="id7">
+<h3>Symptom<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>You expect the <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/install</span></code> directory to exist inside the
+Isaac ROS Dev Docker container, but this directory does not exist.</p>
+<p>This is the result of a change made in the Isaac ROS 2.1 release in November 2023.</p>
+<p>In Isaac ROS 2.1, all base ROS 2 Humble packages are installed using pre-built Debian packages produced by the NVIDIA ROS 2 Buildfarm.
+Previously, these base packages were built from source in a customized global underlay workspace rooted at <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/</span></code>.</p>
+<p>Since the base packages are no longer built from source inline within the image, the <code class="docutils literal notranslate"><span class="pre">./install</span></code> subfolder of <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble</span></code> is never created.</p>
+</section>
+<section id="id8">
+<h3>Solution<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<p><strong>Solution 1</strong>:</p>
+<p>Move any user-specific ROS 2 packages out of the global underlay workspace to an appropriate local overlay workspace, as recommended by the <a class="reference external" href="https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html#background">official ROS documentation</a>.</p>
+<p>Then, build and source this overlay workspace normally.</p>
+<p><strong>Solution 2</strong>:</p>
+<p>Carefully recreate the customized global underlay workspace by following the steps used in Isaac ROS 2.0 and older releases:</p>
+<div class="highlight-docker notranslate"><div class="highlight"><pre><span></span><span class="c"># EXAMPLE: Install OSRF negotiated ROS 2 package from source</span>
+
+<span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_DISTRO</span><span class="o">=</span>humble
+<span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_ROOT</span><span class="o">=</span>/opt/ros/<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>
+
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ROS_ROOT</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ROS_ROOT</span><span class="si">}</span>/src<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/osrf/negotiated<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>negotiated<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>master<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ROS_ROOT</span><span class="si">}</span>/setup.bash<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>negotiated_interfaces<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>bloom-generate<span class="w"> </span>rosdebian<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>fakeroot<span class="w"> </span>debian/rules<span class="w"> </span>binary<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>../<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>./*.deb<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>./*.deb<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>negotiated<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>bloom-generate<span class="w"> </span>rosdebian<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>fakeroot<span class="w"> </span>debian/rules<span class="w"> </span>binary<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>../<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>./*.deb<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>./*.deb<span class="w"> </span><span class="se">\</span>
+<span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*<span class="w"> </span><span class="se">\</span>
+<span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>clean
+</pre></div>
+</div>
+<p>This process involves overriding the behavior of <code class="docutils literal notranslate"><span class="pre">bloom-generate</span></code> to force it to produce and install the Debian packages inline.</p>
+</section>
+</section>
 </section>
 
 
@@ -1867,7 +1909,7 @@ and add like this.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, NVIDIA.
-      <span class="lastupdated">Last updated on Nov 27, 2023.
+      <span class="lastupdated">Last updated on Dec 09, 2023.
       </span></p>
   </div>
 

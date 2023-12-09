@@ -25,38 +25,24 @@ For more information on the Isaac ROS Dev Docker-based development environment a
    On Jetson platforms, NVMe SSD storage is **required** for
    sufficient and fast storage. See :doc:`here </getting_started/hardware_setup/compute/jetson_storage>`
 
-1. **On x86_64 platforms**: Install the ``nvidia-container-runtime``
-   using the
-   `instructions <https://github.com/NVIDIA/nvidia-container-runtime#installation>`__.
+1. **On x86_64 platforms**: 
+
+   1. Install the ``nvidia-container-toolkit`` using the
+      `instructions <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt>`__.
+
+   2. Configure ``nvidia-container-toolkit`` for Docker using the
+      `instructions <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker>`__.
 
    **On Jetson platforms**: Follow :doc:`this instruction </getting_started/hardware_setup/compute/jetson_storage>`
-   to first set your Jetson up with SSD, then come back to this document and resume from Step 3.
+   to first set your Jetson up with SSD, then come back to this document and resume from Step 2.
 
-2. Configure ``nvidia-container-runtime`` as the default runtime for
-   Docker.
-
-   Using your text editor of choice, add the following items to
-   ``/etc/docker/daemon.json``.
-
-   .. code:: json
-
-      {
-          "runtimes": {
-              "nvidia": {
-                  "path": "nvidia-container-runtime",
-                  "runtimeArgs": []
-              }
-          },
-          "default-runtime": "nvidia"
-      }
-
-3. Then, restart Docker:
+2. Restart Docker:
 
    .. code:: bash
 
       sudo systemctl daemon-reload && sudo systemctl restart docker
 
-4. Install `Git LFS <https://git-lfs.github.com/>`__ to pull
+3. Install `Git LFS <https://git-lfs.github.com/>`__ to pull
    down all large files:
 
    .. code:: bash
@@ -67,7 +53,7 @@ For more information on the Isaac ROS Dev Docker-based development environment a
 
       git lfs install --skip-repo
 
-5. Create a ROS 2 workspace for experimenting with Isaac ROS:
+4. Create a ROS 2 workspace for experimenting with Isaac ROS:
 
       **For Jetson setup with SSD as optional storage**:
 

@@ -44,6 +44,8 @@ Quickstart
 Latest
 ------
 
-.. include:: _snippets/latest.rst
+.. latest_update::
+    
+    .. include:: _snippets/updates.rst
 
 .. |package name| replace:: Isaac ROS Mission Client    

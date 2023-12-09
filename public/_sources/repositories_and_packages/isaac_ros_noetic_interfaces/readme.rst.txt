@@ -15,6 +15,8 @@ Collection of generated ROS 1 Noetic sources for Isaac ROS interface packages fo
 Latest
 -------
 
-.. include:: /repositories_and_packages/isaac_ros_nitros_bridge/_snippets/latest.rst
+.. latest_update::
+    
+    .. include:: /repositories_and_packages/isaac_ros_nitros_bridge/_snippets/updates.rst
   
 .. |repo_name| replace:: Isaac ROS Noetic Interfaces

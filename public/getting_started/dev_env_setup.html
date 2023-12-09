@@ -1478,6 +1478,11 @@
 <li class="toctree-l4"><a class="reference internal" href="../troubleshooting/dev_env.html#id6">Solution</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../troubleshooting/dev_env.html#no-opt-ros-humble-install-directory-in-docker-container">No <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/install</span></code> directory in Docker container</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../troubleshooting/dev_env.html#id7">Symptom</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../troubleshooting/dev_env.html#id8">Solution</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/hardware_setup.html">Hardware Setup</a><ul>
@@ -1550,7 +1555,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../blog/index.html">Blogs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../blog/index.html#isaac-ros-webinar-series">Isaac ROS Webinar Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../blog/index.html#isaac-ros-training-webinar-series">Isaac ROS Training Webinar Series</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../blog/index.html#nvidia-developer-blogs">NVIDIA Developer Blogs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../blog/index.html#ros-discourse">ROS Discourse</a></li>
 </ul>
@@ -1679,29 +1684,17 @@ account for the size of the container and datasets.</p>
 sufficient and fast storage. See <a class="reference internal" href="hardware_setup/compute/jetson_storage.html"><span class="doc">here</span></a></p>
 </div>
 <ol class="arabic">
-<li><p><strong>On x86_64 platforms</strong>: Install the <code class="docutils literal notranslate"><span class="pre">nvidia-container-runtime</span></code>
-using the
-<a class="reference external" href="https://github.com/NVIDIA/nvidia-container-runtime#installation">instructions</a>.</p>
+<li><p><strong>On x86_64 platforms</strong>:</p>
+<ol class="arabic simple">
+<li><p>Install the <code class="docutils literal notranslate"><span class="pre">nvidia-container-toolkit</span></code> using the
+<a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt">instructions</a>.</p></li>
+<li><p>Configure <code class="docutils literal notranslate"><span class="pre">nvidia-container-toolkit</span></code> for Docker using the
+<a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker">instructions</a>.</p></li>
+</ol>
 <p><strong>On Jetson platforms</strong>: Follow <a class="reference internal" href="hardware_setup/compute/jetson_storage.html"><span class="doc">this instruction</span></a>
-to first set your Jetson up with SSD, then come back to this document and resume from Step 3.</p>
+to first set your Jetson up with SSD, then come back to this document and resume from Step 2.</p>
 </li>
-<li><p>Configure <code class="docutils literal notranslate"><span class="pre">nvidia-container-runtime</span></code> as the default runtime for
-Docker.</p>
-<p>Using your text editor of choice, add the following items to
-<code class="docutils literal notranslate"><span class="pre">/etc/docker/daemon.json</span></code>.</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;runtimes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;nvidia&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nvidia-container-runtime&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;runtimeArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;default-runtime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nvidia&quot;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</li>
-<li><p>Then, restart Docker:</p>
+<li><p>Restart Docker:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>docker
 </pre></div>
 </div>
@@ -1752,7 +1745,7 @@ to refer to this ROS 2 workspace directory, in the future.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, NVIDIA.
-      <span class="lastupdated">Last updated on Nov 27, 2023.
+      <span class="lastupdated">Last updated on Dec 09, 2023.
       </span></p>
   </div>
 
