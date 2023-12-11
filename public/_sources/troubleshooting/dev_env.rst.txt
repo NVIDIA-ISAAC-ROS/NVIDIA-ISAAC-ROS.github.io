@@ -220,3 +220,51 @@ and add like this.
    DOCKER_ARGS+=("-v $HOME/.Xauthority:/home/admin/.Xauthority:rw")
    DOCKER_ARGS+=("-e DISPLAY")
    DOCKER_ARGS+=("-e ROS_DOMAIN_ID")
+
+No ``/opt/ros/humble/install`` directory in Docker container
+------------------------------------------------------------
+
+Symptom
+~~~~~~~
+
+You expect the ``/opt/ros/humble/install`` directory to exist inside the
+Isaac ROS Dev Docker container, but this directory does not exist.
+
+This is the result of a change made in the Isaac ROS 2.1 release in November 2023. 
+
+In Isaac ROS 2.1, all base ROS 2 Humble packages are installed using pre-built Debian packages produced by the NVIDIA ROS 2 Buildfarm.
+Previously, these base packages were built from source in a customized global underlay workspace rooted at ``/opt/ros/humble/``.
+
+Since the base packages are no longer built from source inline within the image, the ``./install`` subfolder of ``/opt/ros/humble`` is never created.
+
+Solution
+~~~~~~~~
+
+**Solution 1**:
+
+Move any user-specific ROS 2 packages out of the global underlay workspace to an appropriate local overlay workspace, as recommended by the `official ROS documentation <https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html#background>`__. 
+
+Then, build and source this overlay workspace normally.
+
+**Solution 2**:
+
+Carefully recreate the customized global underlay workspace by following the steps used in Isaac ROS 2.0 and older releases:
+
+.. code:: docker
+
+   # EXAMPLE: Install OSRF negotiated ROS 2 package from source
+
+   ENV ROS_DISTRO=humble
+   ENV ROS_ROOT=/opt/ros/${ROS_DISTRO}
+
+   RUN apt-get update && mkdir -p ${ROS_ROOT}/src && cd ${ROS_ROOT}/src \
+      && git clone https://github.com/osrf/negotiated && cd negotiated && git checkout master \
+      && source ${ROS_ROOT}/setup.bash \
+      && cd negotiated_interfaces && bloom-generate rosdebian && fakeroot debian/rules binary \
+      && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
+      && cd negotiated && bloom-generate rosdebian && fakeroot debian/rules binary \
+      && cd ../ && apt-get install -y ./*.deb && rm ./*.deb \
+   && rm -rf /var/lib/apt/lists/* \
+   && apt-get clean
+
+This process involves overriding the behavior of ``bloom-generate`` to force it to produce and install the Debian packages inline.

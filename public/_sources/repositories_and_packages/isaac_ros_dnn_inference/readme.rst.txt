@@ -51,6 +51,8 @@ Packages
 Latest
 ------
 
-.. include:: _snippets/latest.rst
+.. latest_update::
+    
+    .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS DNN Inference
