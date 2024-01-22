@@ -1458,29 +1458,34 @@
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Troubleshooting</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Developer Environment</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#docker-buildx-plugin-not-installed">Docker <code class="docutils literal notranslate"><span class="pre">buildx</span></code> plugin not installed</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gxf-failure-due-to-tensor-stream-creation-failed">GXF Failure due to Tensor Stream Creation Failed</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#symptom">Symptom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#solution">Solution</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#repository-cloned-without-pulling-git-lfs-files">Repository cloned without pulling <code class="docutils literal notranslate"><span class="pre">git-lfs</span></code> files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#docker-buildx-plugin-not-installed">Docker <code class="docutils literal notranslate"><span class="pre">buildx</span></code> plugin not installed</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id1">Symptom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id2">Solution</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#x11-forward-issue">X11-forward issue</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repository-cloned-without-pulling-git-lfs-files">Repository cloned without pulling <code class="docutils literal notranslate"><span class="pre">git-lfs</span></code> files</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id3">Symptom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id4">Solution</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#ros-2-domain-id-collision">ROS 2 Domain ID Collision</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#x11-forward-issue">X11-forward issue</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id5">Symptom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id6">Solution</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#no-opt-ros-humble-install-directory-in-docker-container">No <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/install</span></code> directory in Docker container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ros-2-domain-id-collision">ROS 2 Domain ID Collision</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id7">Symptom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id8">Solution</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#no-opt-ros-humble-install-directory-in-docker-container">No <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/install</span></code> directory in Docker container</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Symptom</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id10">Solution</a></li>
 </ul>
 </li>
 </ul>
@@ -1665,11 +1670,37 @@
              
   <section id="developer-environment">
 <h1>Developer Environment<a class="headerlink" href="#developer-environment" title="Link to this heading"></a></h1>
+<section id="gxf-failure-due-to-tensor-stream-creation-failed">
+<h2>GXF Failure due to Tensor Stream Creation Failed<a class="headerlink" href="#gxf-failure-due-to-tensor-stream-creation-failed" title="Link to this heading"></a></h2>
+<p>When launching an Isaac ROS node on a Jetson accessed remotely with X11 forwarding,
+X events emitted by CUDA for initializing a tensor stream are captured by the remote
+monitoring machine instead of the local Jetson.</p>
+<section id="symptom">
+<h3>Symptom<a class="headerlink" href="#symptom" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="m">2023</span>-09-15<span class="w"> </span><span class="m">14</span>:33:11.362<span class="w"> </span>ERROR<span class="w"> </span>/workspaces/isaac_ros-dev/src/isaac_ros_image_pipeline/isaac_ros_image_proc/gxf/tensorops/extensions/tensorops/components/TensorStream.cpp@104:<span class="w"> </span>tensor<span class="w"> </span>stream<span class="w"> </span>creation<span class="w"> </span>failed.
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="m">2023</span>-09-15<span class="w"> </span><span class="m">14</span>:33:11.363<span class="w"> </span>ERROR<span class="w"> </span>gxf/std/entity_warden.cpp@380:<span class="w"> </span>Failed<span class="w"> </span>to<span class="w"> </span>initialize<span class="w"> </span>component<span class="w"> </span><span class="m">00292</span><span class="w"> </span><span class="o">(</span>stream<span class="o">)</span>
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="m">2023</span>-09-15<span class="w"> </span><span class="m">14</span>:33:11.363<span class="w"> </span>ERROR<span class="w"> </span>gxf/core/runtime.cpp@616:<span class="w"> </span>Could<span class="w"> </span>not<span class="w"> </span>initialize<span class="w"> </span>entity<span class="w"> </span><span class="s1">&#39;IPOQAFVQYV_global&#39;</span><span class="w"> </span><span class="o">(</span>E290<span class="o">)</span>:<span class="w"> </span>GXF_FAILURE
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="m">2023</span>-09-15<span class="w"> </span><span class="m">14</span>:33:11.363<span class="w"> </span>ERROR<span class="w"> </span>gxf/std/program.cpp@205:<span class="w"> </span>Failed<span class="w"> </span>to<span class="w"> </span>activate<span class="w"> </span>entity<span class="w"> </span><span class="m">00290</span><span class="w"> </span>named<span class="w"> </span>IPOQAFVQYV_global:<span class="w"> </span>GXF_FAILURE
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="m">2023</span>-09-15<span class="w"> </span><span class="m">14</span>:33:11.363<span class="w"> </span>ERROR<span class="w"> </span>gxf/std/program.cpp@207:<span class="w"> </span>Deactivating...
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="m">2023</span>-09-15<span class="w"> </span><span class="m">14</span>:33:11.396<span class="w"> </span>ERROR<span class="w"> </span>gxf/core/runtime.cpp@1227:<span class="w"> </span>Graph<span class="w"> </span>activation<span class="w"> </span>failed<span class="w"> </span>with<span class="w"> </span>error:<span class="w"> </span>GXF_FAILURE
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">1694759591</span>.396604150<span class="o">]</span><span class="w"> </span><span class="o">[</span>left_decoder_node<span class="o">]</span>:<span class="w"> </span><span class="o">[</span>NitrosContext<span class="o">]</span><span class="w"> </span>GxfGraphActivate<span class="w"> </span>Error:<span class="w"> </span>GXF_FAILURE
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="o">[</span>INFO<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">1694759591</span>.396906843<span class="o">]</span><span class="w"> </span><span class="o">[</span>right_decoder_node<span class="o">]</span>:<span class="w"> </span><span class="o">[</span>NitrosContext<span class="o">]</span><span class="w"> </span>Loading<span class="w"> </span>application:<span class="w"> </span><span class="s1">&#39;/workspaces/isaac_ros-dev/install/isaac_ros_h264_decoder/share/isaac_ros_h264_decoder/EZXPATGEMM.yaml&#39;</span>
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span><span class="o">[</span>ERROR<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">1694759591</span>.396922620<span class="o">]</span><span class="w"> </span><span class="o">[</span>left_decoder_node<span class="o">]</span>:<span class="w"> </span><span class="o">[</span>NitrosNode<span class="o">]</span><span class="w"> </span>runGraphAsync<span class="w"> </span>Error:<span class="w"> </span>GXF_FAILURE
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span>terminate<span class="w"> </span>called<span class="w"> </span>after<span class="w"> </span>throwing<span class="w"> </span>an<span class="w"> </span>instance<span class="w"> </span>of<span class="w"> </span><span class="s1">&#39;std::runtime_error&#39;</span>
+<span class="o">[</span>component_container_mt-2<span class="o">]</span><span class="w"> </span>what<span class="o">()</span>:<span class="w"> </span><span class="o">[</span>NitrosNode<span class="o">]</span><span class="w"> </span>runGraphAsync<span class="w"> </span>Error:<span class="w"> </span>GXF_FAILURE
+</pre></div>
+</div>
+</section>
+<section id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h3>
+<p>Disabling X11 forwarding will prevent X events from being intercepted by the remote machine, resolving the error.</p>
+</section>
+</section>
 <section id="docker-buildx-plugin-not-installed">
 <h2>Docker <code class="docutils literal notranslate"><span class="pre">buildx</span></code> plugin not installed<a class="headerlink" href="#docker-buildx-plugin-not-installed" title="Link to this heading"></a></h2>
 <p>Isaac ROS Dev scripts rely on Docker configured with the <code class="docutils literal notranslate"><span class="pre">buildx</span></code> plugin which is no longer installed by default.</p>
-<section id="symptom">
-<h3>Symptom<a class="headerlink" href="#symptom" title="Link to this heading"></a></h3>
+<section id="id1">
+<h3>Symptom<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nvidia@ubuntu:~/workspaces/isaac_ros-dev/src/isaac_ros_common$<span class="w"> </span>./scripts/run_dev.sh
 Building<span class="w"> </span>aarch64.ros2_humble.ros1_noetic.user<span class="w"> </span>base<span class="w"> </span>as<span class="w"> </span>image:<span class="w"> </span>isaac_ros_dev-aarch64<span class="w"> </span>using<span class="w"> </span>key<span class="w"> </span>aarch64.ros2_humble.ros1_noetic.user
 Using<span class="w"> </span>configured<span class="w"> </span>docker<span class="w"> </span>search<span class="w"> </span>paths:<span class="w"> </span>/home/nvidia/workspaces/isaac_ros-dev/src/isaac_ros_common/scripts/../../isaac_ros_nitros_bridge/docker<span class="w"> </span>/home/nvidia/workspaces/isaac_ros-dev/src/isaac_ros_common/scripts/../docker
@@ -1687,8 +1718,8 @@ Failed<span class="w"> </span>to<span class="w"> </span>build<span class="w"> </
 </pre></div>
 </div>
 </section>
-<section id="solution">
-<h3>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h3>
+<section id="id2">
+<h3>Solution<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <blockquote>
 <div><p>From the official Docker install instructions (<a class="reference external" href="https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository">here</a>), install the <code class="docutils literal notranslate"><span class="pre">docker-buildx-plugin.</span></code></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add Docker&#39;s official GPG key:</span>
@@ -1713,13 +1744,13 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 </section>
 <section id="repository-cloned-without-pulling-git-lfs-files">
 <h2>Repository cloned without pulling <code class="docutils literal notranslate"><span class="pre">git-lfs</span></code> files<a class="headerlink" href="#repository-cloned-without-pulling-git-lfs-files" title="Link to this heading"></a></h2>
-<section id="id1">
-<h3>Symptom<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="id3">
+<h3>Symptom<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <p>You fail building some <code class="docutils literal notranslate"><span class="pre">isaac_ros</span></code> packages, or some image files in the
 repository are empty.</p>
 </section>
-<section id="id2">
-<h3>Solution<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id4">
+<h3>Solution<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <p>Many Isaac ROS repositories are configured with Git LFS. For example,
 <code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam</span></code> repository is configured with Git LFS to accommodate
 big rosbag files for test.</p>
@@ -1785,16 +1816,16 @@ installing <code class="docutils literal notranslate"><span class="pre">git</spa
 </section>
 <section id="x11-forward-issue">
 <h2>X11-forward issue<a class="headerlink" href="#x11-forward-issue" title="Link to this heading"></a></h2>
-<section id="id3">
-<h3>Symptom<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<section id="id5">
+<h3>Symptom<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
 <p>When you run X11 window application inside the Isaac ROS container, you
 see an error message:</p>
 <blockquote>
 <div><p>“X11 connection rejected because of wrong authentication.”</p>
 </div></blockquote>
 </section>
-<section id="id4">
-<h3>Solution<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<section id="id6">
+<h3>Solution<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
 <p>Go back to your docker host, and re SSH-login from your remote machine
 with <code class="docutils literal notranslate"><span class="pre">ssh</span> <span class="pre">-X</span></code> option.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ssh<span class="w"> </span>-X<span class="w"> </span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span>@<span class="si">${</span><span class="nv">IP</span><span class="si">}</span>
@@ -1823,16 +1854,16 @@ forwarding.</p>
 </section>
 <section id="ros-2-domain-id-collision">
 <h2>ROS 2 Domain ID Collision<a class="headerlink" href="#ros-2-domain-id-collision" title="Link to this heading"></a></h2>
-<section id="id5">
-<h3>Symptom<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<section id="id7">
+<h3>Symptom<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>You see ROS 2 topics that your system is not (yet) publishing</p></li>
 <li><p>ROS 2 topics don’t go away even after you stop the node that you
 think is publishing</p></li>
 </ul>
 </section>
-<section id="id6">
-<h3>Solution<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<section id="id8">
+<h3>Solution<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
 <p>By default, all ROS 2 nodes use domain ID 0, so it is possible you are
 seeing topics from other machines on the network
 (<a class="reference external" href="https://docs.ros.org/en/humble/Concepts/About-Domain-ID.html">docs.ros.org</a>).</p>
@@ -1860,8 +1891,8 @@ and add like this.</p>
 </section>
 <section id="no-opt-ros-humble-install-directory-in-docker-container">
 <h2>No <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/install</span></code> directory in Docker container<a class="headerlink" href="#no-opt-ros-humble-install-directory-in-docker-container" title="Link to this heading"></a></h2>
-<section id="id7">
-<h3>Symptom<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<section id="id9">
+<h3>Symptom<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
 <p>You expect the <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/install</span></code> directory to exist inside the
 Isaac ROS Dev Docker container, but this directory does not exist.</p>
 <p>This is the result of a change made in the Isaac ROS 2.1 release in November 2023.</p>
@@ -1869,8 +1900,8 @@ Isaac ROS Dev Docker container, but this directory does not exist.</p>
 Previously, these base packages were built from source in a customized global underlay workspace rooted at <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/</span></code>.</p>
 <p>Since the base packages are no longer built from source inline within the image, the <code class="docutils literal notranslate"><span class="pre">./install</span></code> subfolder of <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble</span></code> is never created.</p>
 </section>
-<section id="id8">
-<h3>Solution<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<section id="id10">
+<h3>Solution<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <p><strong>Solution 1</strong>:</p>
 <p>Move any user-specific ROS 2 packages out of the global underlay workspace to an appropriate local overlay workspace, as recommended by the <a class="reference external" href="https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html#background">official ROS documentation</a>.</p>
 <p>Then, build and source this overlay workspace normally.</p>
@@ -1909,7 +1940,7 @@ Previously, these base packages were built from source in a customized global un
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, NVIDIA.
-      <span class="lastupdated">Last updated on Dec 09, 2023.
+      <span class="lastupdated">Last updated on Jan 22, 2024.
       </span></p>
   </div>
 

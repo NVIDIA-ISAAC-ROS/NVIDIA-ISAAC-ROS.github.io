@@ -2,6 +2,34 @@
 Developer Environment
 =====================
 
+GXF Failure due to Tensor Stream Creation Failed
+------------------------------------------------
+
+When launching an Isaac ROS node on a Jetson accessed remotely with X11 forwarding, 
+X events emitted by CUDA for initializing a tensor stream are captured by the remote
+monitoring machine instead of the local Jetson.
+
+Symptom
+~~~~~~~
+
+.. code:: bash
+
+   [component_container_mt-2] 2023-09-15 14:33:11.362 ERROR /workspaces/isaac_ros-dev/src/isaac_ros_image_pipeline/isaac_ros_image_proc/gxf/tensorops/extensions/tensorops/components/TensorStream.cpp@104: tensor stream creation failed.
+   [component_container_mt-2] 2023-09-15 14:33:11.363 ERROR gxf/std/entity_warden.cpp@380: Failed to initialize component 00292 (stream)
+   [component_container_mt-2] 2023-09-15 14:33:11.363 ERROR gxf/core/runtime.cpp@616: Could not initialize entity 'IPOQAFVQYV_global' (E290): GXF_FAILURE
+   [component_container_mt-2] 2023-09-15 14:33:11.363 ERROR gxf/std/program.cpp@205: Failed to activate entity 00290 named IPOQAFVQYV_global: GXF_FAILURE
+   [component_container_mt-2] 2023-09-15 14:33:11.363 ERROR gxf/std/program.cpp@207: Deactivating...
+   [component_container_mt-2] 2023-09-15 14:33:11.396 ERROR gxf/core/runtime.cpp@1227: Graph activation failed with error: GXF_FAILURE
+   [component_container_mt-2] [ERROR] [1694759591.396604150] [left_decoder_node]: [NitrosContext] GxfGraphActivate Error: GXF_FAILURE
+   [component_container_mt-2] [INFO] [1694759591.396906843] [right_decoder_node]: [NitrosContext] Loading application: '/workspaces/isaac_ros-dev/install/isaac_ros_h264_decoder/share/isaac_ros_h264_decoder/EZXPATGEMM.yaml'
+   [component_container_mt-2] [ERROR] [1694759591.396922620] [left_decoder_node]: [NitrosNode] runGraphAsync Error: GXF_FAILURE
+   [component_container_mt-2] terminate called after throwing an instance of 'std::runtime_error'
+   [component_container_mt-2] what(): [NitrosNode] runGraphAsync Error: GXF_FAILURE
+
+Solution
+~~~~~~~~
+
+Disabling X11 forwarding will prevent X events from being intercepted by the remote machine, resolving the error.
 
 Docker ``buildx`` plugin not installed
 --------------------------------------
