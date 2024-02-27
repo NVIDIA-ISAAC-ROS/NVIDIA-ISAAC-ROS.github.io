@@ -135,14 +135,14 @@ Select and Start ROS Visualization Tool
       ./scripts/run_dev.sh ${ISAAC_ROS_WS}
 
    From this terminal, run ``tf2_echo`` to display the transform between
-   the ``/map`` frame and the appropriate camera frame:
+   the ``/map`` frame and the appropriate base frame:
 
    -  HAWK: ``/camera``
    -  RealSense: ``/camera_link``
 
    .. code:: bash
 
-      ros2 run tf2_ros tf2_echo map camera_link
+      ros2 run tf2_ros tf2_echo map base
 
 Run Isaac ROS Visual SLAM and Monitor Results
 ---------------------------------------------
@@ -170,7 +170,7 @@ provide accurate measurements of the robot's local motion.
 
          ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam_realsense.launch.py
 
-   
+
    The ``/map``, ``/odom``, and camera frames must all be
    initialized to the starting pose.
 
@@ -316,7 +316,7 @@ Integrating Isaac ROS Visual SLAM
 While the Isaac ROS Visual SLAM node exposes a :ref:`multitude of
 interfaces <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:API>`,
 the core way to consume the node's output is through the reported
-transform between the ``/map`` and camera frames.
+transform between the ``/map`` and ``base`` frame.
 
 Based on your robot's precise specifications, you can set up a static
 transform publisher or URDF-based publisher that connects the camera

@@ -11,6 +11,13 @@ Overview
 
 .. include:: _snippets/overview.rst
 
+
+Performance
+-----------
+
+.. include:: _snippets/performance.rst
+
+
 Packages
 --------
 
@@ -36,6 +43,13 @@ Now, we can playback a test rosbag through the bridge. The launch file will
 send out the images from the rosbag through the NITROS bridge from ROS 2 to 
 ROS 1, then echo back to ROS2 for visualize.
 
+#. **Attach a third terminal** to the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh ${HOME}/workspaces
+
 #. Pull down a rosbag of sample data:
 
    .. code:: bash
@@ -57,13 +71,21 @@ ROS 1, then echo back to ROS2 for visualize.
 
       cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
       source install/setup.bash && \
-      ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_nitros_bridge.launch.py rosbag_path:=/workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_nitros_bridge/resources/quickstart.bag/ ros1_ws_path:=/workspaces/isaac_ros-dev/isaac_ros_1-dev/
+      ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_nitros_bridge.launch.py rosbag_path:=/workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_nitros_bridge/resources/quickstart.bag/ ros1_ws_path:=/workspaces/isaac_ros-dev/isaac_ros_1-dev/ ros1_bridge_ws_path:=/workspaces/isaac_ros-dev/bridge_ws/
 
-#. Attach another terminal to the container, visualize the output topic ``/ros2_output_image`` in RViz:
+#. **Attach a fourth terminal** to the Docker container:
 
    .. code:: bash
 
-      source isaac_ros-dev/install/setup.bash && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh ${HOME}/workspaces
+
+#. Visualize the output topic ``/ros2_output_image`` in RViz:
+
+   .. code:: bash
+      
+      cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
+      source install/setup.bash && \
         rviz2
 
 
@@ -71,6 +93,7 @@ Try Another Example
 -------------------
 
 For an example of a more advanced setup with talkers and listeners, see :doc:`here</concepts/nitros_bridge/ros1_bridge_setup>`.
+
 For an example to run DNN image segmentation with NITROS bridge, see :doc:`here</concepts/nitros_bridge/unet_with_nitros_bridge>`.
 
 .. toctree::

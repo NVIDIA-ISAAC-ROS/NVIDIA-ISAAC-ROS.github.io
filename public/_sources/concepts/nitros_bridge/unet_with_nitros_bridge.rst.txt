@@ -17,63 +17,71 @@ Steps
 
 Now, we can setup ``isaac_ros_unet`` and run it with ``isaac_ros_nitros_bridge``.
 
+#. **Attach a third terminal** to the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh ${HOME}/workspaces
+
+
 #. Clone ``isaac_ros_unet`` and its dependencies under ``/workspaces/isaac_ros-dev/isaac_ros-dev/src``:
 
-    .. code:: bash
+   .. code:: bash
 
-       cd /workspaces/isaac_ros-dev/isaac_ros-dev/src && \
-       git clone :ir_clone:`<isaac_ros_image_segmentation>` && \
-       git clone :ir_clone:`<isaac_ros_dnn_inference>` && \
-       git clone :ir_clone:`<isaac_ros_image_pipeline>`
+      cd /workspaces/isaac_ros-dev/isaac_ros-dev/src && \
+      git clone :ir_clone:`<isaac_ros_image_segmentation>` && \
+      git clone :ir_clone:`<isaac_ros_dnn_inference>` && \
+      git clone :ir_clone:`<isaac_ros_image_pipeline>`
 
 
 #. Complete :doc:`isaac_ros_unet</repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>` Quickstart 
-   step 5-6 to download image segmentation models and convert it to TensorRT engine.
+   step 5-7 to download image segmentation models and convert it to TensorRT engine.
 
 
-#.  Create a file called ``/tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt`` by copying the sample Triton config file:
+#. Create a file called ``/tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt`` by copying the sample Triton config file:
 
-    .. code:: bash
+   .. code:: bash
 
-       cp /workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_image_segmentation/resources/peoplesemsegnet_shuffleseg_config.pbtxt /tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt
+      cp /workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_image_segmentation/resources/peoplesemsegnet_shuffleseg_config.pbtxt /tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt
 
-#.  Inside the container, build ``isaac_ros_unet`` and source the workspace:
+#. Inside the container, build ``isaac_ros_unet`` and source the workspace:
 
-    .. code:: bash
+   .. code:: bash
 
-       cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
-         colcon build --symlink-install --packages-up-to isaac_ros_unet && \
-         source install/setup.bash
+      cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
+      colcon build --symlink-install --packages-up-to isaac_ros_unet && \
+      source install/setup.bash
 
 #. Run the following launch files to spin up a demo of this package:
 
-    .. code:: bash
+   .. code:: bash
 
-       ros2 launch isaac_ros_unet isaac_ros_unet_triton.launch.py model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax' input_image_width:=1200 input_image_height:=632
+      ros2 launch isaac_ros_unet isaac_ros_unet_triton.launch.py model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax' input_image_width:=1200 input_image_height:=632
 
 
 #. **Attach a fourth terminal** to the Docker container:
 
-    .. code:: bash
+   .. code:: bash
 
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-       ./scripts/run_dev.sh ${HOME}/workspaces
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh ${HOME}/workspaces
 
 #. Launch the image converter launch file of ``isaac_ros_nitros_bridge``:
 
-    .. code:: bash
+   .. code:: bash
 
       cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
-        source install/setup.bash && \
-        ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_image_converter.launch.py ros1_ws_path:=/workspaces/isaac_ros-dev/isaac_ros_1-dev/ pub_image_name:=image sub_image_name:=unet/colored_segmentation_mask
+         source install/setup.bash && \
+         ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_image_converter.launch.py ros1_ws_path:=/workspaces/isaac_ros-dev/isaac_ros_1-dev/ ros1_bridge_ws_path:=/workspaces/isaac_ros-dev/bridge_ws/ pub_image_name:=image sub_image_name:=unet/colored_segmentation_mask
 
 
-#. **Attach a fourth terminal** to the Docker container:
+#. **Attach a fifth terminal** to the Docker container:
 
-    .. code:: bash
+   .. code:: bash
 
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-       ./scripts/run_dev.sh ${HOME}/workspaces
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh ${HOME}/workspaces
 
 #. Pull down a rosbag of image segmentation sample:
 
@@ -90,23 +98,23 @@ Now, we can setup ``isaac_ros_unet`` and run it with ``isaac_ros_nitros_bridge``
         source install_isolated/setup.bash && \
         rosbag play -l "src/isaac_ros_nitros_bridge/resources/unet_sample_data_ros1.bag"
 
-#. **Attach a fifth terminal** to the Docker container:
+#. **Attach a sixth terminal** to the Docker container:
 
-    .. code:: bash
+   .. code:: bash
 
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-       ./scripts/run_dev.sh ${HOME}/workspaces
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh ${HOME}/workspaces
 
 #. Source ``ros_noetic``, download ``rviz`` for ROS Noetic:
 
-    .. code:: bash
+   .. code:: bash
 
-       source /opt/ros/noetic/setup.bash && \
-         sudo apt-get update && sudo apt-get install ros-noetic-rviz
+      source /opt/ros/noetic/setup.bash && \
+      sudo apt-get update && sudo apt-get install ros-noetic-rviz
 
 #. Run ``rviz`` under ROS Noetic, add the colorized segmentation topic ``/ros1_output_image`` sent from ROS 2 humble and visualize:
 
-    .. code:: bash
+   .. code:: bash
 
       rviz
 

@@ -1,0 +1,168 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_pose_estimation> <isaac_ros_foundationpose>`
+
+Quickstart
+----------
+
+
+.. warning::
+
+   Step 7 must be performed on ``x86_64``. The resultant
+   model should be copied over to the ``Jetson``. Also note that the
+   process of model preparation differs significantly from the other
+   repositories.
+
+1.  Set up your development environment by following the instructions :doc:`here </getting_started/dev_env_setup>`
+
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_pose_estimation>`
+
+3.  Pull down a ROS Bag of sample data:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_pose_estimation && \
+         git lfs pull -X "" -I "resources/rosbags/"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5.  Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-foundationpose ros-humble-isaac-ros-tensor-rt ros-humble-isaac-ros-dnn-image-encoder ros-humble-vision-msgs-rviz-plugins
+
+``TODO: : @ashwinvk :  remove ros-humble-vision-msgs-rviz-plugins after it has been added to the base image``
+
+
+6.  Make a directory to place mesh and models (inside the Docker container):
+
+    .. code:: bash
+
+       cp src/isaac_ros_pose_estimation/isaac_ros_foundationpose/test/test_cases/foundation_pose/texture* /tmp/ &&
+         cp  src/isaac_ros_pose_estimation/test/models/refine_model.onnx src/isaac_ros_pose_estimation/test/models/score_model.onnx /tmp/    
+
+7.  Run the following launch files to spin up a demo of this package:
+
+    .. note::
+
+      The below launch file will also launch ``RViz2`` for visualization.
+
+
+    Launch ``isaac_ros_foundationpose``:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_foundationpose isaac_ros_foundationpose.launch.py launch_rviz:=True mesh_file_path:=/tmp/textured_simple.obj texture_path:=/tmp/texture_map.png refine_model_file_path:=/tmp/refine_model.onnx score_model_file_path:=/tmp/score_model.onnx
+   
+    Then open **another** terminal, and enter the Docker container
+    again:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then, play the ROS bag:
+
+    .. code:: bash
+
+       ros2 bag play -l src/isaac_ros_pose_estimation/resources/rosbags/foundationpose_rosbag
+
+8.  You should see a ``RViz2`` window open as shown below showing the 3D bounding box overlaid over the input image
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundation_pose/foundation_pose_rviz2.png>`
+      :width: 600px
+      :align: center
+
+Try More Examples
+-----------------
+
+``TODO: : @ashwinvk :  Add examples``
+
+Use Different Object Models
+---------------------------
+
+``TODO: : @ashwinvk :  Add instructions on how use with different object models``
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~~
+
+====================================== ====================
+Launch File                            Components Used
+====================================== ====================
+``isaac_ros_foundationpose.launch.py``    :doc:`FoundationPoseNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`
+====================================== ====================
+
+FoundationPoseNode
+~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+``TODO: @ashwinvk: Understand and add parameters``
+
+====================== ========== ==================== =========================================================================================================================================================================================
+ROS Parameter          Type       Default              Description
+====================== ========== ==================== =========================================================================================================================================================================================
+====================== ========== ==================== =========================================================================================================================================================================================
+
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+=============================== ==================================================================================================================================================================== ====================================================================================
+ROS Topic                       Interface                                                                                                                                                            Description
+=============================== ==================================================================================================================================================================== ====================================================================================
+``depth_registered/image_rect`` `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                                              The input depth image.
+``segmentation``                `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                                              The input segmentation mask.
+``rgb/image_rect_color``        `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                                              The input color image.
+``rgb/camera_info``             `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                                    The input image camera_info.
+=============================== ==================================================================================================================================================================== ====================================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+========== =============================================================================================================================== =======================================================================================================
+ROS Topic  Interface                                                                                                                       Description
+========== =============================================================================================================================== =======================================================================================================
+``output`` `vision_msgs/Detection3DArray <https://github.com/ros-perception/vision_msgs/blob/ros2/vision_msgs/msg/Detection3DArray.msg>`__ The output pose estimate.
+========== =============================================================================================================================== =======================================================================================================
+
+.. |package_name| replace:: ``isaac_ros_foundationpose``

@@ -6,15 +6,12 @@ Find all topics and services of the ``nvblox_node`` and the
 
 .. note::
 
-   The human reconstruction tutorials
-   (:doc:`Isaac Sim </concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim>` /
-   :doc:`realsense </concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_realsense>`)
-   launch the ``nvblox_human_node``, while the static reconstruction tutorials
-   (:doc:`Isaac Sim </concepts/scene_reconstruction/nvblox/tutorials/tutorial_isaac_sim>` /
-   :doc:`realsense </concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense>`)
-   as well as the dynamic reconstruction tutorials
-   (:doc:`Isaac Sim </concepts/scene_reconstruction/nvblox/tutorials/tutorial_dynamic_reconstruction_isaac_sim>` /
-   :doc:`realsense </concepts/scene_reconstruction/nvblox/tutorials/tutorial_dynamic_reconstruction_realsense>`)
+   Human reconstruction parts of the RealSense, hawk, and Isaac Sim tutorials
+   (:doc:`Isaac Sim </concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense>` /
+   :doc:`realsense </concepts/scene_reconstruction/nvblox/tutorials/tutorial_hawk>` / 
+   :doc:`realsense </concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_isaac_sim>`
+   )
+   launch the ``nvblox_human_node``, while the static/dynamic reconstruction tutorials
    launch the ``nvblox_node``. The ``nvblox_human_node`` inherits from the ``nvblox_node``
    and is adding additional topic subscriptions for the mask
    image containing the human semantic segmentation.
@@ -40,7 +37,7 @@ Additionally subscribed topics by the ``nvblox_human_node``:
 ==================== ================================================================================================================= ===================================================================================================================================================================================================================================================================================================
 ROS Topic            Interface                                                                                                         Description
 ==================== ================================================================================================================= ===================================================================================================================================================================================================================================================================================================
-``mask/image``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Image.msg>`__           The mask image with the human segmentation (non-human pixels = 0 and human pixels = 1). In the :doc:`/concepts/scene_reconstruction/nvblox/tutorials/tutorial_human_reconstruction_realsense` tutorial this is published by :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`.
+``mask/image``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Image.msg>`__           In our human reconstruction tutorials this mask is published by :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`.
 ``mask/camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ Required topic along with the mask image. Contains intrinsic calibration parameters of the mask camera.
 ==================== ================================================================================================================= ===================================================================================================================================================================================================================================================================================================
 

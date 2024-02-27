@@ -4,10 +4,11 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dynamic Reconstruction with RealSense &mdash; isaac_ros_docs  documentation</title>
+  <title>Visualizing in Foxglove &mdash; isaac_ros_docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/tabs.css?v=a5c4661c" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=57633736" />
 
   
@@ -23,13 +24,14 @@
         <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+        <script src="../../../../_static/tabs.js?v=3030b3cb"></script>
         <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
         <script>mermaid.initialize({"startOnLoad": true})</script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="RealSense Data Recording for Nvblox" href="tutorial_realsense_record.html" />
-    <link rel="prev" title="Dynamic Reconstruction in Isaac Sim" href="tutorial_dynamic_reconstruction_isaac_sim.html" />
+    <link rel="next" title="Static Reconstruction in Isaac Sim" href="../tutorials/tutorial_isaac_sim.html" />
+    <link rel="prev" title="Installing Nvblox" href="install_nvblox.html" />
  
 <script src="//assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
 
@@ -99,6 +101,7 @@
 <li class="toctree-l7"><a class="reference internal" href="../../../../getting_started/hardware_setup/sensors/hawk_setup.html#imu-configuration">IMU Configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../getting_started/hardware_setup/sensors/hawk_setup.html#ros-driver-setup">ROS Driver Setup</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../getting_started/hardware_setup/sensors/realsense_setup.html">Isaac ROS RealSense Setup</a><ul>
@@ -247,58 +250,63 @@
 <li class="toctree-l5"><a class="reference internal" href="../technical_details.html#dynamic-reconstruction">Dynamic Reconstruction</a></li>
 </ul>
 </li>
-<li class="toctree-l4 current"><a class="reference internal" href="../index.html#examples">Examples</a><ul class="current">
-<li class="toctree-l5"><a class="reference internal" href="tutorial_isaac_sim.html">Static Reconstruction in Isaac Sim</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html#installation">Installation</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="install_nvblox.html">Installing Nvblox</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">Visualizing in Foxglove</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#visualizing-single-hawk-example">Visualizing Single Hawk Example</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tutorial_realsense.html">Static Reconstruction with RealSense</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_realsense.html#realsense-camera-firmware">RealSense Camera Firmware</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_realsense.html#host-system-setup">Host System Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_realsense.html#installing-the-dependencies">Installing the Dependencies</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_realsense.html#example-with-realsense-live-data">Example with RealSense Live Data</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_realsense.html#example-with-realsense-recorded-data">Example with RealSense Recorded Data</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_realsense.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tutorial_zed.html">Static Reconstruction with ZED</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_zed.html#host-system-setup">Host System Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_zed.html#installing-the-dependencies">Installing the Dependencies</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_zed.html#example-with-zed-live-data">Example with ZED Live Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../index.html#examples">Examples</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/tutorial_isaac_sim.html">Static Reconstruction in Isaac Sim</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
-<li class="toctree-l7"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/tutorial_realsense.html">RealSense Camera Examples</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#realsense-camera-firmware">RealSense Camera Firmware</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#install">Install</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#example-rosbag">Example ROSbag</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#realsense-example">RealSense Example</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#recording-data-with-realsense">Recording Data with RealSense</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#reconstruction-with-humans">Reconstruction With Humans</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#reconstruction-with-dynamic-elements">Reconstruction With Dynamic elements</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_realsense.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/tutorial_zed.html">ZED Camera Examples</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_zed.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_zed.html#install">Install</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_zed.html#zed-example">ZED Example</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tutorial_human_reconstruction_realsense.html">Human Reconstruction with RealSense</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_realsense.html#setup-isaac-ros-image-segmentation">Setup Isaac ROS Image Segmentation</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_realsense.html#example-with-realsense-live-data">Example with RealSense Live Data</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_realsense.html#example-with-realsense-recorded-data">Example with RealSense Recorded Data</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_human_reconstruction_realsense.html#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/tutorial_hawk.html">Hawk Stereo Camera Examples</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_hawk.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_hawk.html#install">Install</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_hawk.html#example-rosbag">Example ROSbag</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_hawk.html#single-hawk-example">Single Hawk Example</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_hawk.html#multi-hawk-example">Multi Hawk Example</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_hawk.html#recording-data-on-carter">Recording Data on Carter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_hawk.html#reconstruction-with-humans">Reconstruction With Humans</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_hawk.html#reconstruction-with-dynamic-elements">Reconstruction With Dynamic elements</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tutorial_dynamic_reconstruction_isaac_sim.html">Dynamic Reconstruction in Isaac Sim</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_dynamic_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_dynamic_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/tutorial_human_reconstruction_isaac_sim.html">Human Reconstruction in Isaac Sim</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_human_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="../tutorials/tutorial_human_reconstruction_isaac_sim.html#running-the-demonstration-scene">Running the Demonstration Scene</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../tutorials/tutorial_human_reconstruction_isaac_sim.html#running-with-custom-human-paths">Running with Custom Human Paths</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../tutorials/tutorial_human_reconstruction_isaac_sim.html#running-on-a-custom-scene">Running on a Custom Scene</a></li>
 </ul>
 </li>
-<li class="toctree-l5 current"><a class="current reference internal" href="#">Dynamic Reconstruction with RealSense</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#example-with-realsense-live-data">Example with RealSense Live Data</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#example-with-realsense-recorded-data">Example with RealSense Recorded Data</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_human_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tutorial_realsense_record.html">RealSense Data Recording for Nvblox</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_realsense_record.html#record-ros-bag">Record ROS Bag</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tutorial_realsense_record.html#start-nvblox-from-ros-bag">Start Nvblox from ROS Bag</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/tutorial_dynamic_reconstruction_isaac_sim.html">Dynamic Reconstruction in Isaac Sim</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_dynamic_reconstruction_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../tutorials/tutorial_dynamic_reconstruction_isaac_sim.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -335,8 +343,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../visual_slam/index.html">Visual SLAM</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../visual_slam/cuvslam/index.html">cuVSLAM</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../visual_slam/cuvslam/index.html#list-of-useful-visualizations">List of Useful Visualizations</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../visual_slam/cuvslam/index.html#saving-the-map">Saving the Map</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../visual_slam/cuvslam/index.html#loading-and-localization-in-the-map">Loading and Localization in the Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../visual_slam/cuvslam/index.html#saving-a-map">Saving a Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../visual_slam/cuvslam/index.html#loading-and-localizing-in-a-map">Loading and Localizing in a Map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../visual_slam/cuvslam/index.html#coordinate-frames">Coordinate Frames</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../visual_slam/cuvslam/index.html#repositories-and-packages">Repositories and Packages</a></li>
 </ul>
@@ -564,6 +572,11 @@
 <li class="toctree-l7"><a class="reference internal" href="../../../stereo_depth/bi3d/tutorial_realsense.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
 </ul>
 </li>
+<li class="toctree-l6"><a class="reference internal" href="../../../stereo_depth/bi3d/tutorial_hawk.html">Tutorial with Hawk camera</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="../../../stereo_depth/bi3d/tutorial_hawk.html#overview">Overview</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../stereo_depth/bi3d/tutorial_hawk.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index.html#model-preparation">Model Preparation</a><ul>
@@ -754,6 +767,11 @@
 <li class="toctree-l7"><a class="reference internal" href="../../bi3d_freespace_segmentation/tutorial_isaac_sim.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
 </ul>
 </li>
+<li class="toctree-l6"><a class="reference internal" href="../../bi3d_freespace_segmentation/tutorial_hawk.html">Tutorial with Hawk</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="../../bi3d_freespace_segmentation/tutorial_hawk.html#overview">Overview</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../bi3d_freespace_segmentation/tutorial_hawk.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_freespace_segmentation/isaac_ros_bi3d_freespace/index.html#api">API</a><ul>
@@ -818,6 +836,7 @@
 <li class="toctree-l7"><a class="reference internal" href="../../../stereo_depth/sgm/tutorial_zed.html#tutorial-walkthrough">Tutorial Walkthrough</a></li>
 </ul>
 </li>
+<li class="toctree-l6"><a class="reference internal" href="../../../stereo_depth/sgm/tutorial_hawk.html">Tutorial with Hawk</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_stereo_image_proc/index.html#api">API</a><ul>
@@ -843,6 +862,50 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/index.html#isaac-ros-nitros-acceleration">Isaac ROS NITROS Acceleration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/index.html#dnn-models">DNN models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/index.html#packages">Packages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segformer</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html#api">API</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#api">API</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#usage">Usage</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#segmentanythingdecodernode">SegmentAnythingDecoderNode</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#ros-parameters">ROS Parameters</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#ros-topics-published">ROS Topics Published</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#segmentanythingdataencodernode">SegmentAnythingDataEncoderNode</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#id1">ROS Parameters</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#id2">ROS Topics Subscribed</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#id3">ROS Topics Published</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#dummymaskpublisher">DummyMaskPublisher</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#id4">ROS Parameters</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#id5">ROS Topics Subscribed</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html#id6">ROS Topics Published</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unet</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index.html#quickstart">Quickstart</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index.html#try-more-examples">Try More Examples</a><ul>
@@ -1011,6 +1074,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nitros_bridge/index.html">Isaac ROS NITROS Bridge</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nitros_bridge/index.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nitros_bridge/index.html#performance">Performance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nitros_bridge/index.html#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros1/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros1</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros1/index.html#api">API</a><ul>
@@ -1070,6 +1134,21 @@
 <li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_correlated_timestamp_driver/index.html#ros-topics-published">ROS Topics Published</a></li>
 </ul>
 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_data_recorder</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html#overview">Overview</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html#api">API</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html#usage">Usage</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html#ros-launch-arguments">ROS Launch Arguments</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 </ul>
 </li>
 </ul>
@@ -1312,6 +1391,27 @@
 <li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index.html#configuration-file">Configuration File</a></li>
 <li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
 <li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index.html#ros-topics-published">ROS Topics Published</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationpose</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#quickstart">Quickstart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#try-more-examples">Try More Examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#use-different-object-models">Use Different Object Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#deep-learning-troubleshooting">Deep Learning Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#api">API</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#usage">Usage</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#foundationposenode">FoundationPoseNode</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#ros-parameters">ROS Parameters</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#ros-topics-subscribed">ROS Topics Subscribed</a></li>
+<li class="toctree-l7"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html#ros-topics-published">ROS Topics Published</a></li>
 </ul>
 </li>
 </ul>
@@ -1660,9 +1760,9 @@
           <li class="breadcrumb-item"><a href="../../../index.html">Concepts</a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Scene Reconstruction</a></li>
           <li class="breadcrumb-item"><a href="../index.html">Nvblox</a></li>
-      <li class="breadcrumb-item active">Dynamic Reconstruction with RealSense</li>
+      <li class="breadcrumb-item active">Visualizing in Foxglove</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../../_sources/concepts/scene_reconstruction/nvblox/tutorials/tutorial_dynamic_reconstruction_realsense.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../_sources/concepts/scene_reconstruction/nvblox/setup/visualizing_in_foxglove.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -1670,77 +1770,63 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="dynamic-reconstruction-with-realsense">
-<h1>Dynamic Reconstruction with RealSense<a class="headerlink" href="#dynamic-reconstruction-with-realsense" title="Link to this heading"></a></h1>
+  <section id="visualizing-in-foxglove">
+<h1>Visualizing in Foxglove<a class="headerlink" href="#visualizing-in-foxglove" title="Link to this heading"></a></h1>
 <figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_dynamic_example.gif/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_dynamic_example.gif/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_dynamic_example.gif/" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="https://gitlab-master.nvidia.com/isaac_ros/nvidia-isaac-ros/-/raw/dev/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/nvblox_hawk_foxglove_example.gif/"><img alt="https://gitlab-master.nvidia.com/isaac_ros/nvidia-isaac-ros/-/raw/dev/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/nvblox_hawk_foxglove_example.gif/" src="https://gitlab-master.nvidia.com/isaac_ros/nvidia-isaac-ros/-/raw/dev/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/nvblox_hawk_foxglove_example.gif/" style="width: 600px;" /></a>
 </figure>
-<p>This tutorial demonstrates how to perform reconstruction
-of a scene with moving elements in nvblox using a RealSense camera.</p>
-<p>The algorithm used for nvblox dynamic reconstruction is based on the following paper:</p>
-<ul>
-<li><div class="line-block">
-<div class="line">Lukas Schmid, Olov Andersson, Aurelio Sulser, Patrick Pfreundschuh, and Roland Siegwart.</div>
-<div class="line">“<strong>Dynablox: Real-time Detection of Diverse Dynamic Objects in Complex Environments</strong>”</div>
-<div class="line">in <em>IEEE Robotics and Automation Letters (RA-L)</em>,
-Vol. 8, No. 10, pp. 6259 - 6266, October 2023.</div>
-<div class="line">[ <a class="reference external" href="https://ieeexplore.ieee.org/document/10218983">IEEE</a> | <a class="reference external" href="https://arxiv.org/abs/2304.10049">ArXiv</a> | <a class="reference external" href="https://www.youtube.com/watch?v=NA13fRWlqRQ">Video</a>]</div>
-</div>
-</li>
-</ul>
-<p>For more information about dynamic reconstruction in nvblox see
-<a class="reference internal" href="../technical_details.html"><span class="doc">Technical Details</span></a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">isaac_ros_nvblox</span></code> package includes a custom plugin for visualization in
+<a class="reference external" href="https://github.com/foxglove/studio">Foxglove Studio</a>.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>There are two ways to install the nvblox foxglove extension. From source and via the extension marketplace.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">From source</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">From the extension marketplace</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p>This extension uses the <cite>npm</cite> package manager to install dependencies and run
+build scripts.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Dynamic reconstruction requires accurate pose estimation.
-Objects moving slower than the odometry drift can’t be detected as dynamic.</p>
-</div>
-<section id="example-with-realsense-live-data">
-<h2>Example with RealSense Live Data<a class="headerlink" href="#example-with-realsense-live-data" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>Before continuing this example, you must have successfully completed the</dt><dd><p><a class="reference internal" href="tutorial_realsense.html"><span class="doc">Static Reconstruction with RealSense</span></a>.</p>
-</dd>
-</dl>
-<ol class="arabic">
-<li><p>Connect the RealSense device to your machine using a USB 3 cable/port.</p></li>
-<li><p>Run the ROS Docker container using the <code class="docutils literal notranslate"><span class="pre">run_dev.sh</span></code> script:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_common<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-./scripts/run_dev.sh
+<p>This extension is known to work with node versions <cite>v10.2.3</cite> and <cite>v20.10.0</cite>. Other
+(particularly older) versions fail during the installation steps. To update node
+run, we recommend using <cite>nvm</cite>, to upgrade node.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>https://raw.githubusercontent.com/creationix/nvm/master/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+bash
+nvm<span class="w"> </span>install<span class="w"> </span><span class="m">20</span>.10.0
+nvm<span class="w"> </span>use<span class="w"> </span><span class="m">20</span>.10.0
 </pre></div>
 </div>
-</li>
-<li><p>Source the workspace:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>/workspaces/isaac_ros-dev/install/setup.bash
+</div>
+<p>From the <cite>nvblox_foxglove</cite> folder, install extension dependencies by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>install
 </pre></div>
 </div>
-</li>
-<li><p>Verify that the RealSense camera is connected by running <code class="docutils literal notranslate"><span class="pre">realsense-viewer</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>realsense-viewer
+<p>From the <cite>nvblox_foxglove</cite> folder, build and install the extension into your
+local Foxglove Studio desktop app, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>local-install
 </pre></div>
 </div>
-</li>
-<li><p>If successful, run the launch file to spin up the example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>nvblox_examples_bringup<span class="w"> </span>realsense_dynamics_example.launch.py
-</pre></div>
+<p>To test the extensions open the <cite>Foxglove Studio</cite> desktop or <cite>ctrl-R</cite> to refresh if it is already
+open.</p>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p>This is not yet done.</p>
+</div></div>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Installation from the marketplace</p>
 </div>
-</li>
+</section>
+<section id="visualizing-single-hawk-example">
+<h2>Visualizing Single Hawk Example<a class="headerlink" href="#visualizing-single-hawk-example" title="Link to this heading"></a></h2>
+<p>We include a config for visualizing the results of the nvblox reconstruction for the Single Hawk Example
+described <a class="reference internal" href="../tutorials/tutorial_hawk.html"><span class="doc">Hawk Stereo Camera Examples</span></a>.</p>
+<p>To visualize in Foxglove Studio</p>
+<ol class="arabic simple">
+<li><p>Open Foxglove Studio.</p></li>
+<li><p>Click “Open Connection”, either leaving <cite>localhost</cite> in the box, or entering the IP of the computer
+on which nvblox is running.</p></li>
+<li><p>Open our custom config by clicking on the foxglove logo on the top left of the window, then “View”,
+then “Import layout from file”, then navigating to our layout file at
+<code class="docutils literal notranslate"><span class="pre">isaac_ros_nvblox/nvblox_examples/nvblox_examples_bringup/config/visualization/hawk_example_foxglove.json</span></code>.</p></li>
 </ol>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you want to restrict odometry to a 2D plane
-(for example, to run a robot in a flat environment),
-you can use the <code class="docutils literal notranslate"><span class="pre">flatten_odometry_to_2d</span></code> argument.</p>
-</div>
-</section>
-<section id="example-with-realsense-recorded-data">
-<h2>Example with RealSense Recorded Data<a class="headerlink" href="#example-with-realsense-recorded-data" title="Link to this heading"></a></h2>
-<p>If you want to run the example on recorded data see
-<a class="reference internal" href="tutorial_realsense_record.html"><span class="doc">RealSense Data Recording for Nvblox</span></a>.</p>
-</section>
-<section id="troubleshooting">
-<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
-<p>See
-<a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense.html"><span class="doc">RealSense Issues</span></a>.</p>
+<p>The mesh should appear in the foxglove window.</p>
 </section>
 </section>
 
@@ -1748,15 +1834,15 @@ you can use the <code class="docutils literal notranslate"><span class="pre">fla
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="tutorial_dynamic_reconstruction_isaac_sim.html" class="btn btn-neutral float-left" title="Dynamic Reconstruction in Isaac Sim" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tutorial_realsense_record.html" class="btn btn-neutral float-right" title="RealSense Data Recording for Nvblox" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="install_nvblox.html" class="btn btn-neutral float-left" title="Installing Nvblox" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tutorials/tutorial_isaac_sim.html" class="btn btn-neutral float-right" title="Static Reconstruction in Isaac Sim" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, NVIDIA.
-      <span class="lastupdated">Last updated on Feb 08, 2024.
+      <span class="lastupdated">Last updated on Feb 27, 2024.
       </span></p>
   </div>
 

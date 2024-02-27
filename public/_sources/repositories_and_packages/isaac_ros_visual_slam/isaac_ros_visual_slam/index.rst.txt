@@ -96,7 +96,7 @@ To continue your exploration, check out the following suggested examples:
 
 .. toctree::
    :maxdepth: 1
-   
+
    Validating cuVSLAM Setup </concepts/visual_slam/cuvslam/validating_cuvslam_setup>
 
    Tutorial with Isaac Sim </concepts/visual_slam/cuvslam/tutorial_isaac_sim>
@@ -115,23 +115,23 @@ This section describes the coordinate frames that are involved in the
    :width: 300px
    :align: center
 
-1. ``input_base_frame``: The name of the frame used to calculate
-   transformation between base link and left camera. The default value is
-   empty (''), which means the value of ``base_frame_`` will be used. If
-   ``input_base_frame_`` and ``base_frame_`` are both empty, the left
-   camera is assumed to be in the robot's center.
-2. ``input_left_camera_frame``: The frame associated with left eye of
-   the stereo camera. Note that this is not the same as the optical
-   frame. The default value is empty (''), which means the left camera
-   is in the robot's center and ``left_pose_right`` will be calculated
-   from the CameraInfo message.
-3. ``input_right_camera_frame``: The frame associated with the right eye
-   of the stereo camera. Note that this is not the same as the optical
-   frame. The default value is empty (''), which means left and right
-   cameras have identity rotation and are horizontally aligned, so
-   ``left_pose_right`` will be calculated from CameraInfo.
-4. ``input_imu_frame``: The frame associated with the IMU sensor (if
-   available). It is used to calculate ``left_pose_imu``.
+1. ``base_frame``: The base frame of the robot or camera rig. It is assumed that
+   all cameras are rigidly mounted to this frame, such that the transforms between
+   the ``base_frame`` and the ``camera_optical_frames`` can assumed to be static.
+   The estimated odometry and SLAM pose will represent the pose of this frame.
+
+2. ``map_frame``: The frame corresponding to the origin of the map that cuVSLAM
+   creates or localizes in. The SLAM pose reported by cuVSLAM corresponds with
+   the transform ``map_frame`` -> ``base_frame``.
+
+3. ``odom_frame``: The frame corresponding to the origin of the odometry that
+   cuVSLAM estimates. The odometry pose reported by cuVSLAM corresponds with the
+   transform ``odom_frame`` -> ``base_frame``.
+
+4. ``camera_optical_frames``: The frames corresponding to the optical center of
+   every camera. The frame is expected to lie at the center of the camera lens
+   and oriented with the z-axis pointing in the view direction and the y-axis
+   pointing to the floor.
 
 Troubleshooting
 ---------------
@@ -160,7 +160,7 @@ Troubleshooting Suggestions
 
    1. Fast motion causing the motion blur in the frames
    2. Low-lighting conditions.
-   3. The wrong ``camerainfo`` is being published.
+   3. The wrong ``camera_info`` is being published.
 
 4. For better performance:
 
@@ -181,12 +181,12 @@ Troubleshooting Suggestions
       release <https://github.com/IntelRealSense/realsense-ros/releases/tag/4.51.1>`__
       for the `realsense-ros
       package <https://github.com/IntelRealSense/realsense-ros/commit/2a65533ee7431bdc05fe5744798efc7f5713f866>`__.
-   3. You are using the parameters set in the 
+   3. You are using the parameters set in the
       :ir_repo:`RealSense tutorial launch file <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_realsense.launch.py>`
    4. If the pose estimate frames in RViz is **drifting** from actual
       real-world poses and you see white dots on nearby objects(refer to
       the screenshot below), this means that the emitter of the
-      RealSense camera is on and it needs to be 
+      RealSense camera is on and it needs to be
       :ir_repo:`turned off <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_realsense.launch.py#L35>`.
    5. Left and right images being published are not compressed or
       encoded. Isaac ROS Visual Slam expects raw images.
@@ -208,45 +208,56 @@ Usage
 ROS Parameters
 ^^^^^^^^^^^^^^
 
-================================= =============== =============== =========================================================================================================================================================================================================================================================================================================
+================================= ============================ ================ ===================================================================================================================================================================================================================
 ROS Parameter                     Type            Default         Description
-================================= =============== =============== =========================================================================================================================================================================================================================================================================================================
-``denoise_input_images``          ``bool``        ``false``       If enabled, input images are denoised. It can be enabled when images are noisy because of low-light conditions.
-``rectified_images``              ``bool``        ``true``        Flag to mark if the incoming images are rectified or raw.
-``enable_imu_fusion``             ``bool``        ``false``       If enabled, IMU data is used.
-``gyro_noise_density``            ``double``      ``0.000244``    White noise parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
-``gyro_random_walk``              ``double``      ``0.000019393`` Random walk parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
-``accel_noise_density``           ``double``      ``0.001862``    White noise parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
-``accel_random_walk``             ``double``      ``0.003``       Random walk parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
-``calibration_frequency``         ``double``      ``200.0``       IMU frequency used for generating noise model parameters.
-``img_jitter_threshold_ms``       ``double``      ``33.33``       Acceptable time delta between previous and current pair of image frames. If a pair of image frames exceeds the threshold, it might be an indication of frame drop from the source.
-``enable_verbosity``              ``bool``        ``false``       If enabled, prints logs from cuVSLAM library.
-``force_planar_mode``             ``bool``        ``false``       If enabled, slam poses will be modified such that the camera moves on a horizontal plane.
-``enable_debug_mode``             ``bool``        ``false``       If enabled, a debug dump (image frames, timestamps, and camera info) is saved on to the disk at the path indicated by ``debug_dump_path``
-``debug_dump_path``               ``std::string`` ``/tmp/elbrus`` The path to the directory to store the debug dump data.
-``input_base_frame``              ``std::string`` ``""``          Name of the frame (``baselink``) to calculate transformation between the ``baselink`` and the left camera. Default is empty, which means the value of the ``base_frame`` will be used. If ``input_base_frame`` and ``base_frame`` are both empty, the left camera is assumed to be in the robot's center.
-``input_left_camera_frame``       ``std::string`` ``""``          The name of the left camera frame. the default value is empty, which means the left camera is in the robot's center and ``left_pose_right`` will be calculated from CameraInfo.
-``input_right_camera_frame``      ``std::string`` ``""``          The name of the right camera frame. The default value is empty, which means left and right cameras have identity rotation and are horizontally aligned. ``left_pose_right`` will be calculated from CameraInfo.
-``input_imu_frame``               ``std::string`` ``imu``         Defines the name of the IMU frame used to calculate ``left_camera_pose_imu``.
-``map_frame``                     ``std::string`` ``map``         The frame name associated with the map origin.
-``odom_frame``                    ``std::string`` ``odom``        The frame name associated with the odometry origin.
-``base_frame``                    ``std::string`` ``base_link``   The frame name associated with the robot.
-``enable_observations_view``      ``bool``        ``false``       If enabled, 2D feature pointcloud will be available for visualization.
-``enable_landmarks_view``         ``bool``        ``false``       If enabled, landmark pointcloud will be available for visualization.
-``enable_slam_visualization``     ``bool``        ``false``       Main flag to enable or disable visualization.
-``enable_localization_n_mapping`` ``bool``        ``true``        If enabled, SLAM mode is on. If disabled, only Visual Odometry is on.
-``path_max_size``                 ``int``         ``1024``        The maximum size of the buffer for pose trail visualization.
-``publish_odom_to_base_tf``       ``bool``        ``true``        Enable ``tf`` broadcaster for ``odom_frame`` -> ``base_frame`` transform.
-``publish_map_to_odom_tf``        ``bool``        ``true``        Enable ``tf`` broadcaster for ``map_frame`` -> ``odom_frame`` transform.
-``invert_odom_to_base_tf``        ``bool``        ``false``       Invert the ``odom_frame`` -> ``base_frame`` transform before broadcasting to the ``tf`` tree.
-``invert_map_to_odom_tf``         ``bool``        ``false``       Invert the ``map_frame`` -> ``odom_frame`` transform before broadcasting to the ``tf`` tree.
-``map_frame``                     ``std::string`` ``map``         String name for the ``map_frame``.
-``odom_frame``                    ``std::string`` ``odom``        String name for the ``odom_frame``.
-``base_frame``                    ``std::string`` ``base_link``   String name for the ``base_frame``.
-``override_publishing_stamp``     ``bool``        ``false``       Override timestamp received from the left image with the timestamp from ``rclcpp::Clock``.
-``msg_filter_queue_size``         ``int``         ``100``         Image + Camera Info Synchronizer message filter queue size.
-``image_qos``                     ``std::string`` ``SENSOR_DATA`` QoS profile for the left and right image subscribers.
-================================= =============== =============== =========================================================================================================================================================================================================================================================================================================
+================================= ============================ ================ ===================================================================================================================================================================================================================
+*Functional Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``num_cameras``                   ``int``                      ``2``            Number of cameras used. Set to 2 for a single stereo camera.
+``min_num_images``                ``int``                      ``num_cameras``  Minimum number of images required to track the pose. If less than ``min_num_images`` with a synchronized timestamp are received then the synchronizer will drop all messages.
+``sync_matching_threshold_ms``    ``double``                   ``5.0`` .        Maximum duration between image timestamps to still consider them synced.
+``enable_image_denoising``        ``bool``                     ``false``        If enabled, input images are denoised. It can be enabled when images are noisy because of low-light conditions.
+``rectified_images``              ``bool``                     ``true``         Flag to mark if the incoming images are rectified or raw.
+``enable_planar_mode``            ``bool``                     ``false``        If enabled, slam poses will be modified such that the camera moves on a horizontal plane.
+``enable_localization_n_mapping`` ``bool``                     ``true``         If enabled, SLAM mode is on. If disabled, only odometry is on.
+``enable_imu_fusion``             ``bool``                     ``false``        If enabled, IMU data is used.
+``gyro_noise_density``            ``double``                   ``0.000244``     White noise parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``gyro_random_walk``              ``double``                   ``0.000019393``  Random walk parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``accel_noise_density``           ``double``                   ``0.001862``     White noise parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``accel_random_walk``             ``double``                   ``0.003``        Random walk parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``calibration_frequency``         ``double``                   ``200.0``        IMU frequency used for generating noise model parameters.
+``image_jitter_threshold_ms``     ``double``                   ``34.0``         Acceptable time delta between consecutive synced image messages. If the messages exceed the threshold, it might be an indication of message drop from the source.
+``imu_jitter_threshold_ms``       ``double``                   ``10.0``         Acceptable time delta between consecutive IMU messages. If the messages exceed the threshold, it might be an indication of message drop from the source.
+*Frame Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``map_frame``                     ``std::string``              ``map``          The frame name associated with the map origin.
+``odom_frame``                    ``std::string``              ``odom``         The frame name associated with the odometry origin.
+``base_frame``                    ``std::string``              ``base_link``    The frame name associated with the base of the robot or camera rig.
+``camera_optical_frames``         ``std::vector<std::string>`` ``[]``           The frame names associated with the cameras' optical frames. Using ROS optical frame conventions, i.e. z-axis front, y-axis down. If not specified will use the frames from the camera info messages.
+``imu_frame``                     ``std::string``              ``imu``          The frame name associated with the IMU.
+*Message Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``image_buffer_size``             ``int``                      ``100``          Buffer size used by the image synchronizer.
+``imu_buffer_size``               ``int``                      ``50``           Buffer size used by the IMU sequencer.
+``image_qos``                     ``std::string``              ``DEFAULT``      QoS profile for the image subscribers.
+``imu_qos``                       ``std::string``              ``DEFAULT``      QoS profile for the IMU subscriber.
+*Output Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``override_publishing_stamp``     ``bool``                     ``false``        Override timestamp received from the left image with the timestamp from ``rclcpp::Clock``.
+``publish_map_to_odom_tf``        ``bool``                     ``true``         Enable ``tf`` broadcaster for ``map_frame`` -> ``odom_frame`` transform.
+``publish_odom_to_rig_tf``        ``bool``                     ``true``         Enable ``tf`` broadcaster for ``odom_frame`` -> ``base_frame`` transform.
+``invert_map_to_odom_tf``         ``bool``                     ``false``        Invert the ``map_frame`` -> ``odom_frame`` transform before broadcasting to the ``tf`` tree.
+``invert_odom_to_rig_tf``         ``bool``                     ``false``        Invert the ``odom_frame`` -> ``base_frame`` transform before broadcasting to the ``tf`` tree.
+*Debug/Visualization Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``enable_slam_visualization``     ``bool``                     ``false``        Main flag to enable or disable visualization.
+``enable_observations_view``      ``bool``                     ``false``        If enabled, 2D feature pointcloud will be available for visualization.
+``enable_landmarks_view``         ``bool``                     ``false``        If enabled, landmark pointcloud will be available for visualization.
+``path_max_size``                 ``int``                      ``1024``         The maximum size of the buffer for pose trail visualization.
+``enable_verbosity``              ``bool``                     ``false``        If enabled, prints logs from cuVSLAM library.
+``enable_debug_mode``             ``bool``                     ``false``        If enabled, a debug dump (images, IMU messages, timestamps, and camera info) is saved on to the disk at the path indicated by ``debug_dump_path``
+``debug_dump_path``               ``std::string``              ``/tmp/cuvslam`` The path to the directory to store the debug dump data.
+================================= ============================ ================ ===================================================================================================================================================================================================================
 
 ROS Topics Subscribed
 ^^^^^^^^^^^^^^^^^^^^^
@@ -254,11 +265,9 @@ ROS Topics Subscribed
 ==================================== ===================================================================================================================== ===============================================================
 ROS Topic                            Interface                                                                                                             Description
 ==================================== ===================================================================================================================== ===============================================================
-``/stereo_camera/left/image``        `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__               The image from the left eye of the stereo camera in grayscale.
-``/stereo_camera/left/camera_info``  `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__     CameraInfo from the left eye of the stereo camera.
-``/stereo_camera/right/image``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__               The image from the right eye of the stereo camera in grayscale.
-``/stereo_camera/right/camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__     CameraInfo from the right eye of the stereo camera.
-``visual_slam/imu``                  `sensor_msgs/Imu <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Imu.msg>`__                   Sensor data from the IMU(optional).
+``visual_slam/image_{i}``            `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__               Image from the :spelling:ignore:`i-th` camera in grayscale (i is in range [0, ``num_cameras``-1]).
+``visual_slam/camera_info_{i}``      `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__     Camera info from the :spelling:ignore:`i-th` camera (i is in range [0, ``num_cameras``-1]).
+``visual_slam/imu``                  `sensor_msgs/Imu <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Imu.msg>`__                   Sensor data from the IMU (is only present if ``enable_imu_fusion`` is ``true``).
 ==================================== ===================================================================================================================== ===============================================================
 
 ROS Topics Published
@@ -267,12 +276,13 @@ ROS Topics Published
 =========================================== ======================================================================================================================================================= ==================================================
 ROS Topic                                   Interface                                                                                                                                               Description
 =========================================== ======================================================================================================================================================= ==================================================
-``visual_slam/tracking/odometry``           `nav_msgs/Odometry <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Odometry.msg>`__                                                 Odometry messages for the ``base_link``.
-``visual_slam/tracking/vo_pose_covariance`` `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__     Current pose with covariance of the ``base_link``.
-``visual_slam/tracking/vo_pose``            `geometry_msgs/PoseStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseStamped.msg>`__                                 Current pose of the ``base_link``.
+``visual_slam/tracking/odometry``           `nav_msgs/Odometry <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Odometry.msg>`__                                                 Current odometry of the ``base_frame``.
+``visual_slam/tracking/vo_pose_covariance`` `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__     Current pose with covariance of the ``base_frame``.
+``visual_slam/tracking/vo_pose``            `geometry_msgs/PoseStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseStamped.msg>`__                                 Current pose of the ``base_frame``.
 ``visual_slam/tracking/slam_path``          `nav_msgs/Path <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Path.msg>`__                                                         Trail of poses generated by SLAM.
 ``visual_slam/tracking/vo_path``            `nav_msgs/Path <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Path.msg>`__                                                         Trail of poses generated by pure Visual Odometry.
 ``visual_slam/status``                      :ir_repo:`isaac_ros_visual_slam_interfaces/VisualSlamStatus <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/msg/VisualSlamStatus.msg>`        Status message for diagnostics.
+``/diagnostics``                            `diagnostic_msgs/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/humble/diagnostic_msgs/msg/DiagnosticArray.msg>` __                    Diagnostic message. Similar to ``status`` topic but in a different format.
 =========================================== ======================================================================================================================================================= ==================================================
 
 ROS Services Advertised
@@ -285,6 +295,9 @@ ROS Service                       Interface                                     
 ``visual_slam/get_all_poses``     :ir_repo:`isaac_ros_visual_slam_interfaces/GetAllPoses <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/GetAllPoses.srv>`                                           A service to get the series of poses for the path traversed.
 ``visual_slam/set_odometry_pose`` :ir_repo:`isaac_ros_visual_slam_interfaces/SetOdometryPose <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/SetOdometryPose.srv>`                                   A service to set the pose of the odometry frame.
 ================================= ================================================================================================================================================================================ ============================================================
+
+.. note::
+   ``visual_slam/set_odometry_pose`` only works in odometry mode and not in slam mode i.e. set ``enable_localization_n_mapping = false``
 
 ROS Actions Advertised
 ^^^^^^^^^^^^^^^^^^^^^^

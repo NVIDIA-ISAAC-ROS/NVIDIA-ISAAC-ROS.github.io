@@ -1,0 +1,68 @@
+Tutorial for Bi3D with Hawk Camera
+=======================================
+
+Overview
+------------
+
+This tutorial demonstrates how to use a 
+:ir_repo:`Hawk camera <isaac_ros_argus_camera>` and
+:ir_repo:`isaac_ros_bi3d_freespace <isaac_ros_freespace_segmentation> <isaac_ros_bi3d_freespace>`
+to create a local occupancy grid.
+
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`.
+
+2.  Complete steps 1-7 described in the
+    :ref:`Quickstart Guide <repositories_and_packages/isaac_ros_freespace_segmentation/isaac_ros_bi3d_freespace/index:quickstart>`.
+
+3.  Clone ``isaac_ros_image_pipeline``.
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+4.  Open a new terminal and launch the Docker container using the
+    ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5.  Build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+6.  Inside the container, install the ``isaac_ros_argus_camera`` package.
+
+    :ir_apt:
+
+    .. code:: bash
+
+       sudo apt-get install -y ros-humble-isaac-ros-argus-camera
+
+7.  Run the launch file, to launch the example:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_bi3d_freespace isaac_ros_bi3d_freespace_hawk.launch.py featnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       segnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       max_disparity_values:=16
+
+8. Observe occupancy grid output ``/freespace_segmentation/occupancy_grid`` on a
+   separate terminal with the command:
+
+   .. code:: bash
+
+      ros2 topic echo /freespace_segmentation/occupancy_grid

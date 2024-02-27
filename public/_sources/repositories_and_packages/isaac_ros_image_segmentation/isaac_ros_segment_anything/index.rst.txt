@@ -1,0 +1,310 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_segmentation> <isaac_ros_segment_anything>`
+
+Quickstart
+----------
+
+1.  Set up your development environment by following the instructions :doc:`here </getting_started/dev_env_setup>`.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_image_segmentation>`
+
+3.  Pull down a ROS Bag of sample data:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_image_segmentation && \
+         git lfs pull -X "" -I "resources/rosbags/"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5.  Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-segment-anything ros-humble-isaac-ros-triton ros-humble-isaac-ros-dnn-image-encoder
+
+6.  Make a directory to place models (inside the Docker container):
+
+    .. code:: bash
+
+       mkdir -p /tmp/models/segment_anything/1/
+
+7.  Create the ONNX file for SAM or for Mobile SAM.
+
+    **Steps to use SAM**
+
+    To create ONNX file for SAM. Download the PyTorch weights from Segment Anything official `repo <https://github.com/facebookresearch/segment-anything#model-checkpoints>`__.
+    Copy the downloaded weights in container 
+    The model is assumed to be downloaded to ``~/Downloads`` outside the
+    Docker container.
+
+    This example will use ``vit_b.pth``, which should be downloaded
+    into ``/tmp/models`` inside the Docker container:
+   
+    .. note::
+
+      This should be run outside the Docker container
+
+    On ``x86_64``:
+
+    .. code:: bash
+
+       cd ~/Downloads && \
+       docker cp vit_b.pth isaac_ros_dev-x86_64-container:/tmp/models
+
+    .. code:: bash
+
+        pip install git+https://github.com/facebookresearch/segment-anything.git
+
+    .. code:: bash
+
+       python3 src/isaac_ros_image_segmentation/isaac_ros_segment_anything/scripts/torch_to_onnx.py \
+       --checkpoint /tmp/models/vit_b.pth --output /tmp/models/segment_anything/1/model.onnx --model-type vit_b --sam-type SAM
+
+    **Steps to use MobileSAM**
+
+    To create ONNX file for Mobile SAM. Download the PyTorch weights from Mobile SAM official `repo <https://github.com/ChaoningZhang/MobileSAM/tree/master/weights>`__.
+    Copy the downloaded weights in container 
+
+    This example will use ``mobile_sam.pt``, which should be downloaded
+    into ``/tmp/models`` inside the Docker container:
+   
+    .. note::
+
+      This should be run outside the Docker container
+
+    On ``x86_64``:
+
+    .. code:: bash
+
+       cd ~/Downloads && \
+       docker cp mobile_sam.pt isaac_ros_dev-x86_64-container:/tmp/models
+    
+    .. code:: bash
+        
+        pip install timm && \
+        pip install git+https://github.com/ChaoningZhang/MobileSAM.git
+
+    .. code:: bash
+
+       python3 src/isaac_ros_image_segmentation/isaac_ros_segment_anything/scripts/torch_to_onnx.py \
+       --checkpoint /tmp/models/mobile_sam.pt --output /tmp/models/segment_anything/1/model.onnx --model-type vit_t --sam-type MobileSAM
+
+8.  Copy the config file:
+
+    .. code:: bash
+
+       cp src/isaac_ros_image_segmentation/resources/sam_config_onnx.pbtxt /tmp/models/segment_anything/config.pbtxt
+
+9.  Run the following launch files to spin up a demo of this package:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_segment_anything isaac_ros_segment_anything_triton.launch.py
+
+    Then open **another** terminal, and enter the Docker container again:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then, play the ROS bag:
+
+    .. code:: bash
+
+       ros2 bag play -l src/isaac_ros_image_segmentation/resources/rosbags/segment_anything_sample_data/
+
+10. Start the python script to visualize the output mask
+
+    .. code:: bash
+
+        python3 src/isaac_ros_image_segmentation/isaac_ros_segment_anything/scripts/visualize_mask.py
+
+11. Visualize and validate the output of the package by launching ``rqt_image_view`` in another terminal: In a **third** terminal, enter the Docker container again:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then launch ``rqt_image_view``:
+
+    .. code:: bash
+
+       ros2 run rqt_image_view rqt_image_view
+
+    Then inside the ``rqt_image_view`` GUI, change the topic to ``/segment_anything/colored_segmentation_mask`` to view a colorized segmentation mask.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/sam_output_rqt.png>`
+      :width: 320px
+      :align: center
+
+   .. note::
+
+       The raw segmentation mask is also published to ``/segment_anything/raw_segmentation_mask``. However, the raw pixels correspond to the class labels and so the output is unsuitable for human visual inspection.
+
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~
+
+Single launch file is provided to use this package. The launch file launches ``isaac_ros_triton`` with ONNX backend. 
+Right now only ONNX backend with Triton is supported for this model.
+
+.. warning::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+=============================================== ====================
+Launch File                                     Components Used
+=============================================== ====================
+``isaac_ros_segment_anything_triton.launch.py``  :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`UNetDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+=============================================== ====================
+
+SegmentAnythingDecoderNode
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+==================================== ================ =========== ===================================================================================================================================================================================================
+ROS Parameter                        Type             Default     Description
+==================================== ================ =========== ===================================================================================================================================================================================================
+``mask_width``                       ``int16_t``      ``960``     The width of the segmentation mask.
+``mask_height``                      ``int16_t``      ``544``     The height of the segmentation mask.
+``max_batch_size``                   ``int16_t``      ``20``      Maximum number of prompt inputs for each frame.
+==================================== ================ =========== ===================================================================================================================================================================================================
+
+.. warning::
+
+   -  **Note**: If a frame doesn't have any input prompt then no mask is generated for that particular frame.
+   -  **Note**: If for a frame input prompts are larger than the max_batch_size then first max_batch_size input prompts will be considered.
+
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+============== ==================================================================================================================================================================== =========================================================================
+ROS Topic      Interface                                                                                                                                                            Description
+============== ==================================================================================================================================================================== =========================================================================
+``tensor_sub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      List of Output Tensors from the SAM model.
+============== ==================================================================================================================================================================== =========================================================================
+
+.. warning::
+
+   All input images are required to have height and width that are both an even number of pixels.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============================================ =============================================================================================================================================== ======================================================================================================
+ROS Topic                                     Interface                                                                                                                                      Description
+============================================ =============================================================================================================================================== ======================================================================================================
+``/segment_anything/raw_segmentation_mask``  :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                 The raw segmentation mask, A Tensor with shape [batch_size, 1, orig_img_height, orig_img_width]. Where batch_size is number of prompt inputs for that frame.
+============================================ =============================================================================================================================================== ======================================================================================================
+
+SegmentAnythingDataEncoderNode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+==================================== ================ =============== ===================================================================================================================================================================================================
+ROS Parameter                        Type             Default         Description
+==================================== ================ =============== ===================================================================================================================================================================================================
+``prompt_input_type``                ``string``       ``bbox``        Type of Prompt Input. Supported Types: ``bbox`` and ``point``
+``has_input_mask``                   ``bool``         ``false``       Whether there is any input mask for SAM or not.
+``max_batch_size``                   ``int16_t``      ``20``          Maximum number of prompt inputs for each frame.
+``orig_img_dims``                    ``double list``  ``[632,1200]``  Dimensions of the Original Image in ``[H,W]`` format. Please note, expectation is each bbox/point is in the coordinate system of given dimension image.
+==================================== ================ =============== ===================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+=============== ==================================================================================================================================================================== =========================================================================
+ROS Topic       Interface                                                                                                                                                            Description
+=============== ==================================================================================================================================================================== =========================================================================
+``/prompts``    `vision_msgs/Detection2DArray <https://github.com/ros-perception/vision_msgs/blob/ros2/vision_msgs/msg/Detection2DArray.msg>`__                                      Input Detection2DArray, If prompt type is ``point`` then center of bbox is considered as point of interest.
+``/tensor_pub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The preprocessed & encoded image tensor.
+``/mask``       :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      Input mask for SAM.
+=============== ==================================================================================================================================================================== =========================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============================================ =============================================================================================================================================== ======================================================================================================
+ROS Topic                                     Interface                                                                                                                                      Description
+============================================ =============================================================================================================================================== ======================================================================================================
+``/tensor``                                   :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                Tensor List which has all the required tensors for SAM inference.
+============================================ =============================================================================================================================================== ======================================================================================================
+
+DummyMaskPublisher
+~~~~~~~~~~~~~~~~~~
+
+This node can be used to publish dummy mask to SAM in case we don't have any mask input to use.
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+==================================== ================ =============== ===================================================================================================================================================================================================
+ROS Parameter                        Type             Default         Description
+==================================== ================ =============== ===================================================================================================================================================================================================
+``tensor_name``                      ``string``       ``input_mask``  Name of the mask tensor.
+==================================== ================ =============== ===================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+=============== ==================================================================================================================================================================== =========================================================================
+ROS Topic       Interface                                                                                                                                                            Description
+=============== ==================================================================================================================================================================== =========================================================================
+``/tensor_pub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The data from this topic is used to timestamp the dummy mask.
+=============== ==================================================================================================================================================================== =========================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============================================ =============================================================================================================================================== ======================================================================================================
+ROS Topic                                     Interface                                                                                                                                      Description
+============================================ =============================================================================================================================================== ======================================================================================================
+``/mask``                                    :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                 Dummy mask is published on this topic. Which is supposed to be ingested by SegmentAnythingDataEncoderNode
+============================================ =============================================================================================================================================== ======================================================================================================
+
+.. |package_name| replace:: ``isaac_ros_segment_anything``

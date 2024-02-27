@@ -1,0 +1,85 @@
+Installing Nvblox
+========================================
+
+This page contains instructions for setting up nvblox for running the tutorials.
+
+1. There are two options for installing nvblox:
+   installation from Debian, and installation from source.
+
+    .. tabs::
+
+        .. tab:: Installation from source
+
+            1. Clone ``isaac_ros_nvblox``.
+
+                .. code::
+
+                    cd $ISAAC_ROS_WS
+                    mkdir -p $ISAAC_ROS_WS/src
+                    git clone --recursive https://gitlab-master.nvidia.com/isaac_ros/isaac_ros_nvblox.git src/isaac_ros_nvblox
+
+            2. Clone the dependencies needed to run the examples.
+
+                .. code:: bash
+
+                    cd $ISAAC_ROS_WS
+                    vcs import --recursive $ISAAC_ROS_WS/src < $ISAAC_ROS_WS/src/isaac_ros_nvblox/nvblox_examples/nvblox_examples_bringup/nvblox_examples.repos
+
+            3. Launch the Docker container using the ``run_dev.sh`` script:
+
+                .. code:: bash
+
+                    cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+                    ./scripts/run_dev.sh
+
+            4. Build the ROS workspace
+
+                .. code:: bash
+
+                    cd /workspaces/isaac_ros-dev
+                    colcon build --symlink-install --continue-on-error
+                    source install/setup.bash
+
+        .. tab:: Installation from Debian
+
+            1. Install from Debian:
+
+                .. code:: bash
+
+                    todo
+
+    .. todo::
+
+        Need to add the Debian installation instructions.
+
+
+2. Build the DNN models needed by the tutorials.
+
+    Launch the Docker container using the ``run_dev.sh`` script (If not launched in the build step):
+
+        .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+    Use the `NVIDIA TAO <https://developer.nvidia.com/tao-toolkit>`__ to model optimization toolkit
+    generate an `ESS depth estimation  <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`__
+    engine and `PeopleSemSegNet <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplesemsegnet>`__
+    person segmentation engine. To download and convert the models run (inside the docker):
+
+        .. code:: bash
+
+            /workspace/isaac_ros-dev/src/isaac_ros_nvblox/nvblox_ros/scripts/setup_models.sh
+
+    This will take some time and produce the folder ``/workspace/isaac_ros-dev/models`` containing
+    ESS and Light ESS and PeopleSemSegNet model files.
+
+    .. note::
+
+        This script converts several models: ``ESS``, ``Light ESS``, ``PeopleSemSegNet``
+        and ``PeopleSemSegNet ShuffleSeg``.
+        These models are used by various tutorials for depth estimation on hawk and human
+        reconstruction in several tutorials.
+
+3. **(Optional)** If you want to visualize nvblox outputs in `Foxglove Studio <https://github.com/foxglove/studio>`__
+   you will need to complete :doc:`Visualizing in Foxglove </concepts/scene_reconstruction/nvblox/setup/visualizing_in_foxglove>`.

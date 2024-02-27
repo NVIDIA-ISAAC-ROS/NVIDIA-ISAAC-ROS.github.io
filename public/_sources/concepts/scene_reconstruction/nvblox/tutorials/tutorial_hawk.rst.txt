@@ -1,0 +1,359 @@
+Hawk Stereo Camera Examples
+========================================
+
+.. .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_example.gif>`
+..     :width: 600px
+..     :align: center
+
+.. todo::
+
+    We need a representative GIF. Suggestion to do this using the r2b 2024 dataset when
+    we have it.
+
+This page contains tutorials for running nvblox on the `Hawk camera <https://leopardimaging.com/leopard-imaging-hawk-stereo-camera/>`__,
+:ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>`,
+:ir_repo:`Isaac ROS DNN Stereo Depth <isaac_ros_dnn_stereo_depth>`,
+and :ir_repo:`Isaac ROS Nvblox <isaac_ros_nvblox>`.
+Hawk is a high resolution stereo camera, which can be connected
+`via GMSL <https://www.leopardimaging.com/product/accessories/adapters-carrier-boards/e3653-a03/>`__ to
+Jetson AGX Orin using :ir_repo:`Argus <isaac_ros_argus_camera>`.
+
+.. note::
+
+    In these tutorials we assume a NOVA compliant hardware setup, for example a :doc:`Nova Carter </robots/nova_carter>`.
+    For more information on achieving a NOVA compliant system not on Carter, see NOVA docs.
+
+.. todo::
+
+    Add a link to the NOVA docs when they exist.
+
+
+Prerequisites
+-------------
+
+These are the steps common to running all examples on hawk.
+
+1. Complete the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`.
+
+2. Complete the :doc:`/getting_started/dev_env_setup`.
+
+
+Install
+-------
+
+1. Complete the :doc:`nvblox setup </concepts/scene_reconstruction/nvblox/setup/install_nvblox>`.
+
+Example ROSbag
+--------------
+
+If you want to run the examples in this tutorial from an example ROSbag (rather than from a live sensor),
+we host a demo dataset which can be downloaded `here <https://drive.google.com/drive/folders/1-U2_olmZZsRw6ik4BnnAl_unEieTN54S>`__.
+The downloaded folder ``take10_2024_02_20-16_18_43_0`` should be unzipped and placed somewhere
+accessible inside the Isaac ROS docker, for example ``$ISAAC_ROS_WS/datasets``.
+
+We set an environment variable (inside the Isaac ROS docker) to this dataset path for use
+in the tutorials below. Note that this command assumes you've placed the downloaded dataset
+in a folder called ``datasets`` next to the ``src`` folder. Adjust as required to match
+your dataset path.
+
+.. code::
+
+    export DATASET_PATH=/workspaces/isaac_ros-dev/datasets/take10_2024_02_20-16_18_43_0
+
+.. todo::
+
+    Move this dataset to NGC. Update the code to download from the command line.
+
+
+
+Single Hawk Example
+-------------------
+
+This example runs nvblox-based reconstruction from a single hawk camera,
+either from live data coming directly off a hawk camera, or from recorded
+data coming from a ROSbag.
+
+.. todo::
+
+    example GIF.
+
+1. Navigate (inside the docker) to the workspace folder
+
+    .. code:: bash
+
+        cd /workspaces/isaac_ros-dev
+
+2. Run the hawk example, either live from a sensor of from a recorded ROSbag.
+
+    .. tabs::
+
+        .. tab:: On a ROSbag
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                ess_engine_file_path:=./models/ess.engine \
+                from_bag:=True bag_path:=$DATASET_PATH
+        
+        .. tab:: Live from a sensor
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                ess_engine_file_path:=./models/ess.engine
+
+    .. todo::
+
+        Need to add specifics for running on multi-hawk r2b.
+
+3. We can run the Light ESS model by additionally passing ``run_ess_light_list:=True`` and replacing
+   ``ess_engine_file_path:=./models/ess.engine`` with
+   ``ess_light_engine_file_path:=./models/light_ess.engine``. for example
+  
+    .. tabs::
+
+        .. tab:: On a ROSbag
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                run_ess_light_list:=True \
+                ess_light_engine_file_path:=./models/light_ess.engine
+                from_bag:=True bag_path:=$DATASET_PATH
+
+        .. tab:: Live from a sensor
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                run_ess_light_list:=True \
+                ess_light_engine_file_path:=./models/light_ess.engine
+
+
+Multi Hawk Example
+------------------
+
+The example runs nvblox-based reconstruction from multiple hawk cameras.
+
+.. todo::
+
+    GIF needed.
+
+1. Navigate (inside the docker) to the workspace folder
+
+    .. code:: bash
+
+        cd /workspaces/isaac_ros-dev
+
+2. Run the hawk example, either live from a sensor of from a recorded ROSbag.
+
+    .. tabs:: 
+
+        .. tab:: On a ROSbag
+
+            Run:
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup multi_hawk_example.launch.py \
+                ess_engine_file_path:=./models/ess.engine \
+                ess_light_engine_file_path:=./models/light_ess.engine \
+                from_bag:=True bag_path:=$DATASET_PATH
+
+        .. tab:: Live from a sensor
+
+            Run:
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup multi_hawk_example.launch.py \
+                ess_engine_file_path:=./models/ess.engine \
+                ess_light_engine_file_path:=./models/light_ess.engine
+
+    .. todo::
+
+        Need to add specifics for running on multi-hawk r2b.
+
+    .. note::
+
+        Note that the default settings for the multi-hawk example run the ESS on the front
+        camera at 30Hz and ESS light at 15Hz on the side cameras (it's for this reason that
+        specification of both models is required).
+
+        The configuration of the multi-camera system is controlled by a series flags.
+        For example the default configuration is
+
+        .. code:: bash
+
+            camera_list:=front_stereo_camera,left_stereo_camera,right_stereo_camera \
+            hawk_module_id_list:=5,7,2 \
+            run_ess_light_list:=False,True,True \
+            ess_throttler_skip_list:=0,1,1 \
+
+        Entries in these list parameters correspond to one another. For example above
+        the right hawk camera (namespace ``right_stereo_camera``) has module ID 7, 
+        will run Light ESS (it's entry in ``run_ess_light_list`` is ``True``), and will
+        skip 1 frame before running ESS inference on 1 frame, leading to 15Hz output.
+
+        These parameters can be changes to change the configuration of the multi-hawk
+        system. For example passing ``run_ess_light_list:=True,True,True`` and 
+        ``ess_throttler_skip_list:=0,0,0`` will run all cameras through the Light
+        ESS model, with no throttling (30Hz per hawk stereo camera).
+
+    .. note::
+
+        One should be mindful of the performance limits of the computer the system is
+        running on. For example running the full ESS model at 30Hz on 3 cameras, on
+        a Jetson platform is likely hit performance limits and incur frame-rate
+        limitations.
+
+
+Recording Data on Carter
+------------------------
+
+To generate ROSbags to run on the system we use ``isaac_ros_data_recorder``.
+
+.. todo::
+
+    We need links to the the ``isaac_ros_data_recorder`` documentation above when it exists.
+
+1. To generate the required data for nvblox Multi hawk reconstruction we run:
+
+    .. code::
+
+        ros2 launch isaac_ros_data_recorder data_recorder.launch.py \
+            front_stereo_camera:=True \
+            left_stereo_camera:=True \
+            right_stereo_camera:=True \
+            back_stereo_camera:=False \
+            front_fisheye_camera:=False \
+            back_fisheye_camera:=False \
+            left_fisheye_camera:=False \
+            right_fisheye_camera:=False \
+            front_2d_lidar:=False \
+            back_2d_lidar:=False \
+            front_3d_lidar:=False \
+            front_stereo_imu:=False
+    
+    This runs the recorder configured to capture front, left, and right hawk cameras on
+    Carter, no LiDAR data (2D or 3D), and no IMU.
+
+2. The resulting data can be used to generate a reconstruction using the
+   `Single Hawk Example <#single-hawk-example>`_ or the `Multi Hawk Example <#multi-hawk-example>`_
+   described above.
+
+    .. todo::
+
+        Right now this is configured for 3 cams. No LiDAR (3D or 2D) and no IMU.
+        I don't think we want IMU for cuVSLAM. I also don't thing recording 4 cams
+        works at sufficient quality. Let's check before release.
+
+
+Reconstruction With Humans
+--------------------------
+
+.. .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_nvblox_humans.gif>`
+..     :width: 600px
+..     :align: center
+
+.. todo::
+
+    GIF needed.
+
+This tutorial demonstrates how to perform dynamic human
+reconstruction in nvblox using the Hawk camera. For more information on how
+human reconstruction works, see
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+.. note::
+
+   If you are on a desktop machine, we recommend using the
+   ``PeopleSemSegNet``.
+   On Jetson platforms we recommend the lighter ``PeopleSemSegNet ShuffleSeg``
+   model that is provided in :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`
+   for better segmentation performance.
+
+1. Below we provide run instructions for both the full and light segmentation models (``PeopleSemSegNet`` and ``SuffleSeg``)
+   respectively, running from both a ROSbag and live from a Hawk camera.
+
+    .. tabs::
+
+        .. tab:: PeopleSemSegNet (ROSbag)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                run_segmentation:=True \
+                ess_light_engine_file_path:=./models/light_ess.engine \
+                from_bag:=True bag_path:=$DATASET_PATH
+
+
+        .. tab:: ShuffleSeg (ROSbag)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                run_segmentation:=True \
+                ess_light_engine_file_path:=./models/light_ess.engine \
+                segmentation_model_repository_paths:="['/workspaces/isaac_ros-dev/models']" \
+                segmentation_model_name:=peoplesemsegnet_shuffleseg \
+                segmentation_input_binding_names:="['input_2:0']" \
+                from_bag:=True bag_path:=$DATASET_PATH
+
+
+        .. tab:: PeopleSemSegNet (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                ess_light_engine_file_path:=./models/light_ess.engine \
+                run_segmentation:=True 
+
+        .. tab:: ShuffleSeg (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                run_segmentation:=True \
+                ess_light_engine_file_path:=./models/light_ess.engine \
+                segmentation_model_repository_paths:="['/workspaces/isaac_ros-dev/models']" \
+                segmentation_model_name:=peoplesemsegnet_shuffleseg \
+                segmentation_input_binding_names:="['input_2:0']"
+
+
+Reconstruction With Dynamic elements
+------------------------------------
+
+.. .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_dynamic_example.gif>`
+..     :width: 600px
+..     :align: center
+
+.. todo::
+
+    GIF needed.
+
+This tutorial demonstrates how build a reconstruction with dynamic elements in the scene (human and non-human)
+using Hawk data. For more information about how dynamic reconstruction works in nvblox see
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+1. Below we provide run instructions for running from both a ROSbag and live from a Hawk camera.
+
+    .. tabs::
+
+        .. tab:: On a ROSbag
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                run_dynamics:=True \
+                ess_light_engine_file_path:=./models/light_ess.engine \
+                from_bag:=True bag_path:=$DATASET_PATH
+
+
+        .. tab:: Live from a sensor
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup hawk_example.launch.py \
+                run_dynamics:=True \
+                ess_light_engine_file_path:=./models/light_ess.engine

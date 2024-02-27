@@ -1,0 +1,80 @@
+Visualizing in Foxglove
+========================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/nvblox_hawk_foxglove_example.gif>`
+    :width: 600px
+    :align: center
+
+
+The ``isaac_ros_nvblox`` package includes a custom plugin for visualization in 
+`Foxglove Studio <https://github.com/foxglove/studio>`__.
+
+
+Installation
+------------
+
+There are two ways to install the nvblox foxglove extension. From source and via the extension marketplace.
+
+.. tabs::
+
+    .. tab:: From source
+
+        This extension uses the `npm` package manager to install dependencies and run
+        build scripts.
+
+        .. note::
+            
+            This extension is known to work with node versions `v10.2.3` and `v20.10.0`. Other
+            (particularly older) versions fail during the installation steps. To update node
+            run, we recommend using `nvm`, to upgrade node.
+
+            .. code:: bash
+
+                curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+                bash
+                nvm install 20.10.0
+                nvm use 20.10.0
+
+        From the `nvblox_foxglove` folder, install extension dependencies by running:
+
+        .. code:: bash
+
+            npm install
+
+        From the `nvblox_foxglove` folder, build and install the extension into your
+        local Foxglove Studio desktop app, run:
+
+        .. code:: bash
+
+            npm run local-install
+
+        To test the extensions open the `Foxglove Studio` desktop or `ctrl-R` to refresh if it is already
+        open.
+
+    .. tab:: From the extension marketplace
+
+        This is not yet done.
+
+.. todo::
+
+    Installation from the marketplace
+
+
+Visualizing Single Hawk Example
+-------------------------------
+
+We include a config for visualizing the results of the nvblox reconstruction for the Single Hawk Example
+described :doc:`Hawk Stereo Camera Examples </concepts/scene_reconstruction/nvblox/tutorials/tutorial_hawk>`.
+
+To visualize in Foxglove Studio
+
+1. Open Foxglove Studio.
+
+2. Click "Open Connection", either leaving `localhost` in the box, or entering the IP of the computer
+   on which nvblox is running.
+
+3. Open our custom config by clicking on the foxglove logo on the top left of the window, then "View",
+   then "Import layout from file", then navigating to our layout file at
+   ``isaac_ros_nvblox/nvblox_examples/nvblox_examples_bringup/config/visualization/hawk_example_foxglove.json``.
+
+The mesh should appear in the foxglove window.

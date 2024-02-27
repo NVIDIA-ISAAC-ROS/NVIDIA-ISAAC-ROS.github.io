@@ -1,0 +1,38 @@
+Tutorial With Hawk
+=======================
+
+This tutorial demonstrates how to perform depth-camera based
+reconstruction using a
+:ir_repo:`Hawk camera <isaac_ros_argus_camera>` and
+:ir_repo:`disparity_node <isaac_ros_image_pipeline> <isaac_ros_stereo_image_proc/src/disparity_node.cpp>`.
+
+
+1.  Complete the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`.
+
+2.  Open a new terminal and launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+3. Inside the container, install ``isaac_ros_stereo_image_proc``
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-stereo-image-proc
+
+4.  Run the launch file, which launches the example, and wait for 10 seconds.
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_stereo_image_proc isaac_ros_stereo_image_pipeline_hawk.launch.py
+
+5. Observe point cloud output ``/points2`` on a
+   separate terminal with the command:
+
+   .. code:: bash
+
+      ros2 topic echo /points2
