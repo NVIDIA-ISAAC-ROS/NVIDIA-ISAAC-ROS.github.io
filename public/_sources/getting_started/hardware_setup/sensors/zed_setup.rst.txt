@@ -66,7 +66,15 @@ Setup Instructions
     touch .isaac_ros_common-config && \
     echo CONFIG_IMAGE_KEY=ros2_humble.user.zed >> .isaac_ros_common-config
 
-5. Launch the Docker container.
+5. Zed DEPTH modules are downnloaded at runtime. The solution is to cache them on the local system. To create the mount add an entry to the ``.isaac_ros_dev-dockerargs`` file in the ``isaac_ros_common/scripts`` directory:
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts && \
+    touch .isaac_ros_dev-dockerargs && \
+    echo "-v /usr/local/zed/resources:/usr/local/zed/resources" >> .isaac_ros_dev-dockerargs
+
+6. Launch the Docker container.
 
   .. code:: bash
 
@@ -75,7 +83,7 @@ Setup Instructions
 
   This rebuilds the container image using ``Dockerfile.zed`` in one of its layered stage. It takes some time for rebuilding.
 
-6. After the container image is rebuilt and you are inside the container, you can run ``/usr/local/zed/tools/ZED_Explorer`` to check that the ZED camera is connected.
+7. After the container image is rebuilt and you are inside the container, you can run ``/usr/local/zed/tools/ZED_Explorer`` to check that the ZED camera is connected.
 
   .. code:: bash
 
