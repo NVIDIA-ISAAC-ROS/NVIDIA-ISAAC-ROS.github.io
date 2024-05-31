@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-ROS 2 packages based on NVIDIA ``libArgus`` library for hardware-accelerated CSI camera support.
+ROS 2 packages based on NVIDIA ``libArgus`` library for NVIDIA-accelerated CSI camera support.
 
 .. raw:: html
 
@@ -39,7 +40,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS Argus Camera

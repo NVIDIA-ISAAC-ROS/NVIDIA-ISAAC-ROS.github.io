@@ -1,6 +1,9 @@
 cuVSLAM
 =======
 
+cuVSLAM is a GPU-accelerated library for stereo-visual-inertial SLAM
+and odometry.
+
 All SLAM-related operations work in parallel to visual odometry in a
 separate thread. Input images get copied into GPU and then cuVSLAM
 starts tracking.
@@ -30,12 +33,16 @@ several landmarks, it determines their position from the data structure.
 At the moment of recognition, a connection is added to the PoseGraph, which makes a
 loop from the free trail of the poses. This event is called a 'loop
 closure'. Immediately after that, cuVSLAM performs a graph optimization
-that leads to the correction of the current odometric pose and all
+that leads to the correction of the current odometry pose and all
 previous poses in the graph.
 
 The procedure for adding landmarks is designed such that if a landmark is not
 in the expected location, then it is marked for eventual deletion. This allows
 you to use cuVSLAM over a changing terrain.
+
+cuVSLAM does not just work with a single stereo camera. It is possible to use
+up to 32 cameras (=16 stereo cameras) as input. Using multiple cameras can
+significantly increase robustness, especially in featureless environments.
 
 Along with visual data, cuVSLAM can use Inertial Measurement Unit (IMU)
 measurements. It automatically switches to IMU when VO is unable to
@@ -45,8 +52,8 @@ significant performance improvement in poor visual conditions.
 
 For severe degradation of image input (such as lights being turned off,
 dramatic motion blur on a bump while driving), you can explore the
-following motion estimation algorithms
-to ensure acceptable quality for pose tracking:
+following motion estimation algorithms to ensure acceptable quality
+for pose tracking:
 
 -  The IMU readings integrator provides acceptable pose tracking quality
    for about ~< 1 seconds.
@@ -61,22 +68,21 @@ List of Useful Visualizations
 
 -  ``visual_slam/vis/observations_cloud`` - Point cloud for 2D Features
 -  ``visual_slam/vis/landmarks_cloud`` - All mapped landmarks
--  ``visual_slam/vis/loop_closure_cloud`` - Landmarks visible in last
-   loop closure
+-  ``visual_slam/vis/loop_closure_cloud`` - Landmarks visible in last loop closure
 -  ``visual_slam/vis/pose_graph_nodes`` - Pose graph nodes
 -  ``visual_slam/vis/pose_graph_edges`` - Pose graph edges
 
-Saving the Map
---------------
+Saving a Map
+------------
 
-Optimally, save the stored landmarks and pose graph in
+Optionally, save the stored landmarks and pose graph in
 a map using the ROS 2 ``SaveMap`` action that saves the map to the disk.
 
-Loading and Localization in the Map
------------------------------------
+Loading and Localizing in a Map
+-------------------------------
 
 After the map has been saved to the disk, it can be used to
-localize the robot. To load the map into the memory, we have made a ROS
+localize the robot. To load the map into the memory, you can use the ROS
 2 action called ``LoadMapAndLocalize``. It requires a map file path and
 a prior pose, which is an initial guess of where the robot is in the
 map. Given the prior pose and current set of camera frames, cuVSLAM
@@ -93,26 +99,25 @@ Coordinate Frames
 -----------------
 
 This section describes the coordinate frames that are involved in the
-``VisualSlamNode``. The frames discussed below are oriented as follows:
+``VisualSlamNode``:
 
+1. ``base_frame``: The base frame of the robot or camera rig. It is assumed that
+   all cameras are rigidly mounted to this frame, such that the transforms between
+   the ``base_frame`` and the ``camera_optical_frames`` can assumed to be static.
+   The estimated odometry and SLAM pose will represent the pose of this frame.
 
-1. ``input_base_frame``: The name of the frame used to calculate
-   transformation between base link and left camera. The default value is
-   empty (''), which means the value of ``base_frame_`` will be used. If
-   ``input_base_frame_`` and ``base_frame_`` are both empty, the left
-   camera is assumed to be in the robot's center.
-2. ``input_left_camera_frame``: The frame associated with left eye of
-   the stereo camera. Note that this is not the same as the optical
-   frame. The default value is empty (''), which means the left camera
-   is in the robot's center and ``left_pose_right`` will be calculated
-   from the CameraInfo message.
-3. ``input_right_camera_frame``: The frame associated with the right eye
-   of the stereo camera. Note that this is not the same as the optical
-   frame. The default value is empty (''), which means left and right
-   cameras have identity rotation and are horizontally aligned, so
-   ``left_pose_right`` will be calculated from CameraInfo.
-4. ``input_imu_frame``: The frame associated with the IMU sensor (if
-   available). It is used to calculate ``left_pose_imu``.
+2. ``map_frame``: The frame corresponding to the origin of the map that cuVSLAM
+   creates or localizes in. The SLAM pose reported by cuVSLAM corresponds with
+   the transform ``map_frame`` -> ``base_frame``.
+
+3. ``odom_frame``: The frame corresponding to the origin of the odometry that
+   cuVSLAM estimates. The odometry pose reported by cuVSLAM corresponds with the
+   transform ``odom_frame`` -> ``base_frame``.
+
+4. ``camera_optical_frames``: The frames corresponding to the optical center of
+   every camera. The frame is expected to lie at the center of the camera lens
+   and oriented with the z-axis pointing in the view direction and the y-axis
+   pointing to the floor.
 
 Repositories and Packages
 -------------------------
@@ -120,3 +125,18 @@ Repositories and Packages
 The Isaac ROS implementations of this technology are available here:
 
 * :doc:`Isaac ROS Visual SLAM </repositories_and_packages/isaac_ros_visual_slam/index>`
+
+
+Examples
+---------
+
+To get started with cuVSLAM, review the following examples:
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+
+   tutorial_isaac_sim
+   tutorial_realsense
+   tutorial_hawk
+   tutorial_multi_hawk

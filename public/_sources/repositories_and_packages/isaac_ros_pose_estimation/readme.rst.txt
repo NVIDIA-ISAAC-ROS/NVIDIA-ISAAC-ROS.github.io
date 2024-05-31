@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-Deep learned, hardware-accelerated 3D object pose estimation
+Deep learned, NVIDIA-accelerated 3D object pose estimation
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_pose_estimation/dope_objects.png>`
    :align: center
@@ -42,7 +43,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS Pose Estimation

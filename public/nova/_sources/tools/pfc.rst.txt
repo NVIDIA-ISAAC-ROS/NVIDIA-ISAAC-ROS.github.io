@@ -1,0 +1,76 @@
+======================
+Nova Preflight Checker
+======================
+
+After installing :doc:`Nova Init </nova_init/index>` on your platform, run the Nova Preflight Checker by executing this
+command from any folder:
+
+.. code-block:: bash
+
+    $ nova_preflight_checker -v
+    ================================================================================== test session starts ==================================================================================
+    platform linux -- Python 3.8.10, pytest-7.4.2, pluggy-1.3.0 -- /opt/nvidia/nova/nova-init-py/venv/bin/python3
+    cachedir: .pytest_cache
+    rootdir: /opt/nvidia/nova/nova-init-py
+    configfile: pyproject.toml
+    collected 68 items
+
+    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_dev[/dev/ptp0] PASSED                                                                     [  1%]
+    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_dev[/dev/nvpps0] PASSED                                                                   [  2%]
+    ...
+    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::TestHawkEeprom::test_img_size[left_stereo_camera-right_cam_intr] PASSED                                   [ 75%]
+    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::TestHawkEeprom::test_gravity_acceleration[left_stereo_camera] PASSED                                      [ 76%]
+    ...
+    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_phc2sys_frequency PASSED                                                                             [ 98%]
+    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_calibration_host PASSED                                                                              [100%]
+
+    ================================================================================== 68 passed in 24.24s ==================================================================================
+    ```
+
+If errors appear, we recommended that you check the relevant system on Nova Orin. Below is an
+example:
+
+.. code-block:: shell
+    :class: no-copybutton
+
+    ================================================================================== test session starts ==================================================================================
+    platform linux -- Python 3.8.10, pytest-7.4.0, pluggy-1.3.0
+    rootdir: /opt/nvidia/nova/nova-init-py
+    configfile: pyproject.toml
+    collected 68 items
+
+    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py .....F...........F..................................................                                       [100%]
+
+    ======================================================================================= FAILURES ========================================================================================
+    _____________________________________________________________________________ test_filesystem_camera[owl-4] _____________________________________________________________________________
+
+    camera = <CameraType.OWL: 2>, exp_cams = 4
+
+        @pytest.mark.parametrize("camera,exp_cams", FS_CAMERA_PARAMS, ids=reduceidfn)
+        def test_filesystem_camera(camera, exp_cams):
+            assert camera in FS_CAMERA_MAP, "Camera not mapped with pattern."
+            pattern, feeds_per_cam = FS_CAMERA_MAP[camera]
+            devices = get_matched_camera_devices(pattern)
+            assert len(devices) % feeds_per_cam == 0, \
+                f"Number of devices isn't a multiple of the expected number of feeds " + \
+                f"on a camera {feeds_per_cam}. Found {len(devices)} devices."
+    >       assert len(devices) / feeds_per_cam == exp_cams, f"Not enough cameras. Found {len(devices)}"
+    E       AssertionError: Not enough cameras. Found 0
+
+    /opt/nvidia/nova/nova-init-py/nova_init/tests/filesystem.py:164: AssertionError
+
+    ...
+
+    ================================================================================ short test summary info ================================================================================
+    FAILED ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_camera[owl-4] - AssertionError: Not enough cameras. Found 0
+    FAILED ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_service[nova-carter-led-{exited-dead}-enabled] - AssertionError: Service not in expected state (EXITED,DEAD). Found FAILED.
+    ============================================================================= 2 failed, 66 passed in 25.03s =============================================================================
+    ERROR: /usr/bin/nova_preflight_checker:39 ('sudo -E env PATH=$PATH pytest $test_file $@' exited with code 1)
+
+In this case two tests failed, a filesystem check for the Owl cameras and a service status check.
+The Owl test expects 4 Owls (specified by ``owl-4``) and the service failure expects the
+``nova-carter-led`` service to be ``dead`` or ``exited`` and ``enabled``. The Owls can be debugged by
+checking that they're connected and undamaged. The service can be debugged by determining why it failed
+with ``systemctl status nova-carter-led``.
+
+After installing ``nova-orin-init``, source code for the Nova Preflight Checker can be found at: ``/opt/nvidia/nova/python/nova-init-py/nova_init/tests/``.

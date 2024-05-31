@@ -7,63 +7,199 @@
 Quickstart
 ----------
 
-1. Set up your development environment by following the instructions
-   :doc:`here </getting_started/dev_env_setup>`.
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    .. code:: bash
+.. include:: /_snippets/set_up_dev_env.rst
 
-       cd ${ISAAC_ROS_WS}/src
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    .. code:: bash
+1. Download quickstart data from NGC:
 
-       git clone :ir_clone:`<isaac_ros_common>`
+   :ir_assets:`<isaac_ros_detectnet> <quickstart.tar.gz>`
 
-   .. code:: bash
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
 
-      git clone :ir_clone:`<isaac_ros_object_detection>`
+.. tabs::
 
-3. Pull down a ROS Bag of sample data:
+   .. tab:: Binary Package
 
-   .. code:: bash
+      1. Launch the Docker container using the ``run_dev.sh`` script:
 
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_object_detection/isaac_ros_detectnet && \
-        git lfs pull -X "" -I "resources/rosbags"
+         .. code:: bash
 
-4. Launch the Docker container using the ``run_dev.sh`` script:
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-detectnet ros-humble-isaac-ros-dnn-image-encoder ros-humble-isaac-ros-triton
+   
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_object_detection>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_object_detection --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_detectnet
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Docker container, run the quickstart setup script which will download the `PeopleNet Model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__ from NVIDIA GPU Cloud(NGC)
+
+         .. code:: bash
+
+            ros2 run isaac_ros_detectnet setup_model.sh --height 632 --width 1200 --config-file quickstart_config.pbtxt
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=detectnet interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_detectnet/quickstart_interface_specs.json 
+
+      #. Open a new terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_detectnet/rosbags/detectnet_rosbag --remap image:=image_rect camera_info:=camera_info_rect
+
+   .. tab:: RealSense Camera
+
+      #. Continuing inside the Docker container, run the quickstart setup script which will download the `PeopleNet Model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__ from NVIDIA GPU Cloud(NGC)
+
+         .. code:: bash
+
+            ros2 run isaac_ros_detectnet setup_model.sh --height 480 --width 640 --config-file realsense_config.pbtxt
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,detectnet
+
+   .. tab:: Hawk Camera
+
+      #. Continuing inside the Docker container, run the quickstart setup script which will download the `PeopleNet Model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__ from NVIDIA GPU Cloud(NGC)
+
+         .. code:: bash
+
+            ros2 run isaac_ros_detectnet setup_model.sh --height 1200 --width 1920 --config-file hawk_config.pbtxt   
+         
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+      #. Run the following launch file to spin up a demo of this package using a Hawk camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,rectify_mono,detectnet
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+1. Open a new terminal and run the ``isaac_ros_detectnet_visualizer``:
 
    .. code:: bash
 
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh
-
-5. Install this package's dependencies.
-
-   :ir_apt:
+      ./scripts/run_dev.sh
 
    .. code:: bash
 
-      sudo apt-get install -y ros-humble-isaac-ros-detectnet ros-humble-isaac-ros-triton ros-humble-isaac-ros-dnn-image-encoder
+      cd ${ISAAC_ROS_WS} && \
+      source install/setup.bash && \
+      ros2 run isaac_ros_detectnet isaac_ros_detectnet_visualizer.py --ros-args --remap image:=image_rect
 
-6. Run the quickstart setup script which will download the `PeopleNet
-   Model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__
-   from NVIDIA GPU Cloud(NGC)
-
-   .. code:: bash
-
-      cd /workspaces/isaac_ros-dev/src/isaac_ros_object_detection/isaac_ros_detectnet && \
-        ./scripts/setup_model.sh --height 632 --width 1200 --config-file resources/quickstart_config.pbtxt
-
-7. Run the following launch file to spin up a demo of this package:
+2. Open a new terminal and run ``rqt_image_view`` to visualize the output:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        ros2 launch isaac_ros_detectnet isaac_ros_detectnet_quickstart.launch.py
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh
 
-8. Visualize and validate the output of the package in the
-   ``rqt_image_view`` window. After about a minute, your output should
-   look like this:
+   .. code:: bash
+
+      ros2 run rqt_image_view rqt_image_view /detectnet_processed_image
+   
+3. You should see an output as shown below:
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_object_detection/isaac_ros_detectnet/rqt_visualizer.png>`
       :alt: RQT showing detection of people

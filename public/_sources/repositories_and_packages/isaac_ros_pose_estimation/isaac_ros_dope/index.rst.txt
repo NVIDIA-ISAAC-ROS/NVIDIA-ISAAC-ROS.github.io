@@ -7,177 +7,228 @@
 Quickstart
 ----------
 
-
 .. warning::
 
-   Step 7 must be performed on ``x86_64``. The resultant
-   model should be copied over to the ``Jetson``. Also note that the
-   process of model preparation differs significantly from the other
-   repositories.
+   This package requires a model preparation process that differs significantly from those of other Isaac ROS packages.
+   Running this quickstart requires a conversion step that must be performed on an ``x86_64`` system. 
+   It is not possible to complete this tutorial using only a Jetson device.
 
-1.  Set up your development environment by following the instructions :doc:`here </getting_started/dev_env_setup>`
+   To run on Jetson, first complete the tutorial on ``x86_64``.
+   Then, manually copy the converted model from the ``x86_64`` host to the Jetson and repeat the tutorial on the Jetson.
 
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    .. code:: bash
+.. include:: /_snippets/set_up_dev_env.rst
 
-       cd ${ISAAC_ROS_WS}/src
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    .. code:: bash
+1. Download quickstart data from NGC:
 
-       git clone :ir_clone:`<isaac_ros_common>`
+   :ir_assets:`<isaac_ros_dope> <quickstart.tar.gz>`
 
-    .. code:: bash
+2. Download the ``Ketchup.pth`` DOPE model from the official `DOPE GitHub <https://github.com/NVlabs/Deep_Object_Pose>`__ repository's
+   model collection available `here <https://drive.google.com/open?id=1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__.
 
-       git clone :ir_clone:`<isaac_ros_pose_estimation>`
-
-3.  Pull down a ROS Bag of sample data:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_pose_estimation && \
-         git lfs pull -X "" -I "resources/rosbags/"
-
-4.  Launch the Docker container using the ``run_dev.sh`` script:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-         ./scripts/run_dev.sh
-
-5.  Install this package's dependencies.
-
-   :ir_apt:
+   Move this file to ``${ISAAC_ROS_WS}/isaac_ros_assets/models/dope``.
+   
+   For example, if the model was downloaded to ``~/Downloads``:
 
    .. code:: bash
 
-      sudo apt-get install -y ros-humble-isaac-ros-dope ros-humble-isaac-ros-tensor-rt ros-humble-isaac-ros-dnn-image-encoder
+      mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/ && \
+         mv ~/Downloads/Ketchup.pth ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope
+  
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
 
-6.  Make a directory to place models (inside the Docker container):
+.. tabs::
 
-    .. code:: bash
+   .. tab:: Binary Package
 
-       mkdir -p /tmp/models/
+      1. Launch the Docker container using the ``run_dev.sh`` script:
 
-7.  Select a DOPE model by visiting the DOPE model collection available
-    on the official `DOPE
-    GitHub <https://github.com/NVlabs/Deep_Object_Pose>`__ repository
-    `here <https://drive.google.com/open?id=1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__.
-    The model is assumed to be downloaded to ``~/Downloads`` outside the
-    Docker container.
+         .. code:: bash
 
-    This example will use ``Ketchup.pth``, which should be downloaded
-    into ``/tmp/models`` inside the Docker container:
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-dope
    
-    .. note::
+   .. tab:: Build from Source
 
-      This should be run outside the Docker container
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
 
-    On ``x86_64``:
+         .. code:: bash
 
-    .. code:: bash
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_pose_estimation>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
 
-       cd ~/Downloads && \
-       docker cp Ketchup.pth isaac_ros_dev-x86_64-container:/tmp/models
+         .. code:: bash
 
-8.  Convert the PyTorch file into an ONNX file: **Warning**: this step
-    must be performed on ``x86_64``. The resultant model will be assumed
-    to have been copied to the ``Jetson`` in the same output location
-    (``/tmp/models/Ketchup.onnx``)
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
 
-    .. code:: bash
+      3. Use ``rosdep`` to install the package's dependencies:
 
-       python3 /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_dope/scripts/dope_converter.py --format onnx --input /tmp/models/Ketchup.pth
+         :ir_apt:
 
-    If you are planning on using Jetson, copy the generated ``.onnx``
-    model into the Jetson, and then copy it over into ``aarch64`` Docker
-    container.
+         .. code:: bash
 
-    We will assume that you already performed the transfer of the model
-    onto the Jetson in the directory ``~/Downloads``.
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_pose_estimation --ignore-src -y
 
-    Enter the Docker container in Jetson:
+      4. Build the package from source:
 
-    .. code:: bash
+         .. code:: bash
 
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_dope
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+1. Continuing inside the Docker container, convert the PyTorch model (``.pth``) to a general ONNX model (``.onnx``):
+
+   .. warning::
+      
+         This step must be performed on ``x86_64``. If you intend to run the model on a Jetson,
+         you must first convert the model on an ``x86_64`` system, and then copy the output file to the 
+         corresponding location on the Jetson (``${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.onnx``)
+
+   .. code:: bash
+
+      ros2 run isaac_ros_dope dope_converter.py --format onnx \
+         --input ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.pth --output ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.onnx
+
+.. tabs::
+
+   .. group-tab:: Rosbag
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=dope interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_dope/quickstart_interface_specs.json \
+               model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.plan
+
+      #. Open a **second** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_dope/quickstart.bag
+
+   .. group-tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,dope \
+              model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.plan
+
+   .. group-tab:: Hawk Camera
+         
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+      #. Run the following launch file to spin up a demo of this package using a Hawk camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,rectify_mono,dope \
+               model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.plan
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-    Make a directory called ``/tmp/models`` in Jetson:
+2. Visualize the pose array in RViz2:
 
-    .. code:: bash
+   .. code:: bash
 
-       mkdir -p /tmp/models
+      rviz2
 
-    **Outside** the container, copy the generated ``onnx`` model:
+   Then click on the ``Add`` button, select ``By topic`` and choose
+   ``PoseArray`` under ``/poses``. Finally, change the display to show
+   an axes by updating ``Shape`` to be ``Axes``, as shown in the
+   screenshot below.
 
-    .. code:: bash
+   .. tabs::
 
-       cd ~/Downloads && \
-       docker cp Ketchup.onnx isaac_ros_dev-aarch64-container:/tmp/models
+      .. group-tab:: Rosbag
 
-9.  Run the following launch files to spin up a demo of this package:
+         Make sure to update the ``Fixed Frame`` to ``tf_camera``.
 
-    Launch ``isaac_ros_dope``:
+      .. group-tab:: RealSense Camera
 
-    .. code:: bash
+         Make sure to update the ``Fixed Frame`` to ``camera_color_optical_frame``.
 
-       ros2 launch isaac_ros_dope isaac_ros_dope_tensor_rt.launch.py model_file_path:=/tmp/models/Ketchup.onnx engine_file_path:=/tmp/models/Ketchup.plan
+      .. group-tab:: Hawk Camera
 
-    Then open **another** terminal, and enter the Docker container
-    again:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-         ./scripts/run_dev.sh
-
-    Then, play the ROS bag:
-
-    .. code:: bash
-
-       ros2 bag play -l src/isaac_ros_pose_estimation/resources/rosbags/dope_rosbag/
-
-10. Open another terminal window and attach to the same container. You
-    should be able to get the poses of the objects in the images through
-    ``ros2 topic echo``:
-
-    In a **third** terminal, enter the Docker container again:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-         ./scripts/run_dev.sh
-
-    .. code:: bash
-
-       ros2 topic echo /poses
-
-    .. note::
-
-       We are echoing ``/poses`` because we remapped the
-       original topic ``/dope/pose_array`` to ``poses`` in the launch
-       file.
-
-    Now visualize the pose array in RViz2:
-
-    .. code:: bash
-
-       rviz2
-
-    Then click on the ``Add`` button, select ``By topic`` and choose
-    ``PoseArray`` under ``/poses``. Finally, change the display to show
-    an axes by updating ``Shape`` to be ``Axes``, as shown in the
-    screenshot below. Make sure to update the ``Fixed Frame`` to
-    ``tf_camera``.
+         Make sure to update the ``Fixed Frame`` to ``left_cam``.
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/dope_rviz2.png>`
       :width: 600px
       :align: center
-
-.. note::
-
-   For best results, crop or resize input images to the same dimensions your DNN model is expecting.
 
 Try More Examples
 -----------------
@@ -192,6 +243,12 @@ To continue your exploration, check out the following suggested examples:
    Tutorial with Custom Model </concepts/pose_estimation/dope/tutorial_custom_model>
 
    Tutorial with Custom Size </concepts/pose_estimation/dope/tutorial_custom_size>
+
+   Verifying DOPE Accuracy </concepts/pose_estimation/dope/dope_verification>
+
+.. note::
+
+   For best results, always crop or resize input images to the same dimensions your DOPE model is expecting.
 
 Use Different Models
 --------------------

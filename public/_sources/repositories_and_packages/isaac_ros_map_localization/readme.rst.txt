@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-Hardware-accelerated Map localization.
+NVIDIA-accelerated Map localization.
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_map_localization/occupancy_grid_localizer.gif>`
     :width: 600px
@@ -44,7 +45,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS Map Localization

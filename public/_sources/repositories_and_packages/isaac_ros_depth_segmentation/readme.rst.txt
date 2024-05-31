@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-Hardware-accelerated packages for depth segmentation.
+NVIDIA-accelerated packages for depth segmentation.
 
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d_real_opt.gif>`
@@ -54,7 +55,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS Depth Segmentation

@@ -11,6 +11,13 @@ Overview
 
 .. include:: _snippets/overview.rst
 
+
+Performance
+-----------
+
+.. include:: _snippets/performance.rst
+
+
 Packages
 --------
 
@@ -20,66 +27,157 @@ Packages
 
     **/index
 
-
-Supported Platforms
--------------------
-
-.. include:: _snippets/supported_platforms.rst
-
-
 Quickstart
 ----------
 
-.. include:: /concepts/nitros_bridge/_snippets/setup_ros1_steps.rst
+.. note::
 
-Now, we can playback a test rosbag through the bridge. The launch file will 
-send out the images from the rosbag through the NITROS bridge from ROS 2 to 
-ROS 1, then echo back to ROS2 for visualize.
+   NITROS Bridge is functional on both x86 and Jetson platforms. However, Noetic is not supported on Ubuntu 22.04. https://www.ros.org/reps/rep-0003.html.
+ 
+   In order to leverage NITROS Bridge on ROS Noetic applications, you may consider to wrap the ROS Noetic applications
+   in a docker container with Ubuntu 20.04 or use other alternatives.
 
-#. Pull down a rosbag of sample data:
+   Here we provide an example docker file to build a docker container with ROS Noetic and NITROS Bridge on x86.
 
-   .. code:: bash
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1.  Set up your ``Noetic`` docker follow the instructions :doc:`here</concepts/nitros_bridge/setup_ros1_docker>`.
 
-      cd /workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_nitros_bridge && \ 
-        git lfs pull -X "" -I "resources/quickstart.bag"
 
+2.  Start the ``Noetic`` container with baked ``nitros-bridge-entrypoint``,
+    which will initiate the ``ros1_bridge`` and ``isaac_ros_nitros_bridge_ros1`` within the container:
 
-#. (Optional) Run tests to verify complete and correct installation:
+    .. code:: bash
 
-   .. code:: bash
+        docker run -it --cap-add=SYS_PTRACE --privileged --network host --pid host --runtime nvidia --name nitros_bridge --rm nitros_bridge:latest nitros_bridge_convert_forward.yaml nitros_bridge_convert_forward.launch
 
-      cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
-      colcon test --executor sequential --packages-skip ros1_bridge
+    .. note::
+        In order to enable the CUDA IPC for NITROS Bridge, the ``nitros-bridge-entrypoint`` will change the host ``ptrace_scope`` to ``0``.
 
-#. Run the following launch files to spin up a demo of this package:
+3. Set up your development environment by following the instructions in :doc:`getting started </getting_started/dev_env_setup>`.
 
-   .. code:: bash
-
-      cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
-      source install/setup.bash && \
-      ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_nitros_bridge.launch.py rosbag_path:=/workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_nitros_bridge/resources/quickstart.bag/ ros1_ws_path:=/workspaces/isaac_ros-dev/isaac_ros_1-dev/
-
-#. Attach another terminal to the container, visualize the output topic ``/ros2_output_image`` in RViz:
+4. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
 
    .. code:: bash
 
-      source isaac_ros-dev/install/setup.bash && \
-        rviz2
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_common>`
+
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_nitros_bridge_ros2> <quickstart.tar.gz>`
+
+
+Build ``isaac_ros_nitros_bridge_ros2``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh -a --pid=host
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-nitros-bridge-ros2
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nitros_bridge>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh -a --pid=host
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2 --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_nitros_bridge_ros2
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+         
+      1.  Run the following launch files to spin up a demo of this package:
+
+          .. code:: bash
+
+            cd /workspaces/isaac_ros-dev && \
+              source install/setup.bash && \
+              ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_nitros_bridge_quickstart.launch.py rosbag_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_nitros_bridge_ros2/quickstart.bag
+
+      2.  **Attach a second terminal** to the docker container:
+
+          .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+              ./scripts/run_dev.sh -d ${HOME}/workspaces
+
+      3.  Visualize the output topic ``/r2b/ros2_output_image`` in RViz:
+
+          .. code:: bash
+
+            cd /workspaces/isaac_ros-dev/ && \
+              source install/setup.bash && \
+              rviz2
 
 
 Try Another Example
 -------------------
 
-For an example of a more advanced setup with talkers and listeners, see :doc:`here</concepts/nitros_bridge/ros1_bridge_setup>`.
-For an example to run DNN image segmentation with NITROS bridge, see :doc:`here</concepts/nitros_bridge/unet_with_nitros_bridge>`.
+For an example to run DNN image segmentation with NITROS Bridge, see :doc:`here</concepts/nitros_bridge/unet_with_nitros_bridge>`.
 
 .. toctree::
     :hidden:
 
-    /concepts/nitros_bridge/ros1_bridge_setup.rst
+    /concepts/nitros_bridge/setup_ros1_docker.rst
     /concepts/nitros_bridge/unet_with_nitros_bridge.rst
 
-    
+
 
 Troubleshooting
 ---------------

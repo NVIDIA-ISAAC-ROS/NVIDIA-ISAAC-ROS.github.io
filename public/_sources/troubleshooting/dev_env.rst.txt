@@ -224,7 +224,7 @@ seeing topics from other machines on the network
 **Solution 1**:
 
 You can declare ``ROS_DOMAIN_ID`` on every bash instance inside the
-Issac ROS container.
+Isaac ROS container.
 
 .. code:: bash
 
@@ -296,3 +296,65 @@ Carefully recreate the customized global underlay workspace by following the ste
    && apt-get clean
 
 This process involves overriding the behavior of ``bloom-generate`` to force it to produce and install the Debian packages inline.
+
+``run_dev.sh`` fails to build image with Docker certificate errors
+------------------------------------------------------------------
+
+Symptom
+~~~~~~~
+
+Docker build fails building base image with error messages with the following form:
+
+.. code:: bash
+
+   tls: failed to verify certificate: x509: certificate has expired or is not yet valid
+
+More context:
+
+.. code:: docker
+
+   [+] Building 0.2s (2/2) FINISHED                                                                                                                                                                                 docker:default
+   => [internal] load build definition from Dockerfile.aarch64                                                                                                                                                               0.0s
+   => => transferring dockerfile: 8.45kB                                                                                                                                                                                     0.0s
+   => ERROR [internal] load metadata for nvcr.io/nvidia/nvidia-aarch64-base:ubuntu22.04                                                                                                                                     0.1s
+   ------
+   > [internal] load metadata for nvcr.io/nvidia/nvidia-aarch64-base:ubuntu22.04:
+   ------
+   Dockerfile.aarch64:11
+   --------------------
+      9 |     # Docker file for aarch64 based Jetson device
+   10 |     ARG BASE_IMAGE="nvcr.io/nvidia/nvidia-aarch64-base:ubuntu22.04"
+   11 | >>> FROM ${BASE_IMAGE}
+   12 |
+   13 |     # Store list of packages (must be first)
+   --------------------
+   ERROR: failed to solve: nvcr.io/nvidia/nvidia-aarch64-base:ubuntu22.04: failed to resolve source metadata for nvcr.io/nvidia/nvidia-aarch64-base:ubuntu22.04: failed to do request: Head "https://nvcr.io/v2/nvidia/nvidia-aarch64-base/manifests/ubuntu22.04";: tls: failed to verify certificate: x509: certificate has expired or is not yet valid: current time 1969-12-31T17:10:53-08:00 is before 2024-04-24T00:00:00Z
+   /mnt/nova_ssd/workspaces/isaac_ros-dev/src/isaac_ros_common
+
+
+Solution
+~~~~~~~~
+
+Restarting the Docker daemon should resolve the issue:
+
+.. code:: bash
+
+   sudo systemctl restart docker
+
+Failed to load a NITROS enabled nodes with intraprocess communication enabled
+-----------------------------------------------------------------------------
+
+When launching a NITROS-enabled ROS node with explicitly setting ``use_intra_process_comms`` to ``True``, the following error can be seen.
+
+Symptom
+~~~~~~~
+
+.. code:: bash
+
+   [component_container-1] [ERROR] [1715506914.017761602] [camera_1.camera_1_container]: Component constructor threw an exception: intraprocess communication allowed only with volatile durability
+   [ERROR] [launch_ros.actions.load_composable_nodes]: Failed to load node 'visual_slam_node' of type 'nvidia::isaac_ros::visual_slam::VisualSlamNode' in container '/camera_1/camera_1_container': Component constructor threw an exception: intraprocess communication allowed only with volatile durability
+
+Solution
+~~~~~~~~
+
+NITROS nodes already have intraprocess communication enabled by default, with an exception of few publishers and subscribers that does not participate in data transfer. Disabling intraprocess communication by setting the parameter to ``False`` should resolve the issue and it does not hamper the performance.

@@ -13,7 +13,7 @@ of people using images from Isaac Sim.
 Tutorial Walkthrough
 --------------------
 
-1.  Complete the :ref:`quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index:quickstart>` up until step 9.
+1.  Complete the :ref:`quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index:quickstart>` until the ``Prepare PeopleSemSegnet Model`` section.
 2.  Launch the Docker container using the ``run_dev.sh`` script:
 
     .. code:: bash
@@ -32,10 +32,7 @@ Tutorial Walkthrough
 
     .. code:: bash
 
-           ros2 launch isaac_ros_unet isaac_ros_unet_triton_isaac_sim.launch.py \
-           model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] \
-           input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] \
-           network_output_type:='argmax'
+           ros2 launch isaac_ros_unet isaac_ros_unet_tensor_rt_isaac_sim.launch.py engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegnet/deployable_quantized_vanilla_unet_v2.0/1/model.plan input_binding_names:=['input_1:0']
 
 6.  In another terminal, visualize and validate the output of the package by launching
     ``rqt_image_view``:

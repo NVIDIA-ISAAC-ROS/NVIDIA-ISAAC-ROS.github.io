@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ==========================
 |package name|
 ==========================
 
-VDA5050-compatible mission controller 
+VDA5050-compatible mission controller
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mission_client/MD.png>`
     :width: 800px
@@ -45,7 +46,13 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
-.. |package name| replace:: Isaac ROS Mission Client    
+Contributors
+------------
+
+- Add velocities to the status message [(#10)](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_mission_client/pull/10)
+  Contributors: [Burak Guler](https://github.com/gulerburak)
+
+.. |package name| replace:: Isaac ROS Mission Client

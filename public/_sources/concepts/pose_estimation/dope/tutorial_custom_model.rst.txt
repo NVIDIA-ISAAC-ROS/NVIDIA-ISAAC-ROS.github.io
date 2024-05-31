@@ -15,33 +15,40 @@ data generation (SDG).
 Tutorial Walkthrough
 --------------------
 
-1. Clone the `Isaac Sim DOPE Training
+#. Clone the `Isaac Sim DOPE Training
    repository <https://github.com/andrewyguo/dope_training#deep-object-pose-estimation-dope---training>`__
    and follow the training instructions to prepare a custom DOPE model.
-2. Using the `Isaac Sim DOPE inference
+#. Using the `Isaac Sim DOPE inference
    script <https://github.com/andrewyguo/dope_training/tree/master/inference>`__,
    test the custom DOPE model's inference capability and ensure that the
    quality is acceptable for your use case.
 
-3. Follow steps 1-5 of the main DOPE :doc:`quickstart </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`.
+#. Complete until ``Run Launch File`` of the quickstart :doc:`here </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`.
 
-4. At step 6, move the prepared ``.pth`` model output from the Isaac Sim
-   DOPE Training script into the ``/tmp/models`` path inside the Docker
+#. Move the prepared ``.pth`` model output from the Isaac Sim
+   DOPE Training script into the ``${ISAAC_ROS_WS}/isaac_ros_assets/models/dope`` path inside the Docker
    container.
-   ``bash  docker cp custom_model.pth isaac_ros_dev-x86_64-container:/tmp/models``
-5. At step 7, run the ``dope_converter.py`` script with the custom
-   model:
+
+   .. code:: bash
+      
+      docker cp custom_model.pth isaac_ros_dev-x86_64-container:${ISAAC_ROS_WS}/isaac_ros_assets/models/dope
+
+#. Continuing with the DOPE quickstart's ``Run Launch File`` section, run the ``dope_converter.py`` script with the custom
+   model instead:
 
    .. code:: bash
 
-      python3 /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_dope/scripts/dope_converter.py --format onnx --input /tmp/models/custom_model.pth
+      ros2 run isaac_ros_dope dope_converter.py --format onnx \
+         --input ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/custom_model.pth --output ${ISAAC_ROS_WS}/models/dope/custom_model.onnx
 
-6. Proceed through steps 8-9.
-7. At step 10, launch the ROS 2 launch file with the custom model:
+#. Next, launch the ROS 2 launch file with the custom model.
 
    .. code:: bash
 
-      ros2 launch isaac_ros_dope isaac_ros_dope_tensor_rt.launch.py model_file_path:=/tmp/models/custom_model.onnx engine_file_path:=/tmp/models/custom_model.plan
+      ros2 launch isaac_ros_dope isaac_ros_dope_tensor_rt.launch.py model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/custom_model.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/custom_model.plan
 
-8. Continue with the rest of the :doc:`quickstart </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`. You should now be able to
-   detect poses of custom objects.
+#. Bring up a data source containing your custom object class, such as a camera feed or a rosbag with the custom object.
+
+   The data source should publish to the ``/image`` and ``/camera_info`` topics, and it should provide the appropriate ``tf`` frame representing the optical frame of the camera.
+
+#. Continue with the rest of the quickstart. You should now be able to detect poses of custom objects.

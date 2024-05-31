@@ -2,6 +2,65 @@
 Hardware Setup
 ==============
 
+Version ``4.54.1-1jammy.20240517.191635`` for ``ros-humble-realsense2-camera`` was not found
+--------------------------------------------------------------------------------------------
+
+Symptom
+~~~~~~~
+
+When ``Dockerfile.realsense`` is added to ``.isaac_ros_common-config``, the container does not start due to the RealSense Debian not being found. 
+
+Solution
+~~~~~~~~
+
+This error is because we anchor to a specific ``ros-humble-realsense2-camera`` version but Intel deletes old Debian releases when new ones are generated. You can find the latest version for the Debian by following the steps below:
+
+1. **Remove** ``Dockerfile.realsense`` from ``.isaac_ros_common-config``
+
+2. Start the docker container by running:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+3. Run ``apt-cache policy ros-humble-realsense2-camera`` to find the latest version of the RealSense Debian. You should see the output as shown below (with a different candidate version).
+
+   .. code:: bash
+
+      ros-humble-realsense2-camera:
+      Installed: (none)
+      Candidate: 4.54.1-1jammy.20240517.191635
+      Version table:
+         4.54.1-1jammy.20240517.191635 500
+            500 http://packages.ros.org/ros2/ubuntu jammy/main amd64 Packages
+
+
+4. Update the version of the Debian being installed in ``Dockerfile.realsense`` to this new version.
+
+5. **Add** ``Dockerfile.realsense`` from ``.isaac_ros_common-config`` following the steps in the RealSense setup guide.
+
+RealSense camera not found
+--------------------------
+
+Symptom
+~~~~~~~
+
+No RealSense cameras detected when running `realsense-viewer` or `ros2 launch realsense2_camera rs_launch.py`
+
+Solution
+~~~~~~~~
+
+Ensure that you follow the :doc:`cameras </getting_started/hardware_setup/sensors/realsense_setup>` to install the correct versions for both `librealsense` and `realsense2_camera` as mentioned in the doc.
+
+To confirm this, run `ros2 launch realsense2_camera rs_launch.py` inside the docker container. You should see the following:
+
+.. code:: bash
+
+   [realsense2_camera_node-1] [INFO] [1715878272.636553721] [camera.camera]: RealSense ROS v4.54.1
+   [realsense2_camera_node-1] [INFO] [1715878272.636742684] [camera.camera]: Built with LibRealSense v2.55.1
+   [realsense2_camera_node-1] [INFO] [1715878272.636772605] [camera.camera]: Running with LibRealSense v2.55.1
+
 RealSense Driver Does Not Work with ROS 2 Humble
 ------------------------------------------------
 
@@ -342,3 +401,5 @@ If that is the case, you need to issue this command:
 .. code:: bash
 
    ros2 param set /camera/camera depth_module.enable_auto_exposure true
+
+.. include:: /../shared/_snippets/troubleshooting/jetson_recovery_mode.rst

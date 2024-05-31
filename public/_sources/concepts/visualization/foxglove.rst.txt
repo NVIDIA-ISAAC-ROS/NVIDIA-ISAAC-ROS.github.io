@@ -1,0 +1,111 @@
+Foxglove Visualization
+----------------------
+
+`Foxglove <https://foxglove.dev/>`_ is a popular framework to visualize ROS
+running applications similar to `Rviz <https://github.com/ros2/rviz>`_. It
+provides a web-based visualization client and a desktop app.
+
+Many Isaac ROS tutorials use Foxglove for the visualization.
+
+
+.. _foxglove-setup:
+
+Foxglove Setup
+--------------
+
+Use the following steps to visualize a ROS application in Foxglove.
+
+1. On your visualization computer install
+   `Foxglove Studio <https://foxglove.dev/download>`_ and launch it:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_studio.png>`
+    :width: 800px
+    :alt: foxglove_studio
+    :align: center
+
+2. Click on the `Open connection` button. If you are running the ROS application
+   on a different machine than the one that is running Foxglove you'll have to
+   adjust the `Websocket URL`. In that case, replace ``localhost`` with the IP of
+   the ROS machine.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_connect.png>`
+    :width: 800px
+    :alt: foxglove_connect
+    :align: center
+
+3. You can now add a 3D panel and select which topics should be visualized in the left bar.
+
+4. Some tutorials also provide a pre-configured Foxglove layout in the form of a
+   JSON file. To use those make sure you have the repository containing the
+   tutorial cloned on your visualization machine. Import the layout file by
+   clicking on the ``Import from file...`` in the ``layout`` drop-down menu and
+   choosing the layout file from the correct folder.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_import_layout.png>`
+    :width: 800px
+    :alt: foxglove_import_layout
+    :align: center
+
+
+.. _nvblox-foxglove-ext:
+
+Installing Additional Extensions
+--------------------------------
+Some visualizations require additional extensions. You can install those
+extensions by clicking on the user icon in the top right corner and then opening
+the extensions menu. There you will find a list of all available extensions. An
+extension can be installed by clicking on it and pressing the install button.
+
+We provide the following extensions:
+
+- `Nvblox Foxglove`: Allows to visualize nvblox meshes in Foxglove.
+
+Rosbag Visualization
+--------------------
+
+To visualize a rosbag, images need to be converted from
+`sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__ to
+`foxglove_msgs/msg/CompressedVideo <https://github.com/foxglove/schemas/blob/main/ros_foxglove_msgs/ros2/CompressedVideo.msg>`__.
+
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+3. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh
+
+4. Install the prebuilt Debian package:
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-data-replayer
+
+5. Convert the rosbag.
+
+   .. code-block:: bash
+
+      ros2 run isaac_ros_data_replayer foxglove_converter.py <input> <output>
+
+6. Launch Foxglove Studio and click on the `Open local file` button.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_studio.png>`
+    :width: 800px
+    :alt: foxglove_studio
+    :align: center
+
+7. Navigate to the converted rosbag and select the MCAP file to visualize it in Foxglove.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_rosbag.png>`
+    :width: 800px
+    :alt: foxglove_rosbag
+    :align: center

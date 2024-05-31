@@ -1,0 +1,100 @@
+Tutorial: Recording and Playing Back Data for `Isaac Perceptor`
+===============================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_perceptor/perceptor_in_zanker.gif>`
+    :width: 600px
+    :align: center
+
+    Perceptor running on data recorded on `Nova Carter` operating in a warehouse.
+
+
+This tutorial will guide you through the steps to record and playback data for `Isaac Perceptor`.
+
+    .. note::
+
+        You need to run on a hardware platform equipped with `Nova Orin Developer Kit` to record data
+        compatible with `Isaac Perceptor`.
+
+
+Recording Data for `Isaac Perceptor`
+------------------------------------
+
+To record data for use in the `Running from a ROSbag` tutorial below, we use
+the :doc:`isaac_ros_data_recorder </repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index>`.
+which is part of :ir_repo:`Isaac ROS Nova <isaac_ros_nova>` repository.
+To generate the required data, do the following:
+
+1. Follow the installation instructions in
+:ref:`Isaac ROS Data Recorder Quickstart <repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index:quickstart>`.
+
+2. Substitute the first step, "Start data recording", in
+:ref:`Isaac ROS Data Recorder Launch <isaac-ros-data-recorder-launch>`.
+with the following command
+(this configures the recorder to record only the front, left, and right hawk stereo cameras):
+
+    .. code:: bash
+
+        ros2 launch isaac_ros_data_recorder data_recorder.launch.py config:=${ISAAC_ROS_WS:?}/src/isaac_ros_nova/isaac_ros_data_recorder/config/hawk-3.yaml
+
+3. Once you have completed recording, finish data recording with `ctrl+c` in the terminal.
+
+The resulting data by default is saved under ``/mnt/nova_ssd/recordings``. It can be used to
+generate a reconstruction using the `Running from a ROSbag` tutorial described below.
+
+
+Running from a ROSbag
+---------------------
+
+Downloading Pre-recorded Data (Optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You can run `Isaac Perceptor` on the a pre-recorded ROSbag from `Nova Carter`.
+
+1. Download ``r2b_galileo`` dataset from the :ir_ngc:`r2b 2024 dataset on NGC <teams/isaac/resources/r2bdataset2024>`.
+
+2. Place the dataset at ``$ISAAC_ROS_WS/isaac_ros_assets/r2b_2024/r2b_galileo``.
+
+Launching `Isaac Perceptor`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+
+    You should have completed either
+    :doc:`Tutorial: Running Camera-based 3D Perception with Isaac Perceptor on Nova Orin Developer Kit</reference_workflows/isaac_perceptor/tutorials_on_devkit/demo_perceptor>`
+    or
+    :doc:`Tutorial: Running Camera-based 3D Perception with Isaac Perceptor on Nova Carter</reference_workflows/isaac_perceptor/tutorials_on_carter/demo_perceptor>`. 
+    You will have set up the prerequisites, launched `Isaac Perceptor` application,
+    and obtained object detection and visual odometry visualizations.
+
+If you want to run the `Isaac Perceptor` from a ROSbag (rather than streaming from sensors),
+you may use the ``rosbag`` argument.
+
+If your ROSbag is recorded on `Nova Orin Developer Kit`, you can launch the app as,
+
+.. code:: bash
+
+    ros2 launch nova_developer_kit_bringup perceptor.launch.py mode:=rosbag rosbag:=<YOUR_ROSBAG_PATH>
+
+If your ROSbag is recorded on `Nova Carter`, you can launch the app as,
+
+.. code:: bash
+
+    ros2 launch nova_carter_bringup perceptor.launch.py mode:=rosbag rosbag:=<YOUR_ROSBAG_PATH>
+
+If you are using the pre-recorded ROSbag, you can run:
+
+.. code:: bash
+
+    ros2 launch nova_carter_bringup perceptor.launch.py \
+        stereo_camera_configuration:=front_left_right_configuration \
+        mode:=rosbag \
+        rosbag:=$ISAAC_ROS_WS/isaac_ros_assets/r2b_2024/r2b_galileo
+
+
+Visualizing the Outputs
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Proceed to the Foxglove studio to visualize sensor outputs and mesh of surround environments.
+If your ROSbag is recorded on `Nova Orin Developer Kit`, please follow similar steps in
+:ref:`Visualizing the Outputs from Isaac Perceptor on Nova Orin Developer Kit <reference_workflows/isaac_perceptor/tutorials_on_devkit/demo_perceptor:Visualizing the Outputs>`.
+If your ROSbag is recorded on `Nova Carter`, please follow
+:ref:`Visualizing the Outputs from Isaac Perceptor on Nova Carter <reference_workflows/isaac_perceptor/tutorials_on_carter/demo_perceptor:Visualizing the Outputs>`.

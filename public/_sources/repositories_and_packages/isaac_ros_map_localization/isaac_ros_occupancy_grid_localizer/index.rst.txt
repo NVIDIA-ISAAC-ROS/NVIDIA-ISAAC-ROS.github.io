@@ -7,50 +7,93 @@
 Quickstart
 ----------
 
-1.  Set up your development environment by following :doc:`these instructions </getting_started/dev_env_setup>`.
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_occupancy_grid_localizer> <quickstart.tar.gz>`
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-occupancy-grid-localizer
+   
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_map_localization>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_map_localization --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_occupancy_grid_localizer
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+1.  Continuing inside the Docker container, ``rviz2``:
 
     .. code:: bash
 
-       cd ${ISAAC_ROS_WS}/src
+       rviz2 -d  $(ros2 pkg prefix isaac_ros_occupancy_grid_localizer --share)/rviz/quickstart.rviz
 
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_common>`
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_map_localization>`
-
-3.  Pull down a ROS bag of sample data:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_map_localization && \
-         git lfs pull -X "" -I "**/rosbags/"
-
-4.  Launch the Docker container using the ``run_dev.sh`` script:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-         ./scripts/run_dev.sh
-
-5.  Install this package's dependencies.
-
-   :ir_apt:
-
-   .. code:: bash
-
-      sudo apt-get install -y ros-humble-isaac-ros-occupancy-grid-localizer
-
-6.  Run ``rviz2``:
-
-    .. code:: bash
-
-       rviz2 -d  src/isaac_ros_map_localization/isaac_ros_occupancy_grid_localizer/rviz/quickstart.rviz
-
-7.  Create another terminal in the Docker container using the
+2.  Create another terminal in the Docker container using the
     ``run_dev.sh`` script:
 
     .. code:: bash
@@ -58,13 +101,13 @@ Quickstart
        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-8.  Run the launch file to spin up a demo of this package:
+3.  Run the launch file to spin up a demo of this package:
 
     .. code:: bash
 
        ros2 launch isaac_ros_occupancy_grid_localizer isaac_ros_occupancy_grid_localizer_quickstart.launch.py
 
-9.  Create another terminal in the Docker container using the
+4.  Create another terminal in the Docker container using the
     ``run_dev.sh`` script:
 
     .. code:: bash
@@ -72,13 +115,13 @@ Quickstart
        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-10. Run the rosbag:
+5. Run the rosbag:
 
     .. code:: bash
 
-       ros2 bag play -l src/isaac_ros_map_localization/isaac_ros_occupancy_grid_localizer/data/rosbags/flatscan
+       ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_occupancy_grid_localizer/rosbags/flatscan
 
-11. Create another terminal in the docker container using the
+6. Create another terminal in the docker container using the
     ``run_dev.sh`` script:
 
     .. code:: bash
@@ -86,13 +129,13 @@ Quickstart
        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-12. Trigger the localization using a command line service call :
+7. Trigger the localization using a command line service call :
 
     .. code:: bash
 
        ros2 service call trigger_grid_search_localization std_srvs/srv/Empty {}
 
-13. You should see a frame being generated in the map showing the
+8. You should see a frame being generated in the map showing the
     position of the LIDAR.
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_map_localization/quickstart.png>`
@@ -113,7 +156,7 @@ Troubleshooting
 ---------------
 
 Isaac ROS Troubleshooting
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
 
@@ -121,7 +164,7 @@ API
 ----
 
 Usage
-^^^^^
+~~~~~
 
 .. code:: bash
 
@@ -139,6 +182,10 @@ Usage
 
    **Do not** publish FlatScan messages to both ``flatscan`` and
    ``flatscan_localization`` topics.
+
+
+OccupancyGridLocalizerNode
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ROS Parameters
 ^^^^^^^^^^^^^^

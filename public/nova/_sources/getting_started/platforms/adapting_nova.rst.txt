@@ -1,0 +1,164 @@
+.. include:: /variables.rst
+
+=============
+Adapting Nova
+=============
+
+Any Jetson AGX Orin can be turned into a Nova Orin by installing Nova and connecting the supported sensors. If you are on this page it is expected that you want to use a custom configuration of Nova. For products like :doc:`Nova Orin Developer Kit</getting_started/platforms/nova_devkit>` and :doc:`Nova Carter</getting_started/platforms/nova_carter>` refer to their linked pages.
+
+Sensor Selection
+----------------
+
+When first creating a custom configuration of Nova it must be decided which sensors you are using. The sensors supported in Nova are below:
+
+* 4x `HAWK stereo cameras <li_hawk_>`__ (1920x1200, 60 FPS, 120° FOV)
+* 4x `OWL fisheye cameras <li_owl_>`__ (1920x1200, 120 FPS, 202°± 3° FOV)
+* `HESAI-XT32 3D LiDAR <hesai_xt32_>`__
+* 2x `SLAMTEC RPLIDAR S2E <slamtec_rplidar_s2e_>`__
+
+Connect the desired sensors. LiDARs must be plugged in following the :ref:`LiDAR setup guide <hardware/index:lidar setup>`. Cameras must be connected following the :ref:`camera connecting guide <hardware/index:connecting cameras>`.
+
+.. note::
+
+    Make sure that all sensors are receiving the proper supply of power. A common issue is the cameras GMSL board not being powered separately to the Jetson AGX Orin as mentioned in the :ref:`camera connecting guide <hardware/index:connecting cameras>`. Cameras also must be connected in the correct order.
+
+.. note::
+
+    For known limitations of the Nova platform, refer to the :ref:`limitations section <getting_started/platforms/adapting_nova:limitations>` for more details.
+
+Installing Nova Software
+------------------------
+
+Make sure you are logged into your Jetson AGX Orin. Install the latest Nova Orin Init by following the :ref:`installation section here <nova_init/index:install>`. Use ``none`` as the selection choice. This will install Nova Orin Init without setting up any sensors.
+
+If you install Nova Orin Init with a selection choice that is not ``none`` it will handle the installation process for you. Make sure that the YAML matches the sensors you are using before proceeding down this route as it will error if it cannot find a sensor. This can be done by using the ``show <example>`` during the installation process. If a YAML matches the setup you desire you can skip the rest of the sections and select it.
+
+Customizing Nova
+----------------
+
+After installing Nova software, create a custom Nova Orin YAML configuration file. This YAML file must mirror the hardware that is connected to your system. The structure of the YAML is as follows:
+
+.. code-block:: yaml
+    :class: no-copybutton
+
+    sensors:
+        <sensor_1>:
+        <sensor_2>:
+        ...
+    <module_1>:
+    <module_2>:
+    ...
+
+Valid sensor names to fill ``<sensor_XXX>`` can be found in :ref:`sensor names <getting_started/platforms/adapting_nova:sensor names>`. Any of these names can be used under the sensors section. The order of the listed sensors matter, the first sensor listed is loaded first and also assigned the lowest index if none is given.
+
+The modules in the sensor YAML allow for enabling individual components. A common module to enable, if you install an NVME SSD, is ``ssd:``. This module formats and mounts the SSD at ``/dev/nvme0n1`` to ``/mnt/nova_ssd``.
+
+Modules are a way to control the Nova installation process. Any folders with an ``INSTALL.yaml``` under ``/opt/nvidia/nova`` are considered modules and are installed, if their folder name is referenced. For example, the SSD module can be found here ``/opt/nvidia/nova/ssd``.
+
+Here's an example YAML that enables the SSD, two Hawk cameras, and the first Hawk IMU:
+
+.. code-block:: yaml
+
+    sensors:
+        front_stereo_camera:
+        back_stereo_camera:
+        front_stereo_imu:
+    ssd:
+
+More examples can be found in ``/etc/nova/examples/``.
+
+There are limitations to the YAML, please refer to the :ref:`limitations section <getting_started/platforms/adapting_nova:limitations>` for more details.
+
+Create a custom YAML now. Once your custom YAML has been created place it in the default YAML location for Nova:
+
+.. code-block:: bash
+
+    sudo cp <custom>.yaml /etc/nova/setup.yaml
+
+Setup Nova
+----------
+
+At this point make sure that you have all the sensors connected to the Jetson AGX Orin and receiving enough power. Install Nova for the first time by using :doc:`Nova Manager </tools/nova_manager>`:
+
+.. code-block:: bash
+
+    sudo nova_manager install
+
+The Debian package installation and removal process will manage your system from now on, utilizing the custom YAML you placed.
+
+Reboot your system:
+
+.. code-block:: bash
+
+    sudo reboot
+
+Run the :doc:`Nova Preflight Checker </tools/pfc>` to ensure sensors are working as expected:
+
+.. code-block:: bash
+
+    nova_preflight_checker -v
+
+It is expected for all tests to pass.
+
+Limitations
+-----------
+
+At the moment Nova has the following limitations:
+
+- 2d Lidars cannot be setup individually, you must have both front and back 2d Lidar or no 2d Lidars. This implies that in the sensor field of the YAML for ``*_2d_lidar`` both names or no names must be present for the install to work properly.
+- ``front_stereo_imu`` always corresponds to the first Hawk listed in the ``sensors field``. For instance:
+
+    .. code-block:: yaml
+        :class: no-copybutton
+
+        sensors:
+            back_stereo_camera:
+            front_stereo_camera:
+            front_stereo_imu:
+
+    In this case, the ``front_stereo_imu`` is the IMU of the ``back_stereo_camera``.
+
+Sensor Names
+------------
+
+Below is a list of valid sensor names that can be used in the YAML for adapting Nova. It is required to use these names for Nova to recognize and properly setup the system.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Name
+     - Sensor
+     - Notes
+   * - front_stereo_camera
+     - Hawk
+     -
+   * - back_stereo_camera
+     - Hawk
+     -
+   * - right_stereo_camera
+     - Hawk
+     -
+   * - front_fisheye_camera
+     - Owl
+     -
+   * - back_fisheye_camera
+     - Owl
+     -
+   * - left_fisheye_camera
+     - Owl
+     -
+   * - right_fisheye_camera
+     - Owl
+     -
+   * - front_2d_lidar
+     - Rplidar S2E
+     - Default IP is 192.168.1.2
+   * - back_2d_lidar
+     - Rplidar S2E
+     - Default IP is 192.168.1.3
+   * - front_3d_lidar
+     - Rplidar S2E
+     -  Default IP is 192.168.1.201
+   * - front_stereo_imu
+     - Bmi088
+     -

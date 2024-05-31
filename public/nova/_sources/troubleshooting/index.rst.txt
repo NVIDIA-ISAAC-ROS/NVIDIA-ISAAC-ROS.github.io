@@ -1,0 +1,109 @@
+===============
+Troubleshooting
+===============
+
+Troubleshooting techniques for different problems that you might run into
+while setting up Nova.
+
+It is recommended to run the :doc:`Nova Preflight Checker</tools/pfc>` to diagnose specific sensor failures before proceeding.
+
+.. code-block::
+
+    nova_preflight_checker -v
+
+Nova MGBE0 Latch not set
+------------------------
+
+If the PFC test ``test_service[nova-mgbe0-latch-dead-enabled]`` fails this is likely because another process has unset the latch. For example, whenever ``ptp4l`` restarts it will unset the latch. To set the latch again run:
+
+.. code-block:: bash
+
+    sudo systemctl restart nova-mgbe0-latch
+
+Phc2Sys offsets are large
+-------------------------
+
+If you see an error from the PFC similar to this:
+
+.. code-block::
+    :class: no-copybutton
+
+    ================================================================================ short test summary info ================================================================================
+    FAILED ../../opt/nvidia/nova/python/nova-init-py/nova_init/tests/test_nova_orin.py::test_phc2sys_offsets - AssertionError: phc2sys reporting offset of 141353, which is greater than max 150
+    FAILED ../../opt/nvidia/nova/python/nova-init-py/nova_init/tests/test_nova_orin.py::test_phc2sys_frequency - AssertionError: phc2sys reporting frequency error of 115849, which is greater than max 150
+
+This means that the time synchronization service ``phc2sys`` has not settled or cannot settle. Wait about 30 seconds and try running the PFC again. On boot it takes a period of time for the service to converge. If running the PFC again does not fix the offsets it is recommended to look at this :ref:`MGBE0 latch issue <troubleshooting/index:nova mgbe0 latch not set>` since an unset latch can cause large jumps in ``phc2sys`` offsets.
+
+Generic PFC Service Failure
+---------------------------
+
+If you see any PFC failures related to services like ``test_service[nova-sync-time-dead-enabled]`` it is recommended to look at the service logs and see if the service state matches the test. The way PFC service tests are designed is that the first part is the service name, the second is the service state, and the third is the file state. In the example given this would be ``nova-sync-time``, ``dead``, and ``enabled`` respectively. The service logs can be viewed by running.
+
+.. code-block:: bash
+
+    systemctl status <service-name>
+
+If the service is expected to have run because it was enabled, try restarting the service.
+
+.. code-block:: bash
+
+    sudo systemctl restart <service-name>
+
+Backup Already Exist
+--------------------
+
+When installing Nova you may run into the following error or something similar:
+
+.. code-block:: bash
+
+    ERROR: backup /etc/logrotate.d/rsyslog.nova.disabled already exist
+
+Nova modifies files on the system for robotics applications. When Nova makes a change it backs up the original file with a ``.nova.disabled`` extension. During Nova removal it should find this file and recover it if the file placed by Nova was unmodified. However, when the file has been modified or Nova has lost track of the file for another reason it does not recover. During the follow-up Nova installation the above error happens because Nova does not want to destroy the old backup it created.
+
+To recover from this situation you can try to reinstall Nova with:
+
+.. code-block:: bash
+
+    sudo apt remove nova-orin-init  # nova must be removed since
+    sudo apt install nova-orin-init
+
+If that does not work use these instructions:
+
+.. code-block:: bash
+
+    # Remove Nova
+    $ sudo apt remove nova-orin-init
+    # Find the files Nova did not recover properly
+    $ sudo find / -path /mnt/nova_ssd -prune -o -name "*.nova.disabled"
+    # Recover those files by moving the file to a place with the same name but the .nova.disabled extension removed
+    # Example: sudo mv <file_path>.nova.disabled <file_path>
+
+.. include:: /../shared/_snippets/troubleshooting/jetson_recovery_mode.rst
+
+System Time is Set To 1970
+--------------------------
+
+If you run ``timedatectl`` and see something similar to below:
+
+.. code-block:: bash
+
+    $ timedatectl
+                   Local time: Sat 1970-01-03 23:08:46 PDT
+               Universal time: Sat 1970-01-03 06:08:46 UTC
+                     RTC time: Sat 1970-01-03 06:08:46
+                    Time zone: America/Los_Angeles (PDT, -0700)
+    System clock synchronized: no
+                  NTP service: n/a
+              RTC in local TZ: no
+
+This means that your system clock has not synced to wall-clock time properly. Nova only syncs to the wall-clock time on boot to avoid significant time jumps for sensors. If there is no internet on boot Nova relies on an RTC coin battery connected to the Jetson AGX Orin. Systems without an RTC coin battery cannot establish proper time without internet.
+
+To fix this issue there are two options:
+
+#. Add an RTC coin battery to the Jetson AGX Orin so it tracks time between boots. The RTC coin battery can be `connected on the bottom of the Jetson AGX Orin <https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html#rtc-backup-battery-connector-j13>`__.
+
+#. Connect to the internet with Ethernet or through WiFi and reboot.
+
+    .. code-block:: bash
+
+        sudo reboot

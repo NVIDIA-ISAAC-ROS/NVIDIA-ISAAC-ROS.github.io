@@ -1,0 +1,222 @@
+=====================================
+Tutorial for cuMotion with Perception
+=====================================
+
+
+Overview
+--------
+
+This tutorial walks through the process of planning trajectories for a real robot.
+It leverages the cuMotion plugin for MoveIt 2 provided by :ir_repo:`Isaac ROS cuMotion <isaac_ros_cumotion>`.
+This tutorial demonstrates obstacle-aware planning using cuMotion by moving the robot end effector
+between two predetermined poses, alternating between them while avoiding obstacles detected in the workspace.
+
+The tutorial uses:
+
+- A stereo camera for perception
+- :ir_repo:`Isaac ROS ESS <isaac_ros_dnn_stereo_depth> <isaac_ros_ess>` for depth estimation
+- :ir_repo:`Isaac ROS Nvblox <isaac_ros_nvblox>` to produce a voxelized representation of the scene
+
+Requirements
+------------
+
+Please ensure that you have the following available:
+
+- A `Universal Robots <https://www.universal-robots.com/>`__ manipulator. This tutorial was validated on a UR5e.
+
+- A `Hawk stereo camera <https://leopardimaging.com/leopard-imaging-hawk-stereo-camera/>`__ or a `RealSense camera <https://www.intelrealsense.com/>`__.
+
+Tutorial
+--------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Set up your development environment by following the instructions in :doc:`getting started </getting_started/dev_env_setup>`.
+
+2. Complete the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>` if using a Hawk stereo camera.
+   Alternatively, complete the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>` if using a RealSense camera
+
+3. It is recommended to use a PREEMPT_RT kernel on Jetson. Follow the :doc:`PREEMPT_RT for Jetson guide </getting_started/hardware_setup/compute/preempt_setup>`
+   **outside** of the container.
+
+4. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+        git clone :ir_clone:`<isaac_ros_common>`
+
+Build Isaac ROS cuMotion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Clone ``isaac_manipulator`` under ``${ISAAC_ROS_WS}/src``.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+        git clone --recursive :ir_clone:`<isaac_manipulator>`
+
+2. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd $ISAAC_ROS_WS && ./src/isaac_ros_common/scripts/run_dev.sh
+
+3. There are two options for installing this tutorial:
+   installation from Debian, and installation from source.
+
+   .. tabs::
+
+      .. tab:: Installation from source
+
+               1. Use ``rosdep`` to install the package’s dependencies:
+
+                  :ir_apt:
+
+                  .. code:: bash
+
+                     rosdep update
+                     rosdep install -i -r --from-paths ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/ --rosdistro humble -y
+
+               2. Build and source the ROS workspace
+
+                  .. code:: bash
+
+                     cd ${ISAAC_ROS_WS}
+                     colcon build --symlink-install --packages-up-to isaac_manipulator_bringup
+                     source install/setup.bash
+
+      .. tab:: Installation from Debian
+
+               1. Get ``isaac_manipulator_bringup`` and its dependencies.
+
+                  :ir_apt:
+
+                  .. code:: bash
+
+                     sudo apt-get install -y ros-humble-isaac-manipulator-bringup
+
+Set Up UR5e Robot
+~~~~~~~~~~~~~~~~~
+
+1. Install the UR Robot Driver:
+
+   .. code:: bash
+
+      sudo apt install ros-humble-ur ros-humble-joint-trajectory-controller
+
+   .. note::
+
+      To avoid having to manually install the apt package each time the container is run, consider installing it in
+      a custom layer by following the instructions :ref:`here <configuring-run-dev>`.
+
+2. Setup the UR robot by following the instructions `here <https://docs.ros.org/en/ros2_packages/humble/api/ur_robot_driver/installation/robot_setup.html>`__.
+
+3. Create a program for external control by following the instructions `here <https://docs.ros.org/en/ros2_packages/humble/api/ur_robot_driver/installation/install_urcap_e_series.html>`__.
+
+   .. warning::
+
+      Please do this step carefully and extract the calibration as explained `here <https://docs.ros.org/en/ros2_packages/humble/api/ur_robot_driver/installation/robot_setup.html#extract-calibration-information>`__.
+      Otherwise the TCP's pose will not be correct inside the ROS ecosystem.
+
+4. Finally, note down the IP address of the robot, and substitute it for ``<ROBOT_IP_ADDRESS>`` in the instructions below.
+
+5. Use the `moveit_calibration package <https://github.com/illumo-robotics/moveit_calibration>`__ to calibrate the camera with respect to the robot.
+   Please update the values found in ``static_transforms.launch.py``, which can be found
+   :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`.
+
+6. Update the values for ``world_pose_target1_frame`` and ``world_pose_target2_frame`` in ``static_transforms.launch.py``,
+   which is located :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`,
+   to be two distinct poses that are reachable by the robot.
+
+Set Up Perception Deep Learning Models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+   The ESS model is only required for Hawk.
+
+1. Prepare the Light ESS model to run depth estimation:
+
+   .. code::
+
+      ros2 run isaac_ros_ess_models_install install_ess_models.sh --eula
+
+Run Launch Files and Deploy to Robot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+   We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
+   new terminal you run ROS commands to avoid interference
+   with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
+
+1. On the UR teach pendant, ensure that the robot's **remote program** is loaded and that the robot is **paused** or **stopped** for safety purposes.
+
+2. Launch the UR Robot Driver:
+
+   .. code:: bash
+
+      ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS> launch_rviz:=false
+
+3. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Launch the UR5e cuMotion Example:
+
+  .. code:: bash
+
+     ros2 launch isaac_ros_cumotion_examples ur.launch.py ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS> launch_rviz:=true
+
+  .. warning::
+
+     Please add any obstacles that are not visible by the camera into the scene to prevent potential collisions.
+     Consult the documentation :doc:`here </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index>`.
+
+5. Open **another** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+6. Launch the pose to pose example:
+
+   .. tabs::
+      .. tab:: Hawk stereo camera
+
+         1. Install the Hawk stereo camera:
+
+            .. code:: bash
+
+               sudo apt-get install -y ros-humble-isaac-ros-hawk
+
+         2. Launch the pose-to-pose example:
+
+            .. code:: bash
+
+               ros2 launch isaac_manipulator_bringup cumotion_nvblox_pose_to_pose.launch.py \
+                ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.0.0/light_ess.engine \
+                camera_type:=hawk ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS>
+
+      .. tab:: RealSense camera
+
+         1. Launch the pose-to-pose example:
+
+            .. code:: bash
+
+               ros2 launch isaac_manipulator_bringup cumotion_nvblox_pose_to_pose.launch.py \
+                camera_type:=realsense ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS>
+
+7. On the UR teach pendant, press the **play** button to enable the robot.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif>`
+   :width: 576px
+   :align: center
+
+   "Pose-to-pose" example with obstacle avoidance via cuMotion and nvblox on a UR5e robot.

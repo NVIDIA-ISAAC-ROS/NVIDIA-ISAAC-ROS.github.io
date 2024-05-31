@@ -19,25 +19,30 @@ file using the ``dope_converter.py`` script, as referenced in the
 Tutorial Walkthrough
 --------------------
 
-1. Follow steps 1-6 of the main DOPE
-   :doc:`quickstart </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`.
+#. Complete until ``Run Launch File`` of the quickstart :doc:`here </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`.
 
-2. At step 7, run the ``dope_converter.py`` script with the two
+#. Under the ``Run Launch File`` section, run the ``dope_converter.py`` script with the two
    additional arguments ``row`` and ``col`` specifying the desired input
    image size:
 
    .. code:: bash
 
-      python3 /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_dope/scripts/dope_converter.py --format onnx --input /tmp/models/Ketchup.pth --row 1080 --col 1920
+      ros2 run isaac_ros_dope dope_converter.py --format onnx \
+         --input ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.pth --output ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.onnx \
+         --row 1080 --col 1920
 
-3. Proceed through steps 8-9.
-4. At step 10, launch the ROS 2 launch file with two additional arguments
+#. Continuing in the quickstart's ``Run Launch File`` section, complete the data source-specific setup.
+   Then, launch the data source-specific ``isaac_ros_examples.launch.py`` file with two additional arguments
    ``network_image_height`` and ``network_image_width`` specifying the
-   desired input image size:
+   desired input image size.
 
-   .. code:: bash
+   For example:
 
-      ros2 launch isaac_ros_dope isaac_ros_dope_tensor_rt.launch.py model_file_path:=/tmp/models/Ketchup.onnx engine_file_path:=/tmp/models/Ketchup.plan network_image_height:=1080 network_image_width:=1920 input_image_height:=1080 input_image_width:=1920
+   .. code-block:: bash
+      :class: no-copybutton
 
-5. Continue with the rest of the quickstart. You should now be able to
+      ros2 launch isaac_ros_examples isaac_ros_examples.launch.py <data source-specific arguments> ... \
+         network_image_height:=1080 network_image_width:=1920  # Add these arguments to the launch command
+
+#. Continue with the rest of the quickstart. You should now be able to
    detect poses in images of your desired size.

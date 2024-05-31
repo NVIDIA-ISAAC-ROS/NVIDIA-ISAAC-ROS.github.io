@@ -48,17 +48,10 @@ Tutorial Walkthrough - VSLAM Execution
 
    .. code:: bash
 
-          isaac_ros_container
+          cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
 
    ..
-
-      Or if you did not add the command in
-      :ref:`step 1-3 of the quickstart section <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`:
-
-      .. code:: bash
-
-         cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-           ./scripts/run_dev.sh ${ISAAC_ROS_WS}
 
 5. [Terminal 1] Inside the container, build and source the workspace:
 
@@ -82,7 +75,8 @@ Tutorial Walkthrough - VSLAM Execution
 
    .. code:: bash
 
-      isaac_ros_container
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
 
    Verify that you can see all the ROS2 topics expected.
 
@@ -240,7 +234,7 @@ Live Visualization
 
    .. code:: bash
 
-      rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/realsense.cfg.rviz
+      rviz2 -d $(ros2 pkg prefix isaac_ros_visual_slam --share)/rviz/realsense.cfg.rviz
 
    As you move the camera, verify that the position and orientation of the frames
    corresponds to how the camera moved relative to its starting
@@ -300,7 +294,8 @@ Offline Visualization
 
    .. code:: bash
 
-      isaac_ros_container
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
 
    Run RViz with a configuration file for visualizing a set of messages
    from Visual SLAM node.
@@ -308,7 +303,7 @@ Offline Visualization
    .. code:: bash
 
       cd /workspaces/isaac_ros-dev
-      rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/vslam_keepall.cfg.rviz
+      rviz2 -d $(ros2 pkg prefix isaac_ros_visual_slam --share)/rviz/vslam_keepall.cfg.rviz
 
 3. [Terminal 2] Playback the recorded rosbag.
 
@@ -316,7 +311,8 @@ Offline Visualization
 
    .. code:: bash
 
-      isaac_ros_container
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
 
    Play the recorded rosbag file.
 

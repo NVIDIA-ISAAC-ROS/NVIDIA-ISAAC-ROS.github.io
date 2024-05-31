@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-Hardware-accelerated Image Pipeline.
+NVIDIA-accelerated Image Pipeline.
 
 .. raw:: html
 
@@ -46,7 +47,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS Image Pipeline

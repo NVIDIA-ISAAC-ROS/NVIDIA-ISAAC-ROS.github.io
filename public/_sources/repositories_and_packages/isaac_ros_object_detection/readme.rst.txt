@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-Hardware-accelerated, deep learned model support for object detection including DetectNet.
+NVIDIA-accelerated, deep learned model support for object detection including DetectNet.
 
 .. raw:: html
 
@@ -45,7 +46,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS Object Detection

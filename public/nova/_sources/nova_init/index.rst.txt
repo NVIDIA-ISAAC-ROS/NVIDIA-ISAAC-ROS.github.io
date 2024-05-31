@@ -1,0 +1,118 @@
+==============
+Nova Orin Init
+==============
+
+Nova Orin Init is a Debian package that includes drivers, device trees, system services, configurations, and tools provided for users to start working on robotics software on Jetson Orin.
+
+Install
+-------
+
+:nova_apt:
+
+Install Nova.
+
+#. Update APT and install the Debian:
+
+   .. code-block:: bash
+      
+      sudo apt update && sudo apt install nova-orin-init
+
+#. Verify that you see an output similar to the following, if this is your first time doing the install:
+
+   .. code-block::
+      :class: no-copybutton, wrap-block
+
+      No Nova YAML specified. The following example files are available: none, hawk-2_owl-4, owl-4, nova-devkit, nova-orin, hawk-1, hawk-4_owl-4, hawk-2, nova-carter. Select one of the examples for a predefined yaml or none if you would like to write your own custom. Use `show <example>` if you want to see the YAML. Response:
+
+   Select the example YAML you want to install or add your own custom YAML by selecting ``none`` and following the :ref:`guide here <getting_started/platforms/adapting_nova:customizing nova>`.
+
+   Continue if no question appears. No question means that it's using the old config on the Nova platform.
+
+#. Reboot the platform by pressing the power button or running:
+
+   .. code-block:: bash
+
+      sudo reboot
+
+#. Verify that sensors are working by running the :doc:`PFC</tools/pfc>`.
+   
+   .. code-block:: bash
+
+      nova_preflight_checker -v
+
+Upgrade
+-------
+
+#. Upgrade using the apt repository.
+
+   .. code-block:: bash
+
+      sudo apt update && sudo apt install nova-orin-init
+
+#. Reboot the platform by pressing the power button or running:
+
+   .. code-block:: bash
+
+      sudo reboot
+
+#. Verify that sensors are working by running the :doc:`PFC</tools/pfc>`.
+   
+   .. code-block:: bash
+
+      nova_preflight_checker -v
+
+Uninstall
+---------
+
+#. Remove the Debian:
+
+   .. code-block:: bash
+
+      sudo apt remove nova-orin-init
+   
+   The removal of Nova Orin Init attempts to revert all settings to their original state on the
+   robot.
+
+#. Reboot the platform by pressing the power button or running:
+
+   .. code-block:: bash
+
+      sudo reboot
+
+Remove Previous Selection
+-------------------------
+
+During Nova Orin Init install it asks for a Nova YAML selection. This selection persists between installs and automates the upgrade process for your Nova YAML. If you would like to change your Nova YAML follow the instructions below.
+
+#. Remove Nova Orin Init and its previous selection.
+
+   .. code-block:: bash
+
+      sudo apt remove nova-orin-init
+      sudo rm /etc/nova/manager_selection
+
+#. (Optional) Remove the custom YAML you created if ``none`` was selected previously during install.
+
+   .. code-block:: bash
+
+      sudo rm /etc/nova/setup.yaml
+
+Add Real-Time Support
+---------------------
+
+Real-time capabilities can be added to any Jetson AGX Orin with JP6 GA by following the `installing real-time guide provided by Jetpack <https://docs.nvidia.com/jetson/archives/r36.3/DeveloperGuide/SD/SoftwarePackagesAndTheUpdateMechanism.html?_gl=1*754wy0*_gcl_au*MTQwMzE0MDA4Ny4xNzE2MzMyMTYy#installing-the-real-time-kernel-packages-on-a-jetson-device>`__. This is useful for applications like robotic arms.
+
+Nova Orin Init does not currently support real-time by default it must be modified after every installation/upgrade. To support real-time the system must use the real-time image. Run the following commands to update Nova's boot config to use the real-time image:
+
+.. note::
+
+   The Jetpack real-time guide must be completed and Nova Orin Init must be installed before running the below commands
+
+.. code-block::
+
+   sudo sed -i '/LABEL JetsonIO/,/APPEND/ s|LINUX /boot/Image|LINUX /boot/Image.real-time|' "/boot/extlinux/extlinux.conf"
+
+License
+-------
+
+`NVIDIA Isaac ROS Software License <https://raw.githubusercontent.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros/main/LICENSE>`_

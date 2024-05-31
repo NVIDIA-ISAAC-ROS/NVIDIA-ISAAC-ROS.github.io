@@ -7,81 +7,173 @@
 Quickstart
 ----------
 
-1.  Set up your development environment by following the instructions
-    :doc:`here </getting_started/dev_env_setup>`.
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+.. include:: /_snippets/set_up_dev_env.rst
 
-       cd ${ISAAC_ROS_WS}/src
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+1. Download quickstart data from NGC:
 
-       git clone :ir_clone:`<isaac_ros_common>`
+   :ir_assets:`<isaac_ros_apriltag> <quickstart.tar.gz>`
 
-    .. code:: bash
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
 
-       git clone :ir_clone:`<isaac_ros_apriltag>`
+.. tabs::
 
-3.  Pull down a ROS Bag of sample data:
+   .. tab:: Binary Package
 
-    .. code:: bash
+      1. Launch the Docker container using the ``run_dev.sh`` script:
 
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_apriltag && \ 
-         git lfs pull -X "" -I "resources/rosbags/quickstart.bag"
+         .. code:: bash
 
-4.  Launch the Docker container using the ``run_dev.sh`` script:
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
 
-    .. code:: bash
+      2. Install the prebuilt Debian package:
 
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-         ./scripts/run_dev.sh
+         :ir_apt:
 
-5.  Install this package's dependencies.
+         .. code:: bash
 
-   :ir_apt:
+            sudo apt-get install -y ros-humble-isaac-ros-apriltag
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_apriltag>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_apriltag --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_apriltag
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=apriltag interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_apriltag/quickstart_interface_specs.json
+
+      #. Open a **second** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_apriltag/quickstart.bag --remap image:=image_rect camera_info:=camera_info_rect
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,apriltag
+
+   .. tab:: Hawk Camera
+
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+      #. Run the following launch file to spin up a demo of this package using a Hawk camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,rectify_mono,apriltag
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Open a **new** terminal inside the Docker container:
 
    .. code:: bash
 
-      sudo apt-get install -y ros-humble-isaac-ros-apriltag
-
-6.  Run the following launch files to spin up a demo of this package:
-
-    .. code:: bash
-
-       ros2 launch isaac_ros_apriltag isaac_ros_apriltag.launch.py
-
-7.  Open a **second** terminal inside the docker container:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-8.  Run the rosbag file to simulate an image stream:
+2. Observe the AprilTag detection output ``/tag_detections`` on a separate terminal with the command:
 
-    .. code:: bash
+   .. code:: bash
 
-       ros2 bag play --loop src/isaac_ros_apriltag/resources/rosbags/quickstart.bag
-
-9.  Open a **third** terminal inside the docker container:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-         ./scripts/run_dev.sh
-
-10. Observe the AprilTag detection output ``/tag_detections`` on a
-    separate terminal with the command:
-
-    .. code:: bash
-
-       ros2 topic echo /tag_detections
+      ros2 topic echo /tag_detections
 
 .. note::
 
-   You will need to calibrate the intrinsics of your camera if you want the node to determine 3D poses for tags instead of just detection and corners as 2D pixel coordinates.
-   See `here <https://navigation.ros.org/tutorials/docs/camera_calibration.html>`__ for more details.
+   You must to calibrate the intrinsics of your camera if you want the node to determine 3D poses for tags instead of just detection and corners as 2D pixel coordinates.
+   See `calibration <https://docs.nav2.org/tutorials/docs/camera_calibration.html>`__ for more details.
 
 Try More Examples
 -----------------
@@ -90,14 +182,10 @@ To continue your exploration, check out the following suggested examples:
 
 .. toctree::
    :maxdepth: 1
-   
+
    Tutorial with a USB camera </concepts/fiducials/apriltag/tutorial_usb_cam>
 
    Tutorial with Isaac Sim </concepts/fiducials/apriltag/tutorial_isaac_sim>
-
-   Tutorial with Argus Camera </concepts/fiducials/apriltag/tutorial_nitros_graph>
-
-   Tutorial with Zed Camera </concepts/fiducials/apriltag/tutorial_apriltag_zed>
 
    Tutorial with NITROS ROS 1 Bridge </concepts/fiducials/apriltag/tutorial_apriltag_ros1_bridge>
 
@@ -107,7 +195,7 @@ Troubleshooting
 Isaac ROS Troubleshooting
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
 
 API
 ----
@@ -132,7 +220,7 @@ Replacing ``apriltag_ros`` with ``isaac_ros_apriltag``
 Supported Packages
 ~~~~~~~~~~~~~~~~~~
 
-At this time, the packages under the standard ``apriltag_ros`` have the
+The packages under the standard ``apriltag_ros`` have the
 following support:
 
 ================== ================================
@@ -148,9 +236,9 @@ ROS Parameters
 ============= ========== ======== =====================================================================
 ROS Parameter Type       Default  Description
 ============= ========== ======== =====================================================================
-``size``      ``double`` ``0.22`` The tag edge size in meters, assuming square markers. More `details here <https://github.com/AprilRobotics/apriltag>`__. E.g. ``0.22``
-``max_tags``  ``int``    ``64``   The maximum number of tags to be detected. E.g. ``64``
-``tile_size`` ``uint``   ``4``    Tile/window size used for adaptive thresholding in pixels. E.g. ``4``
+``size``      ``double`` ``0.22`` The tag edge size in meters, assuming square markers. More `details here <https://github.com/AprilRobotics/apriltag>`__. For example, ``0.22``
+``max_tags``  ``int``    ``64``   The maximum number of tags to be detected. For example, ``64``
+``tile_size`` ``uint``   ``4``    Tile/window size used for adaptive thresholding in pixels. For example, ``4``
 ============= ========== ======== =====================================================================
 
 ROS Topics Subscribed
