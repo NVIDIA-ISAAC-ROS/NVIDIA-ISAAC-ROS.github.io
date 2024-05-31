@@ -4,79 +4,273 @@
 
 :ir_github:`<isaac_ros_image_pipeline> <isaac_ros_image_proc>`
 
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/image_proc/image_proc/image_proc.gif>`
+    :align: center
+
 Quickstart
 ----------
 
-1. Set up your development environment by following the instructions
-   :doc:`here </getting_started/dev_env_setup>`.
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+.. include:: /_snippets/set_up_dev_env.rst
 
-       cd ${ISAAC_ROS_WS}/src
+Datasets
+^^^^^^^^
 
-    .. code:: bash
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-       git clone :ir_clone:`<isaac_ros_common>`
+1. Download quickstart data from NGC:
 
-   .. code:: bash
+   :ir_assets:`<isaac_ros_image_proc> <quickstart.tar.gz>`
 
-      git clone :ir_clone:`<isaac_ros_image_pipeline>`
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
 
-3. Build the RealSense camera package for Humble, using :doc:`this doc </getting_started/hardware_setup/sensors/realsense_setup>`.
+.. tabs::
 
-4. Launch the Docker container using the ``run_dev.sh`` script:
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-image-proc
+   
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+            git clone :ir_clone:`<isaac_ros_image_pipeline>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_image_proc --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_image_proc --symlink-install
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+  .. tab:: Rosbag
+
+     #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+     2. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+        Resize:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=resize
+
+        Color Conversion:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=color_conversion interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_image_proc/quickstart_interface_specs.json
+
+        Crop:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=crop interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_image_proc/quickstart_interface_specs.json
+
+        Rectify:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=rectify_mono interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_image_proc/quickstart_interface_specs.json
+
+        Flip:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=flip
+
+     2. Open a **second** terminal inside the Docker container:
+
+        .. code:: bash
+
+          cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+          ./scripts/run_dev.sh
+
+     3. Run the rosbag file to simulate an image stream:
+
+        .. code:: bash
+
+          ros2 bag play --loop ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_image_proc/quickstart --remap /hawk_0_left_rgb_image:=/image_raw /hawk_0_left_rgb_camera_info:=/camera_info
+
+  .. tab:: RealSense Camera
+
+     #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+     2. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+     3. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+        Resize:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono,resize
+
+        Color Conversion:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono,color_conversion
+
+        Crop:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono,crop
+
+        Rectify:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono,rectify_mono
+
+        Flip:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono,flip
+
+  .. tab:: Hawk Camera
+
+     #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+     2. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+     3. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+        Resize:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,resize
+
+        Color Conversion:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,color_conversion
+
+        Crop:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,crop
+
+        Rectify:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,rectify_mono
+
+        Flip:
+          .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,flip
+
+  .. note::
+
+    For RealSense camera package issues, please refer to the section
+    :ref:`here <troubleshooting/hardware_setup:Realsense driver does not work with ROS 2 Humble>`.
+
+    Other supported cameras can be found
+    :ref:`here <repositories_and_packages/isaac_ros_argus_camera/index:Reference Cameras>`.
+
+    For camera calibration, please refer to
+    :doc:`this guide </getting_started/hardware_setup/sensors/camera_calibration>`.
+
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Open a **new** terminal inside the Docker container:
 
    .. code:: bash
 
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh
+         ./scripts/run_dev.sh
 
-5. Install this package's dependencies.
+2. Observe the image_proc output on the terminal with the command:
 
-   :ir_apt:
+   Resize:
+      .. code:: bash
 
-   .. code:: bash
+         ros2 run image_view image_view --ros-args --remap image:=resize/image
 
-      sudo apt-get install -y ros-humble-isaac-ros-image-proc
+   Color Conversion:
+      .. code:: bash
 
-6. Start ``isaac_ros_image_proc`` using the prebuilt executable (Using
-   RealSense camera as an example):
+         ros2 run image_view image_view --ros-args --remap image:=image_mono
 
-   .. code:: bash
+   Crop:
+      .. code:: bash
 
-      ros2 run isaac_ros_image_proc isaac_ros_image_proc --ros-args -r /image_raw:=/camera/color/image_raw --ros-args -r /camera_info:=/camera/color/camera_info
+         ros2 run image_view image_view --ros-args --remap image:=crop/image
 
-7. In a separate terminal, spin up a **calibrated** camera publisher to
-   ``/image_raw`` and ``/camera_info`` using any package(for example,
-   ``realsense2_camera``):
+   Rectify:
+      .. code:: bash
 
-   .. code:: bash
+         ros2 run image_view image_view --ros-args --remap image:=image_rect
 
-      ros2 launch realsense2_camera rs_launch.py
+   Flip:
+      .. code:: bash
 
-8. Observe the image output in grayscale and color on ``/image_mono``
-   and ``/image_rect_color``, respectively:
-
-   .. code:: bash
-
-      ros2 run image_view image_view --ros-args -r image:=image_mono  
-      ros2 run image_view image_view --ros-args -r image:=image_rect_color  
-
-.. note::
-
-   For RealSense camera package issues, please
-   refer to the section
-   :ref:`here <troubleshooting/hardware_setup:Realsense driver does not work with ROS 2 Humble>`.
-
-   Other supported cameras can be found
-   :ref:`here <repositories_and_packages/isaac_ros_argus_camera/index:Reference Cameras>`.
-
-   For camera calibration, please refer to
-   :doc:`this guide </getting_started/hardware_setup/sensors/camera_calibration>`.
-
-API
-----
+         ros2 run image_view image_view --ros-args --remap image:=image_flipped
 
 Overview
 ^^^^^^^^
@@ -92,15 +286,469 @@ is not needed, specify the output width/height same as input.
 Available Components
 ^^^^^^^^^^^^^^^^^^^^
 
-============================ ======================================================= =================================================================== ==========================================================================================================================================================================================================================================================================
-Component                    Topics Subscribed                                       Topics Published                                                    Parameters
-============================ ======================================================= =================================================================== ==========================================================================================================================================================================================================================================================================
-``ImageFormatConverterNode`` ``image_raw``, ``camera_info``: The input camera stream ``image``: The converted image                                      ``encoding_desired``: Target encoding to convert to.
-``RectifyNode``              ``image_raw``, ``camera_info``: The input camera stream ``image_rect``, ``camera_info_rect``: The rectified camera stream   ``output_height``: The absolute height to resize to ``output_width``: The absolute width to resize to
-``ResizeNode``               ``image``, ``camera_info``: The input camera stream     ``resize/image``, ``resize/camera_info``: The resized camera stream ``output_height``: The absolute height to resize to ``output_width``: The absolute width to resize to ``num_blocks``: The number of pre-allocated memory blocks, should not be less than ``40``. ``keep_aspect_ratio``: The flag to keep the aspect_ratio when set to true
-``ImageFlipNode``            ``image``: The input image data                         ``image_flipped``: The flipped image                                ``flip_mode``: Supports 3 modes - ``HORIZONTAL``, ``VERTICAL``, and ``BOTH``
-============================ ======================================================= =================================================================== ==========================================================================================================================================================================================================================================================================
+CropNode
+~~~~~~~~
 
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``input_width``
+     - ``int64_t``
+     - ``0``
+     - The width of the input image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``input_height``
+     - ``int64_t``
+     - ``0``
+     - The height of the input image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``crop_width``
+     - ``int64_t``
+     - ``0``
+     - The width of the output image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``crop_height``
+     - ``int64_t``
+     - ``0``
+     - The height of the output image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``crop_mode``
+     - ``string``
+     - ``""``
+     - Mode of operation to perform cropping. Valid values are - ``CENTER``, ``LEFT``, ``RIGHT``, ``TOP``, ``BOTTOM``, ``TOPLEFT``, ``TOPRIGHT``, ``BOTTOMLEFT``, ``BOTTOMRIGHT``, and ``BBOX``. Except ``BBOX``, region of interest calculation is performed based on input and cropped image dimensions.
+
+   * - ``roi_top_left_x``
+     - ``int64_t``
+     - ``0``
+     - X value of the top left corner of a region of interest. This is only used when ``crop_mode`` is set to ``BBOX``.
+
+   * - ``roi_top_left_y``
+     - ``int64_t``
+     - ``0``
+     - Y value of the top left corner of a region of interest. This is only used when ``crop_mode`` is set to ``BBOX``. 
+
+   * - ``num_blocks``
+     - ``int``
+     - ``40``
+     - The number of pre-allocated memory output blocks, should not be less than ``40``. 
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The input image that needs to be cropped.
+
+   * - ``camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`  
+     - The corresponding camera_info of the input image.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``crop/image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - Cropped image.
+
+   * - ``crop/camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`  
+     - The corresponding camera_info of the cropped image.
+
+ImageFlipNode
+~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``flip_mode``
+     - ``string``
+     - ``BOTH``
+     - Axis to be use for flip operation. Valid values are - ``HORIZONTAL``, ``VERTICAL``, and ``BOTH``.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The input image that needs to be flipped.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image_flipped``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - Flipped image.
+
+ImageFormatConverterNode
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``image_width``
+     - ``int64_t``
+     - ``1280``
+     - The width of the input image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``image_height``
+     - ``int64_t``
+     - ``720``
+     - The height of the input image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``encoding_desired``
+     - ``string``
+     - ``""``
+     - Target color encoding to convert to. Valid values are - ``img_encodings::RGB8``, ``img_encodings::RGB16``, ``img_encodings::BGR8``, ``img_encodings::BGR16``, ``img_encodings::MONO8``, ``img_encodings::MONO16``, ``img_encodings::NV24``, and ``nv12``.
+
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image_raw``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The input image data.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The output image data.
+
+ImageNormalizeNode
+~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``mean``
+     - ``std::vector<double>``
+     - ``{0.5, 0.5, 0.5}``
+     - The mean of the image pixels per channel that will be used for normalization.
+
+   * - ``stddev``
+     - ``std::vector<double>``
+     - ``{0.5, 0.5, 0.5}``
+     - The standard deviation of the image pixels per channel that will be used for normalization.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The input image data.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``normalized_image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The output image data.
+
+PadNode
+~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``output_image_width``
+     - ``uint16_t``
+     - ``1200``
+     - The width of the output image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``output_image_height``
+     - ``uint16_t``
+     - ``1024``
+     - The height of the output image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``padding_type``
+     - ``string``
+     - ``CENTER``
+     - Describes the padding mode. Valid values are - ``CENTER``, ``TOP_LEFT``, ``TOP_RIGHT``, ``BOTTOM_LEFT``, and ``BOTTOM_RIGHT``.
+
+   * - ``border_type``
+     - ``string``
+     - ``CONSTANT``
+     - Describes how border values are calculated. Valid values are - ``CONSTANT``, ``REPLICATE``, ``REFLECT``, ``WRAP``, and ``REFLECT101``. More info can be found `here <https://cvcuda.github.io/_exhale_api/enum_BorderType_8h_1a47d27ddb621b5837b703742548a1b263.html#enum-nvcvbordertype>`__.
+
+   * - ``border_pixel_color_value``
+     - ``std::vector<double>``
+     - ``{0.0, 0.0, 0.0, 0.0}``
+     - RGBA color value for border color.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The input image data.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``padded_image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The output image data.
+
+RectifyNode
+~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``output_width``
+     - ``uint16_t``
+     - ``1200``
+     - The width of the output image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``output_height``
+     - ``uint16_t``
+     - ``1024``
+     - The height of the output image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The input image that needs to be rectified.
+
+   * - ``camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`  
+     - The corresponding camera_info of the input image.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``crop/image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - Rectified image.
+
+   * - ``crop/camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`  
+     - The corresponding camera_info of the rectified image.
+
+ResizeNode
+~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``input_width``
+     - ``int64_t``
+     - ``0``
+     - The width of the input image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``input_height``
+     - ``int64_t``
+     - ``0``
+     - The height of the input image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``output_width``
+     - ``int64_t``
+     - ``1080``
+     - The width of the output image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``output_height``
+     - ``int64_t``
+     - ``720``
+     - The height of the output image. This is a mandatory parameter and needs to be set to a non-zero positive number.
+
+   * - ``keep_aspect_ratio``
+     - ``bool``
+     - ``false``
+     - When enabled, aspect ratio of the original image will be preserved by adding black border.
+  
+   * - ``encoding_desired``
+     - ``string``
+     - ``""``
+     - This value is used to mark the preference of output color format. 
+
+   * - ``disable_padding``
+     - ``bool``
+     - ``false``
+     - When set to true, ``keep_aspect_ratio`` is ignored and no padding is added to the output image. 
+
+   * - ``num_blocks``
+     - ``int``
+     - ``40``
+     - The number of pre-allocated memory output blocks, should not be less than ``40``. 
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - The input image that needs to be resized.
+
+   * - ``camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`  
+     - The corresponding camera_info of the input image.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``resize/image``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`  
+     - Resized image.
+
+   * - ``resize/camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`  
+     - The corresponding camera_info of the resized image.
 
 **Limitation**: ``isaac_ros_image_proc`` nodes require even number dimensions for
 images.

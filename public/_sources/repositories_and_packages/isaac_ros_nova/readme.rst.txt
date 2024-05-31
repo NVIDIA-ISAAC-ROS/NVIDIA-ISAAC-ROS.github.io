@@ -1,4 +1,5 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
@@ -17,6 +18,10 @@ Overview
 
 .. include:: /_snippets/isaac_ros_nitros_acceleration.rst
 
+Performance
+-----------
+
+.. include:: /performance/tables/isaac_ros_nova.rst
 
 -----------------------------------------------------------------------------------------------------------------------------
 

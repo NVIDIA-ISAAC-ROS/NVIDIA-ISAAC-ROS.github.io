@@ -9,7 +9,7 @@ Decoding Jetson H.264 Images on Non-NVIDIA Powered Systems
 Overview
 ------------
 
-Using hardware-accelerated Isaac ROS compression to H.264
+Using NVIDIA-accelerated Isaac ROS compression to H.264
 encode data for playback through Isaac ROS H.264 decoder on
 NVIDIA-powered systems is fast and efficient. However, you may need
 to decode recorded data on systems that are not NVIDIA-powered.
@@ -30,16 +30,17 @@ decoder is used to display it in an image view window.
 Tutorial Walkthrough
 --------------------
 
-1. Complete the quickstart :ref:`here <repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index:quickstart>`.
+1. Finish the setup in the quickstart.
+
+   .. include:: /_snippets/set_up_dev_env.rst
+
 2. Clone the following third-party repository into your workspace:
 
    .. code:: bash
 
-      cd ${ISAAC_ROS_WS}/src
-      git clone https://github.com/clydemcqueen/h264_image_transport.git
-
-      # Install dependencies for the third-party package
-      sudo apt install libavdevice-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_compression>` && \
+         git clone https://github.com/clydemcqueen/h264_image_transport.git
 
 3. Launch the Docker container using the ``run_dev.sh`` script:
 
@@ -48,17 +49,23 @@ Tutorial Walkthrough
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-4. Inside the container, build the third-party ``h264_image_transport``
+4. Install dependencies for the third-party package:
+
+   .. code:: bash
+
+      sudo apt install libavdevice-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
+
+5. Build the third-party ``h264_image_transport``
    package:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
+      cd ${ISAAC_ROS_WS} && \
         colcon build --symlink-install --packages-up-to \
           h264_image_transport isaac_ros_to_h264_msgs_packet && \
         source install/setup.bash
 
-5. Launch the graph to bring up an image viewer that shows the decoded
+6. Launch the graph to bring up an image viewer that shows the decoded
    output.
 
    .. code:: bash

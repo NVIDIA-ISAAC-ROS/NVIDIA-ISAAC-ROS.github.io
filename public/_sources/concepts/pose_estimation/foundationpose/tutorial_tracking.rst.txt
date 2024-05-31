@@ -1,0 +1,180 @@
+FoundationPose Tracking
+=======================
+
+Overview
+---------
+
+This tutorial walks you through a graph to run FoundationPose tracking using
+:ir_repo:`FoundationPose <isaac_ros_pose_estimation> <isaac_ros_foundationpose>`
+FoundationPose tracking has similar functionality as FoundationPose pose estimation. However, it utilizes the pose from the previous frame and requires only the refine network without batching which can significantly increase the speed of the pipeline.
+Therefore, you can use the FoundationPose pose estimation to obtain the initial pose on the first frame and then switch to FoundationPose tracking for subsequent frames.
+
+.. note::
+
+   To ensure the tracking pipeline is able to get the initial pose estimation,
+   please play the ROS bag after the launch file is fully started.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the
+    :ref:`Isaac ROS FoundationPose Quickstart Guide <repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index:quickstart>`.
+
+2.  Open a new terminal and launch the Docker container using the
+    ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+.. tabs::
+   .. group-tab:: Rosbag
+
+      3. Continuing inside the container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      4. Run the following launch files to spin up a demo of this package:
+
+         Launch ``isaac_ros_foundationpose``:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=foundationpose_tracking interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/quickstart_interface_specs.json mesh_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mustard/textured_simple.obj texture_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mustard/texture_map.png score_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/score_trt_engine.plan refine_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/refine_trt_engine.plan rt_detr_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan
+            
+         Then open **another** terminal, and enter the Docker container again:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+         Then, play the ROS bag:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/src/isaac_ros_pose_estimation/resources/rosbags/foundationpose_tracking.bag/
+
+
+   .. group-tab:: RealSense Camera
+
+      3. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+         
+      4. Complete the :ref:`Isaac ROS RT-DETR tutorial <repositories_and_packages/isaac_ros_object_detection/isaac_ros_rtdetr/index:quickstart>`.
+
+      5. Open a new terminal and launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      6. Install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+      7. Place the object in front of the camera and run the launch file:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect_depth,foundationpose_tracking mesh_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/Mac_and_cheese_0_1.obj texture_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/materials/textures/baked_mesh_tex0.png score_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/score_trt_engine.plan refine_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/refine_trt_engine.plan rt_detr_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan
+
+   .. group-tab:: Hawk Camera
+         
+      3. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      4.  Complete the :ref:`Isaac ROS RT-DETR tutorial <repositories_and_packages/isaac_ros_object_detection/isaac_ros_rtdetr/index:quickstart>`.
+
+      5.  Open a new terminal and launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+         .. note::
+
+            Due to high latency in the ``RT-DETR`` object detection pipeline, you need to manually modify ``src/isaac_ros_image_pipeline/isaac_ros_image_proc/nitros_resize_node.yaml`` and replace all ``capacity: 12`` with ``capacity: 50``.
+         
+         .. todo::
+            
+            Reduce latency in the pipeline and remove the above note.
+
+
+      6. Install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+      7. Place the object in front of the hawk camera and run the launch file:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_depth,foundationpose_tracking mesh_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/Mac_and_cheese_0_1.obj texture_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/materials/textures/baked_mesh_tex0.png score_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/score_trt_engine.plan refine_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/refine_trt_engine.plan rt_detr_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan
+
+
+Visualize Results
+-----------------
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+   .. tabs::
+
+      .. group-tab:: Rosbag
+
+         2. launch ``RViz2`` to visualize the output
+            
+            .. code:: bash
+
+               rviz2 -d  $(ros2 pkg prefix isaac_ros_foundationpose --share)/rviz/foundationpose_tracking.rviz
+
+         3.  You should see a ``RViz2`` window open as shown below showing the 3D bounding box overlaid over the input image
+
+            .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/foundation_pose_rviz2.png>`
+               :width: 600px
+               :align: center
+
+      .. group-tab:: RealSense Camera
+
+         2. launch ``RViz2`` to visualize the output
+            
+            .. code:: bash
+
+               rviz2 -d  $(ros2 pkg prefix isaac_ros_foundationpose --share)/rviz/foundationpose_realsense_tracking.rviz
+
+         3.  You should see a visualization of the 3D pose estimate as shown below:
+
+            .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/pose_estimation/foundationpose/foundationpose_realsense.png>`
+               :alt: Isaac ROS FoundationPose RealSense Tracking
+               :align: center
+
+      .. group-tab:: Hawk Camera
+
+         2. launch ``RViz2`` to visualize the output
+            
+            .. code:: bash
+
+               rviz2 -d  $(ros2 pkg prefix isaac_ros_foundationpose --share)/rviz/foundationpose_hawk_tracking.rviz
+
+         3.  You should see a visualization of the 3D pose estimate as shown below:
+
+            .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/pose_estimation/foundationpose/foundationpose_hawk.png>`
+               :alt: Isaac ROS FoundationPose Hawk Tracking
+               :align: center

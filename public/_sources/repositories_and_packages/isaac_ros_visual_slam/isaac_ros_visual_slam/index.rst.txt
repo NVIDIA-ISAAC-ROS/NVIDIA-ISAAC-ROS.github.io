@@ -7,81 +7,182 @@
 Quickstart
 ----------
 
-1. Set up your development environment by following the instructions
-   :doc:`here </getting_started/dev_env_setup>`.
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   Note: ``${ISAAC_ROS_WS}`` is defined to point to either ``/ssd/workspaces/isaac_ros-dev/`` or
-   ``~/workspaces/isaac_ros-dev/``.
+.. include:: /_snippets/set_up_dev_env.rst
 
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+1. Download quickstart data from NGC:
 
-       cd ${ISAAC_ROS_WS}/src
+   :ir_assets:`<isaac_ros_visual_slam> <quickstart.tar.gz>`
 
-    .. code:: bash
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
 
-       git clone :ir_clone:`<isaac_ros_common>`
+.. tabs::
 
-    .. code:: bash
+   .. tab:: Binary Package
 
-       git clone :ir_clone:`<isaac_ros_visual_slam>`
+      1. Launch the Docker container using the ``run_dev.sh`` script:
 
+         .. code:: bash
 
-3. [Terminal 1] Launch the Docker container
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-visual-slam
+   
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_visual_slam>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_visual_slam --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_visual_slam
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=visual_slam \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_visual_slam/quickstart_interface_specs.json \
+            rectified_images:=false
+
+      #. Open a **second** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_visual_slam/quickstart_bag --remap  \
+            /front_stereo_camera/left/image_raw:=/left/image_rect \
+            /front_stereo_camera/left/camera_info:=/left/camera_info_rect \
+            /front_stereo_camera/right/image_raw:=/right/image_rect \
+            /front_stereo_camera/right/camera_info:=/right/camera_info_rect \
+            /back_stereo_camera/left/image_raw:=/rear_left/image_rect \
+            /back_stereo_camera/left/camera_info:=/rear_left/camera_info_rect \
+            /back_stereo_camera/right/image_raw:=/rear_right/image_rect \
+            /back_stereo_camera/right/camera_info:=/rear_right/camera_info_rect
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_stereo_rect,visual_slam \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_visual_slam/quickstart_interface_specs.json \
+            base_frame:=camera_link camera_optical_frames:="['camera_infra1_optical_frame', 'camera_infra2_optical_frame']"
+
+   .. tab:: Hawk Camera
+         
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+      #. Run the following launch file to spin up a demo of this package using a Hawk camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_stereo,rectify_stereo,visual_slam \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_visual_slam/quickstart_interface_specs.json \
+            base_frame:=camera camera_optical_frames:="['left_cam', 'right_cam']" module_id:=5
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Open a **new** terminal inside the Docker container:
 
    .. code:: bash
 
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh ${ISAAC_ROS_WS}
+         ./scripts/run_dev.sh
 
-4. [Terminal 1] Install this package's dependencies.
-
-   :ir_apt:
+2. Visualize and validate the output of the package with ``rviz``:
 
    .. code:: bash
 
-      sudo apt-get install -y ros-humble-isaac-ros-visual-slam
-
-   Run the following launch files in the current terminal (Terminal 1):
-
-   .. code:: bash
-
-      ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam.launch.py
-
-1. [Terminal 2] Attach another terminal to the running container for
-   RViz2
-
-   Attach another terminal to the running container for RViz2.
-
-   .. code:: bash
-
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh ${ISAAC_ROS_WS}
-
-   From this second terminal, run RViz2 to display the output:
-
-   .. code:: bash
-
-      rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/default.cfg.rviz
-
-   If you are SSHing in from a remote machine, the RViz2 window
-   should be forwarded to your remote machine.
-
-2. [Terminal 3] Attach the 3rd terminal to start the rosbag
-
-   .. code:: bash
-
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh ${ISAAC_ROS_WS}
-
-   Run the rosbag file to start the demo.
-
-   .. code:: bash
-
-      ros2 bag play src/isaac_ros_visual_slam/isaac_ros_visual_slam/test/test_cases/rosbags/small_pol_test/
-
-3. Result:
+      rviz2 -d $(ros2 pkg prefix isaac_ros_visual_slam --share)/rviz/default.cfg.rviz
 
    RViz should start displaying the point clouds and poses like below:
 
@@ -96,14 +197,16 @@ To continue your exploration, check out the following suggested examples:
 
 .. toctree::
    :maxdepth: 1
-   
+
    Validating cuVSLAM Setup </concepts/visual_slam/cuvslam/validating_cuvslam_setup>
 
    Tutorial with Isaac Sim </concepts/visual_slam/cuvslam/tutorial_isaac_sim>
 
    Tutorial with RealSense </concepts/visual_slam/cuvslam/tutorial_realsense>
 
-   Tutorial with ZED </concepts/visual_slam/cuvslam/tutorial_zed>
+   Tutorial with HAWK </concepts/visual_slam/cuvslam/tutorial_hawk>
+
+   Tutorial with multiple HAWKs </concepts/visual_slam/cuvslam/tutorial_multi_hawk>
 
 Coordinate Frames
 -----------------
@@ -115,23 +218,23 @@ This section describes the coordinate frames that are involved in the
    :width: 300px
    :align: center
 
-1. ``input_base_frame``: The name of the frame used to calculate
-   transformation between base link and left camera. The default value is
-   empty (''), which means the value of ``base_frame_`` will be used. If
-   ``input_base_frame_`` and ``base_frame_`` are both empty, the left
-   camera is assumed to be in the robot's center.
-2. ``input_left_camera_frame``: The frame associated with left eye of
-   the stereo camera. Note that this is not the same as the optical
-   frame. The default value is empty (''), which means the left camera
-   is in the robot's center and ``left_pose_right`` will be calculated
-   from the CameraInfo message.
-3. ``input_right_camera_frame``: The frame associated with the right eye
-   of the stereo camera. Note that this is not the same as the optical
-   frame. The default value is empty (''), which means left and right
-   cameras have identity rotation and are horizontally aligned, so
-   ``left_pose_right`` will be calculated from CameraInfo.
-4. ``input_imu_frame``: The frame associated with the IMU sensor (if
-   available). It is used to calculate ``left_pose_imu``.
+1. ``base_frame``: The base frame of the robot or camera rig. It is assumed that
+   all cameras are rigidly mounted to this frame, such that the transforms between
+   the ``base_frame`` and the ``camera_optical_frames`` can assumed to be static.
+   The estimated odometry and SLAM pose will represent the pose of this frame.
+
+2. ``map_frame``: The frame corresponding to the origin of the map that cuVSLAM
+   creates or localizes in. The SLAM pose reported by cuVSLAM corresponds with
+   the transform ``map_frame`` -> ``base_frame``.
+
+3. ``odom_frame``: The frame corresponding to the origin of the odometry that
+   cuVSLAM estimates. The odometry pose reported by cuVSLAM corresponds with the
+   transform ``odom_frame`` -> ``base_frame``.
+
+4. ``camera_optical_frames``: The frames corresponding to the optical center of
+   every camera. The frame is expected to lie at the center of the camera lens
+   and oriented with the z-axis pointing in the view direction and the y-axis
+   pointing to the floor.
 
 Troubleshooting
 ---------------
@@ -155,12 +258,13 @@ Troubleshooting Suggestions
          ros2 topic hz --window 100 <image_topic_name>
 
 2. If RViz is not showing the poses, check the **Fixed Frame** value.
+
 3. If you are seeing ``Visual tracking is lost.`` messages frequently,
    it could be caused by the following issues:
 
    1. Fast motion causing the motion blur in the frames
    2. Low-lighting conditions.
-   3. The wrong ``camerainfo`` is being published.
+   3. The wrong ``camera_info`` is being published.
 
 4. For better performance:
 
@@ -169,31 +273,36 @@ Troubleshooting Suggestions
    2. If input images are noisy, you can use the
       ``denoise_input_images`` flag in the node.
 
-5. For RealSense cameras-
+5. For RealSense cameras check that:
 
-   1. The firmware of the RealSense camera is `5.14.0 or
-      newer <https://dev.intelrealsense.com/docs/firmware-releases>`__.
-      Check the RealSense
-      `firmware-update-tool <https://dev.intelrealsense.com/docs/firmware-update-tool>`__
-      page for details on how to check the version and update the camera
-      firmware.
-   2. You are using the `4.51.1 tagged
-      release <https://github.com/IntelRealSense/realsense-ros/releases/tag/4.51.1>`__
-      for the `realsense-ros
-      package <https://github.com/IntelRealSense/realsense-ros/commit/2a65533ee7431bdc05fe5744798efc7f5713f866>`__.
-   3. You are using the parameters set in the 
+   1. You are using the firmware and ``realsense_ros`` versions recommended in
+      :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
+   2. You are using the parameters set in the
       :ir_repo:`RealSense tutorial launch file <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_realsense.launch.py>`
-   4. If the pose estimate frames in RViz is **drifting** from actual
+   3. If the pose estimate frames in RViz is **drifting** from actual
       real-world poses and you see white dots on nearby objects(refer to
       the screenshot below), this means that the emitter of the
-      RealSense camera is on and it needs to be 
+      RealSense camera is on and it needs to be
       :ir_repo:`turned off <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_realsense.launch.py#L35>`.
-   5. Left and right images being published are not compressed or
+   4. Left and right images being published are not compressed or
       encoded. Isaac ROS Visual Slam expects raw images.
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/realsense_emitter.png>`
   :width: 400px
   :align: center
+
+6. For global localization:
+
+   Isaac ROS Visual SLAM does not yet support global localization. Simultaneous
+   localization and mapping mode is only supported for single cameras, for
+   multi-camera setups only visual odometry mode is supported.
+
+   If localization with respect to a map is needed an additional module is
+   required.  We recommend to use
+   `ROS2 AMCL <https://github.com/ros-planning/navigation2/tree/main/nav2_amcl>`_
+   together with :doc:`Isaac ROS Map Localization </repositories_and_packages/isaac_ros_map_localization/index>`
+   for global localization. You can find an example of how to do this in the
+   :doc:`Nova Carter Navigation tutorial </reference_workflows/isaac_perceptor/tutorials_on_carter/demo_navigation>`.
 
 API
 ----
@@ -208,45 +317,60 @@ Usage
 ROS Parameters
 ^^^^^^^^^^^^^^
 
-================================= =============== =============== =========================================================================================================================================================================================================================================================================================================
-ROS Parameter                     Type            Default         Description
-================================= =============== =============== =========================================================================================================================================================================================================================================================================================================
-``denoise_input_images``          ``bool``        ``false``       If enabled, input images are denoised. It can be enabled when images are noisy because of low-light conditions.
-``rectified_images``              ``bool``        ``true``        Flag to mark if the incoming images are rectified or raw.
-``enable_imu_fusion``             ``bool``        ``false``       If enabled, IMU data is used.
-``gyro_noise_density``            ``double``      ``0.000244``    White noise parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
-``gyro_random_walk``              ``double``      ``0.000019393`` Random walk parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
-``accel_noise_density``           ``double``      ``0.001862``    White noise parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
-``accel_random_walk``             ``double``      ``0.003``       Random walk parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
-``calibration_frequency``         ``double``      ``200.0``       IMU frequency used for generating noise model parameters.
-``img_jitter_threshold_ms``       ``double``      ``33.33``       Acceptable time delta between previous and current pair of image frames. If a pair of image frames exceeds the threshold, it might be an indication of frame drop from the source.
-``enable_verbosity``              ``bool``        ``false``       If enabled, prints logs from cuVSLAM library.
-``force_planar_mode``             ``bool``        ``false``       If enabled, slam poses will be modified such that the camera moves on a horizontal plane.
-``enable_debug_mode``             ``bool``        ``false``       If enabled, a debug dump (image frames, timestamps, and camera info) is saved on to the disk at the path indicated by ``debug_dump_path``
-``debug_dump_path``               ``std::string`` ``/tmp/elbrus`` The path to the directory to store the debug dump data.
-``input_base_frame``              ``std::string`` ``""``          Name of the frame (``baselink``) to calculate transformation between the ``baselink`` and the left camera. Default is empty, which means the value of the ``base_frame`` will be used. If ``input_base_frame`` and ``base_frame`` are both empty, the left camera is assumed to be in the robot's center.
-``input_left_camera_frame``       ``std::string`` ``""``          The name of the left camera frame. the default value is empty, which means the left camera is in the robot's center and ``left_pose_right`` will be calculated from CameraInfo.
-``input_right_camera_frame``      ``std::string`` ``""``          The name of the right camera frame. The default value is empty, which means left and right cameras have identity rotation and are horizontally aligned. ``left_pose_right`` will be calculated from CameraInfo.
-``input_imu_frame``               ``std::string`` ``imu``         Defines the name of the IMU frame used to calculate ``left_camera_pose_imu``.
-``map_frame``                     ``std::string`` ``map``         The frame name associated with the map origin.
-``odom_frame``                    ``std::string`` ``odom``        The frame name associated with the odometry origin.
-``base_frame``                    ``std::string`` ``base_link``   The frame name associated with the robot.
-``enable_observations_view``      ``bool``        ``false``       If enabled, 2D feature pointcloud will be available for visualization.
-``enable_landmarks_view``         ``bool``        ``false``       If enabled, landmark pointcloud will be available for visualization.
-``enable_slam_visualization``     ``bool``        ``false``       Main flag to enable or disable visualization.
-``enable_localization_n_mapping`` ``bool``        ``true``        If enabled, SLAM mode is on. If disabled, only Visual Odometry is on.
-``path_max_size``                 ``int``         ``1024``        The maximum size of the buffer for pose trail visualization.
-``publish_odom_to_base_tf``       ``bool``        ``true``        Enable ``tf`` broadcaster for ``odom_frame`` -> ``base_frame`` transform.
-``publish_map_to_odom_tf``        ``bool``        ``true``        Enable ``tf`` broadcaster for ``map_frame`` -> ``odom_frame`` transform.
-``invert_odom_to_base_tf``        ``bool``        ``false``       Invert the ``odom_frame`` -> ``base_frame`` transform before broadcasting to the ``tf`` tree.
-``invert_map_to_odom_tf``         ``bool``        ``false``       Invert the ``map_frame`` -> ``odom_frame`` transform before broadcasting to the ``tf`` tree.
-``map_frame``                     ``std::string`` ``map``         String name for the ``map_frame``.
-``odom_frame``                    ``std::string`` ``odom``        String name for the ``odom_frame``.
-``base_frame``                    ``std::string`` ``base_link``   String name for the ``base_frame``.
-``override_publishing_stamp``     ``bool``        ``false``       Override timestamp received from the left image with the timestamp from ``rclcpp::Clock``.
-``msg_filter_queue_size``         ``int``         ``100``         Image + Camera Info Synchronizer message filter queue size.
-``image_qos``                     ``std::string`` ``SENSOR_DATA`` QoS profile for the left and right image subscribers.
-================================= =============== =============== =========================================================================================================================================================================================================================================================================================================
+================================= ============================ ================ ===================================================================================================================================================================================================================
+ROS Parameter                     Type                         Default          Description
+================================= ============================ ================ ===================================================================================================================================================================================================================
+*Functional Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``num_cameras``                   ``int``                      ``2``            Number of cameras used. Set to 2 for a single stereo camera.
+``min_num_images``                ``int``                      ``num_cameras``  Minimum number of images required to track the pose. If less than ``min_num_images`` with a synchronized timestamp are received then the synchronizer will drop all messages.
+``sync_matching_threshold_ms``    ``double``                   ``5.0`` .        Maximum duration between image timestamps to still consider them synced.
+``enable_image_denoising``        ``bool``                     ``false``        If enabled, input images are denoised. It can be enabled when images are noisy because of low-light conditions.
+``rectified_images``              ``bool``                     ``true``         Flag to mark if the incoming images are rectified or raw.
+``enable_planar_mode``            ``bool``                     ``false``        If enabled, slam poses will be modified such that the camera moves on a horizontal plane.
+``enable_localization_n_mapping`` ``bool``                     ``true``         If enabled, SLAM mode is on. If disabled, only odometry is on. Currently SLAM mode only works when using a single stereo camera.
+``enable_imu_fusion``             ``bool``                     ``false``        If enabled, IMU data is used.
+``gyro_noise_density``            ``double``                   ``0.000244``     White noise parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``gyro_random_walk``              ``double``                   ``0.000019393``  Random walk parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``accel_noise_density``           ``double``                   ``0.001862``     White noise parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``accel_random_walk``             ``double``                   ``0.003``        Random walk parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``calibration_frequency``         ``double``                   ``200.0``        IMU frequency used for generating noise model parameters.
+``image_jitter_threshold_ms``     ``double``                   ``34.0``         Acceptable time delta between consecutive synced image messages. If the messages exceed the threshold, it might be an indication of message drop from the source.
+``imu_jitter_threshold_ms``       ``double``                   ``10.0``         Acceptable time delta between consecutive IMU messages. If the messages exceed the threshold, it might be an indication of message drop from the source.
+``img_mask_top``                  ``int``                      ``0``            The number of pixels of the upper border of the image will be masked at the stage of selecting features for visual tracking.
+``img_mask_bottom``               ``int``                      ``0``            The number of pixels of the lower border of the image will be masked at the stage of selecting features for tracking.
+``img_mask_left``                 ``int``                      ``0``            The number of pixels of the left border of the image from the left camera of the stereo pair (the right border for the right camera of a stereo pair) will be masked at the stage of selecting features for tracking.
+``img_mask_right``                ``int``                      ``0``            The number of pixels of the right border of the image from the left camera of the stereo pair (the left border for the right camera of a stereo pair) will be masked at the stage of selecting features for tracking.
+*Frame Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``map_frame``                     ``std::string``              ``map``          The frame name associated with the map origin.
+``odom_frame``                    ``std::string``              ``odom``         The frame name associated with the odometry origin.
+``base_frame``                    ``std::string``              ``base_link``    The frame name associated with the base of the robot or camera rig.
+``camera_optical_frames``         ``std::vector<std::string>`` ``[]``           The frame names associated with the cameras' optical frames. Using ROS optical frame conventions, i.e. z-axis front, y-axis down. If not specified will use the frames from the camera info messages.
+``imu_frame``                     ``std::string``              ``imu``          The frame name associated with the IMU.
+*Message Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``image_buffer_size``             ``int``                      ``100``          Buffer size used by the image synchronizer.
+``imu_buffer_size``               ``int``                      ``50``           Buffer size used by the IMU sequencer.
+``image_qos``                     ``std::string``              ``DEFAULT``      QoS profile for the image subscribers.
+``imu_qos``                       ``std::string``              ``DEFAULT``      QoS profile for the IMU subscriber.
+*Output Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``override_publishing_stamp``     ``bool``                     ``false``        Override timestamp received from the left image with the timestamp from ``rclcpp::Clock``.
+``publish_map_to_odom_tf``        ``bool``                     ``true``         Enable ``tf`` broadcaster for ``map_frame`` -> ``odom_frame`` transform.
+``publish_odom_to_rig_tf``        ``bool``                     ``true``         Enable ``tf`` broadcaster for ``odom_frame`` -> ``base_frame`` transform.
+``invert_map_to_odom_tf``         ``bool``                     ``false``        Invert the ``map_frame`` -> ``odom_frame`` transform before broadcasting to the ``tf`` tree.
+``invert_odom_to_rig_tf``         ``bool``                     ``false``        Invert the ``odom_frame`` -> ``base_frame`` transform before broadcasting to the ``tf`` tree.
+*Debug/Visualization Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``enable_slam_visualization``     ``bool``                     ``false``        Main flag to enable or disable visualization.
+``enable_observations_view``      ``bool``                     ``false``        If enabled, 2D feature pointcloud will be available for visualization.
+``enable_landmarks_view``         ``bool``                     ``false``        If enabled, landmark pointcloud will be available for visualization.
+``path_max_size``                 ``int``                      ``1024``         The maximum size of the buffer for pose trail visualization.
+``verbosity``                     ``int``                      ``0``            Verbosity for cuVSLAM, 0 is silent.
+``enable_debug_mode``             ``bool``                     ``false``        If enabled, a debug dump (images, IMU messages, timestamps, and camera info) is saved on to the disk at the path indicated by ``debug_dump_path``
+``debug_dump_path``               ``std::string``              ``/tmp/cuvslam`` The path to the directory to store the debug dump data.
+================================= ============================ ================ ===================================================================================================================================================================================================================
 
 ROS Topics Subscribed
 ^^^^^^^^^^^^^^^^^^^^^
@@ -254,11 +378,9 @@ ROS Topics Subscribed
 ==================================== ===================================================================================================================== ===============================================================
 ROS Topic                            Interface                                                                                                             Description
 ==================================== ===================================================================================================================== ===============================================================
-``/stereo_camera/left/image``        `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__               The image from the left eye of the stereo camera in grayscale.
-``/stereo_camera/left/camera_info``  `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__     CameraInfo from the left eye of the stereo camera.
-``/stereo_camera/right/image``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__               The image from the right eye of the stereo camera in grayscale.
-``/stereo_camera/right/camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__     CameraInfo from the right eye of the stereo camera.
-``visual_slam/imu``                  `sensor_msgs/Imu <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Imu.msg>`__                   Sensor data from the IMU(optional).
+``visual_slam/image_{i}``            `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__               Image from the :spelling:ignore:`i-th` camera in grayscale (i is in range [0, ``num_cameras``-1]).
+``visual_slam/camera_info_{i}``      `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__     Camera info from the :spelling:ignore:`i-th` camera (i is in range [0, ``num_cameras``-1]).
+``visual_slam/imu``                  `sensor_msgs/Imu <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Imu.msg>`__                   Sensor data from the IMU (is only present if ``enable_imu_fusion`` is ``true``).
 ==================================== ===================================================================================================================== ===============================================================
 
 ROS Topics Published
@@ -267,24 +389,28 @@ ROS Topics Published
 =========================================== ======================================================================================================================================================= ==================================================
 ROS Topic                                   Interface                                                                                                                                               Description
 =========================================== ======================================================================================================================================================= ==================================================
-``visual_slam/tracking/odometry``           `nav_msgs/Odometry <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Odometry.msg>`__                                                 Odometry messages for the ``base_link``.
-``visual_slam/tracking/vo_pose_covariance`` `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__     Current pose with covariance of the ``base_link``.
-``visual_slam/tracking/vo_pose``            `geometry_msgs/PoseStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseStamped.msg>`__                                 Current pose of the ``base_link``.
+``visual_slam/tracking/odometry``           `nav_msgs/Odometry <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Odometry.msg>`__                                                 Current odometry of the ``base_frame``.
+``visual_slam/tracking/vo_pose_covariance`` `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__     Current pose with covariance of the ``base_frame``.
+``visual_slam/tracking/vo_pose``            `geometry_msgs/PoseStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseStamped.msg>`__                                 Current pose of the ``base_frame``.
 ``visual_slam/tracking/slam_path``          `nav_msgs/Path <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Path.msg>`__                                                         Trail of poses generated by SLAM.
 ``visual_slam/tracking/vo_path``            `nav_msgs/Path <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Path.msg>`__                                                         Trail of poses generated by pure Visual Odometry.
 ``visual_slam/status``                      :ir_repo:`isaac_ros_visual_slam_interfaces/VisualSlamStatus <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/msg/VisualSlamStatus.msg>`        Status message for diagnostics.
+``/diagnostics``                            `diagnostic_msgs/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/humble/diagnostic_msgs/msg/DiagnosticArray.msg>` __                    Diagnostic message. Similar to ``status`` topic but in a different format.
 =========================================== ======================================================================================================================================================= ==================================================
 
 ROS Services Advertised
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-================================= ================================================================================================================================================================================ ============================================================
+================================= ================================================================================================================================================================================ ===============================================================
 ROS Service                       Interface                                                                                                                                                                        Description
-================================= ================================================================================================================================================================================ ============================================================
+================================= ================================================================================================================================================================================ ===============================================================
 ``visual_slam/reset``             :ir_repo:`isaac_ros_visual_slam_interfaces/Reset <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/Reset.srv>`                                                       A service to reset the node.
 ``visual_slam/get_all_poses``     :ir_repo:`isaac_ros_visual_slam_interfaces/GetAllPoses <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/GetAllPoses.srv>`                                           A service to get the series of poses for the path traversed.
-``visual_slam/set_odometry_pose`` :ir_repo:`isaac_ros_visual_slam_interfaces/SetOdometryPose <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/SetOdometryPose.srv>`                                   A service to set the pose of the odometry frame.
-================================= ================================================================================================================================================================================ ============================================================
+``visual_slam/set_slam_pose``     :ir_repo:`isaac_ros_visual_slam_interfaces/SetSlamPose <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/SetSlamPose.srv>`                                           A service to set the estimated SLAM pose of the ``base_frame``.
+================================= ================================================================================================================================================================================ ===============================================================
+
+.. note::
+   ``visual_slam/set_slam_pose`` only works in SLAM mode i.e. set ``enable_localization_n_mapping = false``
 
 ROS Actions Advertised
 ^^^^^^^^^^^^^^^^^^^^^^

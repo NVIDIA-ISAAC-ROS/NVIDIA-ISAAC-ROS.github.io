@@ -67,3 +67,36 @@ Delete the ``model.plan`` file that is being passed in as an argument to
 the Triton node's ``model_repository_paths`` parameter, and then use the
 source package's instructions to regenerate the ``model.plan`` file from
 the original weights file (often a ``.etlt`` or ``.onnx`` file).
+
+Seeing CUDA Error: an illegal memory access was encountered
+-----------------------------------------------------------
+
+One cause of this issue is when the GPU being used does not have enough
+memory to run the model or combination of models. For example, SAM with
+YOLO may require up to 12GB of VRAM to operate depending on the application.
+
+Symptom
+~~~~~~~
+
+.. code:: bash
+
+   [component_container_mt-1] [ERROR] [1714404908.405286740] [NitrosImage]: [convert_to_custom] cudaMemcpy2D failed for conversion from sensor_msgs::msg::Image to NitrosImage: cudaErrorIllegalAddress (an illegal memory access was encountered)
+   [component_container_mt-1] 2024-04-29 21:05:08.405 ERROR gxf/std/entity_executor.cpp@552: Failed to tick codelet  in entity: UKNJEXSISG_triton_response code: GXF_FAILURE
+   [component_container_mt-1] 2024-04-29 21:05:08.405 ERROR gxf/std/entity_executor.cpp@552: Failed to tick codelet  in entity: APDRLGKSXZ_cuda_stream_sync code: GXF_FAILURE
+   [component_container_mt-1] 2024-04-29 21:05:08.405 ERROR gxf/std/entity_executor.cpp@210: Entity with eid 207 not found!
+
+.. code:: bash
+   
+   [component_container_mt-1] CUDA Error: an illegal memory access was encountered
+   [component_container_mt-1] 2024-04-30 14:08:12.187 ERROR extensions/triton/inferencers/triton_inferencer_impl.cpp@729: cudaMemcpy error: an illegal memory access was encountered 
+   [component_container_mt-1] 
+   [component_container_mt-1] 2024-04-30 14:08:12.187 ERROR gxf/std/entity_executor.cpp@552: Failed to tick codelet  in entity: CMMPVZZGUM_triton_response code: GXF_FAILURE
+   [component_container_mt-1] terminate called after throwing an instance of 'std::runtime_error'
+   [component_container_mt-1]   what():  CUDA error returned at ./src/image_to_tensor_node.cpp:154, Error code: 700 (an illegal memory access was encountered)
+   [component_container_mt-1] 2024-04-30 14:08:12.187 WARN  gxf/std/multi_thread_scheduler.cpp@342: Error while executing entity E926 named 'CMMPVZZGUM_triton_response': GXF_FAILURE
+   [ERROR] [component_container_mt-1]: process has died [pid 4801, exit code -6, cmd '/opt/ros/humble/lib/rclcpp_components/component_container_mt --ros-args --log-level WARN --ros-args -r __node:=segment_anything_container -r __ns:=/'].
+
+Solution
+~~~~~~~~
+
+A discrete GPU with more VRAM may be required.

@@ -1,0 +1,73 @@
+
+.. _nova_carter:
+
+===========
+Nova Carter
+===========
+
+`Nova Carter <https://robotics.segway.com/nova-carter/>`__ was jointly developed
+with `Segway Robotics <https://robotics.segway.com/>`__, for autonomous robotics
+development including accelerated computing for ROS 2 with full 360° sensing
+from camera and LIDAR and validated by `Open Navigation
+<https://www.opennav.org/>`__ for use with Nav2.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/carter_header.jpg>`
+    :width: 800px
+    :alt: Nova Carter
+    :align: center
+
+`Nova Carter` is powered by a Jetson AGX Orin with additional interface I|O boards
+developed for robotics; it includes
+
+* 1x 32 beam 360° LIDAR
+* 2x planar LIDARs
+* 4x `HAWK stereo cameras <https://leopardimaging.com/leopard-imaging-hawk-stereo-camera/>`__ (1920x1200, 60 FPS, 120° FOV)
+* 4x `OWL fisheye cameras <https://leopardimaging.com/product/autonomous-camera/maxim-gmsl2-cameras/li-ar0234cs-gmsl2-owl/li-ar0234cs-gmsl2-owl/>`__ (1920x1200, 120 FPS, 202°± 3° FOV)
+* IMU, Magnetometer, and Barometer
+
+`Nova Carter` allows high-precision time synchronization between sensors using
+hardware time stamping, and PTP over Ethernet with less than 10us for sensor
+acquisition time. The robot provides simultaneous camera capture across all
+cameras within 100us from a single hardware trigger, and can write to disk at 4
+GB per second for sensor capture to ROSbags.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/nova_carter_diagram_front_left.png>`
+    :width: 800px
+    :align: center
+
+`Nova Carter` robots running Isaac ROS can be teleoperated, map an environment,
+and navigate within that environment using visual cameras and LiDARs.
+
+
+Setup the `Nova Carter`
+--------------------------------
+
+Review the following guide to set up your `Nova Carter`, and visualize sensor output.
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   getting_started.rst
+
+Tutorials
+---------
+
+Once you set up `Nova Carter` successfully, you can run the demo listed below.
+applications.
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   demo_teleop.rst
+   demo_calibration.rst
+   demo_lidar_mapping.rst
+   demo_docking.rst
+   troubleshooting.rst
+
+You are recommended to go through
+:doc:`tutorials of running camera-based 3D perception </reference_workflows/isaac_perceptor/run_perceptor_on_carter>`
+to run, and evaluate :ref:`isaac_perceptor` on the `Nova Carter`.

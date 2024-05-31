@@ -1,0 +1,46 @@
+.. include:: /variables.rst
+
+========
+Hardware
+========
+
+LIDAR Setup
+-----------
+
+The following is a table of the LIDARs supported by Nova and their requirements:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Lidar
+     - Type
+     - PTP
+   * - |hesai_xt32|
+     - 3D
+     - X
+   * - |slamtec_rplidar_s2e|
+     - 2D
+     -
+
+The Jetson AGX Orin supports PTP by default on its onboard Ethernet. All LIDARs must be connected to the onboard Ethernet because of this. Nova Orin Init assumes that LIDARs are connected to the onboard Ethernet when configuring them.
+
+Hawk/Owl and GMSL Setup
+-----------------------
+
+The Nova Orin kit supports up to four Hawk stereo cameras and four Owl monocular cameras. These
+cameras are connected to the Orin via a GMSL board.
+
+Connecting Cameras
+^^^^^^^^^^^^^^^^^^
+
+Nova Orin Kit only supports p3762 GMSL boards, older e3653 boards are not currently supported.
+Your GMSL board must have two inputs that accept up to four cameras each and a 12v power input.
+
+.. figure:: :ir_lfs:`<resources/isaac_ngc/nova_carter/p3762-diagram.png>`
+
+It's important to note that the 12V power input is *required* for proper functioning of cameras.
+When connecting cameras, it is important to attach the cameras in order. For example, if you have
+only two Hawks, you must connect them to channel 0 and 1 (blue and white), or probing does not work.
+The same applies to Owls. As you connect your cameras, take note of the location on your
+system where the camera is placed. If you are using Nova Carter or related software the assumed order is
+"front back left right" for both Hawk and Owl cameras.

@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-Hardware-accelerated, deep-learned freespace segmentation
+NVIDIA-accelerated, deep-learned freespace segmentation
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/isaac_ros_bi3d_real_opt.gif>`
     :width: 500px
@@ -45,7 +46,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
-    
+
 .. |repo_name| replace:: Isaac ROS Freespace Segmentation

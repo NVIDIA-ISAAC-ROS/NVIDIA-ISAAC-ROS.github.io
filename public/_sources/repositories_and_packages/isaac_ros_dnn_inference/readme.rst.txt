@@ -4,7 +4,7 @@
 |repo_name|
 ===========
 
-Hardware-accelerated DNN model inference ROS 2 packages using NVIDIA Triton/TensorRT for both Jetson and x86_64 with CUDA-capable GPU.
+NVIDIA-accelerated DNN model inference ROS 2 packages using NVIDIA Triton/TensorRT for both Jetson and x86_64 with CUDA-capable GPU.
 
 .. raw:: html
 
@@ -52,7 +52,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS DNN Inference

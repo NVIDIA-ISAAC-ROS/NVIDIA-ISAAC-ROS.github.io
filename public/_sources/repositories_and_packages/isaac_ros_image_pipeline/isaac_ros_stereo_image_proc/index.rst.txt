@@ -7,47 +7,131 @@
 Quickstart
 ----------
 
-1. Set up your development environment by following the instructions
-   :doc:`here </getting_started/dev_env_setup>`.
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+.. include:: /_snippets/set_up_dev_env.rst
 
-       cd ${ISAAC_ROS_WS}/src
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+.. tabs::
 
-       git clone :ir_clone:`<isaac_ros_common>`
+   .. tab:: Binary Package
 
-   .. code:: bash
+      1. Launch the Docker container using the ``run_dev.sh`` script:
 
-      git clone :ir_clone:`<isaac_ros_image_pipeline>`
+         .. code:: bash
 
-3. Build the RealSense camera package for Humble, using :doc:`this doc </getting_started/hardware_setup/sensors/realsense_setup>`.
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
 
-4. Launch the Docker container using the ``run_dev.sh`` script:
+      2. Install the prebuilt Debian package:
 
-   .. code:: bash
+         :ir_apt:
 
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh
+         .. code:: bash
 
-5. Install this package's dependencies.
+            sudo apt-get install -y  ros-humble-isaac-ros-image-proc ros-humble-isaac-ros-stereo-image-proc
+   
+   .. tab:: Build from Source
 
-   :ir_apt:
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
 
-   .. code:: bash
+         .. code:: bash
 
-      sudo apt-get install -y ros-humble-isaac-ros-stereo-image-proc
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_image_pipeline>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
 
-6. Start ``isaac_ros_stereo_image_proc`` using the prebuilt launch file (Using
-   RealSense camera as an example):
+         .. code:: bash
 
-   .. code:: bash
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
 
-      ros2 launch isaac_ros_stereo_image_proc isaac_ros_stereo_image_pipeline_realsense.launch.py
+      3. Use ``rosdep`` to install the package's dependencies:
 
-..
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_stereo_image_proc --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_stereo_image_proc
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense ros-humble-isaac-ros-depth-image-proc
+
+      #. Run the launch file, which launches the example, and wait for 10
+         seconds.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_stereo_rect,disparity,disparity_to_depth,point_cloud_xyz
+
+      #. Observe point cloud output ``/points`` on a
+         separate terminal with the command:
+
+         .. code:: bash
+
+            ros2 topic echo /points
+
+   .. tab:: Hawk Camera
+         
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera ros-humble-isaac-ros-depth-image-proc
+
+      #. Run the launch file, which launches the example, and wait for 10 seconds.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_stereo,rectify_stereo,disparity,disparity_to_depth,point_cloud_xyz
+
+      #. Observe point cloud output ``/points`` on a
+         separate terminal with the command:
+
+         .. code:: bash
+
+            ros2 topic echo /points
 
 .. note::
 
@@ -57,8 +141,6 @@ Quickstart
 
    Other supported cameras can be found
    :ref:`here <repositories_and_packages/isaac_ros_argus_camera/index:Reference Cameras>`.
-
-   For camera calibration, please refer to :doc:`this guide </getting_started/hardware_setup/sensors/camera_calibration>`.
 
 
 Try More Examples
@@ -70,10 +152,6 @@ To continue your exploration, check out the following suggested examples:
    :maxdepth: 1
    
    Tutorial with Isaac Sim </concepts/stereo_depth/sgm/tutorial_isaac_sim>
-
-   Tutorial with RealSense </concepts/stereo_depth/sgm/tutorial_realsense>
-
-   Tutorial with Zed </concepts/stereo_depth/sgm/tutorial_zed>
 
 API
 ----
@@ -95,9 +173,13 @@ Available Components
 Component                Topics Subscribed                                                                                                                                                                                       Topics Published                                     Parameters
 ======================== ======================================================================================================================================================================================================= ==================================================== ===================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
 ``DisparityNode``        ``left/image_rect``, ``left/camera_info``: The left camera stream ``right/image_rect``, ``right/camera_info``: The right camera stream                                                                  ``disparity``: The disparity between the two cameras ``max_disparity``: The maximum value for disparity per pixel, which is 64 by default. With ORIN backend, this value must be 128 or 256. ``backends``: The VPI backend to use, which is CUDA by default (options: “CUDA”, “XAVIER”, “ORIN”) ``confidence_threshold``: The confidence threshold for VPI SGM algorithm ``window_size``: The window size for SGM disparity calculation ``num_passes``: The number of passes SGM takes to compute result ``p1``: Penalty on disparity changes of +/- 1 between neighbor pixels ``p2``: Penalty on disparity changes of more than 1 between neighbor pixels ``p2_alpha``: Alpha for P2 ``quality``: Quality of disparity output. It's only applicable when using XAVIER backend. The higher the value, better the quality and possibly slower performance. **Refer to**\ `this VPI doc <https://docs.nvidia.com/vpi/group__VPI__StereoDisparityEstimator.html>`__\ **for more details on the parameters**
-``PointCloudNode``       ``left/image_rect_color``: The coloring for the point cloud ``left/camera_info``: The left camera info ``right/camera_info``: The right camera info ``disparity`` The disparity between the two cameras ``points2``: The output point cloud                  ``use_color``: Whether or not the output point cloud should have color. The default value is false. ``unit_scaling``: The amount to scale the ``xyz`` points by
+``PointCloudNode``       ``left/image_rect_color``: The coloring for the point cloud ``left/camera_info``: The left camera info ``right/camera_info``: The right camera info ``disparity`` The disparity between the two cameras ``points``: The output point cloud                   ``use_color``: Whether or not the output point cloud should have color. The default value is false. ``unit_scaling``: The amount to scale the ``xyz`` points by
 ``DisparityToDepthNode`` ``disparity`` The disparity image                                                                                                                                                                       ``depth`` The resultant depth image                  N/A
 ======================== ======================================================================================================================================================================================================= ==================================================== ===================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
 
+.. note::
 
+   ``DisparityNode`` with the ``ORIN`` backend requires a ``max_disparity`` value of 128 or 256, but the default value is 64. Besides, the ``ORIN`` backend requires ``nv12`` input image format, you can use the ``ImageFormatConverterNode`` to convert the input to ``nv12`` format.
+
+   
 .. |package_name| replace:: ``isaac_ros_stereo_image_proc``

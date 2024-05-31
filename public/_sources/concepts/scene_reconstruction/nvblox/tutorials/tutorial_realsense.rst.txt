@@ -1,158 +1,235 @@
-Static Reconstruction with RealSense
-====================================
+RealSense Camera Examples
+=========================
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_example.gif>`
     :width: 600px
     :align: center
 
-This tutorial demonstrates how to perform depth-camera based
-reconstruction using a
-`RealSense <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__
-camera, :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>`
-and :ir_repo:`Isaac ROS Nvblox <isaac_ros_nvblox>`.
 
+This page contains tutorials for running nvblox together with Visual SLAM on a
+`RealSense <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__
+camera.
 
 .. note::
 
    This tutorial requires a compatible RealSense camera from
    the list of available :doc:`cameras </getting_started/hardware_setup/sensors/realsense_setup>`.
 
-RealSense Camera Firmware
--------------------------
 
-This example is tested and compatible with RealSense camera firmware
-`version 5.13.0.50 <https://dev.intelrealsense.com/docs/firmware-releases>`__.
+Install
+-------
 
-.. note::
+1. Complete the :doc:`Isaac ROS NvBlox RealSense Setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
 
-   The latest RealSense firmware
-   (version 5.14 at the time of publishing) might have issues. Our recommendation is to install
-   *exactly* `version 5.13.0.50 <https://dev.intelrealsense.com/docs/firmware-releases>`__.
+2. Complete the :ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`.
 
-Host System Setup
------------------
+3. If you installed nvblox as a Debian package, you will also need to clone ``isaac_ros_nvblox`` under ``${ISAAC_ROS_WS}/src``:
 
-The ROS 2 message delivery might be unreliable under high load
-without some small modifications to the QoS profile (especially on
-weaker machines). Before running this example, run one of the following:
+    .. code:: bash
 
-To set the parameter temporarily, until reboot:
+        cd ${ISAAC_ROS_WS}/src
+        git clone --recursive :ir_clone:`<isaac_ros_nvblox>`
 
-.. code:: bash
 
-   sudo sysctl -w net.core.rmem_max=8388608 net.core.rmem_default=8388608
-
-To set the parameter permanently, run:
-
-.. code:: bash
-
-   echo -e "net.core.rmem_max=8388608\nnet.core.rmem_default=8388608\n" | sudo tee /etc/sysctl.d/60-cyclonedds.conf
-
-See
-`DDS tuning <https://docs.ros.org/en/rolling/How-To-Guides/DDS-tuning.html>`__ for more information.
-
-..  _nvblox-realsense-dependencies:
-
-Installing the Dependencies
----------------------------
-
-1. Complete steps 1 and 2 described in the
-   :doc:`Nvblox Quickstart Guide </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index>`
-   to set up your development environment and clone the required repositories.
-
-2. Stop Git tracking the ``COLCON_IGNORE`` file in the
+4. Stop Git tracking the ``COLCON_IGNORE`` file in the
    ``realsense_splitter`` package and remove it.
 
-   .. code:: bash
+    .. code:: bash
 
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_nvblox/nvblox_examples/realsense_splitter && \
-        git update-index --assume-unchanged COLCON_IGNORE && \
-        rm COLCON_IGNORE
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_nvblox/nvblox_examples/realsense_splitter && \
+            git update-index --assume-unchanged COLCON_IGNORE && \
+            rm COLCON_IGNORE
 
-..
+    .. note::
 
-   Note: The ``COLCON_IGNORE`` file was added to remove the dependency
-   to ``realsense-ros`` for users that don't want to run the RealSense
-   examples.
+        Note: The ``COLCON_IGNORE`` file was added to remove the dependency
+        to ``realsense-ros`` for users that don't want to run the RealSense
+        examples.
 
-3. Complete the :doc:`/getting_started/hardware_setup/sensors/realsense_setup`
-   to set up ``librealsense`` *outside of the isaac_ros_common* Docker,
-   clone ``realsense_ros``, and to configure the container for use with
-   RealSense.
+5. Launch the Docker container using the ``run_dev.sh`` script (if not already launched):
 
-4. Launch the Docker container using the ``run_dev.sh`` script:
+    .. code:: bash
 
-   .. code:: bash
-
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-5. Inside the container, install package-specific dependencies using
-   ``rosdep``:
+6. Build the ``realsense_splitter`` and ``realsense2*``
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev/ && \
-        rosdep install -i -r --from-paths src --rosdistro humble -y --skip-keys "libopencv-dev libopencv-contrib-dev libopencv-imgproc-dev python-opencv python3-opencv nvblox"
+       cd /workspaces/isaac_ros-dev
+       colcon build --symlink-install --packages-up-to-regex realsense*
+       source install/setup.bash
 
-   :ir_apt:
 
-   .. code:: bash
+RealSense Example
+------------------
 
-      sudo apt-get install -y ros-humble-isaac-ros-stereo-image-proc ros-humble-isaac-ros-visual-slam
+This example runs nvblox-based reconstruction from a single RealSense camera,
+either from live data coming directly off a RealSense camera, or from recorded
+data coming from a ROSbag.
 
-6. Build and source the workspace:
+1. Start the Isaac ROS Dev Docker container (if not started in the install step)
 
-   .. code:: bash
+    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-        colcon build --symlink-install && \
+        cd $ISAAC_ROS_WS && ./src/isaac_ros_common/scripts/run_dev.sh
+
+2. Navigate (inside the docker) to the workspace folder, and source the workspace
+
+    .. code:: bash
+
+        cd /workspaces/isaac_ros-dev
         source install/setup.bash
 
-Example with RealSense Live Data
---------------------------------
+3. Run the RealSense example, either live from a sensor or from a recorded ROSbag.
 
-1. Complete the sections above.
+    .. tabs::
 
-2. Connect the RealSense device to your machine using a USB 3 cable/port.
+        .. tab:: Live from a sensor
 
-3. Run the ROS Docker container using the ``run_dev.sh`` script:
+            .. code:: bash
 
-   .. code:: bash
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py
 
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh
+        .. tab:: On a ROSbag
 
-4. Source the workspace:
+          1. Download the  `r2b_galileo2 <https://registry.ngc.nvidia.com/orgs/nvstaging/teams/isaac/resources/r2bdataset2024/files>`__ rosbag from the r2b dataset or :ref:`record your own bag. <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Recording Data With RealSense>`
 
-   .. code:: bash
+          2. Launch the rosbag:
 
-      source /workspaces/isaac_ros-dev/install/setup.bash
+          .. code:: bash
 
-5. Verify that the RealSense camera is connected
-   by running ``realsense-viewer``:
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                rosbag:=<YOUR_ROSBAG_PATH>
 
-   .. code:: bash
-
-      realsense-viewer
-
-6. If successful, run the launch file to spin up the example:
-
-   .. code:: bash
-
-      ros2 launch nvblox_examples_bringup realsense_example.launch.py
 
 .. note::
 
    If you want to restrict odometry to a 2D plane
    (for example, to run a robot in a flat environment),
-   you can use the ``flatten_odometry_to_2d`` argument.
+   you can use the ``enable_ground_constraint_in_odometry`` argument.
 
-Example with RealSense Recorded Data
-------------------------------------
+Recording Data with RealSense
+------------------------------
 
-If you want to run the example on recorded data refer to the
-:doc:`tutorial_realsense_record`.
+To record RealSense data for nvblox:
+
+1. Connect the camera, start the Docker container and source the
+   workspace as explained in :doc:`tutorial_realsense`.
+
+2. Start recording:
+
+   .. code:: bash
+
+      ros2 launch nvblox_examples_bringup record_realsense.launch.py
+
+3. Stop the recording when done
+
+4. The resulting ROSbag can be run using the `instructions above <#realsense-example>`_.
+
+
+Reconstruction With People
+--------------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_nvblox_humans.gif>`
+    :width: 600px
+    :align: center
+
+This tutorial demonstrates how to perform dynamic people
+reconstruction in nvblox using RealSense data. For more information on how
+people reconstruction works, see
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+.. note::
+
+   If you are on a desktop machine, we recommend using the
+   ``PeopleSemSegNet``.
+   On Jetson platforms we recommend the lighter ``PeopleSemSegNet ShuffleSeg``
+   model that is provided in :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`
+   for better segmentation performance.
+
+1. Download and install the PeopleSemSegNet model assets:
+
+     :ir_apt:
+
+     .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-peoplesemseg-models-install &&
+      ros2 run isaac_ros_peoplesemseg_models_install install_peoplesemsegnet_vanilla.sh --eula &&
+      ros2 run isaac_ros_peoplesemseg_models_install install_peoplesemsegnet_shuffleseg.sh --eula
+
+2. Below we provide run instructions for both the full and light segmentation models (``PeopleSemSegNet`` and ``ShuffleSeg``)
+   respectively, running from both a ROSbag and live from a RealSense camera.
+
+    .. tabs::
+
+        .. tab:: PeopleSemSegNet (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people
+
+
+        .. tab:: ShuffleSeg (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people \
+                people_segmentation:=peoplesemsegnet_shuffleseg
+
+
+        .. tab:: PeopleSemSegNet (ROSbag)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people \
+                rosbag:=<YOUR_ROSBAG_PATH>
+
+
+        .. tab:: ShuffleSeg (ROSbag)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people \
+                people_segmentation:=peoplesemsegnet_shuffleseg \
+                rosbag:=<YOUR_ROSBAG_PATH>
+
+
+Reconstruction With Dynamic Scene Elements
+------------------------------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_dynamic_example.gif>`
+    :width: 600px
+    :align: center
+
+This tutorial demonstrates how build a reconstruction with dynamic elements in the scene (people and non-people)
+using RealSense data. For more information about how dynamic reconstruction works in nvblox see
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+1. Below we provide run instructions for running from both a ROSbag and live from a RealSense camera.
+
+    .. tabs::
+
+        .. tab:: Live from a sensor
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=dynamic
+
+        .. tab:: On a ROSbag
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=dynamic \
+                rosbag:=<YOUR_ROSBAG_PATH>
+
 
 Troubleshooting
 ---------------

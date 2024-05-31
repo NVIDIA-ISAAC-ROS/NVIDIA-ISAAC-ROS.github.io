@@ -7,29 +7,175 @@
 Quickstart
 ----------
 
-Please see the quickstart from :ref:`isaac_ros_h264_decoder <repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index:quickstart>`.
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Try More Examples
------------------
+.. include:: /_snippets/set_up_dev_env.rst
 
-To continue your exploration, check out the following suggested examples:
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
 
-.. toctree::
-   :maxdepth: 1
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-h264-encoder
    
-    Tutorial with RealSense </concepts/compression/h264/tutorial_realsense_encoder>
+   .. tab:: Build from Source
 
-    Tutorial with NITROS Graph </concepts/compression/h264/tutorial_nitros_graph>
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_compression>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_compression/isaac_ros_h264_encoder --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_h264_encoder
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. group-tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+      #. Run the launch file. This launch file launches the example with the RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_stereo_rect,stereo_h264_encoder
+
+   .. group-tab:: Hawk Camera
+         
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+      #. Run the launch file. This launch file launches the example with the Argus camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_stereo,rectify_stereo,stereo_h264_encoder
+
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+.. note::
+
+   Visualization is **optional**. To visualize the encoded output, you need to complete the :ref:`Isaac ROS H264 decoder <repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index:quickstart>`.
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+   .. tabs::
+      .. group-tab:: RealSense Camera
+
+         2. Decode and visualize the images:
+
+            .. code:: bash
+
+               ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=stereo_h264_decoder
+            
+            .. code:: bash
+
+               ros2 run image_view image_view --ros-args -r image:=/left/image_uncompressed
+
+            .. code:: bash
+
+               ros2 run image_view image_view --ros-args -r image:=/right/image_uncompressed
+
+            For example, the result looks like:
+
+            .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/compression/h264/realsense_example.png>`
+               :align: center
+
+      .. group-tab:: Hawk Camera
+
+         2. Decode and visualize the images:
+
+            .. code:: bash
+
+               ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=stereo_h264_decoder
+
+            .. code:: bash
+
+               ros2 run image_view image_view --ros-args -r image:=/left/image_uncompressed
+
+            .. code:: bash
+
+               ros2 run image_view image_view --ros-args -r image:=/right/image_uncompressed
+
+            For example, the result looks like:
+
+            .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/compression/h264/argus_example.png>`
+               :align: center
 
 API
 ----
-
-Usage
-^^^^^
-
-.. code:: bash
-
-   ros2 launch isaac_ros_h264_encoder isaac_ros_h264_encoder.launch.py input_width:=<"your input image width"> input_height:=<"your input image height">
 
 ROS Parameters
 ^^^^^^^^^^^^^^

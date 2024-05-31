@@ -107,3 +107,111 @@ Create the models directory:
    The calibration cache file (specified using the ``-c``
    option) is required to generate the ``int8`` engine file. This file
    is provided in the **File Browser** tab of the model's page on NGC.
+
+Using ``trtexec`` to convert an ONNX model to a TensorRT Plan File
+------------------------------------------------------------------
+
+Assuming that a model called ``model.onnx`` is available, the conversion is performed using:
+
+.. code::
+
+   /usr/src/tensorrt/bin/trtexec --onnx=model.onnx --saveEngine=model.plan
+
+.. warning::
+
+   Reading the documentation of `trtexec <https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#trtexec>`__ is highly recommended to
+   obtain best performance. In particular, we recommend pay attention to the quantization of the model (e.g. ``fp32`` vs ``fp16`` vs ``int8``).
+
+Inspecting The Input and Output Binding Names of a Model
+--------------------------------------------------------
+
+Deep learning models have ``input_binding_names`` and ``output_binding_names``. These correspond to the model's inputs and outputs
+respectively. These are determined by the model itself during export. There are two methods one can perform to determine this, but
+the **recommended** way is using a TensorRT Plan File.
+
+.. note::
+
+   In addition, the ``TensorRTNode`` and ``TritonNode`` have parameters called ``input_tensor_names`` and ``output_tensor_names``,
+   these correspond to the expected tensor names within the ROS 2 ``TensorList``.
+
+Using an ONNX Model File
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+If an ONNX Model file is used, one can use `netron <https://netron.app/>`__ to visualize the ONNX model, and note down the input and output names and dimensions.
+
+Using a TensorRT Plan File
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a TensorRT Plan file is used, one can use NVIDIA's `polygraph <https://github.com/NVIDIA/TensorRT/tree/main/tools/Polygraphy>`__ tool to determine it.
+
+1. Install TensorRT's Python binding and the polygraph tool:
+
+   .. code:: bash
+
+      pip install tensorrt tensorrt_bindings
+      pip install colored polygraphy --extra-index-url https://pypi.ngc.nvidia.com
+
+2. Add ``/home/admin/.local/bin`` to your ``PATH`` to use ``polygraph`` more conveniently:
+
+   .. code:: bash
+
+      export PATH="/home/admin/.local/bin:$PATH"
+
+3. Obtain the desired model. In this case, we'll show how to get the ``PeopleSemSegnet ShuffleSeg`` network:
+
+   .. code:: bash
+
+      mkdir -p /tmp/models/peoplesemsegnet_shuffleseg/1 && \
+        cd /tmp/models/peoplesemsegnet_shuffleseg && \
+        wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_etlt.etlt && \
+        wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_cache.txt
+
+4. Convert the obtained model from an ``etlt`` file to a ``plan`` file (called ``model.plan``):
+
+   .. code:: bash
+
+      /opt/nvidia/tao/tao-converter -k tlt_encode -d 3,544,960 -p input_2:0,1x3x544x960,1x3x544x960,1x3x544x960 -t int8 -c peoplesemsegnet_shuffleseg_cache.txt -e /tmp/models/peoplesemsegnet_shuffleseg/1/model.plan -o argmax_1 peoplesemsegnet_shuffleseg_etlt.etlt
+
+5. Now go to the directory where we obtained the ``PeopleSemSegNet ShuffleSeg`` model:
+
+   .. code:: bash
+
+      cd /tmp/models/peoplesemsegnet_shuffleseg/1
+
+6. Now use ``polygraph`` to inspect the names of the inputs and outputs of the model. In this case, the model we obtained is called ``model.plan``:
+
+   .. code:: bash
+
+      polygraphy inspect model model.plan
+   
+   The expected output should look like this:
+
+   .. code:: bash
+
+      [I] Loading bytes from /tmp/models/peoplesemsegnet_shuffleseg/1/model.plan
+      [I] ==== TensorRT Engine ====
+        Name: Unnamed Network 0 | Explicit Batch Engine
+
+        ---- 1 Engine Input(s) ----
+        {input_2:0 [dtype=float32, shape=(1, 3, 544, 960)]}
+
+        ---- 1 Engine Output(s) ----
+        {argmax_1 [dtype=int32, shape=(1, 544, 960, 1)]}
+
+        ---- Memory ----
+        Device Memory: 21269504 bytes
+
+        ---- 1 Profile(s) (2 Tensor(s) Each) ----
+        - Profile: 0
+            Tensor: input_2:0          (Input), Index: 0 | Shapes: min=(1, 3, 544, 960), opt=(1, 3, 544, 960), max=(1, 3, 544, 960)
+            Tensor: argmax_1          (Output), Index: 1 | Shape: (1, 544, 960, 1)
+
+        ---- 73 Layer(s) ----
+
+
+  In this case, the ``input_binding_names`` for this network is ``['input_2:0']``, whereas the ``output_binding_names`` is ``['argmax_1']``.
+  The shape of each dimension can also be observed from this command.
+
+  These values can be taken and used as the ``input_binding_names`` and ``output_binding_names`` for the ``TensorRTNode`` or ``TritonNode``. If a model has multiple inputs or outputs, these must be passed in as
+  a string list of all the values. Once again, ensure that the ``TensorRTNode`` or ``TritonNode``'s ``input_tensor_names`` and ``output_tensor_names`` parameters are correctly
+  set according to the names of the ROS 2 ``TensorList`` message obtained from any upstream nodes or expected by any downstream nodes.

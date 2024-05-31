@@ -38,21 +38,21 @@ containing data of the appropriate type. For example, voxels on the TSDF
 layer store distance and weight data, while the color layer voxels store
 color values.
 
-Human Reconstruction
---------------------
+People Reconstruction
+---------------------
 
 There are
 additional options for mapping scenes containing people. In this
-configuration, humans are separated from the TSDF reconstruction into a
+configuration, people are separated from the TSDF reconstruction into a
 separate *layer* containing an occupancy grid representing reconstructed
-humans.
+people.
 
-Human segmentation is applied to each processed color frame with
+People segmentation is applied to each processed color frame with
 :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`.
 The depth masker module uses the segmentation mask from the color image
-to separate the depth-map into human and non-human parts. While the
-non-human labeled part of the depth frame is still forwarded to TSDF
-mapping, the human labeled part is processed to an
+to separate the depth-map into people and non-people parts. While the
+non-people labeled part of the depth frame is still forwarded to TSDF
+mapping, the people labeled part is processed to an
 occupancy grid map.
 
 To relax the assumption that occupancy grid maps only capture static
@@ -79,15 +79,13 @@ The algorithm used for nvblox dynamic reconstruction is based on the following p
     Vol. 8, No. 10, pp. 6259 - 6266, October 2023.
   | [ `IEEE <https://ieeexplore.ieee.org/document/10218983>`__ | `ArXiv <https://arxiv.org/abs/2304.10049>`__ | `Video <https://www.youtube.com/watch?v=NA13fRWlqRQ>`__]
 
-While the human reconstruction pipeline employs a Deep Neural Network (DNN)
-to generate a mask image for separating human detections into a dynamic occupancy layer,
+While the people reconstruction pipeline employs a Deep Neural Network (DNN)
+to generate a mask image for separating people detections into a dynamic occupancy layer,
 the general dynamic reconstruction pipeline maintains a (high-confidence)
 freespace layer dedicated to detecting dynamic objects.
 Whenever an object enters freespace, it is identified as dynamic and
 then integrated into the dynamic occupancy layer, similar to
-the human reconstruction pipeline described above.
-
-This enables the pipeline to separately reconstruct humans
+the people reconstruction pipeline described above. This enables the pipeline to separately reconstruct people
 (or other specific objects that the DNN was trained for)
 and all moving objects regardless of their class or category.
 
@@ -96,3 +94,8 @@ and all moving objects regardless of their class or category.
     :align: center
 
 |
+
+.. note::
+
+  Dynamic reconstruction requires accurate pose estimation.
+  Objects moving slower than the odometry drift can't be detected as dynamic.

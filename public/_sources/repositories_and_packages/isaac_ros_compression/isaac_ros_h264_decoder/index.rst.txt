@@ -4,6 +4,7 @@
 
 :ir_github:`<isaac_ros_compression> <isaac_ros_h264_decoder>`
 
+
 Quickstart
 ----------
 
@@ -13,59 +14,128 @@ compressed H.264 images generated from ``isaac_ros_h264_encoder`` with
 two Argus cameras as the input source. You will be able to visualize the
 decoded images after the last step.
 
-1. Set up your development environment by following the instructions
-   :doc:`here </getting_started/dev_env_setup>`.
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+.. include:: /_snippets/set_up_dev_env.rst
 
-       cd ${ISAAC_ROS_WS}/src
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+1. Download quickstart data from NGC:
 
-       git clone :ir_clone:`<isaac_ros_common>`
+   :ir_assets:`<isaac_ros_h264_decoder> <quickstart.tar.gz>`
 
-   .. code:: bash
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
 
-      git clone :ir_clone:`<isaac_ros_compression>`
+.. tabs::
 
-3. Pull down a rosbag of sample data:
+   .. tab:: Binary Package
 
-   .. code:: bash
+      1. Launch the Docker container using the ``run_dev.sh`` script:
 
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_compression && \ 
-      git lfs pull -X "" -I "resources/rosbags/h264_compressed_sample.bag"
+         .. code:: bash
 
-4. Launch the Docker container using the ``run_dev.sh`` script:
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-h264-decoder
+   
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_compression>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_compression/isaac_ros_h264_decoder --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_h264_decoder
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+             ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=stereo_h264_decoder
+
+      #. Open a **second** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_h264_decoder/quickstart.bag
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Open a **new** terminal inside the Docker container:
 
    .. code:: bash
 
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-      ./scripts/run_dev.sh
+         ./scripts/run_dev.sh
 
-5. Install this package's dependencies.
-
-   :ir_apt:
-
-   .. code:: bash
-
-      sudo apt-get install -y ros-humble-isaac-ros-h264-decoder
-
-6. Run the following launch files to run the demo of this
-   ``isaac_ros_h264_decoder``:
-
-   .. code:: bash
-
-      ros2 launch isaac_ros_h264_decoder isaac_ros_h264_decoder_rosbag.launch.py rosbag_path:=/workspaces/isaac_ros-dev/src/isaac_ros_compression/resources/rosbags/h264_compressed_sample.bag
-
-7. Open a second terminal and attach to the container:
-
-   .. code:: bash
-
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-      ./scripts/run_dev.sh
-
-8. Visualize and validate the output of the package:
+2. Visualize and validate the output of the package:
 
    .. code:: bash
 

@@ -1,0 +1,477 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_cumotion> <isaac_ros_cumotion>`
+
+Motion Generation
+=================
+
+The motion generation capabilities provided by the cuMotion planner node are exposed via
+a plugin for MoveIt 2.  Please see the corresponding
+:ref:`quickstart <repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index:Quickstart>`
+to get started.
+
+Robot Segmentation
+==================
+
+.. _robot-segmentation-quickstart:
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+
+Download Quickstart Assets for Robot Segmentation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Download the ``r2b_robotarm`` dataset from the :ir_ngc:`r2b 2024 dataset on NGC <teams/isaac/resources/r2bdataset2024>`
+
+2. Place the dataset at ``${ISAAC_ROS_WS}/isaac_ros_assets/r2b_2024/r2b_robotarm``.
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-cumotion
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_cumotion>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_cumotion --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_cumotion
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able
+            to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+
+Run Launch File for Robot Segmentation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      1. Continuing inside the docker container, run the following launch file to spin up a demonstration of robot
+         segmentation for a single camera using the rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_cumotion robot_segmentation.launch.py
+
+      2. Open a **second** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play --clock -l ${ISAAC_ROS_WS}/isaac_ros_assets/r2b_2024/r2b_robotarm \
+            --remap /camera_1/aligned_depth_to_color/image_raw:=/depth_image \
+            camera_1/color/camera_info:=rgb/camera_info
+
+      4. Open a **third** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      5. Run a static transform publisher, used by the segmentation node to determine the relative pose of the robot base:
+
+         .. code:: bash
+
+            ros2 run tf2_ros static_transform_publisher --frame-id ar_tag --child-frame-id  base_link --x -0.30 --y 0.47 --z 0.0 --qx 0 --qy 0 --qz 0.707 --qw 0.707
+
+Visualize Results of Robot Segmentation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+2. Visualize the robot mask in ``RViz``:
+
+   .. code:: bash
+
+      rviz2
+
+   Then click on the ``Add`` button and select ``By topic``. In the ``By topic`` window, select the topic
+   ``/cumotion/camera_1/robot_mask``.
+
+   Optionally, you can also add the camera image to the RViz window by selecting the topic
+   ``/camera_1/color/image_raw``. This will allow you to confirm that the robot mask correctly matches the
+   camera image.
+
+   .. note::
+
+      Due to initial warm-up time, the visualization may take up to 1 minute to appear. 
+      During this time, the depth mask may stutter or lag behind the camera image.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/cumotion_rviz.gif>`
+      :width: 600px
+      :align: center
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+---
+
+CumotionRobotSegmenter
+~~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``robot``
+     - ``string``
+     - ``ur5e.yml``
+     - Path to the XRDF file for the robot
+
+   * - ``urdf_path``
+     - ``string``
+     - ``rclpy.Parameter.Type.STRING``
+     - Path to the robot's URDF
+
+   * - ``cuda_device`` 
+     - ``int``
+     - ``0``
+     - CUDA device index to use
+
+   * - ``distance_threshold``
+     - ``float``
+     - ``0.1``
+     - Maximum distance from a given collision sphere (in meters) at which to mask points
+
+   * - ``time_sync_slop``
+     - ``float``
+     - ``0.1``
+     - Maximum allowed delay (in seconds) for which depth image and joint state messages are considered synchronized
+
+   * - ``tf_lookup_duration``
+     - ``float``
+     - ``5.0``
+     - Maximum duration (in seconds) for which to block while waiting for a transform to become available
+
+   * - ``joint_states_topic``
+     - ``string``
+     - ``/joint_states``
+     - Topic to subscribe to for the robot's joint states
+
+   * - ``debug_robot_topic``
+     - ``string``
+     - ``/cumotion/robot_segmenter/robot_spheres``
+     - Topic on which to publish the spheres representing the robot
+
+   * - ``depth_image_topics``
+     - ``string array``
+     - ``['/cumotion/depth_1/image_raw']``
+     - List of topics to subscribe to for input depth images
+
+   * - ``depth_camera_infos``
+     - ``string array``
+     - ``['/cumotion/depth_1/camera_info']``
+     - List of topics to subscribe to for camera info corresponding to the input depth image streams
+
+   * - ``robot_mask_publish_topics``
+     - ``string array``
+     - ``['/cumotion/depth_1/robot_mask']``
+     - List of topics on which to publish the robot segmentation masks for the corresponding depth image streams
+
+   * - ``world_depth_publish_topics``
+     - ``string array``
+     - ``['/cumotion/depth_1/world_depth']``
+     - List of topics on which to publish depth images with the robot segmented out
+
+   * - ``log_debug``
+     - ``bool``
+     - ``False``
+     - When true, increases logging verbosity to help with debugging
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``joint_states_topic``
+     - `sensor_msgs/JointState <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/JointState.msg>`__
+     - Joint states of the robot
+
+   * - ``depth_image_topics``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__     
+     - Input depth images, including the robot to be segmented out
+
+   * - ``depth_camera_infos``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Topics to subscribe to for the camera info corresponding to the input depth image streams
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``debug_robot_topic``
+     - `visualization_msgs/MarkerArray <https://github.com/ros2/common_interfaces/blob/humble/visualization_msgs/msg/MarkerArray.msg>`__
+     - Robot represented by spheres for debugging and visualization
+
+   * -  ``robot_mask_publish_topics``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__     
+     - Robot segmentation masks for the corresponding depth image streams
+
+   * - ``world_depth_publish_topics``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__     
+     - Depth images with the robot segmented out
+
+CumotionActionServer
+~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``robot``
+     - ``string``
+     - ``ur5e.yml``
+     - Path to the XRDF file for the robot
+
+   * - ``urdf_path``
+     - ``string``
+     - ``rclpy.Parameter.Type.STRING``
+     - Path to the robot's URDF
+
+   * - ``time_dilation_factor`` 
+     - ``float``
+     - ``0.5``
+     - Speed scaling factor for the planner
+
+   * - ``collision_cache_mesh``
+     - ``int``
+     - ``20``
+     - Number of mesh objects to pre-allocate in the cuMotion world
+
+   * - ``collision_cache_cuboid``
+     - ``int``
+     - ``20``
+     - Number of cuboid objects to pre-allocate in the cuMotion world
+
+   * - ``interpolation_dt``
+     - ``float``
+     - ``0.02``
+     - Fixed time step (in seconds) used for interpolating the trajectory
+
+   * - ``voxel_dims``
+     - ``float array``
+     - ``[2.0, 2.0, 2.0]``
+     - Maximum dimensions of the voxels in meters
+
+   * - ``voxel_size``
+     - ``float``
+     - ``0.05``
+     - Size of a voxel in meters
+
+   * - ``read_esdf_world``
+     - ``bool``
+     - ``false``
+     - When true, indicates that cuMotion should read a Euclidean signed distance field (ESDF) as part of its world
+
+   * - ``publish_curobo_world_as_voxels``
+     - ``bool``
+     - ``false``
+     - When true, indicates that cuMotion should publish its world representation
+
+   * - ``add_ground_plane``
+     - ``bool``
+     - ``false``
+     - When true, indicates that cuMotion should add an implicit ground plane
+
+   * - ``publish_voxel_size``
+     - ``float``
+     - ``0.05``
+     - Voxel size to use when publishing cuMotion's world
+
+   * - ``max_publish_voxels``
+     - ``int``
+     - ``50000``
+     - Maximum number of voxels that may be used to publish cuMotion's world
+
+   * - ``joint_states_topic``
+     - ``string``
+     - ``/joint_states``
+     - Topic for reading the robot's joint state
+
+   * - ``tool_frame``
+     - ``string``
+     - ``rclpy.Parameter.Type.STRING``
+     - Tool frame of the robot that should be used for planning
+
+   * - ``grid_position``
+     - ``float array``
+     - ``[0.5, 0.5, 0.5]``
+     - Grid position at which to place cuMotion's world
+
+   * - ``esdf_service_name``
+     - ``string``
+     - ``/nvblox_node/get_esdf_and_gradient``
+     - Service to call when querying the ESDF world
+
+   * - ``enable_curobo_debug_mode``
+     - ``bool``
+     - ``false``
+     - When true, cuMotion's backend planning library (currently cuRobo) will log additional debug messages
+
+   * - ``override_moveit_scaling_factors``
+     - ``bool``
+     - ``false``
+     - When true, the planner is allowed to override MoveIt's scaling factors
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``joint_states_topic``
+     - `sensor_msgs/JointState <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/JointState.msg>`__
+     - Joint states of the robot
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``/curobo/voxels``
+     - `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/humble/visualization_msgs/msg/Marker.msg>`__
+     - cuMotion's world represented as voxels for visualization
+
+ROS Services Requested
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+
+   * - ``esdf_service_name``
+     - :ir_repo:`nvblox_msgs/EsdfAndGradients <isaac_ros_nvblox> <nvblox_msgs/srv/EsdfAndGradients.srv>`
+     - Service that takes an axis-aligned bounding box (AABB) for the planning region and returns a dense ESDF and gradient field for that region.
+
+ROS Actions Advertised
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Action
+     - Interface
+     - Description
+
+   * - ``cumotion/move_group``
+     - `moveit_msgs/MoveGroup <https://github.com/moveit/moveit_msgs/blob/humble/action/MoveGroup.action>`__
+     - Creates a motion plan and forwards it to MoveIt
+
+.. |package_name| replace:: ``isaac_ros_cumotion``
+

@@ -2,6 +2,62 @@
 Release Notes
 =============
 
+Isaac ROS 3.0.0 May 30, 2024
+----------------------------
+
+Packages available as `3.0.0 Release` tagged `v3.0.0` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for JetPack 6.0 / Ubuntu 22.04 on CUDA 12.2 (only)
+- tested with Isaac Sim 2023.1.1
+- Introducing Isaac Manipulator reference workflows for perception-driven manipulation
+- Introducing Isaac Perceptor reference workflows for visual odometry and obstacle perception
+- Improved documentation with tabbed quickstarts for source/binary and image providers
+- ``isaac_ros_benchmark`` added multi-cam benchmarks
+- ``isaac_ros_common`` improvements to run_dev.sh, added Docker deployment scripts
+- ``isaac_ros_cumotion`` new cuMotion package and ``MoveIt!`` plugin
+- ``isaac_ros_dnn_inference`` decomposed DNN image encoder nodes
+- ``isaac_ros_ess`` updated for ESS 4.0 improved for workcell manipulation use cases
+- ``isaac_ros_foundationpose`` added NITROS FoundationPose decoder
+- ``isaac_ros_image_proc`` added crop/resize nodes
+- ``isaac_ros_jetson_stats`` added ``jtop`` package
+- ``isaac_ros_mission_client`` new Nav2 docking support
+- ``isaac_ros_nitros`` added ``message_filter`` support for CUDA with NITROS
+- ``isaac_ros_nova`` new data recorder/replayer, rosbag validation tools
+- ``isaac_ros_nitros_bridge`` added support for Jetson
+- ``isaac_ros_nvblox`` new multi-cam scene reconstruction, added NITROS support, Foxglove viz plugin
+- ``isaac_ros_rtdetr`` added NITROS RT-DETR support for SyntheticaDETR models
+- ``isaac_ros_segformer`` added NITROS Segformer decoder
+- ``isaac_ros_segment_anything`` added NITROS Segment Anything (SAM) decoder
+- ``isaac_ros_visual_slam`` new multi-cam visual odometry, added NITROS support
+
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds available in the troubleshooting section:
+
+- Known stability issues and frame drops under high CPU load in multi-cam configurations
+- Known disconnect issues with Nova Carter WiFi + Bluetooth when switching access points during teleoperation
+- Known high latency issue of Isaac ROS FoundationPose pipeline with Hawk cameras
+- Removed support for JetPack 5.1.2, Ubuntu 20.04, and Jetson Xavier
+- Removed support for Stereolabs ZED cameras until ZED SDK support for JP6 is available
+- ROS 1 Noetic not supported on Ubuntu 22.04 for use with Isaac ROS NITROS Bridge
+- Known issue with setting ``use_intra_process_comms`` explicitly to ``True`` in ROS graphs with NITROS nodes. See workaround :ref:`here <troubleshooting/dev_env:Failed to load a NITROS enabled nodes with intraprocess communication enabled>`.
+
+Feature Requests & Issues Addressed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This release contains new features and fixes to address user feedback, including:
+
+- `isaac_ros_visual_slam #141 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_visual_slam/issues/141>`__: Removes TF static publisher preventing intra-process communication
+
+
+
 Isaac ROS 2.1.0 November 16, 2023
 ---------------------------------
 
@@ -135,7 +191,7 @@ Updates including:
    of nodes in open source
 -  new package ``isaac_ros_benchmark`` building upon ``ros2_benchmark``
    to provide configurations to benchmark Isaac ROS graphs of nodes
--  open source release for multiple NITROS-enabled hardware accelerated
+-  open source release for multiple NITROS-enabled NVIDIA-accelerated
    packages
 
 Limitations
@@ -181,7 +237,7 @@ Updates including:
    8GB <https://developer.nvidia.com/blog/solving-entry-level-edge-ai-challenges-with-nvidia-jetson-orin-nano/>`__
 -  `Apache-2.0 <https://www.apache.org/licenses/LICENSE-2.0>`__
    licensing for Isaac ROS repositories
--  ``isaac_ros_compression`` hardware accelerated H.264
+-  ``isaac_ros_compression`` NVIDIA-accelerated H.264
    encoding/decoding
 -  ``isaac_ros_depth_segmentation`` freespace segmentation based on
    Bi3D, added Isaac Sim tutorials, added RealSense tutorial
@@ -261,7 +317,7 @@ including:
    (kudos to `@GEngels <https://github.com/GEngels>`__,
    `@Doch88 <https://github.com/Doch88>`__)
 -  `isaac_ros_object_detection #8 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_object_detection/issues/8>`__:
-   Isaac ROS Object Detection doesn't install parameters file (kudos to `@Tristis116`)
+   Isaac ROS Object Detection does not install parameters file (kudos to `@Tristis116`)
 
 Isaac ROS 0.10.1 DP (Developer Preview) July 12, 2022
 -----------------------------------------------------
@@ -320,7 +376,7 @@ section:
    September. Incompatibilities exist when performing SIL (software in the
    loop) simulation with Isaac ROS.
 -  RealSense drivers as-is do not support Humble, but can be modified to
-   work. 
+   work.
 -  ``isaac_ros_nvblox`` is untested with Nav2 on Humble.
 -  Removed CenterPose support on Jetson.
 -  ``isaac_ros_ess`` throws an error if using rosbag as input, and input
@@ -372,13 +428,13 @@ Isaac ROS EA2 (Early Access) Oct 20, 2021
 What's New
 ~~~~~~~~~~
 
-ROSCon 2021 release of Isaac ROS providing hardware acceleration for
+ROSCon 2021 release of Isaac ROS providing NVIDIA acceleration for
 autonomous robots with new features including:
 
 -  packages for ROS 2 Foxy on JetPack 4.6
 -  ``isaac_ros_visual_odometry`` providing stereo visual inertial
    odometry
--  ``isaac_ros_argus_camera`` for hardware accelerated ISP of CSI and
+-  ``isaac_ros_argus_camera`` for NVIDIA-accelerated ISP of CSI and
    GMSL cameras
 -  ``isaac_ros_image_segmentation`` for DNN based image segmentation
    including people detection pre-trained model
@@ -393,13 +449,13 @@ Isaac ROS EA1 (Early Access) Aug 11, 2021
 What's New
 ~~~~~~~~~~
 
-This is the first release of Isaac ROS providing hardware acceleration for
+This is the first release of Isaac ROS providing NVIDIA acceleration for
 autonomous robots with new features including:
 
 -  packages for ROS 2 Foxy on JetPack 4.5
--  ``isaac_apriltag`` providing hardware acceleration replacement for
+-  ``isaac_apriltag`` providing NVIDIA acceleration replacement for
    ``apriltag``
--  ``isaac_image_proc`` providing hardware acceleration replacement for
+-  ``isaac_image_proc`` providing NVIDIA acceleration replacement for
    ``image_proc``
--  ``isaac_stereo_image_proc`` providing hardware acceleration
+-  ``isaac_stereo_image_proc`` providing NVIDIA acceleration
    replacement for ``image_proc``

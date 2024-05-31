@@ -1,10 +1,11 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-Hardware-accelerated AprilTag detection and pose estimation.
+NVIDIA-accelerated AprilTag detection and pose estimation.
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_apriltag/isaac_ros_apriltag_sample_crop.gif>`
     :width: 550px
@@ -44,7 +45,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
 
 .. |repo_name| replace:: Isaac ROS AprilTag

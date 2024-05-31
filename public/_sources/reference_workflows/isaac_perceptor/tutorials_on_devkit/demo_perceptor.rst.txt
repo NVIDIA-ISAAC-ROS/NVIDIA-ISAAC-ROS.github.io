@@ -1,0 +1,217 @@
+Tutorial: Running Camera-based 3D Perception with `Isaac Perceptor`
+===================================================================
+
+This tutorial walks you through using `Isaac Perceptor` on the `Nova Orin Developer Kit`.
+`Isaac Perceptor` uses Isaac ROS components, including Visual SLAM to localize the robot, ESS and
+nvblox to reconstruct 3D environments.
+
+For this tutorial, you must have successfully completed the
+:doc:`Tutorial: running all sensors on the Nova Orin Developer Kit</reference_workflows/isaac_perceptor/tutorials_on_devkit/demo_sensors>`.
+
+
+Running the Application
+-----------------------
+
+1. SSH into the `Nova Orin Developer Kit` (:ref:`instructions<nova-developer-kit-ssh-setup>`).
+
+2. Build/install the required packages and run the app:
+
+.. run_ros_app::
+    :repo_setup: <nova-developer-kit-dev-setup>
+    :repo: nova_developer_kit
+    :image: isaac/nova_developer_kit_bringup:release_3.0-aarch64
+    :package: nova_developer_kit_bringup
+    :app: perceptor.launch.py
+    :asset_packages: isaac_ros_ess_models_install:isaac_ros_peoplesemseg_models_install:isaac_ros_peoplesemseg_models_install
+    :asset_scripts: install_ess_models.sh:install_peoplesemsegnet_vanilla.sh:install_peoplesemsegnet_shuffleseg.sh
+
+.. note::
+
+   Please launch the application, ensure you follow :doc:`the mounting guide </reference_workflows/isaac_perceptor/run_perceptor_on_devkit>`
+   for correct mounting procedures, and configuration changes.
+
+Customizing Sensor Configurations
+---------------------------------
+
+By default, as specified in the launch file ``perceptor.launch.py``, all 3 stereo
+cameras available on the `Nova Orin Developer Kit` (front, left, right) are used in
+`Isaac Perceptor` algorithms.
+You may use the ``stereo_camera_configuration`` launch argument to customize camera
+configurations when running `Isaac Perceptor`.
+
+For example, to use only front stereo camera for 3D reconstruction and visual SLAM
+you could run the following launch command:
+
+.. code:: bash
+
+    ros2 launch nova_developer_kit_bringup perceptor.launch.py \
+        stereo_camera_configuration:=front_configuration
+
+For example, to use only front stereo camera for 3D reconstruction, visual SLAM
+and people reconstruction, you could run the following launch command:
+
+.. code:: bash
+
+    ros2 launch nova_developer_kit_bringup perceptor.launch.py \
+        stereo_camera_configuration:=front_people_configuration
+
+For a detailed description of all available configurations refer to
+:doc:`Tutorial: Stereo Camera Configurations for Isaac Perceptor </reference_workflows/isaac_perceptor/tutorials_on_devkit/tutorial_stereo_camera_configurations>`.
+
+
+Visualizing the Outputs
+------------------------
+
+1. Make sure you complete :ref:`visualization-setup-devkit`.
+   This is required to visualize the `Isaac nvblox` mesh in a recommended layout configuration.
+
+2. Open the Foxglove studio on your remote machine.
+
+   1. If you are **not** running a configuration with people reconstruction,
+      open the ``nova_developer_kit_perceptor.json`` layout file downloaded in the previous step.
+
+   2. If you are running a configuration with people reconstruction,
+      open the ``nova_developer_kit_perceptor_with_people.json`` layout file
+      downloaded in the previous step.
+
+3. In Foxglove, it shows a visualization of the `Nova Orin Developer Kit` platform and
+   `Isaac nvblox` mesh visualization of surrounding environments.
+   You should expect a visualization similar as below.
+   In the mesh, it shows the reconstructed colored voxels,
+   the computed distance map from `Isaac nvblox` outputs.
+   The colored voxels are uniformly reconstructed with a resolution of 5cm.
+   The rainbow color spectrum reflects the proximity of each region
+   to nearest obstacles. Regions closer to obstacle surfaces are marked in warmer colors
+   (red, orange), while regions further away from obstacle surfaces are marked in cooler
+   colors (blue, violet).
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_developer_kit/foxglove_perceptor.png>`
+    :width: 800px
+    :alt: Foxglove visualization of the `Isaac Perceptor` outputs
+    :align: center
+
+4. If running a configuration with people reconstruction, in addition,
+   you can see highlighted red voxels shown in the reconstructed mesh.
+   It visualizes people perceived in the field of view of one or more cameras. In the default
+   ``nova_developer_kit_perceptor_with_people.json`` layout file,
+   only ``/nvblox_human_node/dynamic_occupancy_layer`` is visualized and shown as the red voxels.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_perceptor/perceptor_foxglove_people_mapping.png>`
+    :width: 800px
+    :alt: Foxglove visualization of the `Isaac Perceptor` people mapping outputs
+    :align: center
+
+.. note::
+
+   For a better visualization experience, some topics requiring a large bandwidth are not available
+   to Foxglove studio. You can set ``use_foxglove_whitelist:=False`` as additional argument
+   when running the app. Most likely the image stream will be fairly choppy given its large
+   bandwidth. To learn more about topics published by `Isaac nvblox`, you can refer to
+   :doc:`nvblox ROS messages. </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/api/topics_and_services>`.
+   For topics published by `Isaac visual SLAM`, you can refer to
+   :doc:`cuvslam ROS messages. </repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index>`.
+
+
+.. _perceptor_devkit_eval:
+
+Evaluating `Isaac Perceptor`
+----------------------------
+
+Follow these instructions to assert that `Isaac Perceptor` is performing as
+expected.
+
+1. `Isaac nvblox` continuously measures computation efficiency metrics and reports
+   them in the terminal. You should expect to see metrics similar to the following:
+
+   1. ``nvblox Rates`` reports how the frequencies of specific events happening
+      in nvblox. For the **3-camera** configuration, you are expected to see
+      ``ros/depth_image_callback`` at 60Hz, and ``ros/color_image_callback``
+      at 90Hz. For the **1-camera** configuration, you are expected to see
+      ``ros/depth_image_callback`` at 30Hz, and ``ros/color_image_callback``
+      at 30Hz.
+
+    .. code:: bash
+
+        nvblox Rates (in Hz)
+        namespace/tag - NumSamples (Window Length) - Mean
+        -----------
+        ros/color                   100              13.2
+        ros/depth                   100              60.4
+        ros/depth_image_callback    100              60.8
+        ros/color_image_callback    100              90.8
+        ros/update_esdf             100              7.2
+        mapper/stream_mesh          100              4.5
+        ros/tick                    100              16.7
+        -----------
+
+   2. ``nvblox Delays`` reports the average compute time a node takes in second
+      based on a certain number of samples. You are expected to see
+      ``ros/esdf_integration`` at 100 ~ 200 ms.
+
+    .. code:: bash
+
+        nvblox Delays
+        namespace/tag - NumSamples (Window Length) - Mean Delay (seconds)
+        -----------
+        ros/esdf_integration        100              0.174
+        ros/depth_image_integration 100              0.152
+        ros/color_image_integration 100              0.129
+        ros/depth_image_callback    100              0.106
+        ros/color_image_callback    100              0.068
+        -----------
+
+2. To further evaluate the quality of `Isaac Perceptor`, you can perform the following tests.
+
+    1. Choose objects above 10cm with various heights, and place them in front of
+       any camera specified in the ``stereo_camera_configuration`` launch argument.
+       Vary the distance to the camera (e.g. 1m, 3m, 5m, 7m). You should expect to see the
+       object in the distance map visualization.
+       Additionally, you may also use the `Measure Tool` in the top panel to measure
+       the distance between the object surface and the camera center.
+
+       For instance, a pallet at the height of 10cm and a box at the height of 50cm are placed
+       in front of the front stereo camera. We vary its distance to the robot
+       at 0.4m, 1.0m, 3.0m, 5.0m. In the 3D view, you could see colored voxels visualizing
+       the pallet and the box (illustrated by bounding boxes in green and blue). The proximity value
+       measured by `Measure Tool` shows the distance between the front camera and perceived objects.
+       You are expected to obtain similar proximity value with the distance you place objects at.
+
+        .. figure::
+            :ir_lfs:`<resources/isaac_ros_docs/robots/nova_developer_kit/perceptor_devkit_eval_0.4m.png>`
+            :alt: Evaluating `Isaac Perceptor` voxels at 0.4m.
+            :align: center
+
+        .. figure::
+            :ir_lfs:`<resources/isaac_ros_docs/robots/nova_developer_kit/perceptor_devkit_eval_1m.png>`
+            :alt: Evaluating `Isaac Perceptor` voxels at 1m.
+            :align: center
+
+        .. figure::
+            :ir_lfs:`<resources/isaac_ros_docs/robots/nova_developer_kit/perceptor_devkit_eval_3m.png>`
+            :alt: Evaluating `Isaac Perceptor` voxels at 3m.
+            :align: center
+
+        .. figure::
+            :ir_lfs:`<resources/isaac_ros_docs/robots/nova_developer_kit/perceptor_devkit_eval_5m.png>`
+            :alt: Evaluating `Isaac Perceptor` voxels at 5m.
+            :align: center
+
+       You are advised to follow :doc:`Technical Details </concepts/scene_reconstruction/nvblox/technical_details>`
+       to understand how scene reconstruction works.
+
+       .. note::
+         Objects detection range shown in the reconstructed 3D mesh is sensitive to the
+         sensor calibration accuracy.
+         Ensure you follow :doc:`the mounting guide </reference_workflows/isaac_perceptor/run_perceptor_on_devkit>`
+         for correct mounting procedures, and configuration changes.
+
+    2. Ensure `Nova Orin Developer Kit` is stationary. You are expected to see no drift
+       from the `Nova Orin Developer Kit` visualization with reference to the odometry frame.
+       You are advised to follow :doc:`cuVSLAM </concepts/visual_slam/cuvslam/index>`
+       to understand how visual SLAM works.
+
+Once you complete this tutorial, you could go back to
+:doc:`Camera-based Perception with Isaac Perceptor on Nova Orin Developer Kit </reference_workflows/isaac_perceptor/run_perceptor_on_devkit>`
+to proceed with other tutorials.

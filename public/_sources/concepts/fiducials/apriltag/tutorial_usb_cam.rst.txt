@@ -44,9 +44,13 @@ Tutorial Walkthrough
 
 6. Finally, launch the provided launch file:
 
+   .. warning::
+
+      Make sure to set the ``camera_width`` and ``camera_height`` arguments based on your camera's resolution.
+
    .. code:: bash
 
-      ros2 launch isaac_ros_apriltag isaac_ros_apriltag_usb_cam.launch.py
+      ros2 launch isaac_ros_apriltag isaac_ros_apriltag_usb_cam.launch.py camera_width:=1280 camera_height:=720
 
 7. Launch a second terminal inside the container
 
@@ -59,7 +63,7 @@ Tutorial Walkthrough
 
    .. code:: bash
 
-      rviz2 -d /workspaces/isaac_ros-dev/src/isaac_ros_apriltag/isaac_ros_apriltag/rviz/usb_cam.rviz
+      rviz2 -d $(ros2 pkg prefix isaac_ros_apriltag --share)/rviz/usb_cam.rviz
 
 ..
 

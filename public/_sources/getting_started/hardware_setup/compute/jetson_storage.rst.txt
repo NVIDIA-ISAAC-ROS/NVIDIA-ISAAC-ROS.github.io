@@ -3,7 +3,7 @@ Jetson Setup
 ============
 
 If you are working on a Jetson developer kit, you'll need a fast and
-large storage device is required to store container images and rosbag files. To add this storage capacity, install an NVMe SSD
+large storage device to store container images and rosbag files. To add this storage capacity, install an NVMe SSD
 card in the Jetson developer kit's carrier board.
 
 .. note::
@@ -100,11 +100,11 @@ Physically Install SSD and Auto-Mount
 
    .. code:: bash
 
-      sudo mkdir /ssd
+      sudo mkdir -p /mnt/nova_ssd
 
    .. code:: bash
 
-      sudo mount /dev/nvme0n1 /ssd
+      sudo mount /dev/nvme0n1 /mnt/nova_ssd
 
 7. To ensure that the mount persists after boot, add an entry
    to the ``fstab`` file:
@@ -126,13 +126,13 @@ Physically Install SSD and Auto-Mount
 
    .. code:: text
 
-      UUID=************-****-****-****-******** /ssd/ ext4 defaults 0 2
+      UUID=************-****-****-****-******** /mnt/nova_ssd/ ext4 defaults 0 2
 
-8. Change the ownership of the ``/ssd`` directory.
+8. Change the ownership of the ``/mnt/nova_ssd`` directory.
 
    .. code:: bash
 
-      sudo chown ${USER}:${USER} /ssd
+      sudo chown ${USER}:${USER} /mnt/nova_ssd
 
 Migrate Docker directory to SSD
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,55 +140,7 @@ Migrate Docker directory to SSD
 After installing the SSD and making it available to your device, you can use
 the extra storage capacity to hold the space-heavy Docker directory.
 
-1. Stop the Docker service.
-
-   .. code:: bash
-
-      sudo systemctl stop docker
-
-2. Move the existing Docker folder.
-
-   .. code:: bash
-
-      sudo du -csh /var/lib/docker/ && \
-          sudo mkdir /ssd/docker && \
-          sudo rsync -axPS /var/lib/docker/ /ssd/docker/ && \
-          sudo du -csh  /ssd/docker/
-
-3. Edit ``/etc/docker/daemon.json``
-
-   .. code:: bash
-
-      sudo vi /etc/docker/daemon.json
-
-   Insert ``"data-root"`` line similar to the following:
-
-   .. code:: json
-
-      {
-          "runtimes": {
-              "nvidia": {
-                  "path": "nvidia-container-runtime",
-                  "runtimeArgs": []
-              }
-          },
-          "default-runtime": "nvidia",
-          "data-root": "/ssd/docker"
-      }
-
-4. Rename the old Docker data directory.
-
-   .. code:: bash
-
-      sudo mv /var/lib/docker /var/lib/docker.old
-
-5. Restart the Docker daemon.
-
-   .. code:: bash
-
-      sudo systemctl daemon-reload && \
-          sudo systemctl restart docker && \
-          sudo journalctl -u docker
+.. include:: /_snippets/docker_storage_config.rst
 
 Test Docker on SSD
 ~~~~~~~~~~~~~~~~~~
@@ -206,7 +158,7 @@ Test Docker on SSD
 
       docker pull nvcr.io/nvidia/l4t-base:r35.2.1
 
-3. [Terminal 1] Observe that the disk usage on ``/ssd`` goes up as the
+3. [Terminal 1] Observe that the disk usage on ``/mnt/nova_ssd`` goes up as the
    container image is downloaded and extracted.
 
    .. code:: bash
@@ -234,12 +186,12 @@ Reboot your Jetson, and verify that you observe the following:
    tmpfs           5.0M  4.0K  5.0M   1% /run/lock
    tmpfs           3.6G     0  3.6G   0% /sys/fs/cgroup
    tmpfs           734M   88K  734M   1% /run/user/1000
-   /dev/nvme0n1    458G  824M  434G   1% /ssd
+   /dev/nvme0n1    458G  824M  434G   1% /mnt/nova_ssd
 
    ~$ docker info | grep Root
-    Docker Root Dir: /ssd/docker
+    Docker Root Dir: /mnt/nova_ssd/docker
 
-   ~$ sudo ls -l /ssd/docker/
+   ~$ sudo ls -l /mnt/nova_ssd/docker/
    total 44
    drwx--x--x  4 root root 4096 Mar 22 11:44 buildkit
    drwx--x---  2 root root 4096 Mar 22 11:44 containers
@@ -253,14 +205,14 @@ Reboot your Jetson, and verify that you observe the following:
    drwx------  2 root root 4096 Mar 22 11:44 trust
    drwx-----x  2 root root 4096 Mar 22 16:19 volumes
 
-   ~$ sudo du -chs /ssd/docker/
-   752M    /ssd/docker/
+   ~$ sudo du -chs /mnt/nova_ssd/docker/
+   752M    /mnt/nova_ssd/docker/
    752M    total
 
    ~$ docker info | grep -e "Runtime" -e "Root"
     Runtimes: io.containerd.runtime.v1.linux nvidia runc io.containerd.runc.v2
     Default Runtime: nvidia
-    Docker Root Dir: /ssd/docker
+    Docker Root Dir: /mnt/nova_ssd/docker
 
 Your Jetson is now set up with the SSD!
 

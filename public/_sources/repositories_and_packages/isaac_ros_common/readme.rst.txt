@@ -1,4 +1,5 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|

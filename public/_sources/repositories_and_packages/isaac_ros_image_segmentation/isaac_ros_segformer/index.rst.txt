@@ -1,0 +1,270 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_segmentation> <isaac_ros_segformer>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_segformer> <quickstart.tar.gz>`
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-segformer
+   
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_image_segmentation>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_segmentation --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_segformer
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Prepare PeopleSemSegFormer Model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Open a new terminal and attach to the container.
+
+   .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+2. Download the ``PeopleSemSegFormer`` ONNX file:
+
+    .. code:: bash
+
+       mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegformer/1 && \
+        cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegformer/1 && \
+        wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplesemsegformer/deployable_v1.0/files?redirect=true&path=peoplesemsegformer.onnx' -O model.onnx
+
+3.  Convert the ONNX file to a TensorRT plan file:
+
+    .. code:: bash
+
+       /usr/src/tensorrt/bin/trtexec --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegformer/1/model.onnx --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegformer/1/model.plan
+
+    .. note::
+
+       The model conversion time varies across different platforms. On Jetson AGX Orin, the engine conversion process takes ~10-15 minutes to complete.
+   
+
+4. Create a file called ``/tmp/models/peoplesemsegformer/config.pbtxt`` by copying the sample config file:
+
+    .. code:: bash
+
+      cp ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segformer/peoplesemsegformer_config.pbtxt ${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegformer/config.pbtxt
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      1. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      2. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+           ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=segformer interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segformer/quickstart_interface_specs.json model_name:=peoplesemsegformer model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+
+      3. Open **another** terminal and play the ROS bag:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+         .. code:: bash
+
+            ros2 bag play -l isaac_ros_assets/isaac_ros_segformer/segformer_sample_data
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,segformer model_name:=peoplesemsegformer model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+
+   .. tab:: Hawk Camera
+
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+
+      #. Run the following launch file to spin up a demo of this package using a Hawk camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,rectify_mono,segformer model_name:=peoplesemsegformer model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+2. Visualize and validate the output of the package by launching ``rqt_image_view``:
+
+   .. code:: bash
+
+      ros2 run rqt_image_view rqt_image_view
+
+   Then inside the ``rqt_image_view`` GUI, change the topic to ``/segformer/colored_segmentation_mask`` to view a colorized segmentation mask.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/peoplesemsegformer_output_rqt.png>`
+      :width: 320px
+      :align: center
+
+   .. note::
+
+      The raw segmentation mask is also published to ``/segformer/raw_segmentation_mask``. However, the raw pixels correspond to the class labels and so the output is unsuitable for human visual inspection.
+
+
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+   
+   Tutorial with Isaac Sim </concepts/segmentation/segformer/tutorial_isaac_sim>
+
+   Tutorial with TensorRT </concepts/segmentation/segformer/tutorial_tensorrt>
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~
+
+Two launch files are provided to use this package. The first launch file launches ``isaac_ros_tensor_rt``, whereas another one uses ``isaac_ros_triton``, along with
+the necessary components to perform encoding on images and decoding of ``Segformer``'s output. Please note, Segformer re-utilizes U-Net decoder for decoding the network output.
+
+.. warning::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+========================================================= ====================
+Launch File                                               Components Used
+========================================================= ====================
+``isaac_ros_people_sem_segformer_tensor_rt.launch.py``    :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TensorRTNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index>`, :doc:`UNetDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+``isaac_ros_people_sem_segformer_triton.launch.py``       :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`UNetDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+========================================================= ====================
+
+.. note::
+
+   Isaac ROS Segformer uses UNetDecoderNode for postprocessing and doesn't have any nodes of its own. Refer :doc:`Isaac ROS UNet Package </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>` for more details.
+
+.. |package_name| replace:: ``isaac_ros_segformer``

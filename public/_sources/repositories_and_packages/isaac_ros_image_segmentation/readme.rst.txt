@@ -1,14 +1,15 @@
 :orphan:
+:nosearch:
 
 ===========
 |repo_name|
 ===========
 
-Hardware-accelerated, deep learned semantic image segmentation
+NVIDIA-accelerated, deep learned semantic image segmentation
 
 .. raw:: html
 
-  <div align="center"><img alt="sample input to image segmentation" src=":ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_image_segmentation_example.png>`" width="320px"/> 
+  <div align="center"><img alt="sample input to image segmentation" src=":ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_image_segmentation_example.png>`" width="320px"/>
   <img alt="sample output from image segmentation" src=":ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_image_segmentation_example_seg.png>`" width="320px"/></div>
 
 Overview
@@ -45,7 +46,7 @@ Latest
 ------
 
 .. latest_update::
-    
+
     .. include:: _snippets/updates.rst
-    
+
 .. |repo_name| replace:: Isaac ROS Image Segmentation

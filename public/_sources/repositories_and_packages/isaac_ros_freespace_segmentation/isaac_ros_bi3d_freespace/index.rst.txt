@@ -7,129 +7,261 @@
 Quickstart
 ----------
 
-1.  Set up your development environment by following the instructions
-    :doc:`here </getting_started/dev_env_setup>`.
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+.. include:: /_snippets/set_up_dev_env.rst
 
-    .. code:: bash
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-       cd ${ISAAC_ROS_WS}/src
+1. Download quickstart data from NGC:
 
-    .. code:: bash
+   :ir_assets:`<isaac_ros_bi3d_freespace> <quickstart.tar.gz>`
 
-       git clone :ir_clone:`<isaac_ros_common>`
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_freespace_segmentation>`
-
-3.  Pull down a rosbag of sample data:
-
-    .. code:: bash
-
-       git clone :ir_clone:`<isaac_ros_depth_segmentation>`
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_depth_segmentation &&
-       git lfs pull -X "" -I "resources/rosbags/bi3dnode_rosbag"
-
-4.  Launch the Docker container using the ``run_dev.sh`` script:
-
-    .. code:: bash
-
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common &&
-       ./scripts/run_dev.sh
-
-5.  Install this package's dependencies.
-
-   :ir_apt:
+2. Download a pre-trained :ir_ngc:`Bi3D <teams/isaac/models/bi3d_proximity_segmentation>` model:
 
    .. code:: bash
 
-      sudo apt-get install -y ros-humble-isaac-ros-bi3d-freespace
+      mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation && \
+      cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation && \
+      wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/featnet.onnx' &&
+      wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/segnet.onnx'
 
-6.  Download model files for Bi3D (refer to the 
-    :ref:`Model Preparation <repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index:model preparation>`
-    section for more information):
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
 
-    .. code:: bash
+.. tabs::
 
-       mkdir -p /tmp/models/bi3d &&
-       cd /tmp/models/bi3d &&
-       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/featnet.onnx' &&
-       wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/bi3d_proximity_segmentation/versions/2.0.0/files/segnet.onnx'
+   .. tab:: Binary Package
 
-7.  Convert the ``.onnx`` model files to TensorRT engine plan files
-    (refer to the
-    :ref:`Model Preparation <repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index:model preparation>`
-    section for more information):
+      1. Launch the Docker container using the ``run_dev.sh`` script:
 
-    If using Jetson (Generate engine plans with DLA support enabled):
+         .. code:: bash
 
-    .. code:: bash
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
 
-       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_featnet.plan \
-       --onnx=/tmp/models/bi3d/featnet.onnx \
-       --int8 --useDLACore=0 --allowGPUFallback &&
-       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_segnet.plan \
-       --onnx=/tmp/models/bi3d/segnet.onnx \
-       --int8 --useDLACore=0 --allowGPUFallback
+      2. Install the prebuilt Debian package:
 
-    If using x86_64:
+         :ir_apt:
 
-    .. code:: bash
+         .. code:: bash
 
-       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_featnet.plan \
-       --onnx=/tmp/models/bi3d/featnet.onnx --int8 &&
-       /usr/src/tensorrt/bin/trtexec --saveEngine=/tmp/models/bi3d/bi3dnet_segnet.plan \
-       --onnx=/tmp/models/bi3d/segnet.onnx --int8
+            sudo apt-get install -y ros-humble-isaac-ros-bi3d-freespace
 
+   .. tab:: Build from Source
 
-    .. note::
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
 
-       The engine plans generated using the x86_64 commands
-       will also work on Jetson, but performance will be reduced.
+         .. code:: bash
 
-8.  Run the launch file to spin up a demo of this package:
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_freespace_segmentation>`
 
-    .. code:: bash
+      2. Launch the Docker container using the ``run_dev.sh`` script:
 
-       cd /workspaces/isaac_ros-dev
+         .. code:: bash
 
-    .. code:: bash
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
 
-       ros2 launch isaac_ros_bi3d_freespace isaac_ros_bi3d_freespace.launch.py featnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_featnet.plan \
-       segnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_segnet.plan \
-       max_disparity_values:=10
+      3. Use ``rosdep`` to install the package's dependencies:
 
+         :ir_apt:
 
-9.  Open a **second** terminal inside the Docker container:
+         .. code:: bash
 
-    .. code:: bash
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_freespace_segmentation --ignore-src -y
 
-       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_bi3d_freespace
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+1. Convert the ``.onnx`` model files to TensorRT engine plan files:
+
+   .. tabs::
+
+      .. tab:: x86_64
+
+         .. code:: bash
+
+            /usr/src/tensorrt/bin/trtexec --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.plan \
+            --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.onnx --int8 &&
+            /usr/src/tensorrt/bin/trtexec --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.plan \
+            --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.onnx --int8
+
+         .. note::
+
+            The engine plans generated using the x86_64 commands
+            will also work on Jetson, but performance will be reduced.
+
+      .. tab:: Jetson
+
+         On Jetson platforms, generate engine plans with DLA support enabled:
+
+         .. code:: bash
+
+            /usr/src/tensorrt/bin/trtexec \
+            --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.plan \
+            --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.onnx \
+            --int8 --useDLACore=0 --allowGPUFallback &&
+            /usr/src/tensorrt/bin/trtexec \
+            --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.plan \
+            --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.onnx \
+            --int8 --useDLACore=0 --allowGPUFallback
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-bi3d
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
+            launch_fragments:=bi3d,bi3d_freespace \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_bi3d_freespace/rosbag_quickstart_interface_specs.json \
+            featnet_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.plan \
+            segnet_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.plan \
+            max_disparity_values:=10
+
+      #. Open a **second** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      #. Run the rosbag file to simulate image streams:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_bi3d_freespace/quickstart.bag
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense ros-humble-isaac-ros-bi3d
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. note::
+
+            This package requires a known transform between the camera optical frame and the base link frame.
+            The base link frame defines the plane that the freespace segmentation will be projected onto; it can be
+            thought of as the ground plane.
+            
+            The following command sets the launch argument ``publish_default_tf:=true``, which will publish a default transform
+            positioning the camera 30 centimeters above the base link frame, with the optical Z axis pointing straight forward.
+
+            Position the physical camera to match this default
+            or set ``publish_default_tf:=false``. Then publish your own transform between the camera optical frame and the base link frame.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
+            launch_fragments:=realsense_stereo_rect,bi3d,bi3d_freespace \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_bi3d_freespace/realsense_quickstart_interface_specs.json \
+            featnet_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.plan \
+            segnet_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.plan \
+            max_disparity_values:=10 publish_default_tf:=true
+
+   .. tab:: Hawk Camera
+
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera ros-humble-isaac-ros-image-proc ros-humble-isaac-ros-bi3d
+
+      #. Run the following launch file to spin up a demo of this package using a Hawk camera:
+
+         .. note::
+
+            This package requires a known transform between the camera optical frame and the base link frame.
+            The base link frame defines the plane that the freespace segmentation will be projected onto; it can be
+            thought of as the ground plane.
+            
+            The following command sets the launch argument ``publish_default_tf:=true``, which will publish a default transform
+            positioning the camera 30 centimeters above the base link frame, with the optical Z axis pointing straight forward.
+
+            Position the physical camera to match this default
+            or set ``publish_default_tf:=false``. Then publish your own transform between the camera optical frame and the base link frame.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
+            launch_fragments:=argus_stereo,resize_rectify_stereo,bi3d,bi3d_freespace \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_bi3d_freespace/hawk_quickstart_interface_specs.json \
+            featnet_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.plan \
+            segnet_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.plan \
+            max_disparity_values:=10 publish_default_tf:=true
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-10. Visualize the occupancy grid in RViz.
+2. Visualize the occupancy grid in RViz.
 
-    Start RViz:
+   Start RViz:
 
-    .. code:: bash
+   .. code:: bash
 
-       rviz2
+      rviz2
 
-    In the left pane, change **Fixed Frame** to ``base_link``.
+   In the left pane, change **Fixed Frame** to ``base_link``.
 
-    In the left pane, click the **Add** button, then select **By topic**
-    followed by **Map** to add the occupancy grid.
+   In the left pane, click the **Add** button, then select **By topic**
+   followed by **Map** to add the occupancy grid.
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/Rviz_quickstart.png>`
       :width: 500px
       :align: center
       :alt: RViz Output
-
 
 Try More Examples
 -----------------
@@ -138,10 +270,6 @@ To continue your exploration, check out the following suggested examples:
 
 .. toctree::
    :maxdepth: 1
-   
-   Tutorial with RealSense </concepts/scene_reconstruction/bi3d_freespace_segmentation/tutorial_realsense>
-
-   Tutorial with Zed </concepts/scene_reconstruction/bi3d_freespace_segmentation/tutorial_zed>
 
    Tutorial with Isaac Sim </concepts/scene_reconstruction/bi3d_freespace_segmentation/tutorial_isaac_sim>
 
@@ -179,7 +307,7 @@ ROS Topic                          Interface                                    
 ``freespace_segmentation/mask_in`` `stereo_msgs/DisparityImage <https://github.com/ros2/common_interfaces/blob/humble/stereo_msgs/msg/DisparityImage.msg>`__ The input disparity image, with pixels corresponding to ground labeled as 0
 ================================== ========================================================================================================================= ============================================================================
 
-..
+.. warning::
 
    **Limitation**: For all input images, both the height and width must be an even number of pixels.
 

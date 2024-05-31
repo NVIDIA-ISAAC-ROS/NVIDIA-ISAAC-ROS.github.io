@@ -1,0 +1,108 @@
+============
+Nova Manager
+============
+
+Nova Manager is a tool used by Nova during the installation and removal of the Nova Orin Init Debian. It provides an interface to manage and change Nova agnostic to the Debian process.
+
+Install
+-------
+
+.. note::
+
+    ``sudo apt install nova-orin-init`` has already installed Nova Orin Init using this command. Only use this argument if you are looking to reinstall Nova with a different YAML.
+
+Nova Manager provides an interface for installing Nova. Here's instructions on how to use the ``install`` argument:
+
+#. Install using Nova Manager.
+
+    .. code-block:: bash
+
+        sudo nova_manager install
+
+#. Reboot the platform by pressing the power button or running:
+
+    .. code-block:: bash
+
+        sudo reboot
+
+#. Verify that sensors are working by running the :doc:`PFC</tools/pfc>`.
+
+    .. code-block:: bash
+
+        nova_preflight_checker -v
+
+Uninstall
+---------
+
+.. note::
+
+    ``sudo apt remove nova-orin-init`` will uninstall Nova Orin Init using this command. Only use this argument if you are looking to uninstall Nova without removing the software from your system.
+
+Nova Manager provides an interface for uninstalling Nova. Use the following instructions to uninstall Nova.
+
+#. Uninstall using Nova Manager.
+
+    .. code-block:: bash
+
+        sudo nova_manager uninstall
+
+API
+---
+
+Arguments
+^^^^^^^^^
+
+List of optional arguments for ``nova_manager``:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Argument
+      - Type
+      - Default
+      - Description
+
+    * - ``--list``
+      - ``action``
+      -
+      - List all example YAML files.
+
+    * - ``--show``
+      - ``str``
+      -
+      - Show YAML for example file. Use a name from ``--list``.
+
+Subcommands
+^^^^^^^^^^^
+
+List of subcommands that can be called from ``nova_manager``:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Subcommand
+      - Description
+
+    * - ``install``
+      - Install Nova
+
+    * - ``uninstall``
+      - Uninstall Nova
+
+Install
+~~~~~~~
+
+List of optional arguments for ``nova_manager install``:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Argument
+      - Type
+      - Default
+      - Description
+
+    * - ``--file``
+      - ``str``
+      -
+      - YAML file path to use for installation.

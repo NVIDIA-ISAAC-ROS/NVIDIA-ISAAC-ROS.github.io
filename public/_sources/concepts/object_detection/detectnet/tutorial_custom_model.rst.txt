@@ -16,20 +16,19 @@ Tutorial Walkthrough
 1. Complete the quickstart :ref:`here <repositories_and_packages/isaac_ros_object_detection/isaac_ros_detectnet/index:quickstart>`.
 2. Choose one of the DetectNet model that is `listed
    here <https://catalog.ngc.nvidia.com/models?filters=&orderBy=dateModifiedDESC&query=detectnet&page=0&pageSize=25>`__
-3. Create a config file. Use ``resources/quickstart_config.pbtxt`` as a
+3. Create a config file. Use ``${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplenet/quickstart_config.pbtxt`` as a
    template. The datatype can be found in the overview tab of the model
    page. The ``input/dims`` should be the size of the raw input images.
    It can be different for the same model. The ``output/dims``
    dimensions can be calculated as ``round(input_dims/max_batch_size)``.
-   Place this config file in the ``isaac_ros_detectnet/resources``
+   Place this config file in the ``${ISAAC_ROS_WS}/isaac_ros_assets/models/<model_name>``
    directory. You can find more information about the config file
    `here <https://github.com/NVIDIA-AI-IOT/tao-toolkit-triton-apps/blob/main/docs/configuring_the_client.md#configuring-the-detectnet_v2-model-entry-in-the-model-repository>`__
 4. Run the following command with the required input parameters:
 
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev/src/isaac_ros_object_detection/isaac_ros_detectnet && \
-        ./scripts/setup_model.sh --height 720 --width 1280 --config-file resources/isaac_sim_config.pbtxt
+      ros2 run isaac_ros_detectnet setup_model.sh --height 720 --width 1280 --config-file isaac_sim_config.pbtxt
 
    Parameters:
 
@@ -47,8 +46,8 @@ Tutorial Walkthrough
 
    ``--width`` : width dimension of the input image. e.g.: ``1200``
 
-   ``--config-file`` : relative path to the config file mentioned in
-   step 3. e.g.: ``isaac_ros_detectnet/resources/peoplenet_config.pbtxt``
+   ``--config-file`` : name of config file mentioned in
+   step 3. Located at ``${ISAAC_ROS_WS}/isaac_ros_assets/models/<model_name>`` e.g.: ``peoplenet_config.pbtxt``
    
    ``-precision`` : type/precision of model found in the overview tag of the
    model page. e.g.: ``int8``

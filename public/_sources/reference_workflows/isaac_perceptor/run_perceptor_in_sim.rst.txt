@@ -1,0 +1,115 @@
+Camera-based Perception with `Isaac Perceptor` in `Isaac Sim`
+=============================================================
+
+This tutorial will enable you to run autonomous navigation in Isaac Sim.
+The tutorial uses the Isaac Perceptor stack for local camera-based perception,
+using the simulated sensor outputs.
+
+Hardware Requirements
+---------------------
+
+Simulating the scene and robot sensors requires an RTX-enabled GPU
+of sufficient capability and memory capacity. In particular, we recommend an "ideal" machine in the
+`Isaac Sim requirements <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/requirements.html>`__.
+
+   .. note::
+
+      Presently, we only support running Perceptor in simulation using a
+      single forward-facing Hawk stereo camera. We expect future releases to
+      enable multi-cam simulation.
+
+
+Prerequisites
+-------------
+
+To complete this tutorial you need to:
+
+1. Set up your development environment by following the instructions in :doc:`getting started </getting_started/dev_env_setup>`.
+
+2. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_common>`
+
+3. Complete the :ref:`Isaac Perceptor Prerequisites <nova-carter-dev-setup>`.
+
+4. Complete the :doc:`/getting_started/isaac_sim/index`.
+
+
+Install
+-------
+
+1. Build/install the required packages:
+
+.. run_ros_app::
+    :repo_setup: <nova-carter-dev-setup>
+    :repo: nova_carter
+    :package: nova_carter_bringup
+    :asset_packages: isaac_ros_ess_models_install:isaac_ros_peoplesemseg_models_install:isaac_ros_peoplesemseg_models_install
+    :asset_scripts: install_ess_models.sh:install_peoplesemsegnet_vanilla.sh:install_peoplesemsegnet_shuffleseg.sh
+
+Instructions
+------------
+
+
+- **Terminal #1:**
+
+   1. Open a terminal from the Isaac Sim launcher GUI, as described in
+      :doc:`/getting_started/isaac_sim/index`.
+
+   2. Start the simulation by running:
+
+      .. code:: bash
+
+         ./isaac-sim.sh
+
+   3. Open the scene at the path ``localhost/NVIDIA/Assets/Isaac/2023.1.1/Isaac/Samples/NvBlox/perceptor_sample_scene.usd``.
+
+   4. Play the scene to start the ROS communication from sim.
+
+- **Terminal #2:**
+
+   1. Inside the container, launch the example:
+
+      .. code:: bash
+
+         ros2 launch nova_carter_bringup navigation.launch.py \
+         mode:=simulation run_rviz:=True
+
+- **In RViz**
+
+   1. Click on the **2D Goal Pose** button. You should see the robot moving towards the goal location,
+   using the costmap produced by the camera-based 3D perception `Isaac Perceptor`.
+
+Visualizing the Outputs
+------------------------
+
+In RViz, it shows camera images streaming from the `Nova Carter` and
+`Isaac nvblox` mesh visualization of surrounding environments. You should expect a
+visualization similar as below.
+
+*  The reconstructed colored voxels are uniformly reconstructed with a resolution of 5cm.
+*  The computed distance map from `Isaac nvblox` outputs.
+   The rainbow color spectrum reflects the proximity of each region
+   to nearest obstacles. Regions closer to obstacle surfaces are marked in warmer colors
+   (red, orange), while regions further away from obstacle surfaces are marked in cooler
+   colors (blue, violet).
+
+To learn more about topics published by `Isaac nvblox`,
+you can refer to :doc:`nvblox ROS messages. </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index>`
+
+.. figure::
+   :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/perceptor_in_isaac_sim.png>`
+   :width: 700px
+   :align: center
+
+By default, as specified in the launch file ``navigation.launch.py``, the front camera on
+`Nova Carter` is used in `Isaac Perceptor` algorithms.
+You may use the ``stereo_camera_configuration`` launch argument to customize camera
+configurations when running this tutorial.
+
+For a detailed description of other available configurations refer to
+:doc:`Tutorial: Stereo Camera Configurations for Isaac Perceptor </reference_workflows/isaac_perceptor/tutorials_on_devkit/tutorial_stereo_camera_configurations>`.
+

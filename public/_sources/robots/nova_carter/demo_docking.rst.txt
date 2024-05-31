@@ -1,0 +1,183 @@
+.. _nova-carter-docking-tutorial:
+
+Tutorial: Docking with Nav2 and Isaac Cloud Service
+=============================================================
+
+This tutorial will enable you to dock/undock a Nova Carter robot through Isaac Cloud Services. Below we will start the Isaac Mission Dispatch edge service, configure the on-robot Nav2 and Isaac Mission Client services, and send a behavior tree via the Mission Dispatch REST interface to have the robot perform a dock/undock maneuver. This tutorial uses opennav_docking maneuver and Isaac ROS AprilTag for dock pose detection.
+
+Prerequisites
+-------------
+- AprilTag attached to the dock
+  Ensure an AprilTag is affixed to the front of the dock to allow the cart to accurately detect the dock's position.
+  The AprilTag must belong to the tag36h11 family and measure 6 inches. The images below illustrate how to measure
+  the tag size and how the tag is attached to the dock. For further information about AprilTags, please refer to the details provided `here <https://github.com/AprilRobotics/apriltag>`__.
+
+  .. figure::
+      :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/apriltag_size_measure.png>`
+      :width: 500px
+      :align: center
+
+  .. figure::
+      :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/dock_with_apriltag.png>`
+      :width: 500px
+      :align: center
+
+Instructions
+------------
+1. Follow the directions to start `Isaac Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`_
+
+  Verify Mission Dispatch is running by navigating to ``http://localhost:5000/docs``, or ``http://<your_ip_address>:5000/docs``
+
+  .. note::
+
+    Read `this tutorial <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`_ for more deployment options for Mission Dispatch.
+
+
+2. SSH into the robot (:ref:`instructions<nova-carter-ssh-setup>`).
+
+3. Make sure you have successfully connected the PS5 joystick to the robot
+   (:ref:`instructions<nova-carter-joystick-setup>`).
+
+4. Build/install the required packages:
+
+.. run_ros_app::
+    :repo_setup: <nova-carter-dev-setup>
+    :repo: nova_carter
+    :image: isaac/nova_carter_bringup:release_3.0-aarch64
+    :package: nova_carter_bringup
+    :app: navigation.launch.py
+    :asset_packages: isaac_ros_ess_models_install
+    :asset_scripts: install_ess_models.sh
+    :launch_args: enable_nvblox_costmap:=False stereo_camera_configuration:=front_driver_rectify enable_wheel_odometry:=True enable_3d_lidar_localization:=True map_yaml_path:=<path_to_map_yaml> enable_mission_client:=True mqtt_host_name:=<mission_dispatch_ip>
+
+.. note::
+
+    Make sure to replace ``<path_to_map_yaml>`` with the path of the map YAML
+    file. If you do not have a map of your environment you can create one using
+    this :doc:`tutorial </robots/nova_carter/demo_lidar_mapping>`
+
+5. Get an initial pose for your dock
+
+  The docking server utilizes this dock pose to calculate a rough initial pose to start dock detection. Thus, it is unnecessary to be precise.
+
+  Use the PS5 joystick to move the carter into the dock. Open a new terminal in the container
+
+  .. code:: bash
+
+      ros2 run tf2_ros tf2_echo map base_link
+
+  You will get output like the following
+
+  .. code:: bash
+
+    - Translation: [45.199, 19.320, 0.000]
+    - Rotation: in Quaternion [0.000, 0.000, 0.614, 0.789]
+    - Rotation: in RPY (radian) [0.000, -0.000, 1.323]
+    - Rotation: in RPY (degree) [0.000, -0.000, 75.787]
+    - Matrix:
+      0.246 -0.969  0.000 45.199
+      0.969  0.246  0.000 19.320
+      0.000  0.000  1.000  0.000
+      0.000  0.000  0.000  1.000
+
+  Record the x, y translation and yaw in radian for later use.
+
+6. Send docking mission
+
+  ``dock_robot`` action parameters (types of all parameters are ``string``):
+
+  =============================== ==============================================================================================
+  Parameter                       Description
+  =============================== ==============================================================================================
+  ``dock_type``                   The type of the dock. For Carter, it should be ``nova_carter_dock``.
+  ``dock_pose``                   The position of the dock. A comma separated string with three floats.
+                                  For example, for the sample pose shown in step 5, it should be ``45.199,19.320,1.323``.
+  ``trigger_global_localization`` Optional. Whether to trigger global localization before executing the action.
+                                  It is ``true`` by default.
+  =============================== ==============================================================================================
+
+  Use the dock pose you get from step 5. Here is an example input for mission dispatch:
+
+  .. code:: json
+
+      {
+          "robot": "carter01",
+          "mission_tree": [
+              {
+                  "name": "dock",
+                  "parent": "root",
+                  "action": {
+                      "action_type": "dock_robot",
+                      "action_parameters": {
+                          "dock_type": "nova_carter_dock",
+                          "dock_pose": "<dock_x>,<dock_y>,<dock_yaw>",
+                          "trigger_global_localization": "true"
+                      }
+                  }
+
+              }
+          ],
+          "timeout": 300,
+          "deadline": "2023-09-28T04:04:24.013Z",
+          "needs_canceled": false,
+          "name": "dock_example"
+      }
+
+
+  .. note::
+
+    The robot state will not turn into ``CHARGING`` if the battery percentage is high(around 90%).
+
+7. Send undocking mission
+
+  ``undock_robot`` action parameters (types of all parameters are ``string``):
+
+  =============================== ===============================================================================================
+  Parameter                       Description
+  =============================== ===============================================================================================
+  ``dock_type``                   The type of the dock. For Carter, it should be ``nova_carter_dock``.
+  ``trigger_global_localization`` Optional. Whether to trigger global localization after executing the action. It is ``true`` by
+                                  default. In the default carter configuration, global localization relies on the front 2D lidar.
+                                  This can lead to positional drift when Carter is docked. It is recommended to enable this.
+  =============================== ===============================================================================================
+
+  Here is an example input for mission dispatch:
+
+  .. code:: json
+
+      {
+          "robot": "carter01",
+          "mission_tree": [
+              {
+                  "name": "undock",
+                  "parent": "root",
+                  "action": {
+                      "action_type": "undock_robot",
+                      "action_parameters": {
+                          "dock_type": "nova_carter_dock",
+                          "trigger_global_localization": "true"
+                      }
+                  }
+
+              }
+          ],
+          "timeout": 300,
+          "deadline": "2023-09-28T04:04:24.013Z",
+          "needs_canceled": false,
+          "name": "undock_example"
+      }
+
+  .. note::
+
+    The robot can still perform undocking when the state is not ``CHARGING``. Nav2 Collision detection is
+    disabled when the robot is in-between the staging pose and the dock. The path between staging
+    pose and the dock is expected to be free of obstacles.
+
+Troubleshooting
+---------------
+
+If the carter does not establish contact with the dock after the docking process is complete, consider
+adjusting the ``external_detection_translation_x`` parameter in
+``/workspaces/isaac_ros-dev/src/opennav_docking/nova_carter_docking/params/nova_carter_docking.yaml``.
+The default value is ``-0.18``. You may increase this value to bring the carter closer to the dock.
+More details for docking parameters can be found `here <https://gitlab-master.nvidia.com/isaac_ros/opennav_docking/-/tree/main?ref_type=heads#configuration>`__.

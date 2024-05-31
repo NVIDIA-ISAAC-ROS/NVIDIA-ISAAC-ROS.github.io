@@ -7,56 +7,27 @@
 Quickstart
 ----------
 
-1. Set up your development environment by following the instructions
-   :doc:`here </getting_started/dev_env_setup>`.
-2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    .. code:: bash
+.. include:: /_snippets/set_up_dev_env.rst
 
-       cd ${ISAAC_ROS_WS}/src
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    .. code:: bash
+1. Download quickstart data from NGC:
 
-       git clone :ir_clone:`<isaac_ros_common>`
+   :ir_assets:`<isaac_ros_yolov8> <quickstart.tar.gz>`
 
-   .. code:: bash
-
-      git clone :ir_clone:`<isaac_ros_object_detection>`
-
-3. Launch the Docker container using the ``run_dev.sh`` script:
-
-   .. code:: bash
-
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh
-
-4. Install this package's dependencies.
-
-   :ir_apt:
-
-   .. code:: bash
-
-      sudo apt-get install -y ros-humble-isaac-ros-yolov8 ros-humble-isaac-ros-tensor-rt ros-humble-isaac-ros-dnn-image-encoder
-
-5. Download the model of your choice from `Ultralytics YOLOv8 <https://github.com/ultralytics/ultralytics#models>`__.
-   
-   .. warning::
-
-      This step must be performed on ``x86_64``.
-   
+2. Download the model of your choice from `Ultralytics YOLOv8 <https://github.com/ultralytics/ultralytics#models>`__.
    For this example, we use `YOLOv8s <https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s.pt>`__.
 
    .. code:: bash
 
-      cd /tmp && \
+      cd Downloads && \
          wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s.pt
 
-6. Export to `ONNX <https://onnx.ai/>`__ following instructions `here <https://docs.ultralytics.com/modes/export/>`__.
-   
-   .. warning::
-      
-      This step must be performed on ``x86_64``. 
-
+3. Convert the PyTorch model (``.pt``) to a general ONNX model (``.onnx``). Export to `ONNX <https://onnx.ai/>`__ following instructions given below or `here <https://docs.ultralytics.com/modes/export/>`__.
    Arguments can be specified for FP16 quantization during this step. This ONNX model is converted to a TensorRT engine 
    file and used with the Isaac ROS TensorRT node for inference. You can use `netron <https://netron.app/>`__ to 
    visualize the ONNX model and note input and output names and dimensions.
@@ -72,8 +43,7 @@ Quickstart
    
    .. code:: bash
    
-      cd /tmp && \
-         python3
+      python3
 
    Then within ``python3``, export the model:
 
@@ -83,70 +53,219 @@ Quickstart
       >> model = YOLO('yolov8s.pt')
       >> model.export(format='onnx')
 
-   If you are planning on using Jetson, copy the generated ``.onnx``
-   model into the Jetson, and then copy it over into ``aarch64`` Docker
-   container.
+   Exit the interactive python shell and copy the generated ``.onnx`` model into the designated location for Isaac ROS (``${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8``):
 
-   We will assume that you already performed the transfer of the model
-   onto the Jetson in the directory ``~/Downloads``.
+   .. code:: bash
 
-   Enter the Docker container in Jetson:
+      mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8
+      cp yolov8s.onnx ${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8 
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-yolov8 ros-humble-isaac-ros-dnn-image-encoder ros-humble-isaac-ros-tensor-rt  
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_object_detection>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_object_detection --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_yolov8
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+1. Enter the Docker container in Jetson:
 
    .. code:: bash
 
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
          ./scripts/run_dev.sh
 
-   Make a directory called ``/tmp`` in Jetson:
+.. tabs::
+
+   .. tab:: Rosbag
+
+      1. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      2. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            cd /workspaces/isaac_ros-dev && \
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=yolov8 interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_yolov8/quickstart_interface_specs.json \
+               model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8/yolov8s.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8/yolov8s.plan
+
+      3. Open a **second** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      4. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_yolov8/quickstart.bag
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      2. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+      
+      3. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,yolov8 \
+               model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8/yolov8s.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8/yolov8s.plan
+
+   .. tab:: Hawk Camera
+         
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      2. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+      
+      3. Run the following launch file to spin up a demo of this package using a Hawk camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,rectify_mono,yolov8 \
+               model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8/yolov8s.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8/yolov8s.plan
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+1. Open a **new** terminal inside the Docker container:
 
    .. code:: bash
 
-      mkdir -p /tmp
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
 
-   **Outside** the container, copy the generated ``onnx`` model:
+2. Run the YOLOv8 visualization script:
 
    .. code:: bash
 
-      cd ~/Downloads && \
-      docker cp yolov8s.onnx isaac_ros_dev-aarch64-container:/tmp
+      ros2 run isaac_ros_yolov8 isaac_ros_yolov8_visualizer.py
 
-7.  Run the following launch file to perform YOLOv8 detection using TensorRT:
+3. Open **another** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+         
+4. Visualize and validate the output of the package with ``rqt_image_view``:
    
    .. code:: bash
 
-      cd /workspaces/isaac_ros-dev && \
-         ros2 launch isaac_ros_yolov8 isaac_ros_yolov8_visualize.launch.py model_file_path:=/tmp/yolov8s.onnx engine_file_path:=/tmp/yolov8s.plan input_binding_names:=['images'] output_binding_names:=['output0'] network_image_width:=640 network_image_height:=640 force_engine_update:=False image_mean:=[0.0,0.0,0.0] image_stddev:=[1.0,1.0,1.0] input_image_width:=640 input_image_height:=640 confidence_threshold:=0.25 nms_threshold:=0.45
- 
-   .. note:: 
-
-      A method of running the detections without visualization is available by using the ``yolov8_tensor_rt.launch.py`` launch file in this package.
-
-      The output bounding boxes here will be published on the ``/detections/output`` topic.
-
-8.  Run the image publisher node to publish input images for inference. 
-    A sample image (``people_cycles.jpg``) is provided :ir_repo:`here <isaac_ros_object_detection> <resources/people_cycles.jpg>`:
-
-    .. code:: bash
-
-       cd /workspaces/isaac_ros-dev/src/isaac_ros_object_detection && \
-          ros2 run image_publisher image_publisher_node resources/people_cycles.jpg --ros-args --remap /image_raw:=/image 
-
-9.  Visualize and validate the output of the package in the
-    ``rqt_image_view`` window. Inside the RQT image window that should have popped up, the output should look like:
+      ros2 run rqt_image_view rqt_image_view /yolov8_processed_image
+      
+   Your output should look like this:
 
    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/people-cycling-results.png>`
       :alt: RQT showing detection of people cycling and bikes
       :align: center
 
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
 API
 ----
 
 Usage
-^^^^^
+-----
 
 .. code:: bash
 
-   ros2 launch isaac_ros_yolov8 yolov8_tensor_rt.launch.py model_file_path:=<model_file_path> engine_file_path:=<engine_file_path> input_binding_names:=<input_binding_names> output_binding_names:=<output_binding_names> network_image_width:=<network_image_width> network_image_height:=<network_image_height> force_engine_update:=<force_engine_update> image_mean:=<image_mean> image_stddev:=<image_stddev>
+   ros2 launch isaac_ros_yolov8 isaac_ros_yolov8_visualize.launch.py model_file_path:=<model_file_path> engine_file_path:=<engine_file_path> input_binding_names:=<input_binding_names> output_binding_names:=<output_binding_names> network_image_width:=<network_image_width> network_image_height:=<network_image_height> force_engine_update:=<force_engine_update> image_mean:=<image_mean> image_stddev:=<image_stddev> confidence_threshold:=<confidence_threshold> nms_threshold:=<nms_threshold>
+
+Yolov8DecoderNode
+~~~~~~~~~~~~~~~~~
 
 ROS Parameters
 ^^^^^^^^^^^^^^

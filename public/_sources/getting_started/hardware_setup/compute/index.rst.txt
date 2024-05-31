@@ -7,15 +7,19 @@ x86 Platforms
 
 1. Prepare a NVIDIA-powered platform with the following minimum specs:
 
-   -  Ubuntu 20.04+
+   -  Ubuntu 22.04+
 
       -  **Experimental**: WSL2 on Windows 11
 
    -  16 GB general RAM
    -  Discrete NVIDIA GPU with the following specs:
 
-      -  supports CUDA 11.8 with Volta or newer
+      -  supports CUDA 12.2+ with Volta or newer
       -  minimum 8GB of VRAM and recommended 12GB+
+      
+      .. note::
+
+         Various DNN models when loaded together can consume more memory than you may have available.
 
 2. Install Docker from official instructions (`here <https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository>`__)
 
@@ -24,11 +28,11 @@ x86 Platforms
 Jetson Platforms
 ----------------
 
-1. `Install Jetpack <https://docs.nvidia.com/jetson/jetpack/install-jetpack/index.html>`__ including the ``nvidia-container`` package.
+1. `Install Jetpack <https://docs.nvidia.com/jetson/jetpack/install-setup/index.html>`__ including the ``nvidia-container`` package.
 
-2. After boot, confirm that you have installed ``Jetpack 5.1.2`` by
+2. After boot, confirm that you have installed the correct version of ``Jetpack`` by
    running the following command. Confirm that the output has the terms
-   ``R35 (release), REVISION: 4.1``.
+   ``R36 (release), REVISION: 3.0``.
 
    .. code:: bash
 
@@ -71,4 +75,4 @@ Consider adding more storage to your Jetson for a better experience: :doc:`Devel
    :maxdepth: 1
 
    jetson_storage.rst
-   
+   preempt_setup.rst

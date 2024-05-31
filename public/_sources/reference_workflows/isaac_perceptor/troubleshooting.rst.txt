@@ -1,0 +1,132 @@
+Troubleshooting
+===============
+
+NITROS Warning: Failed to get the rectified camera model
+--------------------------------------------------------
+
+When running an app using the HAWK stereo cameras, a warning is printed
+concerning the rectified camera model not being found. It is safe to ignore this
+warning.
+
+Symptom
+~~~~~~~
+
+.. code:: bash
+
+    [component_container_mt-3] [WARN] [1716418145.724108453] [NitrosCameraInfo]: [convert_to_ros_message] Failed to get the Rectified CameraModel object: Falling back to raw camera model
+    [component_container_mt-3] [WARN] [1716418145.724193797] [NitrosCameraInfo]: [convert_to_ros_message] Failed to get the target extrinsics delta Pose3D object: GXF_ENTITY_COMPONENT_NOT_FOUND Falling back to extrinsics
+
+Solution
+~~~~~~~~
+
+This warning can be ignored safely.
+
+
+The robot starts navigating but stops moving after approximately 5 seconds
+--------------------------------------------------------------------------
+
+Symptom
+~~~~~~~
+
+When setting a navigation goal for the robot, it initially starts moving, but
+stops after approximately 5 seconds. Setting a new navigation goal results in
+the same behavior.
+
+Solution 
+~~~~~~~~
+
+This issue occurs when the goal pose is not sent in the same frame that the
+global planner is using, i.e., in most cases the ``map`` frame. 
+This can happen if the "Display Frame" in Foxglove's `3D panel
+<https://docs.foxglove.dev/docs/visualization/panels/3d/>`_ (or the "Fixed
+Frame" in RVIZ2) is not set to the ``map`` frame.
+
+Please ensure that this frame is set to the ``map`` frame.
+
+
+Not all topics are visible in Foxglove for visualization
+--------------------------------------------------------
+
+Symptom
+~~~~~~~
+
+Some topics are visible locally when using ``ros2 topic list`` or 
+``ros2 topic echo /my/topic`` but they are not visible in Foxglove.
+
+Solution 
+~~~~~~~~
+
+Per default, we use Foxglove's ``topic_whitelist`` parameter to disable
+visualization of all topics. This is to keep users from accidentally visualizing
+bandwidth-heavy topics such as raw camera images, which can decrease the
+quality of the visualization.
+
+Additionally, visualizing raw images will trigger a GPU-to-CPU conversion of the
+corresponding NITROS messages which will increase the load on the system.
+
+If a specific use case requires streaming all topics to Foxglove the whitelist
+can be disabled with the launch parameter ``use_foxglove_whitelist:=False``.
+
+
+Frame drops when starting up Isaac Perceptor
+--------------------------------------------
+
+When starting up Isaac Perceptor it can happen that the cameras are dropping
+frames and therefore the VSLAM node also doesn't receive enough frames. This is
+only expected to happen during and shortly after (1-2 seconds) the type
+negotiation period. This is not an issue as we expect the robot to be stationary
+during startup. It is safe to ignore this warning.
+
+Symptom
+~~~~~~~
+
+.. code:: bash
+
+    [component_container_mt-3] 2024-05-24 21:20:46.457 WARN  extensions/hawk/components/argus_camera.cpp@1553: Frame drop detected in module_id 5 camera_id 0
+    [component_container_mt-3] [WARN] [1716578372.175037514] [visual_slam_node]: Delta between current and previous frame [66.676000 ms] is above threshold [34.000000 ms]
+
+
+Solution
+~~~~~~~~
+
+This warning can be ignored safely.
+
+
+Observed false positives people reconstruction results
+-------------------------------------------------------
+
+When launching the `Isaac Perceptor` app with
+`stereo_camera_configuration:=front_people_configuration`, people reconstruction identifies
+false positives.
+
+Symptom
+~~~~~~~
+
+Wrong voxels are marked as red in Foxglove visualization.
+
+Solution
+~~~~~~~~
+
+People are expected to be not too close to the front stereo camera, and to be visible to its field
+of view. People shall appear in the camera view without much occlusion across a few frames.
+The false positives shall not remain across multiple frames.
+To learn more about how people reconstruction works, please refer to
+:ref:`people reconstruction in nvblox <concepts/scene_reconstruction/nvblox/technical_details:People Reconstruction>`.
+
+Data recorder reports failure to shutdown a ROS adapter
+--------------------------------------------------------
+
+When terminating the recording app as suggested by
+:ref:`Recording Data for Isaac Perceptor <reference_workflows/isaac_perceptor/tutorials_on_devkit/tutorial_recording_and_playback:Recording Data for \`Isaac Perceptor\`>`,
+it reports an error in the log.
+
+Symptom
+~~~~~~~
+.. code:: bash
+
+    [ERROR] [launch]: Caught exception in launch (see debug for traceback): Cannot shutdown a ROS adapter that is not running
+
+Solution
+~~~~~~~~
+
+This warning can be ignored safely.
