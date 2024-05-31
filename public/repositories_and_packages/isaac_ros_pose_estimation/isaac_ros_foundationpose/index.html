@@ -2789,14 +2789,14 @@ mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span
 </div>
 </li>
 <li><p>Download the pre-trained <a class="reference external" href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/foundationpose">FoundationPose</a> models from NGC:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./ngc-cli/ngc<span class="w"> </span>registry<span class="w"> </span>model<span class="w"> </span>download-version<span class="w"> </span><span class="s2">&quot;nvstaging/isaac/foundationpose:1.0.0&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>--content-disposition<span class="w"> </span>https://api.ngc.nvidia.com/v2/models/nvidia/isaac/foundationpose/versions/1.0.0/zip<span class="w"> </span>-O<span class="w"> </span>foundationpose_1.0.0.zip
 </pre></div>
 </div>
 </li>
 <li><p>Copy the models to the required directory:</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models/foundationpose<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>cp<span class="w"> </span>-r<span class="w"> </span>foundationpose_v1.0.0/*<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models/foundationpose
+<span class="w">   </span>unzip<span class="w"> </span>foundationpose_1.0.0.zip<span class="w"> </span>-d<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models/foundationpose
 </pre></div>
 </div>
 </div></blockquote>
