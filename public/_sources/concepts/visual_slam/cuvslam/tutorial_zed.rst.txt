@@ -1,0 +1,315 @@
+Tutorial for Visual SLAM Using a ZED Camera
+===========================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/zed_rviz.gif>`
+    :align: center
+    :alt: After Localization
+    :width: 600px
+
+Overview
+--------
+
+This tutorial walks you through setting up :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>` with
+a `ZED <https://www.stereolabs.com/>`__ camera.
+
+.. note::
+
+   The :ir_repo:`launch file <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_zed.launch.py>`
+   provided in this tutorial is designed for a ZED camera with
+   integrated IMU. If you want to run this tutorial with a ZED camera
+   without an IMU (like ZED), then change the ``enable_imu_fusion`` parameter in
+   the launch file to ``False``.
+
+.. note::
+
+   This tutorial requires a
+   compatible ZED camera from the list of available
+   :ref:`cameras <getting_started/hardware_setup/sensors/zed_setup:Camera Compatibility>`.
+
+Tutorial Walkthrough - VSLAM Execution
+--------------------------------------
+
+1.  Complete the :doc:`ZED setup tutorial </getting_started/hardware_setup/sensors/zed_setup>`.
+
+2.  Complete the :ref:`Quickstart section <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`.
+
+3. Follow the
+   `IMU page <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model#how-to-obtain-the-parameters-for-your-imu>`__
+   to obtain `IMU Noise
+   Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__
+   parameters. Parameters can be obtained through the datasheet for the IMU
+   or from a ROS package like
+   `this <https://github.com/CruxDevStuff/allan_ros2>`__.
+
+4. ``[Terminal 1]`` Run ``ZED`` node and ``visual_slam`` node
+
+   Make sure that you have your ZED camera attached to the system, and
+   then start the Isaac ROS container.
+
+   .. code:: bash
+
+          cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+   ..
+
+   Or, if you did not add the command in :ref:`step 1-3 of the quickstart
+   section <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5. ``[Terminal 1]`` Inside the container, install ``isaac_ros_stereo_image_proc``
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-stereo-image-proc
+
+6. ``[Terminal 1]`` Run the launch file, which launches the example and waits
+   for 5 seconds:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam_zed.launch.py
+
+7. ``[Terminal 2]`` Attach a second terminal to check the operation.
+
+   Attach Terminal 2 to the running container so that you can issue other
+   ROS2 commands.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+   Verify that you can see all the expected ROS2 topics.
+
+   .. code:: bash
+
+      ros2 topic list
+
+   ..
+
+   Output example:
+
+   .. code:: bash
+
+      /visual_slam/status
+      /visual_slam/tracking/odometry
+      /visual_slam/tracking/slam_path
+      /visual_slam/tracking/vo_path
+      /visual_slam/tracking/vo_pose
+      /visual_slam/tracking/vo_pose_covariance
+      /visual_slam/vis/gravity
+      /visual_slam/vis/landmarks_cloud
+      /visual_slam/vis/localizer
+      /visual_slam/vis/localizer_loop_closure_cloud
+      /visual_slam/vis/localizer_map_cloud
+      /visual_slam/vis/localizer_observations_cloud
+      /visual_slam/vis/loop_closure_cloud
+      /visual_slam/vis/observations_cloud
+      /visual_slam/vis/pose_graph_edges
+      /visual_slam/vis/pose_graph_edges2
+      /visual_slam/vis/pose_graph_nodes
+      /visual_slam/vis/slam_odometry
+      /visual_slam/vis/velocity
+      /zed_node/atm_press
+      /zed_node/imu/data
+      /zed_node/imu/data_raw
+      /zed_node/imu/mag
+      /zed_node/left/camera_info
+      /zed_node/left/image_rect_color
+      /zed_node/left/image_rect_color/compressed
+      /zed_node/left/image_rect_color/compressedDepth
+      /zed_node/left/image_rect_color/nitros
+      /zed_node/left/image_rect_color/theora
+      /zed_node/left/image_rect_color_rgb
+      /zed_node/left/image_rect_color_rgb/nitros
+      /zed_node/left/image_rect_gray
+      /zed_node/left/image_rect_gray/compressed
+      /zed_node/left/image_rect_gray/compressedDepth
+      /zed_node/left/image_rect_gray/theora
+      /zed_node/left_cam_imu_transform
+      /zed_node/left_raw/camera_info
+      /zed_node/left_raw/image_raw_color
+      /zed_node/left_raw/image_raw_color/compressed
+      /zed_node/left_raw/image_raw_color/compressedDepth
+      /zed_node/left_raw/image_raw_color/theora
+      /zed_node/left_raw/image_raw_gray
+      /zed_node/left_raw/image_raw_gray/compressed
+      /zed_node/left_raw/image_raw_gray/compressedDepth
+      /zed_node/left_raw/image_raw_gray/theora
+      /zed_node/rgb/camera_info
+      /zed_node/rgb/image_rect_color
+      /zed_node/rgb/image_rect_color/compressed
+      /zed_node/rgb/image_rect_color/compressedDepth
+      /zed_node/rgb/image_rect_color/theora
+      /zed_node/rgb/image_rect_gray
+      /zed_node/rgb/image_rect_gray/compressed
+      /zed_node/rgb/image_rect_gray/compressedDepth
+      /zed_node/rgb/image_rect_gray/theora
+      /zed_node/rgb_raw/camera_info
+      /zed_node/rgb_raw/image_raw_color
+      /zed_node/rgb_raw/image_raw_color/compressed
+      /zed_node/rgb_raw/image_raw_color/compressedDepth
+      /zed_node/rgb_raw/image_raw_color/theora
+      /zed_node/rgb_raw/image_raw_gray
+      /zed_node/rgb_raw/image_raw_gray/compressed
+      /zed_node/rgb_raw/image_raw_gray/compressedDepth
+      /zed_node/rgb_raw/image_raw_gray/theora
+      /zed_node/right/camera_info
+      /zed_node/right/image_rect_color
+      /zed_node/right/image_rect_color/compressed
+      /zed_node/right/image_rect_color/compressedDepth
+      /zed_node/right/image_rect_color/nitros
+      /zed_node/right/image_rect_color/theora
+      /zed_node/right/image_rect_color_rgb
+      /zed_node/right/image_rect_color_rgb/nitros
+      /zed_node/right/image_rect_gray
+      /zed_node/right/image_rect_gray/compressed
+      /zed_node/right/image_rect_gray/compressedDepth
+      /zed_node/right/image_rect_gray/theora
+      /zed_node/right_raw/camera_info
+      /zed_node/right_raw/image_raw_color
+      /zed_node/right_raw/image_raw_color/compressed
+      /zed_node/right_raw/image_raw_color/compressedDepth
+      /zed_node/right_raw/image_raw_color/theora
+      /zed_node/right_raw/image_raw_gray
+      /zed_node/right_raw/image_raw_gray/compressed
+      /zed_node/right_raw/image_raw_gray/compressedDepth
+      /zed_node/right_raw/image_raw_gray/theora
+      /zed_node/stereo/image_rect_color
+      /zed_node/stereo/image_rect_color/compressed
+      /zed_node/stereo/image_rect_color/compressedDepth
+      /zed_node/stereo/image_rect_color/theora
+      /zed_node/stereo_raw/image_raw_color
+      /zed_node/stereo_raw/image_raw_color/compressed
+      /zed_node/stereo_raw/image_raw_color/compressedDepth
+      /zed_node/stereo_raw/image_raw_color/theora
+      /zed_node/temperature/imu
+      /zed_node/temperature/left
+      /zed_node/temperature/right
+
+Tutorial Walkthrough - Visualization
+------------------------------------
+
+You have the following two options for checking the ``visual_slam``
+output:
+
+-  **Live visualization**: Run ``RViz2`` live while running ``ZED`` node and
+   ``visual_slam`` nodes.
+-  **Offline visualization**: Record a rosbag file and check the recorded
+   data offline (possibly on a different machine).
+
+Running ``RViz2`` on a remote PC over the network can be challenging and can be
+difficult especially when you have image message topics to subscribe because
+of the added burden on the ROS 2 network transport.
+
+Working on ``RViz2`` in a X11-forwarded window can also be difficult because of
+the network speed limitation.
+
+Typically, if you are running ``visual_slam`` on Jetson, it is generally
+recommended that you **NOT** evaluate with live visualization (1).
+
+
+Live Visualization
+~~~~~~~~~~~~~~~~~~
+
+1. ``[Terminal 2]`` Open ``RViz2`` from the second terminal:
+
+   .. code:: bash
+
+      rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/zed.cfg.rviz
+
+   As you move the camera, verify that the position and orientation of the frames
+   corresponds to how the camera moved relative to its starting
+   pose.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/zed_rviz.gif>`
+    :align: center
+    :alt: After Localization
+    :width: 600px
+
+Offline Visualization
+~~~~~~~~~~~~~~~~~~~~~
+
+1. ``[Terminal 2]`` Save a rosbag file.
+
+   Record the output in your rosbag file, along with the input data for
+   later visual inspection.
+
+   .. code:: bash
+
+      export ROSBAG_NAME=courtyard-d435i
+      ros2 bag record -o ${ROSBAG_NAME} \
+        /zed_node/imu/data \
+        /zed_node/left/camera_info /zed_node/left/image_rect_color_rgb \
+        /zed_node/right/camera_info /zed_node/right/image_rect_color_rgb \
+        /tf_static /tf \
+        /visual_slam/status \
+        /visual_slam/tracking/odometry \
+        /visual_slam/tracking/slam_path /visual_slam/tracking/vo_path \
+        /visual_slam/tracking/vo_pose /visual_slam/tracking/vo_pose_covariance \
+        /visual_slam/vis/landmarks_cloud /visual_slam/vis/loop_closure_cloud \
+        /visual_slam/vis/observations_cloud \
+        /visual_slam/vis/pose_graph_edges /visual_slam/vis/pose_graph_edges2 \
+        /visual_slam/vis/pose_graph_nodes
+      ros2 bag info ${ROSBAG_NAME}
+
+   If you plan to run the rosbag on a remote machine (PC) for
+   evaluation, you can send the rosbag file to your remote machine:
+
+   .. code:: bash
+
+      export IP_PC=192.168.1.100
+      scp -r ${ROSBAG_NAME} ${PC_USER}@${IP_PC}:/home/${PC_USER}/workspaces/isaac_ros-dev/
+
+2. ``[Terminal 1]`` Launch ``RViz2``:
+
+      If you are SSHing into Jetson from your PC, make sure you enabled
+      X forwarding by adding ``-X`` option with SSH command:
+
+      .. code:: bash
+
+         ssh -X ${USERNAME_ON_JETSON}@${IP_JETSON}
+
+   Launch the Isaac ROS container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+   Run ``RViz2`` with a configuration file for visualizing a set of messages
+   from Visual SLAM node:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev
+      rviz2 -d src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/vslam_keepall.cfg.rviz
+
+3. ``[Terminal 2]`` Playback the recorded rosbag:
+
+   Attach another terminal to the running container.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+   Play the recorded rosbag file.
+
+   .. code:: bash
+
+      ros2 bag play ${ROSBAG_NAME}
+
+   ``RViz2`` starts showing a visual similar to the following:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/RViz_0217-cube_vslam-keepall.png>`
+    :align: center
+    :alt: After Localization
+    :width: 600px

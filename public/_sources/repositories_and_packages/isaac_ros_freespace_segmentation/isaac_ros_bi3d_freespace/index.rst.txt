@@ -15,8 +15,8 @@ Set Up Development Environment
 Download Quickstart Assets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Download quickstart data from NGC:
-
+1. Download quickstart data from NGC: 
+   
    :ir_assets:`<isaac_ros_bi3d_freespace> <quickstart.tar.gz>`
 
 2. Download a pre-trained :ir_ngc:`Bi3D <teams/isaac/models/bi3d_proximity_segmentation>` model:
@@ -49,7 +49,7 @@ Build |package_name|
          .. code:: bash
 
             sudo apt-get install -y ros-humble-isaac-ros-bi3d-freespace
-
+   
    .. tab:: Build from Source
 
       1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
@@ -58,7 +58,7 @@ Build |package_name|
 
             cd ${ISAAC_ROS_WS}/src && \
                git clone :ir_clone:`<isaac_ros_freespace_segmentation>`
-
+     
       2. Launch the Docker container using the ``run_dev.sh`` script:
 
          .. code:: bash
@@ -86,7 +86,7 @@ Build |package_name|
          .. note::
 
             Make sure to repeat this step in **every** terminal created inside the Docker container.
-
+            
             Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
 
          .. code:: bash
@@ -120,11 +120,11 @@ Run Launch File
 
          .. code:: bash
 
-            /usr/src/tensorrt/bin/trtexec \
+            /usr/src/tensorrt/bin/trtexec \ 
             --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.plan \
             --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.onnx \
             --int8 --useDLACore=0 --allowGPUFallback &&
-            /usr/src/tensorrt/bin/trtexec \
+            /usr/src/tensorrt/bin/trtexec \ 
             --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.plan \
             --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.onnx \
             --int8 --useDLACore=0 --allowGPUFallback
@@ -192,7 +192,7 @@ Run Launch File
             or set ``publish_default_tf:=false``. Then publish your own transform between the camera optical frame and the base link frame.
 
          .. code:: bash
-
+            
             ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
             launch_fragments:=realsense_stereo_rect,bi3d,bi3d_freespace \
             interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_bi3d_freespace/realsense_quickstart_interface_specs.json \
@@ -201,7 +201,7 @@ Run Launch File
             max_disparity_values:=10 publish_default_tf:=true
 
    .. tab:: Hawk Camera
-
+         
       #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
 
       #. Continuing inside the Docker container, install the following dependencies:
@@ -227,7 +227,7 @@ Run Launch File
             or set ``publish_default_tf:=false``. Then publish your own transform between the camera optical frame and the base link frame.
 
          .. code:: bash
-
+            
             ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
             launch_fragments:=argus_stereo,resize_rectify_stereo,bi3d,bi3d_freespace \
             interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_bi3d_freespace/hawk_quickstart_interface_specs.json \
@@ -270,6 +270,8 @@ To continue your exploration, check out the following suggested examples:
 
 .. toctree::
    :maxdepth: 1
+   
+   Tutorial with Zed </concepts/scene_reconstruction/bi3d_freespace_segmentation/tutorial_zed>
 
    Tutorial with Isaac Sim </concepts/scene_reconstruction/bi3d_freespace_segmentation/tutorial_isaac_sim>
 

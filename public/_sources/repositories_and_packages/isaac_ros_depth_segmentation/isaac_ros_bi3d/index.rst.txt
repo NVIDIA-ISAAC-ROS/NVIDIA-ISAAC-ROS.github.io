@@ -15,8 +15,8 @@ Set Up Development Environment
 Download Quickstart Assets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Download quickstart data from NGC:
-
+1. Download quickstart data from NGC: 
+   
    :ir_assets:`<isaac_ros_bi3d> <quickstart.tar.gz>`
 
 2. Download a pre-trained :ir_ngc:`Bi3D <teams/isaac/models/bi3d_proximity_segmentation>` model:
@@ -59,7 +59,7 @@ Build |package_name|
 
             cd ${ISAAC_ROS_WS}/src && \
                git clone :ir_clone:`<isaac_ros_depth_segmentation>`
-
+     
       2. Launch the Docker container using the ``run_dev.sh`` script:
 
          .. code:: bash
@@ -87,7 +87,7 @@ Build |package_name|
          .. note::
 
             Make sure to repeat this step in **every** terminal created inside the Docker container.
-
+            
             Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
 
          .. code:: bash
@@ -121,11 +121,11 @@ Run Launch File
 
          .. code:: bash
 
-            /usr/src/tensorrt/bin/trtexec \
+            /usr/src/tensorrt/bin/trtexec \ 
             --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.plan \
             --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/featnet.onnx \
             --int8 --useDLACore=0 --allowGPUFallback &&
-            /usr/src/tensorrt/bin/trtexec \
+            /usr/src/tensorrt/bin/trtexec \ 
             --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.plan \
             --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/bi3d_proximity_segmentation/segnet.onnx \
             --int8 --useDLACore=0 --allowGPUFallback
@@ -173,13 +173,13 @@ Run Launch File
       2. Continuing inside the Docker container, install dependencies:
 
          .. code:: bash
-
+            
             sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
-
+      
       3. Continuing inside the Docker container, run the following launch file to spin up a demo of this package using a RealSense camera:
 
          .. code:: bash
-
+            
             ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
             launch_fragments:=realsense_stereo_rect,bi3d \
             interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_bi3d/realsense_quickstart_interface_specs.json \
@@ -194,13 +194,13 @@ Run Launch File
       2. Continuing inside the Docker container, install dependencies:
 
          .. code:: bash
-
+            
             sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera ros-humble-isaac-ros-image-proc
-
+      
       3. Run the following launch file to spin up a demo of this package using a Hawk camera:
 
          .. code:: bash
-
+            
             ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
             launch_fragments:=argus_stereo,resize_rectify_stereo,bi3d \
             interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_bi3d/hawk_quickstart_interface_specs.json \
@@ -248,9 +248,10 @@ To continue your exploration, check out the following suggested examples:
    :maxdepth: 1
 
    Bi3D Example </concepts/stereo_depth/bi3d/bi3d_example>
-
+   
    Tutorial with Isaac Sim </concepts/stereo_depth/bi3d/tutorial_isaac_sim>
 
+   Tutorial with ZED camera </concepts/stereo_depth/bi3d/tutorial_zed>
 
 Model Preparation
 -----------------
@@ -394,7 +395,7 @@ ROS Topic                  Interface                                            
 ``right_camera_info_bi3d`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ Baseline populated in the Bi3D output disparity is extracted from this topic.
 ========================== ================================================================================================================= ===========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
 
-.. note::
+.. note:: 
 
    The images on input topics (``left_image_bi3d`` and ``right_image_bi3d``) should be a color image in ``rgb8`` format.
 

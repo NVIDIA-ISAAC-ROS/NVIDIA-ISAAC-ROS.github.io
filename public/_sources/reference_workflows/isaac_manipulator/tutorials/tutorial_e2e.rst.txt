@@ -1,21 +1,29 @@
-=====================================
-Tutorial for cuMotion with Perception
-=====================================
+===================================================
+Tutorial for cuMotion with Perception on Jetson AGX
+===================================================
 
 
 Overview
 --------
 
 This tutorial walks through the process of planning trajectories for a real robot.
-It leverages the cuMotion plugin for MoveIt 2 provided by :ir_repo:`Isaac ROS cuMotion <isaac_ros_cumotion>`.
-This tutorial demonstrates obstacle-aware planning using cuMotion by moving the robot end effector
-between two predetermined poses, alternating between them while avoiding obstacles detected in the workspace.
+It leverages the cuMotion plugin for MoveIt 2 provided by :ir_repo:`Isaac ROS cuMotion <isaac_ros_cumotion>` on a Jetson AGX Orin.
+This tutorial demonstrates obstacle-aware planning using cuMotion in two different scenarios. The first moves the robot end effector
+between two predetermined poses, alternating between them while avoiding obstacles detected in the workspace.  The second scenario
+goes further by having the robot end effector track an object at a fixed offset distance (leveraging RT-DETR for object detection and
+FoundationPose for pose estimation), again while avoiding obstacles.
 
-The tutorial uses:
+The pose-to-pose tutorial uses:
 
 - A stereo camera for perception
 - :ir_repo:`Isaac ROS ESS <isaac_ros_dnn_stereo_depth> <isaac_ros_ess>` for depth estimation
 - :ir_repo:`Isaac ROS Nvblox <isaac_ros_nvblox>` to produce a voxelized representation of the scene
+
+The object-tracking tutorial uses the above and adds:
+
+- :ir_repo:`Isaac ROS RT-DETR <isaac_ros_object_detection> <isaac_ros_rtdetr>` to detect an object of interest
+- :ir_repo:`Isaac ROS FoundationPose <isaac_ros_pose_estimation> <isaac_ros_foundationpose>` to estimate the 6 DoF pose
+  of the desired object to approach
 
 Requirements
 ------------
@@ -25,6 +33,14 @@ Please ensure that you have the following available:
 - A `Universal Robots <https://www.universal-robots.com/>`__ manipulator. This tutorial was validated on a UR5e.
 
 - A `Hawk stereo camera <https://leopardimaging.com/leopard-imaging-hawk-stereo-camera/>`__ or a `RealSense camera <https://www.intelrealsense.com/>`__.
+
+- One of the objects that :ir_ngc:`sdetr_grasp <teams/isaac/models/synthetica_detr>` was trained on.
+
+.. note::
+
+   For the desired object, please ensure that you have a mesh and a texture file available for it.
+   To prepare an object, please consult FoundationPose's documentation
+   :doc:`here </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`.
 
 Tutorial
 --------
@@ -37,8 +53,7 @@ Set Up Development Environment
 2. Complete the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>` if using a Hawk stereo camera.
    Alternatively, complete the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>` if using a RealSense camera
 
-3. It is recommended to use a PREEMPT_RT kernel on Jetson. Follow the :doc:`PREEMPT_RT for Jetson guide </getting_started/hardware_setup/compute/preempt_setup>`
-   **outside** of the container.
+3. It is recommended to use a PREEMPT_RT kernel. Follow the :doc:`PREEMPT_RT for Jetson guide </getting_started/hardware_setup/compute/preempt_setup>`.
 
 4. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
 
@@ -95,7 +110,7 @@ Build Isaac ROS cuMotion
 
                   .. code:: bash
 
-                     sudo apt-get install -y ros-humble-isaac-manipulator-bringup
+                     sudo apt-get install -y ros-humble-isaac-cumotion-manipulator
 
 Set Up UR5e Robot
 ~~~~~~~~~~~~~~~~~
@@ -122,26 +137,109 @@ Set Up UR5e Robot
 
 4. Finally, note down the IP address of the robot, and substitute it for ``<ROBOT_IP_ADDRESS>`` in the instructions below.
 
-5. Use the `moveit_calibration package <https://github.com/illumo-robotics/moveit_calibration>`__ to calibrate the camera with respect to the robot.
+5. Follow the instructions `here <https://moveit.picknik.ai/humble/doc/examples/hand_eye_calibration/hand_eye_calibration_tutorial.html>`__ to calibrate the camera with respect to the robot.
    Please update the values found in ``static_transforms.launch.py``, which can be found
    :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`.
 
-6. Update the values for ``world_pose_target1_frame`` and ``world_pose_target2_frame`` in ``static_transforms.launch.py``,
-   which is located :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`,
-   to be two distinct poses that are reachable by the robot.
+6. Modify other appropriate values based on the tutorial:
+
+   .. tabs::
+      .. tab:: Object Tracking
+
+         Please modify ``object_pose_grasp`` to a desired grasp pose relative to the detected object.
+         Feel free to leave this as the default for simplicity.
+
+      .. tab:: Pose to Pose
+
+         Update the values for ``world_pose_target1_frame`` and ``world_pose_target2_frame`` to be
+         two distinct poses that are reachable by the robot.
 
 Set Up Perception Deep Learning Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
-
-   The ESS model is only required for Hawk.
-
 1. Prepare the Light ESS model to run depth estimation:
 
-   .. code::
+   a. Download the pre-trained ESS model and TensorRT plugins from the `ESS model
+      page <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`__:
 
-      ros2 run isaac_ros_ess_models_install install_ess_models.sh --eula
+      .. code::
+
+        mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity && \
+         cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity && \
+         wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/dnn_stereo_disparity/versions/4.0.0/files/dnn_stereo_disparity_v4.0.0.tar.gz'
+
+      .. warning::
+
+         NVIDIA Internal: run the following command
+
+      .. code:: bash
+
+         mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/ && \
+          cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/ && \
+          ngc registry model download-version "nvstaging/isaac/dnn_stereo_disparity:4.0.0" && \
+          mv dnn_stereo_disparity_v4.0.0/dnn_stereo_disparity_v4.0.0.tar.gz .
+
+   b. Extract the downloaded model:
+
+      .. code:: bash
+
+         tar xvzf dnn_stereo_disparity_v4.0.0.tar.gz
+
+   c. Convert the encrypted model (``.etlt``) to a TensorRT engine plan:
+
+      .. code:: bash
+
+         ros2 run isaac_ros_ess generate_engine.py --etlt_model ${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.0.0/light_ess.etlt --arch aarch64
+
+.. note::
+
+   The rest of the models, textures and meshes are only required for the object-tracking tutorial.
+
+2. Get the SyntheticaDETR model to run object detection:
+
+   a. Download a pre-trained :ir_ngc:`SyntheticaDETR <teams/isaac/models/synthetica_detr>` model
+
+      .. code:: bash
+
+         mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr && \
+         cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr && \
+         wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/synthetica_detr/versions/1.0.0/files/sdetr_grasp.etlt'
+
+   b. Convert the encrypted model (``.etlt``) to a TensorRT engine plan:
+
+      .. code:: bash
+
+         /opt/nvidia/tao/tao-converter -k sdetr -t fp16 -e ${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan -p images,1x3x640x640,2x3x640x640,4x3x640x640 -p orig_target_sizes,1x2,2x2,4x2 ${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.etlt
+
+3. Get the FoundationPose models to run pose estimation:
+
+   a. Download the pre-trained :ir_ngc:`FoundationPose <teams/isaac/models/foundation_pose>` models
+
+      .. code:: bash
+
+         mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose && \
+         cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose && \
+         ngc registry model download-version "nvstaging/isaac/foundation_pose:1.0.0" && \
+         mv foundation_pose_v1.0.0/* . && \
+         rm -r foundation_pose_v1.0.0
+
+   b. Convert the encrypted models (``.etlt``) to TensorRT engine plans:
+
+      Convert the refine model:
+
+      .. code:: bash
+
+         /opt/nvidia/tao/tao-converter -k foundationpose -t fp16 -e ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/refine_trt_engine.plan -p input1,1x160x160x6,1x160x160x6,252x160x160x6 -p input2,1x160x160x6,1x160x160x6,252x160x160x6 -o output1,output2 ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/refine_model.etlt
+
+      Convert the score model:
+
+      .. code:: bash
+
+         /opt/nvidia/tao/tao-converter -k foundationpose -t fp16 -e ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/score_trt_engine.plan -p input1,1x160x160x6,1x160x160x6,252x160x160x6 -p input2,1x160x160x6,1x160x160x6,252x160x160x6 -o output1 ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/score_model.etlt
+
+   c. Download the Mac and Cheese texture and mesh from
+
+      :ir_assets:`<isaac_ros_foundationpose> <quickstart.tar.gz>`
 
 Run Launch Files and Deploy to Robot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,68 +250,62 @@ Run Launch Files and Deploy to Robot
    new terminal you run ROS commands to avoid interference
    with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
 
-1. On the UR teach pendant, ensure that the robot's **remote program** is loaded and that the robot is **paused** or **stopped** for safety purposes.
-
-2. Launch the UR Robot Driver:
+1. Launch the UR Robot Driver:
 
    .. code:: bash
 
       ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS> launch_rviz:=false
 
-3. Open a **new** terminal inside the Docker container:
-
-   .. code:: bash
-
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh
-
-4. Launch the UR5e cuMotion Example:
+2. Launch the UR5e cuMotion Example:
 
   .. code:: bash
 
-     ros2 launch isaac_ros_cumotion_examples ur.launch.py ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS> launch_rviz:=true
+     ros2 launch isaac_ros_cumotion_examples ur.launch.py ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS> launch_rviz:=false
 
-  .. warning::
-
-     Please add any obstacles that are not visible by the camera into the scene to prevent potential collisions.
-     Consult the documentation :doc:`here </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index>`.
-
-5. Open **another** terminal inside the Docker container:
-
-   .. code:: bash
-
-      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-        ./scripts/run_dev.sh
-
-6. Launch the pose to pose example:
+3. Launch Isaac cuMotion Manipulator:
 
    .. tabs::
-      .. tab:: Hawk stereo camera
+      .. tab:: Hawk stereo camera with object tracking
 
-         1. Install the Hawk stereo camera:
+         .. code:: bash
 
-            .. code:: bash
+            ros2 launch isaac_manipulator_bringup isaac_manipulator.launch.py \
+               ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.0.0/light_ess.engine \
+               rtdetr_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan \
+               refine_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/refine_trt_engine.plan \
+               score_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/score_trt_engine.plan \
+               mesh_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/Mac_and_cheese_0_1.obj \
+               texture_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/materials/textures/baked_mesh_tex0.png \
+               camera_type:=hawk
 
-               sudo apt-get install -y ros-humble-isaac-ros-hawk
+      .. tab:: RealSense camera with object tracking
 
-         2. Launch the pose-to-pose example:
+         .. code:: bash
 
-            .. code:: bash
+            ros2 launch isaac_manipulator_bringup isaac_manipulator.launch.py \
+               ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.0.0/light_ess.engine \
+               rtdetr_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan \
+               refine_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/refine_trt_engine.plan \
+               score_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose/score_trt_engine.plan \
+               mesh_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/Mac_and_cheese_0_1.obj \
+               texture_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/materials/textures/baked_mesh_tex0.png \
+               camera_type:=realsense
 
-               ros2 launch isaac_manipulator_bringup cumotion_nvblox_pose_to_pose.launch.py \
-                ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.0.0/light_ess.engine \
-                camera_type:=hawk ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS>
+      .. tab:: Hawk stereo camera for pose-to-pose example
 
-      .. tab:: RealSense camera
+         .. code:: bash
 
-         1. Launch the pose-to-pose example:
+            ros2 launch isaac_manipulator_bringup cumotion_nvblox_pose_to_pose.launch.py \
+               ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.0.0/light_ess.engine \
+               camera_type:=hawk
 
-            .. code:: bash
+      .. tab:: RealSense camera for pose-to-pose example
 
-               ros2 launch isaac_manipulator_bringup cumotion_nvblox_pose_to_pose.launch.py \
-                camera_type:=realsense ur_type:=ur5e robot_ip:=<ROBOT_IP_ADDRESS>
+         .. code:: bash
 
-7. On the UR teach pendant, press the **play** button to enable the robot.
+            ros2 launch isaac_manipulator_bringup cumotion_nvblox_pose_to_pose.launch.py \
+               ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.0.0/light_ess.engine \
+               camera_type:=realsense
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif>`
    :width: 576px
