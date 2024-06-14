@@ -137,6 +137,59 @@ Visualize Results
       :align: center
 
 
+Control your Jetson
+-------------------
+
+You can control your Jetson using the following services:
+   * ``jtop/fan``: Change the fan speed configuration.
+   * ``jtop/nvpmodel``: Change the NVPmodel of your board.
+   * ``jtop/jetson_clocks``: Enable or disable Jetson Clocks.
+
+Change the Fan Speed Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An example to change the fan speed configuration:
+
+   .. code:: bash
+
+	   ros2 service call /jtop/fan isaac_ros_jetson_stats_services/srv/Fan "{'profile':quiet ,'speed':100}"
+
+This command will change the fan speed configuration to 100% and the profile to quiet. You can change the profile to quiet, cool, or manual.
+
+These profile can change depending on JetPack version and Jetson model. You can check the available profiles from the documentation reference.
+
+Change the NVPmodel of your board
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An example to change the NVPmodel of your board:
+   
+      .. code:: bash
+   
+         ros2 service call /jtop/nvpmodel isaac_ros_jetson_stats_services/srv/NVPModel  "{'nvpmodel':0 }"
+
+This command will change NVPmodel on your board. To check the available NVPmodel, you can check the documentation reference.
+
+   .. note::
+
+      Not all NVPmodel are available on all Jetson models. You can check the available NVPmodel from the NVIDIA Jetson documentation reference.
+
+   .. note::
+
+      Not all NVPmodel can be set without a reboot. If it fails you need to change manually on your board.
+
+
+Change the Jetson Clocks
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+An example to enable Jetson Clocks:
+
+   .. code:: bash
+
+      ros2 service call /jtop/jetson_clocks isaac_ros_jetson_stats_services/srv/JetsonClocks "{'enable':true}"
+
+This command enables Jetson Clocks. You can disable Jetson Clocks by changing the value to false.
+
+
 Troubleshooting
 ---------------
 

@@ -33,6 +33,11 @@ Download Quickstart Assets
       cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr && \
          wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/synthetica_detr/versions/1.0.0/files/sdetr_grasp.etlt'
 
+   .. note::
+
+      This quickstart uses the NVIDIA-produced ``sdetr_grasp`` SyntheticaDETR model, but Isaac ROS RT-DETR is compatible with all RT-DETR architecture models.
+      For more about the differences between SyntheticaDETR and RT-DETR, see :doc:`here </concepts/object_detection/rtdetr/index>`.
+
 Build |package_name|
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -107,6 +112,10 @@ Run Launch File
 
       /opt/nvidia/tao/tao-converter -k sdetr -t fp16 -e ${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan -p images,1x3x640x640,2x3x640x640,4x3x640x640 -p orig_target_sizes,1x2,2x2,4x2 ${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.etlt
 
+   .. note::
+
+      The model conversion time varies across different platforms. On Jetson AGX Orin, for example, the engine conversion process can take up to 10-15 minutes to complete.
+
 .. tabs::
 
    .. tab:: Rosbag
@@ -155,6 +164,8 @@ Run Launch File
          .. code:: bash
 
             ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,rtdetr engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan
+         
+      .. include:: ../_snippets/sdetr_objects.rst
 
    .. tab:: Hawk Camera
          
@@ -173,6 +184,8 @@ Run Launch File
          .. code:: bash
 
             ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,rectify_mono,rtdetr  engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/synthetica_detr/sdetr_grasp.plan
+
+      .. include:: ../_snippets/sdetr_objects.rst
 
 Visualize Results
 ^^^^^^^^^^^^^^^^^
@@ -287,10 +300,15 @@ ROS Parameters
      - ``orig_target_sizes``
      - The name of the target image size tensor binding in the output tensor list.
 
-   * - ``image_size``
+   * - ``image_height``
+     - ``int``
+     - ``480``
+     - The height of the original image, for resizing the final bounding box to match the original dimensions.
+   
+   * - ``image_width``
      - ``int``
      - ``640``
-     - The side length of the encoded image, which must be a square.
+     - The width of the original image, for resizing the final bounding box to match the original dimensions.
 
 ROS Topics Subscribed
 ^^^^^^^^^^^^^^^^^^^^^

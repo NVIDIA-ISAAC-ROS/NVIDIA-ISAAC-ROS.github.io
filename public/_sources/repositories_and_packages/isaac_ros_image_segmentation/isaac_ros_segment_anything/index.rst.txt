@@ -72,7 +72,7 @@ Build |package_name|
          .. code:: bash
 
             cd ${ISAAC_ROS_WS} && \
-               colcon build --packages-up-to isaac_ros_segment_anything
+               colcon build --symlink-install --packages-up-to isaac_ros_segment_anything
 
       5. Source the ROS workspace:
 
@@ -297,6 +297,21 @@ Visualize Results
    .. note::
 
       The raw segmentation mask is also published to ``/segment_anything/raw_segmentation_mask``. However, the raw pixels correspond to the class labels and so the output is unsuitable for human visual inspection.
+
+.. note::
+
+   Segment Anything is designed to perform segmentation on unseen objects, and requires significant GPU compute 
+   to perform this task. Refer to `performance <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_segmentation?tab=readme-ov-file#performance>`__ of the model, for your target platform.
+   High performance discrete GPU's can outperform Jetson platforms for this task, and should be used if higher performance is needed. 
+.. note::
+
+   Segment Anything is designed to perform image segmentation on previously unseen objects without model retraining. As a result, inference requires significant GPU compute for this task. Refer to `performance <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_segmentation?tab=readme-ov-file#performance>`__ of the model for your target platform to determine which model variants to use.
+
+   More powerful discrete GPUs can outperform all other platforms for this task and should be preferred if higher performance is required.
+   Interleaving image segmentation with other tasks rather than running continuously can be a more effective solution as well. Finally, if runtime performance
+   is critical and offline training resources are available, developers can train :doc:`Unet </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+   for their own target objects using synthetic data generation and/or real-world data for faster image segmentation.
+
 
 Try More Examples
 -----------------

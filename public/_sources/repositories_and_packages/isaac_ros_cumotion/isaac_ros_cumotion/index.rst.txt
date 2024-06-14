@@ -175,144 +175,21 @@ Visualize Results of Robot Segmentation
       :align: center
 
 Troubleshooting
----------------
+===============
 
 Isaac ROS Troubleshooting
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
 
 API
----
-
-CumotionRobotSegmenter
-~~~~~~~~~~~~~~~~~~~~~~
-
-ROS Parameters
-^^^^^^^^^^^^^^
-
-.. list-table::
-   :header-rows: 1
-
-   * - ROS Parameter
-     - Type
-     - Default
-     - Description
-
-   * - ``robot``
-     - ``string``
-     - ``ur5e.yml``
-     - Path to the XRDF file for the robot
-
-   * - ``urdf_path``
-     - ``string``
-     - ``rclpy.Parameter.Type.STRING``
-     - Path to the robot's URDF
-
-   * - ``cuda_device`` 
-     - ``int``
-     - ``0``
-     - CUDA device index to use
-
-   * - ``distance_threshold``
-     - ``float``
-     - ``0.1``
-     - Maximum distance from a given collision sphere (in meters) at which to mask points
-
-   * - ``time_sync_slop``
-     - ``float``
-     - ``0.1``
-     - Maximum allowed delay (in seconds) for which depth image and joint state messages are considered synchronized
-
-   * - ``tf_lookup_duration``
-     - ``float``
-     - ``5.0``
-     - Maximum duration (in seconds) for which to block while waiting for a transform to become available
-
-   * - ``joint_states_topic``
-     - ``string``
-     - ``/joint_states``
-     - Topic to subscribe to for the robot's joint states
-
-   * - ``debug_robot_topic``
-     - ``string``
-     - ``/cumotion/robot_segmenter/robot_spheres``
-     - Topic on which to publish the spheres representing the robot
-
-   * - ``depth_image_topics``
-     - ``string array``
-     - ``['/cumotion/depth_1/image_raw']``
-     - List of topics to subscribe to for input depth images
-
-   * - ``depth_camera_infos``
-     - ``string array``
-     - ``['/cumotion/depth_1/camera_info']``
-     - List of topics to subscribe to for camera info corresponding to the input depth image streams
-
-   * - ``robot_mask_publish_topics``
-     - ``string array``
-     - ``['/cumotion/depth_1/robot_mask']``
-     - List of topics on which to publish the robot segmentation masks for the corresponding depth image streams
-
-   * - ``world_depth_publish_topics``
-     - ``string array``
-     - ``['/cumotion/depth_1/world_depth']``
-     - List of topics on which to publish depth images with the robot segmented out
-
-   * - ``log_debug``
-     - ``bool``
-     - ``False``
-     - When true, increases logging verbosity to help with debugging
-
-ROS Topics Subscribed
-^^^^^^^^^^^^^^^^^^^^^
-
-.. list-table::
-   :header-rows: 1
-
-   * - ROS Topic
-     - Interface
-     - Description
-
-   * - ``joint_states_topic``
-     - `sensor_msgs/JointState <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/JointState.msg>`__
-     - Joint states of the robot
-
-   * - ``depth_image_topics``
-     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__     
-     - Input depth images, including the robot to be segmented out
-
-   * - ``depth_camera_infos``
-     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
-     - Topics to subscribe to for the camera info corresponding to the input depth image streams
-
-ROS Topics Published
-^^^^^^^^^^^^^^^^^^^^
-
-.. list-table::
-   :header-rows: 1
-
-   * - ROS Topic
-     - Interface
-     - Description
-
-   * - ``debug_robot_topic``
-     - `visualization_msgs/MarkerArray <https://github.com/ros2/common_interfaces/blob/humble/visualization_msgs/msg/MarkerArray.msg>`__
-     - Robot represented by spheres for debugging and visualization
-
-   * -  ``robot_mask_publish_topics``
-     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__     
-     - Robot segmentation masks for the corresponding depth image streams
-
-   * - ``world_depth_publish_topics``
-     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__     
-     - Depth images with the robot segmented out
+===
 
 CumotionActionServer
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 ROS Parameters
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -418,7 +295,7 @@ ROS Parameters
      - When true, the planner is allowed to override MoveIt's scaling factors
 
 ROS Topics Subscribed
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -432,7 +309,7 @@ ROS Topics Subscribed
      - Joint states of the robot
 
 ROS Topics Published
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -446,7 +323,7 @@ ROS Topics Published
      - cuMotion's world represented as voxels for visualization
 
 ROS Services Requested
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -460,7 +337,7 @@ ROS Services Requested
      - Service that takes an axis-aligned bounding box (AABB) for the planning region and returns a dense ESDF and gradient field for that region.
 
 ROS Actions Advertised
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -472,6 +349,129 @@ ROS Actions Advertised
    * - ``cumotion/move_group``
      - `moveit_msgs/MoveGroup <https://github.com/moveit/moveit_msgs/blob/humble/action/MoveGroup.action>`__
      - Creates a motion plan and forwards it to MoveIt
+
+CumotionRobotSegmenter
+----------------------
+
+ROS Parameters
+~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``robot``
+     - ``string``
+     - ``ur5e.yml``
+     - Path to the XRDF file for the robot
+
+   * - ``urdf_path``
+     - ``string``
+     - ``rclpy.Parameter.Type.STRING``
+     - Path to the robot's URDF
+
+   * - ``cuda_device`` 
+     - ``int``
+     - ``0``
+     - CUDA device index to use
+
+   * - ``distance_threshold``
+     - ``float``
+     - ``0.1``
+     - Maximum distance from a given collision sphere (in meters) at which to mask points
+
+   * - ``time_sync_slop``
+     - ``float``
+     - ``0.1``
+     - Maximum allowed delay (in seconds) for which depth image and joint state messages are considered synchronized
+
+   * - ``tf_lookup_duration``
+     - ``float``
+     - ``5.0``
+     - Maximum duration (in seconds) for which to block while waiting for a transform to become available
+
+   * - ``joint_states_topic``
+     - ``string``
+     - ``/joint_states``
+     - Topic to subscribe to for the robot's joint states
+
+   * - ``debug_robot_topic``
+     - ``string``
+     - ``/cumotion/robot_segmenter/robot_spheres``
+     - Topic on which to publish the spheres representing the robot
+
+   * - ``depth_image_topics``
+     - ``string array``
+     - ``['/cumotion/depth_1/image_raw']``
+     - List of topics to subscribe to for input depth images
+
+   * - ``depth_camera_infos``
+     - ``string array``
+     - ``['/cumotion/depth_1/camera_info']``
+     - List of topics to subscribe to for camera info corresponding to the input depth image streams
+
+   * - ``robot_mask_publish_topics``
+     - ``string array``
+     - ``['/cumotion/depth_1/robot_mask']``
+     - List of topics on which to publish the robot segmentation masks for the corresponding depth image streams
+
+   * - ``world_depth_publish_topics``
+     - ``string array``
+     - ``['/cumotion/depth_1/world_depth']``
+     - List of topics on which to publish depth images with the robot segmented out
+
+   * - ``log_debug``
+     - ``bool``
+     - ``False``
+     - When true, increases logging verbosity to help with debugging
+
+ROS Topics Subscribed
+~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``joint_states_topic``
+     - `sensor_msgs/JointState <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/JointState.msg>`__
+     - Joint states of the robot
+
+   * - ``depth_image_topics``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__
+     - Input depth images, including the robot to be segmented out
+
+   * - ``depth_camera_infos``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Topics to subscribe to for the camera info corresponding to the input depth image streams
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``debug_robot_topic``
+     - `visualization_msgs/MarkerArray <https://github.com/ros2/common_interfaces/blob/humble/visualization_msgs/msg/MarkerArray.msg>`__
+     - Robot represented by spheres for debugging and visualization
+
+   * -  ``robot_mask_publish_topics``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__
+     - Robot segmentation masks for the corresponding depth image streams
+
+   * - ``world_depth_publish_topics``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__
+     - Depth images with the robot segmented out
 
 .. |package_name| replace:: ``isaac_ros_cumotion``
 

@@ -40,7 +40,7 @@ Build |package_name|
          .. code:: bash
 
             sudo apt-get install -y ros-humble-isaac-ros-visual-slam
-   
+
    .. tab:: Build from Source
 
       1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
@@ -49,7 +49,7 @@ Build |package_name|
 
             cd ${ISAAC_ROS_WS}/src && \
                git clone :ir_clone:`<isaac_ros_visual_slam>`
-     
+
       2. Launch the Docker container using the ``run_dev.sh`` script:
 
          .. code:: bash
@@ -77,7 +77,7 @@ Build |package_name|
          .. note::
 
             Make sure to repeat this step in **every** terminal created inside the Docker container.
-            
+
             Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
 
          .. code:: bash
@@ -149,7 +149,7 @@ Run Launch File
             base_frame:=camera_link camera_optical_frames:="['camera_infra1_optical_frame', 'camera_infra2_optical_frame']"
 
    .. tab:: Hawk Camera
-         
+
       #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
 
       #. Continuing inside the Docker container, install the following dependencies:
@@ -322,7 +322,7 @@ ROS Parameter                     Type                         Default          
 ================================= ============================ ================ ===================================================================================================================================================================================================================
 *Functional Parameters*
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-``num_cameras``                   ``int``                      ``2``            Number of cameras used. Set to 2 for a single stereo camera.
+``num_cameras``                   ``int``                      ``2``            Number of cameras used. Set to 2 for a single stereo camera. Maximum value is 32.
 ``min_num_images``                ``int``                      ``num_cameras``  Minimum number of images required to track the pose. If less than ``min_num_images`` with a synchronized timestamp are received then the synchronizer will drop all messages.
 ``sync_matching_threshold_ms``    ``double``                   ``5.0`` .        Maximum duration between image timestamps to still consider them synced.
 ``enable_image_denoising``        ``bool``                     ``false``        If enabled, input images are denoised. It can be enabled when images are noisy because of low-light conditions.
@@ -410,7 +410,7 @@ ROS Service                       Interface                                     
 ================================= ================================================================================================================================================================================ ===============================================================
 
 .. note::
-   ``visual_slam/set_slam_pose`` only works in SLAM mode i.e. set ``enable_localization_n_mapping = false``
+   ``visual_slam/set_slam_pose`` only works in SLAM mode i.e. set ``enable_localization_n_mapping = true``
 
 ROS Actions Advertised
 ^^^^^^^^^^^^^^^^^^^^^^

@@ -267,6 +267,16 @@ Visualize Results
                :alt: Isaac ROS FoundationPose Hawk Pose Estimation
                :align: center
 
+.. note::
+
+   FoundationPose is designed to perform pose estimation on previously unseen objects without model retraining. 
+   As a result, inference requires significant GPU compute for first detection. Tracking once an initial pose estimation is determined can be significantly faster, however.
+   Refer to `performance <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_pose_estimation?tab=readme-ov-file#performance>`__ of the model for your target platform to determine which model to use.
+
+   More powerful discrete GPUs can outperform all other platforms for this task and should be preferred if higher performance is required.
+   Interleaving pose estimation with other tasks rather than running continuously can be a more effective solution as well. Finally, if runtime performance
+   is critical and offline training resources are available, developers can train :doc:`CenterPose </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>` 
+   for their own target objects using synthetic data generation and/or real-world data for faster pose estimation.
 
 Try More Examples
 -----------------

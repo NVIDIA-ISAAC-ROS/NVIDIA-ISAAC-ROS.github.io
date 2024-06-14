@@ -16,36 +16,29 @@ in Isaac Sim leveraging the cuMotion plugin for MoveIt 2 provided by
 developed by PickNik Robotics, which in turn was based on a less featureful MoveIt example provided
 with Isaac Sim.
 
-This tutorial has been tested with Isaac Sim 2023.1.1.
+This tutorial has been tested with Isaac Sim 4.0 and Isaac Sim 2023.1.1.
 
 Tutorial Walkthrough
 --------------------
 
-1. Complete the "Basic Setup" section of the ``isaac_ros_cumotion_moveit`` :ref:`quickstart <repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index:Quickstart>`.
-2. Build the ``isaac_ros_cumotion_examples`` package and its dependencies (including ``isaac_ros_cumotion`` and ``isaac_ros_cumotion_moveit``):
+1. Set up your development environment by following the instructions in :doc:`Getting Started </getting_started/dev_env_setup>`.
+
+2. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
 
    .. code:: bash
 
-      cd ${ISAAC_ROS_WS} && \
-        colcon build --packages-up-to isaac_ros_cumotion_examples
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_common>`
 
-3. Launch MoveIt (including RViz) using the provided launch file:
+3. Install the ``isaac_ros_cumotion_examples`` package and its dependencies
+   (including ``isaac_ros_cumotion`` and ``isaac_ros_cumotion_moveit``):
 
-   .. code:: bash
+   .. include:: /repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/_snippets/install.rst
 
-      source install/setup.bash && \
-        ros2 launch isaac_ros_cumotion_examples franka_isaac_sim.launch.py
-
-4. In a separate terminal, run the cuMotion planner node:
-
-   .. code:: bash
-
-      source install/setup.bash && \
-        ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args -p robot:=franka.xrdf -p urdf_path:=/opt/ros/humble/share/moveit_resources_panda_description/urdf/panda.urdf
-
-5. Install and configure Isaac Sim following the steps in the
+4. Install and configure Isaac Sim following the steps in the
    :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`, stopping after step 4.
-6. This tutorial uses the Isaac Sim "standalone workflow," in which Isaac Sim is launched via a python script.  In the
+
+5. This tutorial uses the Isaac Sim "standalone workflow," in which Isaac Sim is launched via a python script.  In the
    terminal opened using the **"Open in Terminal"** button in the Isaac Sim App Selector (and notably **not** in a shell
    within the Isaac ROS docker container), source your ROS 2 workspace, e.g.,
 
@@ -53,16 +46,48 @@ Tutorial Walkthrough
 
       source /opt/ros/humble/setup.bash
 
-7. Run ``python.sh`` with the full path to the ``start_isaac_sim_franka.py`` script provided by the
+6. Run ``python.sh`` with the full path to the ``start_isaac_sim_franka.py`` script provided by the
    ``isaac_ros_cumotion_examples`` package.  Please note that this is a standalone script and could be copied to
    another location for convenience.
 
+   .. tabs::
+
+      .. tab:: Binary Package
+
+         Please clone or download the script from :ir_repo:`here <isaac_ros_cumotion> <isaac_ros_cumotion_examples/isaac_sim_scripts/start_isaac_sim_franka.py>`.  Then run it with ``python.sh`` as follows.
+
+         .. code:: bash
+
+            ./python.sh <DOWNLOAD_PATH>/start_isaac_sim_franka.py
+
+      .. tab:: Build from Source
+
+         .. code:: bash
+
+            ./python.sh ${ISAAC_ROS_WS}/src/isaac_ros_cumotion/isaac_ros_cumotion_examples/isaac_sim_scripts/start_isaac_sim_franka.py
+
+   Once Isaac Sim fully loads, the timeline will begin playing automatically.
+
+   .. note::
+
+      The example should be loaded in Isaac Sim before MoveIt is launched.
+
+7. In a terminal within the Isaac ROS Docker container, launch MoveIt (including RViz) using the provided
+   launch file.  Remember to first run ``source install/setup.bash`` if package was built from source.
+
    .. code:: bash
 
-      ./python.sh ${ISAAC_ROS_WS}/src/isaac_ros_cumotion/isaac_ros_cumotion_examples/isaac_sim_scripts/start_isaac_sim_franka.py
+      ros2 launch isaac_ros_cumotion_examples franka_isaac_sim.launch.py
 
-   Once Isaac Sim fully loads, the timeline will begin playing automatically, with the simulated robot synchronized
-   to the one visualized in RViz.
+   The visualization of the robot in RViz should reflect the current joint state of the
+   simulated robot in Isaac Sim.
+
+7. In a separate terminal within the Docker container, run the cuMotion planner node.  Remember to first run
+   ``source install/setup.bash`` if package was built from source.
+
+   .. code:: bash
+
+      ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args -p robot:=franka.xrdf -p urdf_path:=/opt/ros/humble/share/moveit_resources_panda_description/urdf/panda.urdf
 
 8. In RViz, enable cuMotion by ensuring that ``isaac_ros_cumotion`` and ``cuMotion`` are selected within the
    **"Planning Library"** pane within the **"Context"** tab in the bottom left corner of the RViz window.
