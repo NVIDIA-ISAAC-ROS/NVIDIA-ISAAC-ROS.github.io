@@ -10,165 +10,108 @@ Quickstart
 Set Up Development Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. include:: /_snippets/set_up_dev_env.rst
+1. Set up your development environment by following the instructions in :doc:`Getting Started </getting_started/dev_env_setup>`.
+
+2. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_common>`
 
 
-Build |package_name| and Examples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Install |package_name| and Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: _snippets/install.rst
+
+
+Set Up MoveIt 2 with cuMotion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Complete the following steps for your selected robot.
 
 .. tabs::
 
-   .. tab:: Binary Package
+   .. tab:: Universal Robot (UR)
 
-      1. Launch the Docker container using the ``run_dev.sh`` script:
-
-         .. code:: bash
-
-            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-               ./scripts/run_dev.sh
-
-      2. Install the prebuilt Debian package:
-
-         :ir_apt:
+      1. **Optional:** If running on a physical UR robot, install the following support package:
 
          .. code:: bash
 
-            sudo apt-get install -y ros-humble-isaac-ros-cumotion-examples
+            sudo apt install ros-humble-ur-bringup
 
-   .. tab:: Build from Source
-
-      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+      2. Generate a URDF for the UR10e from the corresponding xacro:
 
          .. code:: bash
 
-            cd ${ISAAC_ROS_WS}/src && \
-               git clone --recurse-submodules :ir_clone:`<isaac_ros_cumotion>`
+            mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/urdf && \
+                xacro -o ${ISAAC_ROS_WS}/isaac_ros_assets/urdf/ur10e.urdf /opt/ros/humble/share/ur_description/urdf/ur.urdf.xacro ur_type:=ur10e name:=ur10e
 
-      2. Launch the Docker container using the ``run_dev.sh`` script:
-
-         .. code:: bash
-
-            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
-               ./scripts/run_dev.sh
-
-      3. Use ``rosdep`` to install the package's dependencies:
-
-         :ir_apt:
+      3. Launch MoveIt (including RViz).
 
          .. code:: bash
 
-            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_cumotion --ignore-src -y
+            ros2 launch isaac_ros_cumotion_examples ur.launch.py ur_type:=ur10e
 
-      4. Build the package from source:
-
-         .. TODO(author): Replace `isaac_ros_package`
+      4. In a separate terminal, run the cuMotion planner node.  Remember to first ``source install/setup.bash`` if package was built from source.
 
          .. code:: bash
 
-            cd ${ISAAC_ROS_WS} && \
-               colcon build --symlink-install --packages-up-to isaac_ros_cumotion_examples
+            ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args -p robot:=ur10e.xrdf -p urdf_path:=${ISAAC_ROS_WS}/isaac_ros_assets/urdf/ur10e.urdf
 
-      5. Source the ROS workspace:
+   .. tab:: Franka
 
-         .. note::
-
-            Make sure to repeat this step in **every** terminal created inside the Docker container.
-
-            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to
-            find the package's contents.
+      1. Launch MoveIt (including RViz).
 
          .. code:: bash
 
-            source install/setup.bash
+            ros2 launch isaac_ros_cumotion_examples franka.launch.py
 
+      2. In a separate terminal, run the cuMotion planner node.  Remember to first ``source install/setup.bash`` if package was built from source.
 
-Setting up cuMotion for a New Robot
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         .. code:: bash
 
-1. Follow the instructions in the "Build |package_name| and Examples" section above.
-2. Create a MoveIt configuration for your robot using the MoveIt setup assistant.
-3. cuMotion requires a URDF as well as an
-   :ref:`XRDF <concepts/manipulation/xrdf:Extended Robot Description Format (XRDF)>` file for the robot.
-   URDFs are available for most common robot arms, but it may be necessary to create an XRDF file.  This can
-   be done by hand (e.g., using an existing XRDF file as a reference), but Isaac Sim 4.0 will provide a robot
-   description editor with XRDF support to simplify this process.
-4. Copy cuMotion's planning configuration file to the MoveIt ``config`` directory for your robot:
+            ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args -p robot:=franka.xrdf -p urdf_path:=/opt/ros/humble/share/moveit_resources_panda_description/urdf/panda.urdf
 
-   .. code:: bash
+   .. tab:: Another Robot
 
-      cp ${ISAAC_ROS_WS}/src/isaac_ros_cumotion/isaac_ros_cumotion_moveit/config/isaac_ros_cumotion_planning.yaml \
-        PATH/TO/ROBOT_moveit_config/config/
+      1. Create a MoveIt configuration for your robot using the MoveIt setup assistant.
 
-5. In the MoveIt launch file for your robot (e.g., ``<ROBOT>_moveit_config/launch/<ROBOT>_moveit.launch.py``), add the following entry
-   to the ``parameters`` list of the ``Node()`` constructor for ``move_group_node``:
+      2. cuMotion requires a URDF as well as an
+         :ref:`XRDF <concepts/manipulation/xrdf:Extended Robot Description Format (XRDF)>` file for the robot.
+         URDFs are available for most common robot arms, but it may be necessary to create an XRDF file.  This can
+         be done by hand (e.g., using an existing XRDF file as a reference) or by using the
+         `Robot Description Editor <https://docs.omniverse.nvidia.com/isaacsim/latest/advanced_tutorials/tutorial_motion_generation_robot_description_editor.html>`_
+         in Isaac Sim 4.0 or later.
 
-   .. code:: python
+      3. Copy cuMotion's planning configuration file to the MoveIt ``config`` directory for your robot:
 
-      { "planning_pipelines": ["ompl", "isaac_ros_cumotion"] }
+         .. code:: bash
 
-6. Build any additional required packages for your robot, and source ``install/setup.bash``.
-7. Launch MoveIt (including RViz) using a suitable launch file for your robot, e.g.:
+            cp ${ISAAC_ROS_WS}/src/isaac_ros_cumotion/isaac_ros_cumotion_moveit/config/isaac_ros_cumotion_planning.yaml \
+                PATH/TO/ROBOT_moveit_config/config/
 
-   .. code:: bash
+      4. In the MoveIt launch file for your robot (e.g., ``<ROBOT>_moveit_config/launch/<ROBOT>_moveit.launch.py``),
+         add the following entry to the ``parameters`` list of the ``Node()`` constructor for ``move_group_node``:
 
-      source install/setup.bash && \
-         ros2 launch ROBOT_moveit_config ROBOT_moveit.launch.py
+         .. code:: python
 
-8. In a separate terminal, run the cuMotion planner node:
+            { "planning_pipelines": ["ompl", "isaac_ros_cumotion"] }
 
-   .. code:: bash
+      5. Install any additional required packages for your robot, and run ``source install/setup.bash`` if building from source.
 
-      source install/setup.bash && \
-         ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args -p robot:=/path/to/ROBOT.xrdf -p urdf_path:=/path/to/ROBOT.urdf
+      6. Launch MoveIt (including RViz) using a suitable launch file for your robot, e.g.:
 
+         .. code:: bash
 
-Example: Setting Up cuMotion for a Universal Robot (UR)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            ros2 launch ROBOT_moveit_config ROBOT_moveit.launch.py
 
-1. Follow the instructions in the "Build |package_name| and Examples" section above.
-2. **Optional:** If running on a physical UR robot, install the following support package:
+      7. In a separate terminal, run the cuMotion planner node.  Remember to first run ``source install/setup.bash`` if package was built from source.
 
-   .. code:: bash
+         .. code:: bash
 
-      sudo apt install ros-humble-ur-bringup
-
-3. Generate a URDF for the UR10e from the corresponding xacro:
-
-   .. code:: bash
-
-      xacro -o ur10e.urdf /opt/ros/humble/share/ur_description/urdf/ur.urdf.xacro ur_type:=ur10e name:=ur10e
-
-4. Launch MoveIt (including RViz):
-
-   .. code:: bash
-
-      ros2 launch isaac_ros_cumotion_examples ur.launch.py ur_type:=ur10e
-
-5. In a separate terminal, run the cuMotion planner node:
-
-   .. code:: bash
-
-      source install/setup.bash && \
-         ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args -p robot:=ur10e.xrdf -p urdf_path:=$PWD/ur10e.urdf
-
-
-Example: Setting Up cuMotion for a Franka robot
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Follow the instructions in the "Build |package_name| and Examples" section above.
-
-2. Launch MoveIt (including RViz):
-
-   .. code:: bash
-
-      ros2 launch isaac_ros_cumotion_examples franka.launch.py
-
-3. In a separate terminal, run the cuMotion planner node:
-
-   .. code:: bash
-
-      source install/setup.bash && \
-         ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args -p robot:=franka.xrdf -p urdf_path:=/opt/ros/humble/share/moveit_resources_panda_description/urdf/panda.urdf
+            ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args -p robot:=/path/to/ROBOT.xrdf -p urdf_path:=/path/to/ROBOT.urdf
 
 
 Using the cuMotion Planner in MoveIt

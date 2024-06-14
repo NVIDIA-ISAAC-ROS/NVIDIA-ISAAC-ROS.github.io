@@ -231,6 +231,38 @@ using RealSense data. For more information about how dynamic reconstruction work
                 rosbag:=<YOUR_ROSBAG_PATH>
 
 
+Visualizing in Foxglove
+-----------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_in_foxglove.gif>`
+    :width: 600px
+    :align: center
+
+The examples in previous sections on this page have used `rviz <https://github.com/ros2/rviz>`__ 
+for visualization.
+RViz is our default visualization tool in the case that nvblox is running on the same computer 
+that is displaying the visualization. In the case that you'd like to visualize a reconstruction 
+streamed from a remote machine, for example a robot, our recommended method is to use 
+`Foxglove <https://foxglove.dev/>`__.
+
+To visualize with foxglove please see :doc:`/concepts/visualization/foxglove`.
+Ensure that you additionally install the nvblox Foxglove extension.
+The animation above shows the results of visualizing the ``/nvblox_node/mesh`` 
+and ``/nvblox/static_esdf_pointcloud`` topics.
+
+.. note::
+
+   When visualizing from a remote machine over WiFi, bandwidth is limited
+   and easily exceeded.
+   Exceeding this bandwidth can lead to poor visualization results.
+   For best results we recommend visualizing a limited number of topics, 
+   and to avoiding visualizing high-bandwidth topics for example images.
+   Furthermore, it is necessary to limit bandwidth of the mesh transmitted 
+   by nvblox. Nvblox exposes a parameter for this purpose ``mesh_bandwidth_limit_mbps``.
+   When visualizing over WiFi we recommend setting this to ``30`` 
+   `here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/blob/main/nvblox_examples/nvblox_examples_bringup/config/nvblox/nvblox_base.yaml#L89>`__.
+
+
 Troubleshooting
 ---------------
 
