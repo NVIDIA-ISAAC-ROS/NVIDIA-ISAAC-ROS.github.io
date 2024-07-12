@@ -24,53 +24,27 @@ The developer kit can be mounted using either a tripod mount or the general
 purpose hole pattern on its bottom. Recommended mounting hole positions can be found
 in the `Nova Orin DevKit Quick Start Guide` from Segway.
 
-
-To account for the mounting location when running `Isaac Perceptor`, a custom URDF file needs to be passed.
-Per default, the :ir_repo:`nova_developer_kit.urdf.xacro <nova_developer_kit> <nova_developer_kit_description/urdf/nova_developer_kit.urdf.xacro>`
+To account for the mounting location when running `Isaac Perceptor`, a robot URDF file needs to be
+provided. Otherwise the :ir_repo:`nova_developer_kit.urdf.xacro <nova_developer_kit> <nova_developer_kit_description/urdf/nova_developer_kit.urdf.xacro>`
 is used, which assumes that the `Nova Orin Developer Kit` is initialized on the ground plane.
-To define your own URDF file, you can use the following code snippet and store it at a suitable ``urdf_file_path``:
 
-.. code-block:: xml
+It is **recommended to follow the**
+:doc:`calibration instructions</robots/nova_carter/demo_calibration>`. The output of calibration is
+stored in a default location in the robot (``/etc/nova/calibration/isaac_calibration.urdf``), and
+`Isaac Perceptor` will use it without requiring any additional arguments:
 
-    <?xml version="1.0"?>
-    <robot name="please_specify_robot_name" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:arg name="robot_namespace" default="/"/> 
-    <xacro:include filename="$(find nova_developer_kit_description)/urdf/nova_developer_kit_macro.urdf.xacro"/>
+.. code:: bash
 
-    <link name="base_link"/>
-    <xacro:nova_developer_kit name="nova_developer_kit" parent="base_link" mount_is_root="true">
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
-    </xacro:nova_developer_kit>
-    </robot>
+    ros2 launch nova_developer_kit_bringup perceptor.launch.py
 
-    <!-- Your Robot Description goes here. -->
-
-The fields `xyz` and `rpy` parametrize the transformation between the
-`Nova Orin Developer Kit` and the provided parent link (e.g. `base_link`). Specifically, the field `xyz`
-represents a 3D translation in meters, and the field `rpy` represents a rotation as fixed-axis Euler
-angles in radians: roll, pitch and yaw, respectively.
-
-The field `mount_is_root` must be set to `true` if the transformation is provided with respect to
-the `Nova Orin Developer Kit` mount point (center screw of the lower plate), or `false` if the
-transformation refers to the `Nova Orin Developer Kit` main link (center-front of the module).
-
-For example, if you are mounting the `Nova Orin Developer Kit` such that its center-front point is at a
-height of `Z = 0.4 m` above the robot origin and `X = -0.1 m` behind it, the root link origin should
-be adjusted accordingly:
-
-.. code-block:: xml
-
-    ...
-    <xacro:nova_developer_kit name="nova_developer_kit" parent="base_link" mount_is_root="false">
-        <origin xyz="-0.1 0.0 0.4" rpy="0.0 0.0 0.0"/>
-    ...
-
-Your custom URDF file can then be passed with the `urdf_override_file` argument to `Isaac Perceptor`:
+Alternatively, the :ref:`Nominal values and URDF file generation<robot-urdf-with-nova-developer-kit>`
+section details the process to create a robot nominals URDF file (``urdf_nominals_file_path``). The
+robot nominals URDF file can then be passed with the `urdf_override_file` argument to `Isaac Perceptor`:
 
 .. code:: bash
 
     ros2 launch nova_developer_kit_bringup perceptor.launch.py \
-        urdf_override_file:=<"urdf_file_path">
+        urdf_override_file:=<"urdf_nominals_file_path">
 
 Powering On the `Nova Orin Developer Kit`
 ------------------------------------------

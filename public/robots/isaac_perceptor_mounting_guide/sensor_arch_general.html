@@ -2932,6 +2932,50 @@ and
 respectively.
 The reader is advised to download Hawk and Owl specifications and 3D
 models to cross-check these numbers.</p>
+<p><strong>URDF Mounting the Nova Orin Developer Kit on a Robot</strong></p>
+<p id="robot-urdf-with-nova-developer-kit">If the <cite>Nova Orin Developer Kit</cite> is mounted on a robot, the user must provide a URDF encoding its
+position on the robot.</p>
+<p>It is recommended to follow the self-contained
+<a class="reference internal" href="../nova_carter/demo_calibration.html"><span class="doc">calibration instructions</span></a>. The output of calibration is
+stored in a default location in the robot, and Isaac Perceptor will use it without requiring any
+additional arguments.</p>
+<p>Alternatively, the remaining of this section details how to create a robot nominals URDF file
+(<code class="docutils literal notranslate"><span class="pre">urdf_nominals_file_path</span></code>) to be used with Isaac Perceptor. Note that the steps below
+shall not be followed if performing calibration. The instructions
+<a class="reference internal" href="../../reference_workflows/isaac_perceptor/run_perceptor_on_devkit.html"><span class="doc">Isaac Perceptor on a Robot with the Nova Orin Developer Kit</span></a>
+detail how to provide the <code class="docutils literal notranslate"><span class="pre">urdf_nominals_file_path</span></code> to  Isaac Perceptor.</p>
+<p>To define your own URDF nominals file to use in Isaac Perceptor, you can use the following code
+snippet and store it at a suitable <code class="docutils literal notranslate"><span class="pre">urdf_nominals_file_path</span></code>:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+<span class="nt">&lt;robot</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;please_specify_robot_name&quot;</span><span class="w"> </span><span class="na">xmlns:xacro=</span><span class="s">&quot;http://www.ros.org/wiki/xacro&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;robot_namespace&quot;</span><span class="w"> </span><span class="na">default=</span><span class="s">&quot;/&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;xacro:include</span><span class="w"> </span><span class="na">filename=</span><span class="s">&quot;$(find nova_developer_kit_description)/urdf/nova_developer_kit_macro.urdf.xacro&quot;</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;link</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;base_link&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;xacro:nova_developer_kit</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;nova_developer_kit&quot;</span><span class="w"> </span><span class="na">parent=</span><span class="s">&quot;base_link&quot;</span><span class="w"> </span><span class="na">mount_is_root=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;origin</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0.0 0.0 0.0&quot;</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0.0 0.0 0.0&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/xacro:nova_developer_kit&gt;</span>
+<span class="nt">&lt;/robot&gt;</span>
+
+<span class="cm">&lt;!-- Your Robot Description goes here. --&gt;</span>
+</pre></div>
+</div>
+<p>The fields <cite>xyz</cite> and <cite>rpy</cite> parametrize the transformation between the
+<cite>Nova Orin Developer Kit</cite> and the provided parent link (e.g. <cite>base_link</cite>). Specifically, the field <cite>xyz</cite>
+represents a 3D translation in meters, and the field <cite>rpy</cite> represents a rotation as fixed-axis Euler
+angles in radians: roll, pitch and yaw, respectively.</p>
+<p>The field <cite>mount_is_root</cite> must be set to <cite>true</cite> if the transformation is provided with respect to
+the <cite>Nova Orin Developer Kit</cite> mount point (center screw of the lower plate), or <cite>false</cite> if the
+transformation refers to the <cite>Nova Orin Developer Kit</cite> main link (center-front of the module).</p>
+<p>For example, if you are mounting the <cite>Nova Orin Developer Kit</cite> such that its center-front point is at a
+height of <cite>Z = 0.4 m</cite> above the robot origin and <cite>X = -0.1 m</cite> behind it, the root link origin should
+be adjusted accordingly:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span>...
+<span class="nt">&lt;xacro:nova_developer_kit</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;nova_developer_kit&quot;</span><span class="w"> </span><span class="na">parent=</span><span class="s">&quot;base_link&quot;</span><span class="w"> </span><span class="na">mount_is_root=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;origin</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;-0.1 0.0 0.4&quot;</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0.0 0.0 0.0&quot;</span><span class="nt">/&gt;</span>
+...
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -2947,7 +2991,7 @@ models to cross-check these numbers.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2024, NVIDIA.
-      <span class="lastupdated">Last updated on Jun 14, 2024.
+      <span class="lastupdated">Last updated on Jul 12, 2024.
       </span></p>
   </div>
 
