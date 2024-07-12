@@ -2787,43 +2787,21 @@ and the bottom plate is parallel to the ground.</p>
 <p>The developer kit can be mounted using either a tripod mount or the general
 purpose hole pattern on its bottom. Recommended mounting hole positions can be found
 in the <cite>Nova Orin DevKit Quick Start Guide</cite> from Segway.</p>
-<p>To account for the mounting location when running <cite>Isaac Perceptor</cite>, a custom URDF file needs to be passed.
-Per default, the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/nova_developer_kit/blob/main/nova_developer_kit_description/urdf/nova_developer_kit.urdf.xacro">nova_developer_kit.urdf.xacro</a>
-is used, which assumes that the <cite>Nova Orin Developer Kit</cite> is initialized on the ground plane.
-To define your own URDF file, you can use the following code snippet and store it at a suitable <code class="docutils literal notranslate"><span class="pre">urdf_file_path</span></code>:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
-<span class="nt">&lt;robot</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;please_specify_robot_name&quot;</span><span class="w"> </span><span class="na">xmlns:xacro=</span><span class="s">&quot;http://www.ros.org/wiki/xacro&quot;</span><span class="nt">&gt;</span>
-<span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;robot_namespace&quot;</span><span class="w"> </span><span class="na">default=</span><span class="s">&quot;/&quot;</span><span class="nt">/&gt;</span>
-<span class="nt">&lt;xacro:include</span><span class="w"> </span><span class="na">filename=</span><span class="s">&quot;$(find nova_developer_kit_description)/urdf/nova_developer_kit_macro.urdf.xacro&quot;</span><span class="nt">/&gt;</span>
-
-<span class="nt">&lt;link</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;base_link&quot;</span><span class="nt">/&gt;</span>
-<span class="nt">&lt;xacro:nova_developer_kit</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;nova_developer_kit&quot;</span><span class="w"> </span><span class="na">parent=</span><span class="s">&quot;base_link&quot;</span><span class="w"> </span><span class="na">mount_is_root=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;origin</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;0.0 0.0 0.0&quot;</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0.0 0.0 0.0&quot;</span><span class="nt">/&gt;</span>
-<span class="nt">&lt;/xacro:nova_developer_kit&gt;</span>
-<span class="nt">&lt;/robot&gt;</span>
-
-<span class="cm">&lt;!-- Your Robot Description goes here. --&gt;</span>
+<p>To account for the mounting location when running <cite>Isaac Perceptor</cite>, a robot URDF file needs to be
+provided. Otherwise the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/nova_developer_kit/blob/main/nova_developer_kit_description/urdf/nova_developer_kit.urdf.xacro">nova_developer_kit.urdf.xacro</a>
+is used, which assumes that the <cite>Nova Orin Developer Kit</cite> is initialized on the ground plane.</p>
+<p>It is <strong>recommended to follow the</strong>
+<a class="reference internal" href="../../robots/nova_carter/demo_calibration.html"><span class="doc">calibration instructions</span></a>. The output of calibration is
+stored in a default location in the robot (<code class="docutils literal notranslate"><span class="pre">/etc/nova/calibration/isaac_calibration.urdf</span></code>), and
+<cite>Isaac Perceptor</cite> will use it without requiring any additional arguments:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>nova_developer_kit_bringup<span class="w"> </span>perceptor.launch.py
 </pre></div>
 </div>
-<p>The fields <cite>xyz</cite> and <cite>rpy</cite> parametrize the transformation between the
-<cite>Nova Orin Developer Kit</cite> and the provided parent link (e.g. <cite>base_link</cite>). Specifically, the field <cite>xyz</cite>
-represents a 3D translation in meters, and the field <cite>rpy</cite> represents a rotation as fixed-axis Euler
-angles in radians: roll, pitch and yaw, respectively.</p>
-<p>The field <cite>mount_is_root</cite> must be set to <cite>true</cite> if the transformation is provided with respect to
-the <cite>Nova Orin Developer Kit</cite> mount point (center screw of the lower plate), or <cite>false</cite> if the
-transformation refers to the <cite>Nova Orin Developer Kit</cite> main link (center-front of the module).</p>
-<p>For example, if you are mounting the <cite>Nova Orin Developer Kit</cite> such that its center-front point is at a
-height of <cite>Z = 0.4 m</cite> above the robot origin and <cite>X = -0.1 m</cite> behind it, the root link origin should
-be adjusted accordingly:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span>...
-<span class="nt">&lt;xacro:nova_developer_kit</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;nova_developer_kit&quot;</span><span class="w"> </span><span class="na">parent=</span><span class="s">&quot;base_link&quot;</span><span class="w"> </span><span class="na">mount_is_root=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;origin</span><span class="w"> </span><span class="na">xyz=</span><span class="s">&quot;-0.1 0.0 0.4&quot;</span><span class="w"> </span><span class="na">rpy=</span><span class="s">&quot;0.0 0.0 0.0&quot;</span><span class="nt">/&gt;</span>
-...
-</pre></div>
-</div>
-<p>Your custom URDF file can then be passed with the <cite>urdf_override_file</cite> argument to <cite>Isaac Perceptor</cite>:</p>
+<p>Alternatively, the <a class="reference internal" href="../../robots/isaac_perceptor_mounting_guide/sensor_arch_general.html#robot-urdf-with-nova-developer-kit"><span class="std std-ref">Nominal values and URDF file generation</span></a>
+section details the process to create a robot nominals URDF file (<code class="docutils literal notranslate"><span class="pre">urdf_nominals_file_path</span></code>). The
+robot nominals URDF file can then be passed with the <cite>urdf_override_file</cite> argument to <cite>Isaac Perceptor</cite>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>nova_developer_kit_bringup<span class="w"> </span>perceptor.launch.py<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>urdf_override_file:<span class="o">=</span>&lt;<span class="s2">&quot;urdf_file_path&quot;</span>&gt;
+<span class="w">    </span>urdf_override_file:<span class="o">=</span>&lt;<span class="s2">&quot;urdf_nominals_file_path&quot;</span>&gt;
 </pre></div>
 </div>
 </section>
@@ -2868,7 +2846,7 @@ and for software integration <a class="reference internal" href="tutorials_on_de
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2024, NVIDIA.
-      <span class="lastupdated">Last updated on Jun 14, 2024.
+      <span class="lastupdated">Last updated on Jul 12, 2024.
       </span></p>
   </div>
 
