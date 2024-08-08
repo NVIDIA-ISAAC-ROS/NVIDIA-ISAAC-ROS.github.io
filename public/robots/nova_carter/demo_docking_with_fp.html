@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial: Docking with Nav2 and Isaac Cloud Service &mdash; isaac_ros_docs  documentation</title>
+  <title>Tutorial: Docking with Nova Carter Using Nav2 and FoundationPose in Sim &mdash; isaac_ros_docs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Troubleshooting" href="troubleshooting.html" />
-    <link rel="prev" title="Tutorial: Generate an Occupancy Map for Navigation" href="demo_lidar_mapping.html" />
+    <link rel="prev" title="Tutorial: Docking with Nova Carter in Sim and Real" href="demo_docking_with_apriltag.html" />
  
 <script src="//assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
 
@@ -2434,10 +2434,17 @@
 <li class="toctree-l5"><a class="reference internal" href="demo_lidar_mapping.html#instructions">Instructions</a></li>
 </ul>
 </li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">Tutorial: Docking with Nav2 and Isaac Cloud Service</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#instructions">Instructions</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="demo_docking_with_apriltag.html">Tutorial: Docking with Nova Carter in Sim and Real</a><ul class="current">
+<li class="toctree-l5 current"><a class="current reference internal" href="#">Tutorial: Docking with Nova Carter Using Nav2 and FoundationPose in Sim</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#instructions">Instructions</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="demo_docking_with_apriltag.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l5"><a class="reference internal" href="demo_docking_with_apriltag.html#docking-with-nova-carter-in-isaac-sim-using-apriltag">Docking with Nova Carter in Isaac Sim Using AprilTag</a></li>
+<li class="toctree-l5"><a class="reference internal" href="demo_docking_with_apriltag.html#docking-with-nova-carter-in-real-using-apriltag">Docking with Nova Carter in Real Using AprilTag</a></li>
+<li class="toctree-l5"><a class="reference internal" href="demo_docking_with_apriltag.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a><ul>
@@ -2757,9 +2764,10 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Robots</a></li>
           <li class="breadcrumb-item"><a href="index.html">Nova Carter</a></li>
-      <li class="breadcrumb-item active">Tutorial: Docking with Nav2 and Isaac Cloud Service</li>
+          <li class="breadcrumb-item"><a href="demo_docking_with_apriltag.html">Tutorial: Docking with Nova Carter in Sim and Real</a></li>
+      <li class="breadcrumb-item active">Tutorial: Docking with Nova Carter Using Nav2 and FoundationPose in Sim</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/robots/nova_carter/demo_docking.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/robots/nova_carter/demo_docking_with_fp.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -2767,267 +2775,110 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="tutorial-docking-with-nav2-and-isaac-cloud-service">
-<span id="nova-carter-docking-tutorial"></span><h1>Tutorial: Docking with Nav2 and Isaac Cloud Service<a class="headerlink" href="#tutorial-docking-with-nav2-and-isaac-cloud-service" title="Link to this heading"></a></h1>
-<p>This tutorial will enable you to dock/undock a Nova Carter robot through Isaac Cloud Services. Below we will start the Isaac Mission Dispatch edge service, configure the on-robot Nav2 and Isaac Mission Client services, and send a behavior tree via the Mission Dispatch REST interface to have the robot perform a dock/undock maneuver. This tutorial uses opennav_docking maneuver and Isaac ROS AprilTag for dock pose detection.</p>
+  <section id="tutorial-docking-with-nova-carter-using-nav2-and-foundationpose-in-sim">
+<h1>Tutorial: Docking with Nova Carter Using Nav2 and FoundationPose in Sim<a class="headerlink" href="#tutorial-docking-with-nova-carter-using-nav2-and-foundationpose-in-sim" title="Link to this heading"></a></h1>
 <section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
-<ul>
-<li><p>AprilTag attached to the dock
-Ensure an AprilTag is affixed to the front of the dock to allow the cart to accurately detect the dock’s position.
-The AprilTag must belong to the tag36h11 family and measure 6 inches. The images below illustrate how to measure
-the tag size and how the tag is attached to the dock. For further information about AprilTags, please refer to the details provided <a class="reference external" href="https://github.com/AprilRobotics/apriltag">here</a>.</p>
-<figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/apriltag_size_measure.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/apriltag_size_measure.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/apriltag_size_measure.png/" style="width: 500px;" /></a>
-</figure>
-<figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/dock_with_apriltag.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/dock_with_apriltag.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/dock_with_apriltag.png/" style="width: 500px;" /></a>
-</figure>
-</li>
-</ul>
+<p>Finish the <a class="reference external" href="https://nvidia-isaac-ros.github.io/concepts/pose_estimation/foundationpose/tutorial_isaac_sim.html">Tutorial for FoundationPose with Isaac Sim</a>.</p>
 </section>
 <section id="instructions">
 <h2>Instructions<a class="headerlink" href="#instructions" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
-<li><p>Follow the directions to start <a class="reference external" href="https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended">Isaac Mission Dispatch</a></p></li>
+<li><p>Set up Isaac Sim:</p></li>
 </ol>
-<blockquote>
-<div><p>Verify Mission Dispatch is running by navigating to <code class="docutils literal notranslate"><span class="pre">http://localhost:5000/docs</span></code>, or <code class="docutils literal notranslate"><span class="pre">http://&lt;your_ip_address&gt;:5000/docs</span></code></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Read <a class="reference external" href="https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended">this tutorial</a> for more deployment options for Mission Dispatch.</p>
-</div>
-</div></blockquote>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/set_up_isaac_sim.gif/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/set_up_isaac_sim.gif/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/set_up_isaac_sim.gif/" style="width: 800px;" /></a>
+</figure>
+<ul class="simple">
+<li><p>Install and launch Isaac Sim following the Isaac Sim Setup <a class="reference external" href="https://nvidia-isaac-ros.github.io/getting_started/isaac_sim/index.html">here</a>.</p></li>
+<li><p>Add the charging dock at the path <code class="docutils literal notranslate"><span class="pre">localhost/NVIDIA/Assets/Isaac/Props/NVIDIA/Carter/ChargingDock/charging_station_galileo.usd</span></code> to the Isaac ROS Sample scene.</p></li>
+<li><p>Adjust docking and robot transforms as desired. For example: set dock to (-10.0, 14.0, 0.01, 0.0, 0.0, 180) and set robot to (-2.0, 14.0, 0.0, 0.0, 0.0, 180).</p></li>
+<li><p>Press Play to initiate data publishing from Isaac Sim.</p></li>
+</ul>
 <ol class="arabic simple" start="2">
-<li><p>SSH into the robot (<a class="reference internal" href="getting_started.html#nova-carter-ssh-setup"><span class="std std-ref">instructions</span></a>).</p></li>
-<li><p>Make sure you have successfully connected the PS5 joystick to the robot
-(<a class="reference internal" href="getting_started.html#nova-carter-joystick-setup"><span class="std std-ref">instructions</span></a>).</p></li>
-<li><p>Build/install the required packages:</p></li>
+<li><p>Build and install the required packages:</p></li>
 </ol>
-<blockquote>
-<div><div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Docker Image</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Binary Package</button><button aria-controls="panel-0-0-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-2" name="0-2" role="tab" tabindex="-1">Build from Source</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><ol class="arabic simple">
-<li><p>Pull the docker image:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>nvcr.io/nvidia/isaac/nova_carter_bringup:release_3.0-aarch64
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Binary Package</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Build from Source</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Make sure you followed the <a class="reference internal" href="getting_started.html#nova-carter-dev-setup"><span class="std std-ref">Prerequisites</span></a> and you are inside the Isaac ROS Docker container.</p></li>
+<li><p>Install the prebuilt Debian package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-humble-nova-carter-bringup
 </pre></div>
 </div>
-<ol class="arabic simple" start="2">
-<li><p>Run the docker image:</p></li>
+</li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--privileged<span class="w"> </span>--network<span class="w"> </span>host<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-v<span class="w"> </span>/dev/*:/dev/*<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-v<span class="w"> </span>/tmp/argus_socket:/tmp/argus_socket<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-v<span class="w"> </span>/etc/nova:/etc/nova<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>nvcr.io/nvidia/isaac/nova_carter_bringup:release_3.0-aarch64<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>ros2<span class="w"> </span>launch<span class="w"> </span>nova_carter_bringup<span class="w"> </span>navigation.launch.py<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_nvblox_costmap:<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>stereo_camera_configuration:<span class="o">=</span>front_driver_rectify<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_wheel_odometry:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_3d_lidar_localization:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>map_yaml_path:<span class="o">=</span>&lt;path_to_map_yaml&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_mission_client:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>mqtt_host_name:<span class="o">=</span>&lt;mission_dispatch_ip&gt;
-</pre></div>
-</div>
-</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><ol class="arabic simple">
-<li><p>Make sure you followed the <a class="reference internal" href="getting_started.html#nova-carter-dev-setup"><span class="std std-ref">Prerequisites</span></a> and you are inside the Isaac ROS docker container.</p></li>
-<li><p>Install the required Debian packages:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
-sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-humble-nova-carter-bringup<span class="w"> </span>
-<span class="nb">source</span><span class="w"> </span>/opt/ros/humble/setup.bash
-</pre></div>
-</div>
-<ol class="arabic simple" start="3">
-<li><p>Run the launch file:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>nova_carter_bringup<span class="w"> </span>navigation.launch.py<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_nvblox_costmap:<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>stereo_camera_configuration:<span class="o">=</span>front_driver_rectify<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_wheel_odometry:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_3d_lidar_localization:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>map_yaml_path:<span class="o">=</span>&lt;path_to_map_yaml&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_mission_client:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>mqtt_host_name:<span class="o">=</span>&lt;mission_dispatch_ip&gt;
-</pre></div>
-</div>
-</div><div aria-labelledby="tab-0-0-2" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-2" name="0-2" role="tabpanel" tabindex="0"><ol class="arabic simple">
-<li><p>Make sure you followed the <a class="reference internal" href="getting_started.html#nova-carter-dev-setup"><span class="std std-ref">Prerequisites</span></a> and you are inside the Isaac ROS docker container.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> to install the package’s dependencies:</p></li>
-</ol>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Make sure you followed the <a class="reference internal" href="getting_started.html#nova-carter-dev-setup"><span class="std std-ref">Prerequisites</span></a> and you are inside the Isaac ROS Docker container.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> to install the package’s dependencies:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
 rosdep<span class="w"> </span>update
-rosdep<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>-r<span class="w"> </span>--from-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/nova_carter/nova_carter_bringup/<span class="w"> </span>--rosdistro<span class="w"> </span>humble<span class="w"> </span>-y
+rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/nova_carter/nova_carter_bringup<span class="w"> </span>--ignore-src<span class="w"> </span>-y
 </pre></div>
 </div>
-<ol class="arabic simple" start="3">
-<li><p>Build the ROS package in the Docker container:</p></li>
+</li>
+<li><p>Build the package from source:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-up-to<span class="w"> </span>nova_carter_bringup<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--packages-skip<span class="w"> </span>isaac_ros_ess_models_install<span class="w"> </span>isaac_ros_peoplesemseg_models_install
+</pre></div>
+</div>
+</li>
+<li><p>Source the ROS workspace:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure to repeat this step in <strong>every</strong> terminal created inside the Docker container.</p>
+<p>Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package’s contents.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-up-to<span class="w"> </span>nova_carter_bringup<span class="w">  </span>--packages-skip<span class="w"> </span>isaac_ros_ess_models_install<span class="w"> </span>isaac_ros_peoplesemseg_models_install
-<span class="nb">source</span><span class="w"> </span>install/setup.bash
-</pre></div>
-</div>
-<ol class="arabic simple" start="4">
-<li><p>Run the launch file:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>nova_carter_bringup<span class="w"> </span>navigation.launch.py<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_nvblox_costmap:<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>stereo_camera_configuration:<span class="o">=</span>front_driver_rectify<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_wheel_odometry:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_3d_lidar_localization:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>map_yaml_path:<span class="o">=</span>&lt;path_to_map_yaml&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>enable_mission_client:<span class="o">=</span>True<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>mqtt_host_name:<span class="o">=</span>&lt;mission_dispatch_ip&gt;
-</pre></div>
-</div>
 </div></div>
-</div></blockquote>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Make sure to replace <code class="docutils literal notranslate"><span class="pre">&lt;path_to_map_yaml&gt;</span></code> with the path of the map YAML
-file. If you do not have a map of your environment you can create one using
-this <a class="reference internal" href="demo_lidar_mapping.html"><span class="doc">tutorial</span></a></p>
-</div>
-<ol class="arabic simple" start="5">
-<li><p>Get an initial pose for your dock</p></li>
-</ol>
+<ol class="arabic" start="3">
+<li><p>Run the launch file:</p>
 <blockquote>
-<div><p>The docking server utilizes this dock pose to calculate a rough initial pose to start dock detection. Thus, it is unnecessary to be precise.</p>
-<p>Use the PS5 joystick to move the carter into the dock. Open a new terminal in the container</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>tf2_ros<span class="w"> </span>tf2_echo<span class="w"> </span>map<span class="w"> </span>base_link
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>nova_carter_docking<span class="w"> </span>docking_with_fp_sim.launch.py<span class="w"> </span>init_pose_x:<span class="o">=</span>-2.0<span class="w"> </span>init_pose_y:<span class="o">=</span><span class="m">14</span>.0<span class="w"> </span>init_pose_yaw:<span class="o">=</span><span class="m">3</span>.14
 </pre></div>
 </div>
-<p>You will get output like the following</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>-<span class="w"> </span>Translation:<span class="w"> </span><span class="o">[</span><span class="m">45</span>.199,<span class="w"> </span><span class="m">19</span>.320,<span class="w"> </span><span class="m">0</span>.000<span class="o">]</span>
--<span class="w"> </span>Rotation:<span class="w"> </span><span class="k">in</span><span class="w"> </span>Quaternion<span class="w"> </span><span class="o">[</span><span class="m">0</span>.000,<span class="w"> </span><span class="m">0</span>.000,<span class="w"> </span><span class="m">0</span>.614,<span class="w"> </span><span class="m">0</span>.789<span class="o">]</span>
--<span class="w"> </span>Rotation:<span class="w"> </span><span class="k">in</span><span class="w"> </span>RPY<span class="w"> </span><span class="o">(</span>radian<span class="o">)</span><span class="w"> </span><span class="o">[</span><span class="m">0</span>.000,<span class="w"> </span>-0.000,<span class="w"> </span><span class="m">1</span>.323<span class="o">]</span>
--<span class="w"> </span>Rotation:<span class="w"> </span><span class="k">in</span><span class="w"> </span>RPY<span class="w"> </span><span class="o">(</span>degree<span class="o">)</span><span class="w"> </span><span class="o">[</span><span class="m">0</span>.000,<span class="w"> </span>-0.000,<span class="w"> </span><span class="m">75</span>.787<span class="o">]</span>
--<span class="w"> </span>Matrix:
-<span class="w">  </span><span class="m">0</span>.246<span class="w"> </span>-0.969<span class="w">  </span><span class="m">0</span>.000<span class="w"> </span><span class="m">45</span>.199
-<span class="w">  </span><span class="m">0</span>.969<span class="w">  </span><span class="m">0</span>.246<span class="w">  </span><span class="m">0</span>.000<span class="w"> </span><span class="m">19</span>.320
-<span class="w">  </span><span class="m">0</span>.000<span class="w">  </span><span class="m">0</span>.000<span class="w">  </span><span class="m">1</span>.000<span class="w">  </span><span class="m">0</span>.000
-<span class="w">  </span><span class="m">0</span>.000<span class="w">  </span><span class="m">0</span>.000<span class="w">  </span><span class="m">0</span>.000<span class="w">  </span><span class="m">1</span>.000
-</pre></div>
-</div>
-<p>Record the x, y translation and yaw in radian for later use.</p>
 </div></blockquote>
-<ol class="arabic simple" start="6">
-<li><p>Send docking mission</p></li>
-</ol>
+</li>
+<li><p>Send a docking action:</p>
 <blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">dock_robot</span></code> action parameters (types of all parameters are <code class="docutils literal notranslate"><span class="pre">string</span></code>):</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dock_type</span></code></p></td>
-<td><p>The type of the dock. For Carter, it should be <code class="docutils literal notranslate"><span class="pre">nova_carter_dock</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dock_pose</span></code></p></td>
-<td><p>The position of the dock. A comma separated string with three floats.
-For example, for the sample pose shown in step 5, it should be <code class="docutils literal notranslate"><span class="pre">45.199,19.320,1.323</span></code>.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">trigger_global_localization</span></code></p></td>
-<td><p>Optional. Whether to trigger global localization before executing the action.
-It is <code class="docutils literal notranslate"><span class="pre">true</span></code> by default.</p></td>
-</tr>
-</tbody>
-</table>
-<p>Use the dock pose you get from step 5. Here is an example input for mission dispatch:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;robot&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;carter01&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;mission_tree&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dock&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;action_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dock_robot&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;action_parameters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;dock_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nova_carter_dock&quot;</span><span class="p">,</span>
-<span class="w">                    </span><span class="nt">&quot;dock_pose&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;dock_x&gt;,&lt;dock_y&gt;,&lt;dock_yaw&gt;&quot;</span><span class="p">,</span>
-<span class="w">                    </span><span class="nt">&quot;trigger_global_localization&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">}</span>
-
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;deadline&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2023-09-28T04:04:24.013Z&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;needs_canceled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dock_example&quot;</span>
-<span class="p">}</span>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>send_goal<span class="w"> </span>/dock_robot<span class="w"> </span>opennav_docking_msgs/action/DockRobot<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">{</span>
+<span class="s2">    use_dock_id: false,</span>
+<span class="s2">    dock_pose: {</span>
+<span class="s2">        pose: {</span>
+<span class="s2">        position: {x: -10.0, y: 14.0, z: 0.0},</span>
+<span class="s2">        orientation: {x: 0.0, y: 0.0, z: 1.0, w: 0.0}</span>
+<span class="s2">        },</span>
+<span class="s2">        header: {</span>
+<span class="s2">        frame_id: &#39;map&#39;</span>
+<span class="s2">        }</span>
+<span class="s2">    },</span>
+<span class="s2">    dock_type: &#39;nova_carter_dock&#39;,</span>
+<span class="s2">    navigate_to_staging_pose: true</span>
+<span class="s2">}&quot;</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The robot state will not turn into <code class="docutils literal notranslate"><span class="pre">CHARGING</span></code> if the battery percentage is high(around 90%).</p>
-</div>
 </div></blockquote>
-<ol class="arabic simple" start="7">
-<li><p>Send undocking mission</p></li>
+</li>
 </ol>
-<blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">undock_robot</span></code> action parameters (types of all parameters are <code class="docutils literal notranslate"><span class="pre">string</span></code>):</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dock_type</span></code></p></td>
-<td><p>The type of the dock. For Carter, it should be <code class="docutils literal notranslate"><span class="pre">nova_carter_dock</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trigger_global_localization</span></code></p></td>
-<td><p>Optional. Whether to trigger global localization after executing the action. It is <code class="docutils literal notranslate"><span class="pre">true</span></code> by
-default. In the default carter configuration, global localization relies on the front 2D lidar.
-This can lead to positional drift when Carter is docked. It is recommended to enable this.</p></td>
-</tr>
-</tbody>
-</table>
-<p>Here is an example input for mission dispatch:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;robot&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;carter01&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;mission_tree&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;undock&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;action_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;undock_robot&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;action_parameters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;dock_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nova_carter_dock&quot;</span><span class="p">,</span>
-<span class="w">                    </span><span class="nt">&quot;trigger_global_localization&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span>
-<span class="w">                </span><span class="p">}</span>
-<span class="w">            </span><span class="p">}</span>
-
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;deadline&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2023-09-28T04:04:24.013Z&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;needs_canceled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;undock_example&quot;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The robot can still perform undocking when the state is not <code class="docutils literal notranslate"><span class="pre">CHARGING</span></code>. Nav2 Collision detection is
-disabled when the robot is in-between the staging pose and the dock. The path between staging
-pose and the dock is expected to be free of obstacles.</p>
-</div>
-</div></blockquote>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/docking_with_fp_sim.gif/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/docking_with_fp_sim.gif/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/robots/nova_carter/docking_with_fp_sim.gif/" style="width: 800px;" /></a>
+<figcaption>
+<p><span class="caption-text">Docking with Nova Carter in Isaac Sim Using FoundationPose</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 <section id="troubleshooting">
 <h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
-<p>If the carter does not establish contact with the dock after the docking process is complete, consider
+<p>If the Nova Carter does not establish contact with the dock after the docking process is complete, consider
 adjusting the <code class="docutils literal notranslate"><span class="pre">external_detection_translation_x</span></code> parameter in
-<code class="docutils literal notranslate"><span class="pre">/workspaces/isaac_ros-dev/src/opennav_docking/nova_carter_docking/params/nova_carter_docking.yaml</span></code>.
-The default value is <code class="docutils literal notranslate"><span class="pre">-0.18</span></code>. You may increase this value to bring the carter closer to the dock.
-More details for docking parameters can be found <a class="reference external" href="https://github.com/open-navigation/opennav_docking/tree/main?tab=readme-ov-file#configuration">here</a>.</p>
+<code class="docutils literal notranslate"><span class="pre">/workspaces/isaac_ros-dev/src/nova_carter/nova_carter_docking/params/nova_carter_docking_fp.yaml</span></code>.
+The default value is <code class="docutils literal notranslate"><span class="pre">-0.15</span></code>. You may increase this value to bring the Nova Carter closer to the dock.
+More details for docking parameters can be found on <a class="reference external" href="https://github.com/open-navigation/opennav_docking/tree/main?tab=readme-ov-file#configuration">GitHub</a>.</p>
 </section>
 </section>
 
@@ -3035,7 +2886,7 @@ More details for docking parameters can be found <a class="reference external" h
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="demo_lidar_mapping.html" class="btn btn-neutral float-left" title="Tutorial: Generate an Occupancy Map for Navigation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="demo_docking_with_apriltag.html" class="btn btn-neutral float-left" title="Tutorial: Docking with Nova Carter in Sim and Real" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="troubleshooting.html" class="btn btn-neutral float-right" title="Troubleshooting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
@@ -3043,7 +2894,7 @@ More details for docking parameters can be found <a class="reference external" h
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2024, NVIDIA.
-      <span class="lastupdated">Last updated on Jul 15, 2024.
+      <span class="lastupdated">Last updated on Aug 08, 2024.
       </span></p>
   </div>
 

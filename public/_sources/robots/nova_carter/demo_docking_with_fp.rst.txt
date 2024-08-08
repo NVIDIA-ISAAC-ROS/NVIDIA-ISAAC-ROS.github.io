@@ -1,0 +1,58 @@
+Tutorial: Docking with Nova Carter Using Nav2 and FoundationPose in Sim
+=======================================================================
+
+Prerequisites
+-------------
+Finish the `Tutorial for FoundationPose with Isaac Sim <https://nvidia-isaac-ros.github.io/concepts/pose_estimation/foundationpose/tutorial_isaac_sim.html>`_.
+
+Instructions
+------------
+
+1. Set up Isaac Sim:
+
+.. include:: _snippets/set_up_sim_w_dock.rst
+
+2. Build and install the required packages:
+
+.. include:: _snippets/build_docking.rst
+
+3. Run the launch file:
+
+    .. code:: bash
+
+       ros2 launch nova_carter_docking docking_with_fp_sim.launch.py init_pose_x:=-2.0 init_pose_y:=14.0 init_pose_yaw:=3.14
+
+4. Send a docking action:
+
+    .. code:: bash
+
+       ros2 action send_goal /dock_robot opennav_docking_msgs/action/DockRobot "
+       {
+           use_dock_id: false,
+           dock_pose: {
+               pose: {
+               position: {x: -10.0, y: 14.0, z: 0.0},
+               orientation: {x: 0.0, y: 0.0, z: 1.0, w: 0.0}
+               },
+               header: {
+               frame_id: 'map'
+               }
+           },
+           dock_type: 'nova_carter_dock',
+           navigate_to_staging_pose: true
+       }"
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/docking_with_fp_sim.gif>`
+   :align: center
+   :width: 800px
+
+   Docking with Nova Carter in Isaac Sim Using FoundationPose
+
+Troubleshooting
+---------------
+
+If the Nova Carter does not establish contact with the dock after the docking process is complete, consider
+adjusting the ``external_detection_translation_x`` parameter in
+``/workspaces/isaac_ros-dev/src/nova_carter/nova_carter_docking/params/nova_carter_docking_fp.yaml``.
+The default value is ``-0.15``. You may increase this value to bring the Nova Carter closer to the dock.
+More details for docking parameters can be found on `GitHub <https://github.com/open-navigation/opennav_docking/tree/main?tab=readme-ov-file#configuration>`__.
