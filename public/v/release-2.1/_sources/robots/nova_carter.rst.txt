@@ -1,0 +1,744 @@
+===========
+Nova Carter
+===========
+
+`Nova Carter <https://robotics.segway.com/nova-carter/>`__ was jointly developed with `Segway Robotics <https://robotics.segway.com/>`__, for autonomous robotics development including accelerated computing for ROS 2 with full 360° sensing from camera and LIDAR and validated by Open Navigation for use with Nav2.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/carter_header.jpg>`
+   :width: 800px
+   :alt: Nova Carter
+   :align: center
+
+Nova Carter is powered by a Jetson AGX Orin with additional interface I|O boards developed for robotics; it includes a 32 beam 360° LIDAR, 2x planar LIDAR, 4x `HAWK <https://leopardimaging.com/leopard-imaging-hawk-stereo-camera/>`__, 4x `OWL <https://leopardimaging.com/product/autonomous-camera/maxim-gmsl2-cameras/li-ar0234cs-gmsl2-owl/li-ar0234cs-gmsl2-owl/>`__, IMU, Magnetometer, and Barometer with high precision time synchronization between sensors using hardware time stamping, and PTP over Ethernet with less than 10us for sensor acquisition time. The robot provides simultaneous camera capture across all cameras within 100us from a single hardware trigger, and can write to disk at 4 GB per second for sensor capture to ROSbags.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/nova_carter_diagram_front_left.png>`
+   :width: 800px
+   :align: center
+
+Nova Carter robots running Isaac ROS can be teleoperated, map an environment, and navigate within that environment using visual cameras and LiDARs.
+
+Important Nova Carter Robot Information
+=======================================
+
+Before operating the Nova Carter robot, read all of the following safety
+guidelines carefully. You must follow all of these guidelines during
+operation of the robot.
+
+Isaac Robot Operator Safety
+---------------------------
+
+- The Nova Carter robot is small and lightweight, weighing less than 100 kg even with its full payload. The main hazard is impact from the robot itself, where moderate harm could result from a worst-case direct collision. Robot operators must take the following precautions:
+
+   ◦ Familiarize yourself with the Nova Carter controls and dynamics in an open area away from bystanders.
+
+   ◦ Be aware of the speed at which Nova Carter can accelerate, decelerate, and turn.
+
+   ◦ Be aware that stopping Nova Carter quickly while it's moving forward can cause it to overshoot and move backwards.
+
+- In the event of a safety incident, inspect the Nova Carter for the following:
+
+   ◦ Damage to the robot chassis (including dents and punctures to the housing or drivetrain).
+
+   ◦ Damage to the sensors that emit IR (including scratches and pits on the optical window).
+
+- If there is damage, do not power on Nova Carter. Use the tow handle to move the robot and contact your Segway representative immediately. Nova Carter has a tow handle for manual transport located above the caster wheels.
+
+- A red emergency stop (ESTOP) button is located above the caster wheels, below the tow handle. Pushing the ESTOP button disconnects power to the motors, but the Carter robot can continue to coast in the direction it was previously moving.  It can also roll if placed on a sloped surface while the ESTOP is pressed.
+
+- Do not open or remove any panels from the robot, and do not loosen or remove any sensors.
+
+Unboxing Nova Carter
+====================
+
+After receiving your Nova Carter robot from Segway, follow the guide below to unpack and power on
+the robot.
+
+Make sure you are familiar with or have completed the following:
+
+1. Remove Nova Carter from its packaging.
+
+2. Remove the protective Lidar cover (colored red) using a 2.5 mm hex driver, and re-install any bolts which were removed.
+
+3. Familiarize yourself with the following parts of Nova Carter:
+
+   a. | Wall charger and its connection to the robot. You can connect
+        Nova Carter to its charger when it is powered on or off.
+
+    .. note:: The robot does not respond to movement commands while plugged into the wall charger.
+
+   b. EStop button at the rear of the robot and its operation. Press to
+      engage, twist clockwise to disengage.
+
+   c. IO panel at rear of robot with USB-C, DisplayPort, and Ethernet
+      connections. These connect directly to the Jetson, and can be used
+      for development, rapid data transfer, or to re-flash the Jetson
+      AGX Orin.
+
+
+   d. Status indicator LED bar at the front. This shows yellow on boot, green when Jetson is actively communicating with the wheelbase, and red if there is an error or EStop button is pressed.
+
+4. Power on the robot using the button at its front. The LED panels at
+   each corner of the robot flash white. After Jetson has finished
+   booting, they transition to green. If the status indicator light
+   flashes red, disengage the EStop.
+
+Network Connectivity
+====================
+
+Connecting the Robot to your WiFi Network
+-----------------------------------------
+
+Follow these steps to connect the Nova Carter to the local WiFi
+network:
+
+1. Connect the robot to a display using the DisplayPort on the rear
+   rear IO panel.
+
+   .. note:: A recommended best practice is to engage the EStop button any time you connect external cables to the robot, to prevent it from responding to any movement commands.
+
+2. Connect the robot to the wired Ethernet Port (using an RJ45 connector) on
+   the rear IO panel.
+
+3. Connect the keyboard with touchpad to the rear IO panel.
+
+4. Log in to the robot (contact the NVIDIA Solutions team for the robot password).
+
+5. Follow the `WiFi instructions for Ubuntu <https://help.ubuntu.com/20.04/ubuntu-help/net-wireless-connect.html.en>`__.
+
+Connecting the PC to the Robot
+------------------------------
+
+To control, deploy, launch, and debug applications, you have to connect
+your PC to the robot.
+
+First, you must get the IP address of the robot. Assuming you have the
+robot connected to a display and a keyboard with touchpad from the
+previous section, follow these instructions:
+
+1. Use ``CTRL+ALT+t`` to open a terminal.
+
+2. Find the IP address of the WiFi by running ``ifconfig wlan0``. You
+   should see an output similar to the screenshot below. The IP address
+   is highlighted with a red rectangle.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/ifconfig.png>`
+      :width: 800px
+      :alt: ifconfig console screenshot
+      :align: center
+
+3. Record the IP address (in above case it is ``10.110.66.127``). This IP
+   address will be used for connecting in all further tutorials and
+   may need to be retrieved again if it changes.
+
+4. SSH into the robot:
+
+   .. code:: bash
+
+      bob@jetson:~/isaac$ ssh ROBOTUSER@ROBOT_IP
+
+   a. Use a computer that is connected to the same WiFi network as your
+      robot
+
+   b. Assuming you are on a Linux computer, open a terminal with
+      ``CTRL+ALT+t`` and run ``ssh <USER>@<ROBOT_IP>``. In the above case,
+      it would be ``ssh nvidia@10.110.66.127``.
+
+   c. Enter the password to log in to the robot (contact the NVIDIA Solutions team
+      for the robot password). The tutorials/tools in the following sections will be
+      run from this SSH connection.
+
+   .. note:: The login will timeout for security reasons. Also, the DisplayPort will turn
+             off after a while due to inactivity, so retry if the screen goes
+             black.
+
+Initializing Nova Carter with Nova Carter Init
+==============================================
+
+Nova Carter Init is a Debian package that sets up the sensors and Jetson device on the Nova Carter robot.
+Follow the instructions to install Nova Carter Init(version 1.1.1) :ir_ngc:`here <teams/isaac/resources/nova_carter_init>`.
+
+Pairing the Joystick Controller
+===============================
+
+1. A PS5 joystick controller is shipped with the robot. To connect the joystick with the robot, put
+   the controller in pairing mode, by pressing and holding down the
+   two buttons shown in the image below until the controller lights
+   start blinking:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/joystick_pairing.png>`
+      :width: 800px
+      :alt: joystick_pairing
+      :align: center
+
+2.  Connect to the robot and pair the controller to the robot.
+
+   .. code:: bash
+
+      ssh nvidia@<ROBOT IP>
+
+      $ sudo bluetoothctl
+
+      **[bluetooth]#** scan on
+
+      // This should list the available devices
+
+      Discovery started
+
+      [CHG] Controller 90:E8:68:84:35:24 Discovering: yes
+
+      [NEW] Device D4:20:B0:42:66:4F D4-20-B0-42-66-4F
+
+      [NEW] Device D4:20: B0:42:5C:CC D4-20-B0-42-5C-CC
+
+      [NEW] Device D4:20:B0:42:64:1A D4-20-B0-42-64-1A
+
+      [NEW] Device 7C:66:EF:5D:36:B1 Wireless Controller
+
+      [NEW] Device D4:20:B0:42:C6:80 D4-20-B0-42-C6-80
+
+      [NEW] Device D4:20:B0:42:5B:37 D4-20-B0-42-5B-37
+
+      **[bluetooth]#** scan off
+
+      //The mac address used should match the one named Wireless Controller, in this case it is
+      7C:66:EF:5D:36:B1
+
+      **[bluetooth]#** pair 7C:66:EF:5D:36:B1
+
+      //Upon successful pairing, it should ask you to type yes/no to trust the
+      device. Type "yes". If not prompted
+
+      **[bluetooth]#** trust 7C:66:EF:5D:36:B1
+
+      **[bluetooth]#** exit
+
+   .. note::
+
+      Once the controller is connected, the LEDs on the controller
+      should stay solid blue; flashing blue LEDs indicate the controller is
+      trying to connect.
+
+   .. note::
+
+      In the terminal run ``ls /dev/input/js0``. If the connection was successful it prints out ``/dev/input/js0``. If the connection was **not** successful the command prints out ``\ ls: cannot access '/dev/input/js0': No such file or directory\``.
+
+3. The controller should now be connected. You should not need to pair again. If you want to
+   connect again after the controller turns off press the PS button as shown below.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/joystick_on.png>`
+      :width: 800px
+      :alt: PS5 Controller
+      :align: center
+
+Docker Configuration
+====================
+
+1. Add the ``nvidia`` user to the docker group:
+
+   .. code:: bash
+
+      sudo usermod -aG docker $USER
+      # verify that command succeeded
+      id nvidia | grep docker
+      #log out and log in for the changes to take effect
+
+2. Setup docker cache by making a data folder ``mkdir /mnt/nova_ssd/docker``. Then, follow this
+   link and set the ``data-root`` field to ``/mnt/nova_ssd/docker``:
+
+   https://www.guguweb.com/2019/02/07/how-to-move-docker-data-directory-to-another-location-on-ubuntu/
+
+3. Configure the docker daemon to use ``nvidia`` by default. Add ``"default-runtime": "nvidia"`` to the
+   ``/etc/docker/daemon.json`` on your robot. Your file should have at least these fields when
+   ``cat /etc/docker/daemon.json`` is run.
+
+   .. code:: bash
+
+      {
+         "default-runtime": "nvidia",
+         "runtimes": {
+            "nvidia": {
+               "path": "nvidia-container-runtime",
+               "runtimeArgs": []
+            }
+         },
+      }
+
+Checking the Battery Status
+===========================
+
+Before using the robot check the battery level. Run:
+
+.. code:: bash
+
+  nova_battery_status
+
+Verify that you see output similar to the following with a battery percentage printed at the end:
+
+.. code:: bash
+
+  nvidia@ubuntu:~$ nova_battery_status
+  host version build date:[23-09-19]
+  host version build time:[14:21:54]
+  Communication interface adding CAN_INTERFACE
+  Please guarantee the 'canbus_pre.sh' file has been taken into the '/home/sdcard/firmware' directory, if can register has not been configed
+  HAL CANBUS init success!
+  Scheduler Num 0 Start. Task Num = 1. Period = 100000
+  Scheduler Num 1 Start. Task Num = 1. Period = 50000
+  Scheduler Num 2 Start. Task Num = 1. Period = 20000
+
+  battery: 54%
+
+Calibrating Extrinsics with the Nova Calibration Tool
+=====================================================
+
+The Nova Carter Calibration Tool is a containerized application that guides you through the process of calibrating the poses of the sensors on a Nova Carter robot.
+Follow the instructions to  :ir_ngc:`set up calibration <teams/isaac/containers/nova_extrinsics_sensor_calibration_tool>`.
+
+If the calibration is successful, you should see a URDF file generated at ``/etc/nova/calibration/isaac_calibration.urdf``. This is
+also the default URDF path used by Nova Carter `demo applications <#demo-applications>`__.
+
+.. note:: You also have access to a URDF file with nominal values located at ``/etc/nova/calibration/isaac_nominals.urdf``.
+   This file could be useful as a backup in case calibration fails, but in general, always use ``isaac_calibration.urdf`` because it better reflects the true extrinsics of your physical robot.
+
+Development Environment Setup
+=============================
+
+Follow the :doc:`development environment setup steps </getting_started/dev_env_setup>`.
+
+.. note:: Ensure you setup the SSD and migrate Docker directory to SSD. Instructions can be found in the first step of the Quickstart section in the above link.
+
+Repository Setup
+================
+
+1. Clone the ``nova_carter`` and ``isaac_ros_common`` repository:
+
+   .. code:: bash
+
+      cd /mnt/nova_ssd/workspaces/isaac_ros-dev/src && \
+         git clone --recurse-submodules :ir_clone:`<nova_carter>` && \
+         git clone --recurse-submodules :ir_clone:`<isaac_ros_common>`
+
+2. Setup the Nova Carter environment variable:
+
+   .. code:: bash
+
+      echo "export ISAAC_ROS_WS=/mnt/nova_ssd/workspaces/isaac_ros-dev" >> ~/.bashrc && \
+         source ~/.bashrc
+
+3. Create the ``run_dev`` script configuration files in the ``$ISAAC_ROS_WS/src/isaac_ros_common/scripts`` dir:
+
+    1. Create a file called ``.isaac_ros_common-config`` with the following context:
+
+      .. code:: bash
+
+         cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts && \
+            echo -e "CONFIG_IMAGE_KEY=ros2_humble.nova_carter\nCONFIG_DOCKER_SEARCH_DIRS=(../../nova_carter/docker ../docker)" > .isaac_ros_common-config
+
+    2. Create a file called ``.isaac_ros_dev-dockerargs`` with the following context:
+
+      .. code:: bash
+
+         cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts && \
+            echo -e "-v /etc/nova/calibration:/etc/nova/calibration/" > .isaac_ros_dev-dockerargs
+         
+
+
+4. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd $ISAAC_ROS_WS/src/isaac_ros_common && \
+        ./scripts/run_dev.sh $ISAAC_ROS_WS
+
+5. Download the `ESS 3D Depth Estimation Neural Network model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`__ for :doc:`isaac_ros_ess </repositories_and_packages/isaac_ros_dnn_stereo_depth/index>`:
+
+   .. code:: bash
+
+      mkdir -p /workspaces/isaac_ros-dev/src/nova_carter/carter_navigation/models && \
+         cd /workspaces/isaac_ros-dev/src/nova_carter/carter_navigation/models && \
+         wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/dnn_stereo_disparity/versions/3.0.0/files/ess.etlt'
+
+6. Convert the ``.etlt`` model file to an ``.engine`` file:
+
+   .. code:: bash
+
+      /opt/nvidia/tao/tao-converter -k ess -t fp16 -e /workspaces/isaac_ros-dev/src/nova_carter/carter_navigation/models/ess.engine -o output_left,output_conf /workspaces/isaac_ros-dev/src/nova_carter/carter_navigation/models/ess.etlt
+
+7. Clone the dependency repositories using the ``vcstool`` file in the ``nova_carter`` repository:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         vcs import --recursive src < src/nova_carter/nova_carter.repos
+
+Demo Applications
+=================
+
+Joystick Driving with 4 Owl Fisheye Cameras
+--------------------------------------------
+
+1. Connect the PS5 joystick to the robot using `step 3 of these instructions <#pairing-the-joystick-controller>`__.
+2. Run the following command:
+
+   .. code:: bash
+
+      ls /dev/input/js0
+
+   If the output below is as shown, the joystick has been connected successfully.
+
+   .. code:: bash
+
+      /dev/input/js0
+
+3. Open a new terminal and `connect it to the robot <#connecting-the-pc-to-the-robot>`__.
+4. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd $ISAAC_ROS_WS/src/isaac_ros_common && \
+        ./scripts/run_dev.sh $ISAAC_ROS_WS
+5. Build the ROS packages in the Docker container:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install --packages-up-to carter_navigation isaac_ros_vda5050_nav2_client_bringup isaac_ros_hesai isaac_ros_occupancy_grid_localizer isaac_ros_pointcloud_utils isaac_ros_segway_rmp isaac_ros_hawk isaac_ros_owl isaac_ros_correlated_timestamp_driver isaac_ros_image_proc isaac_ros_ess isaac_ros_visual_slam isaac_ros_nvblox nvblox_nav2 isaac_ros_depth_image_proc sllidar_ros2 nvblox_examples_bringup
+6. Run the launch file:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         source install/setup.bash && \
+         ros2 launch carter_navigation teleop.launch.py
+7. Complete the `foxglove setup <#foxglove-setup>`__ guide.
+8. The ``joystick_owl.json`` foxglove layout file can be found in the :ir_repo:`nova_carter repository <nova_carter> <carter_navigation/foxglove_layouts/joystick_owl.json>`. You should now be able to see the 4 Owl fisheye camera streams.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_joystick_owl.png>`
+   :width: 800px
+   :alt: Foxglove viz with OWLs
+   :align: center
+
+8. Move the robot using the joystick. Controls can be found below:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/joystick_controls.png>`
+   :width: 800px
+   :alt: Foxglove viz with joystick controls
+   :align: center
+
+Visualizing All Sensors on Foxglove
+-----------------------------------
+
+The ``teleop.launch.py`` file can be used to launch all the sensors on the Nova Carter robot.
+
+   .. note::
+
+      Streaming higher bandwidth data to Foxglove causes higher latency. You can choose an appropriate value for the `send_buffer_limit <https://github.com/foxglove/ros-foxglove-bridge#configuration>`__ parameter in Foxglove bridge to control latency vs. high bandwidth data visualization.
+
+1. Open a new terminal and `connect it to the robot <#connecting-the-pc-to-the-robot>`__.
+2. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd $ISAAC_ROS_WS/src/isaac_ros_common && \
+        ./scripts/run_dev.sh $ISAAC_ROS_WS
+
+3. Print all the arguments for the ``teleop.launch.py``:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+      source install/setup.bash && \
+      ros2 launch carter_navigation teleop.launch.py --show-args
+
+   You should see:
+
+   .. code:: bash
+
+      admin@carter-v24-3:/workspaces/isaac_ros-dev$ ros2 launch carter_navigation teleop.launch.py -show-args
+      Arguments (pass arguments as ':='):
+
+      'launch_owls':
+         Launch Owl Cameras
+         (default: LaunchConfig('launch_owls'))
+
+      'launch_hawks':
+         Launch Hawk Cameras
+         (default: LaunchConfig('launch_hawks'))
+
+      'launch_hesai':
+         Launch Hesai 3D Lidar
+         (default: LaunchConfig('launch_hesai'))
+
+      'launch_rplidars':
+         Launch rplidars
+         (default: LaunchConfig('launch_rplidars'))
+
+      'send_buffer_limit':
+         no description given
+         (default: '10000000')
+
+      'joy_config':
+         no description given
+         (default: 'ps5')
+
+      'joy_dev':
+         no description given
+         (default: '/dev/input/js0')
+
+      'joy_vel':
+         no description given
+         (default: 'cmd_vel')
+
+      'config_filepath':
+         no description given
+         (default: '/workspaces/isaac_ros-dev/install/carter_navigation/share/carter_navigation/config/' + LaunchConfig('joy_config') + '.config.yaml')
+
+      'launch_delay':
+         no description given
+         (default: '15')
+
+      'publish_odom':
+         no description given
+         (default: 'True')
+
+4. Enable the required sensors using the corresponding launch file argument. For example, to enable the Hesai 3D Lidar and the 2 RPLIDARs, run the following command:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         source install/setup.bash && \
+         ros2 launch carter_navigation teleop.launch.py launch_hesai:=True launch_rplidars:=True
+
+   .. note:: The Owl cameras are enabled by default. Use ``launch_owls:=False`` to disable streaming the Owl cameras.
+
+5. Complete the `foxglove setup <#foxglove-setup>`__. The ``foxglove_layout_all_sensors.json`` foxglove layout file to visualize all sensors can be found in the :ir_repo:`nova_carter repository <nova_carter> <carter_navigation/foxglove_layouts/foxglove_layout_all_sensors.json>`. You should see the sensor data in Foxglove as shown below:
+
+   .. note:: If both the RPLIDARs visualizations do not show up, press ``Ctrl+R`` when in the Foxglove window to get the latest update.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_hesai_rplidar_owl.png>`
+      :width: 800px
+      :alt: foxglove_hesai_rplidar_owl
+      :align: center
+
+
+Mapping with slam_toolbox, Nav2, Hesai 3D Lidar and Segway Wheel Odometry
+-------------------------------------------------------------------------
+
+1.  Connect the joystick by following steps using steps 1-2 from `Joystick Driving with 4 Owl Fisheye Cameras <#demo-applications>`__.
+2.  Open a new terminal and `connect it to the robot <#connecting-the-pc-to-the-robot>`__.
+3.  Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd $ISAAC_ROS_WS/src/isaac_ros_common && \
+        ./scripts/run_dev.sh $ISAAC_ROS_WS
+
+4.  Run the launch file:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         source install/setup.bash && \
+         ros2 launch carter_navigation mapping.launch.py
+
+5.  Complete the `foxglove setup <#foxglove-setup>`__. The ``foxglove_layout_nav2.json`` Foxglove layout file can be found in the  :ir_repo:`nova_carter repository <nova_carter> <carter_navigation/foxglove_layouts/foxglove_layout_nav2.json>`. You should see the map, local costmap data, and footprint of the robot in foxglove as shown below:
+
+      .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_mapping.png>`
+         :width: 800px
+         :alt: foxglove_mapping
+         :align: center
+
+6.  You can move the robot around using the joystick. You can also move the robot around using Nav2 (autonomous navigation) as shown in the next step.
+7.  You can send a goal pose setpoint to Nav2 using the `Pose publish button <https://foxglove.dev/docs/studio/panels/3d#publish>`__ in Foxglove as shown below:
+
+      .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_mapping.gif>`
+         :width: 800px
+         :alt: foxglove_mapping
+         :align: center
+
+   .. note:: You can use the joystick to override Nav2 autonomous control at any point.
+
+8.  Attach a new terminal to the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd $ISAAC_ROS_WS/src/isaac_ros_common && \
+        ./scripts/run_dev.sh $ISAAC_ROS_WS
+
+9.  Run the below command to save the map ``.png`` and ``.yaml`` file:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         ros2 run nav2_map_server map_saver_cli --fmt png -f map_filename
+
+10. This ``.yaml`` file can be used as the input map launch file argument (``map_yaml_file``) in the next Nav2+AMCL tutorial.
+
+   .. note:: Use the ``launch_nvblox_pipeline`` launch argument to enable the front hawk + Isaac ROS ESS + Isaac ROS Nvblox 3D reconstruction pipeline
+
+Nav2 with Hesai 3D lidar and Segway Wheel Odometry
+--------------------------------------------------
+
+The ``teleop.launch.py`` file can be used to launch all the sensors on the Nova Carter robot.
+
+.. note:: Streaming higher bandwidth data to Foxglove causes higher latency. You can choose an appropriate value for the `send_buffer_limit <https://github.com/foxglove/ros-foxglove-bridge#configuration>`__ parameter in Foxglove bridge to control latency versus high bandwidth data visualization.
+
+1. Open a new terminal and `connect it to the robot <#connecting-the-pc-to-the-robot>`__.
+2. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd $ISAAC_ROS_WS/src/isaac_ros_common && \
+        ./scripts/run_dev.sh $ISAAC_ROS_WS
+
+3. Run the launch file:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         source install/setup.bash && \
+         ros2 launch carter_navigation nav2.launch.py
+4. Complete the `foxglove setup <#foxglove-setup>`__. The ``foxglove_layout_nav2.json`` Foxglove layout file can be found in the ``nova_carter`` repository :ir_repo:`here <nova_carter> <carter_navigation/foxglove_layouts/foxglove_layout_nav2.json>`. You should see the map, local costmap data, and footprint of the robot in Foxglove as shown below:
+
+      .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_nav2.png>`
+         :width: 800px
+         :alt: foxglove_nav2
+         :align: center
+
+5. You can send a goal pose setpoint to Nav2 using the `Pose publish button <https://foxglove.dev/docs/studio/panels/3d#publish>`__ in Foxglove as shown below:
+
+      .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_nav2_galileo.gif>`
+         :width: 800px
+         :alt: foxglove_nav2_galileo
+         :align: center
+
+   .. note:: You can use the joystick to override Nav2 autonomous control at any point.
+
+.. note:: To pass a custom map YAML file path use the ``map_yaml_file`` launch argument.
+
+.. note:: Use the ``launch_nvblox_pipeline`` launch argument to enable the front hawk + Isaac ROS ESS + Isaac ROS Nvblox 3D reconstruction pipeline
+
+Foxglove Setup
+--------------
+1. On your visualization computer (laptop), setup the Isaac ROS development environment by following :doc:`these steps </getting_started/dev_env_setup>`
+
+2. Clone the ``nova_carter`` repository:
+
+   .. code:: bash
+
+      cd ${HOME}/workspaces && \
+         git clone --recurse-submodules :ir_clone:`<nova_carter>`
+
+3. Install `Foxglove Studio <https://foxglove.dev/download>`__, launch Foxglove Studio:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_studio.png>`
+      :width: 800px
+      :alt: foxglove_studio
+      :align: center
+
+4. Click on the “Open connection” button. Connect to the Foxglove bridge running on the robot by replacing ``localhost`` with the `ip of the robot <#connecting-the-pc-to-the-robot>`__:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_connect.png>`
+      :width: 800px
+      :alt: foxglove_connect
+      :align: center
+
+5. A layout file is provided for each tutorial in the :ir_repo:`nova_carter repository <nova_carter> <carter_navigation/foxglove_layouts>`.
+6. Import this layout file by clicking on the ``Import from file...`` in the ``layout`` drop down menu and choosing the layout file from the ``${HOME}/workspaces/nova_carter/carter_navigation/foxglove_layouts``.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_import_layout.png>`
+      :width: 800px
+      :alt: foxglove_import_layout
+      :align: center
+
+AMCL Tuning
+-----------
+We made the following changes to the AMCL default parameters:
+1. Used the ``beam`` laser_model_type instead of the default "likelihood_field" laser_model_type
+2. Reduced the ``z_hit`` Gaussian model sigma(``sigma_hit``) to 0.1
+3. Set the ``beam`` laser_model_type weights to ``z_hit``: 0.5, ``z_max``: 0.05, ``z_rand``: 0.4 and ``z_short``: 0.05
+4. Increased the ``max_beams`` parameter from ``60`` to ``360`` to allow for more detailed features to be used by AMCL
+5. Decreased all odometry process noise from ``0.2`` to ``0.1`` to allow higher confidence in the robots wheel odometry
+
+Troubleshooting
+===============
+
+How do I Pair the Bluetooth Joystick with the Nova Carter Robot?
+----------------------------------------------------------------
+
+Refer to the `pairing the controller section <#pairing-the-joystick-controller>`__.
+
+Jetson Won't Connect to the Monitor Unless Ethernet Is Connected
+----------------------------------------------------------------
+
+This is a known bug. We'd recommend that you have the Nova Carter robot connected to Ethernet during the initial SW setup procedure in the documentation.
+
+Robot Does Not Move:
+-------------------------------------
+
+1. In a terminal inside the Docker container, run ``ros topic echo /cmd_vel``.
+
+   Ensure that when you press the buttons or move the joysticks, the values on the topic change. If it does not show any data move to the next step.
+2. If you can see the expected values in the above command when pressing the joystick, check if the horizontal indicator light next to the power button on the robot is green. If it is not green, then the Segway ROS driver has gone into "locked state".
+
+You can fix this by running `ros2 service call /reset_chassis std_srvs/srv/Empty {}` in a new terminal that is attached to the Isaac ROS Docker container. The Segway driver has to be running to reset the chassis. Restarting the teleop, Nav2, or mapping launch files also resets the Segway driver.
+
+``/cmd_vel`` Shows No Data when the Joystick Enable Button is Pressed
+---------------------------------------------------------------------
+1. In a terminal inside the Docker container run ``ls /dev/input/js0`` .
+   If the connection was successful it prints out ``/dev/input/js0``. If the connection was **not** successful the command prints out ``ls: cannot access '/dev/input/js0': No such file or directory``.
+2. In a terminal inside the Docker container run ``ros topic echo /joy``. Ensure that when you press the buttons or move the joysticks, the values on the topic change.
+3. Ensure your joystick is connected by following the joystick pairing steps in this document.
+
+``ros2 topic hz`` Shows a Lower than Expected Value
+----------------------------------------------------
+
+   .. note:: ``ros2 topic hz`` is known to cause 100% CPU load for the first ~6 seconds after running the command. And the frame rate measured during this period is inaccurate compared to when the command is not running. Use the ``--window`` flag as shown below and wait for ~6 secs to get a more accurate measurement.
+
+   .. note:: ``ros2 topic hz`` also triggers the type adaptation NITROS nodes.
+
+1. Run the following command to get a list of all the topics:
+
+   .. code:: bash
+
+      ros2 topic list
+2. Run the ``ros2 topic hz`` command of the required topic:
+
+   .. code:: bash
+
+      ros2 topic hz <topic_name> --window 30
+
+``ros2 topic list`` on a remote system does not show all topics on robot 
+------------------------------------------------------------------------
+
+   .. note:: We use Cyclone DDS as our ROS 2 middleware interface
+
+   .. note:: When using the below Cyclone DDS configuration file, replace ``your_network_interface``, ``robot_ip`` and ``remote_system_ip`` with appropriate values.
+
+1. Check if your system allows multicast communication by following the steps in `this medium post <https://medium.com/@arshad.mehmood/setting-up-node-discovery-across-multiple-systems-in-ros2-infrastructure-a1a5c25f052f>`__
+2. If it does not, disable multicast and set the peer IPs manually as shown in `this medium post <https://medium.com/@arshad.mehmood/setting-up-node-discovery-across-multiple-systems-in-ros2-infrastructure-a1a5c25f052f>`__. An example of the cyclone DDS config file is also given below:
+
+   .. code:: xml
+
+      <CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+      <Domain id="any">
+      <General>
+      <Interfaces>
+         <NetworkInterface name="your_network_interface"  multicast="false" />
+      </Interfaces>
+      <AllowMulticast>false</AllowMulticast>
+      <EnableMulticastLoopback>false</EnableMulticastLoopback>
+      </General>
+
+      <Discovery>
+      <!-- Replace with robot and visualization machine ip -->
+      <Peers>
+         <Peer address="robot_ip"/>
+         <Peer address="remote_system_ip"/>
+      </Peers>
+      <ParticipantIndex>auto</ParticipantIndex>
+      <MaxAutoParticipantIndex>200</MaxAutoParticipantIndex>
+      </Discovery>
+      </Domain>
+      </CycloneDDS>
+

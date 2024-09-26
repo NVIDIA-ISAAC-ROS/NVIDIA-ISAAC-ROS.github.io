@@ -1,0 +1,80 @@
+Camera-based Perception with `Isaac Perceptor` on a Robot with the `Nova Orin Developer Kit`
+===============================================================================================
+
+To run and evaluate camera-based perception on your robot with the `Nova Orin Developer Kit`,
+please follow suggested mounting guidelines, and power on the `Nova Orin Developer Kit`.
+
+.. note::
+    The `Nova Orin Developer Kit` has been unboxed and set up as expected by following
+    :doc:`Getting Started </robots/nova_developer_kit/getting_started>`.
+
+Mounting the `Nova Orin Developer Kit` on a Robot
+----------------------------------------------------
+
+In order to use the `Nova Orin Developer Kit` as the perception module on an
+existing robot, you shall mount it on your robot. It is essential that the
+developer kit is mounted rigidly and cannot move.
+
+It is recommended to mount the `Nova Orin Developer Kit` such that the camera's field of
+views are largely unobstructed. Make sure to orient the `Nova Orin Developer Kit` such that
+the front camera is pointing to the robot's main direction of travel,
+and the bottom plate is parallel to the ground.
+
+The developer kit can be mounted using either a tripod mount or the general
+purpose hole pattern on its bottom. Recommended mounting hole positions can be found
+in the `Nova Orin DevKit Quick Start Guide` from Segway.
+
+To account for the mounting location when running `Isaac Perceptor`, a robot URDF file needs to be
+provided. Otherwise the :ir_repo:`nova_developer_kit.urdf.xacro <nova_developer_kit> <nova_developer_kit_description/urdf/nova_developer_kit.urdf.xacro>`
+is used, which assumes that the `Nova Orin Developer Kit` is initialized on the ground plane.
+
+It is **recommended to follow the**
+:doc:`calibration instructions</robots/nova_carter/demo_calibration>`. The output of calibration is
+stored in a default location in the robot (``/etc/nova/calibration/isaac_calibration.urdf``), and
+`Isaac Perceptor` will use it without requiring any additional arguments:
+
+.. code:: bash
+
+    ros2 launch nova_developer_kit_bringup perceptor.launch.py
+
+Alternatively, the :ref:`Nominal values and URDF file generation<robot-urdf-with-nova-developer-kit>`
+section details the process to create a robot nominals URDF file (``urdf_nominals_file_path``). The
+robot nominals URDF file can then be passed with the `urdf_override_file` argument to `Isaac Perceptor`:
+
+.. code:: bash
+
+    ros2 launch nova_developer_kit_bringup perceptor.launch.py \
+        urdf_override_file:=<"urdf_nominals_file_path">
+
+Powering On the `Nova Orin Developer Kit`
+------------------------------------------
+
+Use the power splitter cable to distribute power to the barrel jack ports found on the Jetson AGX Orin and GMSL Camera Board. For the input side of the splitter cable, provide a 12V (90W capable) power source. The male barrel jack input has an outer diameter of 5.5mm and inner diameter of 2.5mm.
+The system should turn on when power is applied. Alternatively, power on the `Nova Orin Developer Kit` by pressing the power button (the left-most button) in the AGX Orin.
+
+
+Tutorials
+---------
+
+You are recommended to go through following tutorials to running and evaluating
+`Isaac Perceptor` on your robot equipped with the `Nova Orin Developer Kit`.
+
+Running `Isaac Perceptor` on a Robot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the :doc:`Tutorial: Running Camera-based 3D Perception with Isaac Perceptor</reference_workflows/isaac_perceptor/tutorials_on_devkit/demo_perceptor>`
+on how to launch the application, how to visualize, and evaluate the results.
+
+Running `Isaac Perceptor` on Recorded Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See the :doc:`Tutorial: Recording and Playing Back Data for Isaac Perceptor </reference_workflows/isaac_perceptor/tutorials_on_devkit/tutorial_recording_and_playback>` on how to
+record data on your robot equipped with `Nova Orin Developer Kit`, and how to run `Isaac Perceptor` on recordings.
+
+Running `Isaac Perceptor` on a Robot with the Navigation Stack
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To support running `Isaac Perceptor` with navigation stacks on your robot,
+we provide reference design examples for
+sensor mounting :doc:`Isaac Perceptor Sensor Mounting Guide</robots/isaac_perceptor_mounting_guide/index>`,
+and for software integration :doc:`Tutorial: Integrating Isaac Perceptor with ROS2 Nav2</reference_workflows/isaac_perceptor/tutorials_on_devkit/demo_navigation>`.

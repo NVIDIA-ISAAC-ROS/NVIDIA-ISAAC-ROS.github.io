@@ -1,0 +1,204 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_segmentation> <isaac_ros_unet>`
+
+Quickstart
+----------
+
+1.  Set up your development environment by following the instructions :doc:`here </getting_started/dev_env_setup>`.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_image_segmentation>`
+
+3.  Pull down a ROS Bag of sample data:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_image_segmentation && \
+         git lfs pull -X "" -I "resources/rosbags/"
+
+4.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5.  Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-unet ros-humble-isaac-ros-triton ros-humble-isaac-ros-dnn-image-encoder
+
+6.  Download the ``PeopleSemSegNet ShuffleSeg`` ETLT file and the ``int8`` inference mode cache file:
+
+    .. code:: bash
+
+       mkdir -p /tmp/models/peoplesemsegnet_shuffleseg/1 && \
+         cd /tmp/models/peoplesemsegnet_shuffleseg && \
+         wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_etlt.etlt && \
+         wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_cache.txt
+
+7.  Convert the ETLT file to a TensorRT plan file:
+
+    .. code:: bash
+
+       /opt/nvidia/tao/tao-converter -k tlt_encode -d 3,544,960 -p input_2:0,1x3x544x960,1x3x544x960,1x3x544x960 -t int8 -c peoplesemsegnet_shuffleseg_cache.txt -e /tmp/models/peoplesemsegnet_shuffleseg/1/model.plan -o argmax_1 peoplesemsegnet_shuffleseg_etlt.etlt
+
+8.  Create a file called ``/tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt`` by copying the sample Triton config file:
+
+    .. code:: bash
+
+       cp /workspaces/isaac_ros-dev/src/isaac_ros_image_segmentation/resources/peoplesemsegnet_shuffleseg_config.pbtxt /tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt
+
+9.  Run the following launch files to spin up a demo of this package:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_unet isaac_ros_unet_triton.launch.py model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax' input_image_width:=1200 input_image_height:=632
+
+    Then open **another** terminal, and enter the Docker container again:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then, play the ROS bag:
+
+    .. code:: bash
+
+       ros2 bag play -l src/isaac_ros_image_segmentation/resources/rosbags/unet_sample_data/
+
+10. Visualize and validate the output of the package by launching ``rqt_image_view`` in another terminal: In a **third** terminal, enter the Docker container again:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then launch ``rqt_image_view``:
+
+    .. code:: bash
+
+       ros2 run rqt_image_view rqt_image_view
+
+    Then inside the ``rqt_image_view`` GUI, change the topic to ``/unet/colored_segmentation_mask`` to view a colorized segmentation mask.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/peoplesemsegnet_shuffleseg_rqt.png>`
+      :width: 320px
+      :align: center
+
+   .. note::
+
+       The raw segmentation mask is also published to ``/unet/raw_segmentation_mask``. However, the raw pixels correspond to the class labels and so the output is unsuitable for human visual inspection.
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+   
+   Tutorial with Isaac Sim </concepts/segmentation/unet/tutorial_isaac_sim>
+
+   Tutorial with Nitros Graph </concepts/segmentation/unet/tutorial_nitros_graph>
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~
+
+Three launch files are provided to use this package. The first launch file launches ``isaac_ros_tensor_rt``, whereas another one uses ``isaac_ros_triton``, along with
+the necessary components to perform encoding on images and decoding of ``U-Net``'s output. The final launch file launches an :doc:`Argus-compatible camera </repositories_and_packages/isaac_ros_argus_camera/index>`
+with a :doc:`rectification node </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>`, along with the components found in ``isaac_ros_unet_triton.launch.py``.
+A more comprehensive tutorial featuring the third launch file can be found :doc:`here </concepts/segmentation/unet/tutorial_nitros_graph>`.
+
+.. warning::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+========================================= ====================
+Launch File                               Components Used
+========================================= ====================
+``isaac_ros_unet_tensor_rt.launch.py``    :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TensorRTNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index>`, :doc:`UNetDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+``isaac_ros_unet_triton.launch.py``       :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`UNetDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+``isaac_ros_argus_unet_triton.launch.py`` :doc:`ArgusMonoNode </repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera/index>`, :doc:`RectifyNode </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>`, :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`UNetDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+========================================= ====================
+
+UNetDecoderNode
+~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+==================================== ================ =========== ===================================================================================================================================================================================================
+ROS Parameter                        Type             Default     Description
+==================================== ================ =========== ===================================================================================================================================================================================================
+``color_segmentation_mask_encoding`` ``string``       ``rgb8``    The image encoding of the colored segmentation mask. Supported values: ``rgb8``, ``bgr8``
+``color_palette``                    ``int64_t list`` ``[]``      Vector of integers where each element represents the RGB color hex code for the corresponding class label. The number of elements should equal the number of classes. E.g. ``[0xFF0000, 0x76b900]``
+``network_output_type``              ``string``       ``softmax`` The type of output that the network provides. Supported values: ``softmax``, ``argmax``, ``sigmoid``
+``mask_width``                       ``int16_t``      ``960``     The width of the segmentation mask.
+``mask_height``                      ``int16_t``      ``544``     The height of the segmentation mask.
+==================================== ================ =========== ===================================================================================================================================================================================================
+
+..
+
+
+.. warning::
+
+   -  **Note**: the model output should be ``NCHW`` or ``NHWC``. In this context, the ``C`` refers to the class.
+   -  **Note**: For the ``network_output_type``, the ``softmax`` and ``sigmoid`` option expects a single 32 bit floating point tensor. For the ``argmax`` option, a single signed 32 bit integer tensor is expected. 
+   -  **Note**: Models with greater than 255 classes are currently not supported. If a class label greater than 255 is detected, this mask will be downcast to 255 in the raw segmentation.
+
+
+============== ==================================================================================================================================================================== =========================================================================
+ROS Topic      Interface                                                                                                                                                            Description
+============== ==================================================================================================================================================================== =========================================================================
+``tensor_sub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The tensor that contains raw probabilities for every class in each pixel.
+============== ==================================================================================================================================================================== =========================================================================
+
+.. warning::
+
+   All input images are required to have height and width that are both an even number of pixels.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+=================================== ======================================================================================================= ======================================================================================================
+ROS Topic                           Interface                                                                                               Description
+=================================== ======================================================================================================= ======================================================================================================
+``unet/raw_segmentation_mask``      `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__ The raw segmentation mask, encoded in mono8. Each pixel represents a class label.
+``/unet/colored_segmentation_mask`` `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__ The colored segmentation mask. The color palette is user specified by the ``color_palette`` parameter.
+=================================== ======================================================================================================= ======================================================================================================
+
+.. |package_name| replace:: ``isaac_ros_unet``

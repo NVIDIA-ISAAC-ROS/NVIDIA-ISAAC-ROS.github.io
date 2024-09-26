@@ -1,0 +1,80 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_benchmark> <isaac_ros_benchmark>`
+
+Quickstart
+----------
+
+Follow the steps below to run a sample benchmark for measuring
+performance of an Isaac ROS AprilTag node with ``ros2_benchmark``. This
+process can also be used to benchmark the other Isaac ROS nodes, and the
+``ros2_benchmark`` framework more generally supports benchmarking
+arbitrary graphs of ROS 2 nodes.
+
+1. Set up your development environment by following the instructions
+   :doc:`here </getting_started/dev_env_setup>`.
+
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_benchmark>`
+
+3. Pull down ``r2b Dataset 2023`` by following the instructions :ir_repo:`here <ros2_benchmark> <README.md#datasets>`
+   or fetch just the rosbag used in this Quickstart with the following
+   command.
+
+   .. code:: bash
+
+      mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/datasets/r2b_dataset/r2b_storage && \
+        cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/datasets/r2b_dataset/r2b_storage && \
+        wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/nvidia/isaac/r2bdataset2023/versions/2/files/r2b_storage/metadata.yaml' && \
+        wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/nvidia/isaac/r2bdataset2023/versions/2/files/r2b_storage/r2b_storage_0.db3'
+
+4. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+5. Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-benchmark ros-humble-isaac-ros-apriltag
+
+6. Start the Isaac ROS AprilTag benchmark:
+
+   .. code:: bash
+
+      launch_test src/isaac_ros_benchmark/scripts/isaac_ros_apriltag_node.py
+
+7. Once the benchmark is finished, the final performance measurements
+   are displayed in the terminal.
+
+   Additionally, the final results and benchmark metadata (e.g., system
+   information, benchmark configurations) are also exported as a JSON
+   file.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+.. |package_name| replace:: ``isaac_ros_benchmark``

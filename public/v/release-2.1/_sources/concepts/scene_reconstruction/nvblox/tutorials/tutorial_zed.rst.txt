@@ -1,0 +1,80 @@
+Static Reconstruction with ZED
+==============================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/zed_example.gif>`
+    :width: 600px
+    :align: center
+
+This tutorial demonstrates how to perform depth-camera based reconstruction
+using a `ZED <https://www.stereolabs.com/docs/get-started-with-zed>`__ camera.
+
+.. note::
+   This tutorial requires a compatible ZED camera from
+   the list available  :doc:`here </getting_started/hardware_setup/sensors/zed_setup>`.
+
+Host System Setup
+-----------------
+
+The ROS 2 message delivery can be unreliable under high load
+without some small modifications to the QoS profile (especially on
+weaker machines). Before running this example, run one of the following:
+
+To set the parameter temporarily, until reboot:
+
+.. code:: bash
+
+   sudo sysctl -w net.core.rmem_max=8388608 net.core.rmem_default=8388608
+
+To set the parameter permanently, run:
+
+.. code:: bash
+
+   echo -e "net.core.rmem_max=8388608\nnet.core.rmem_default=8388608\n" | sudo tee /etc/sysctl.d/60-cyclonedds.conf
+
+See
+`DDS tuning <https://docs.ros.org/en/rolling/How-To-Guides/DDS-tuning.html>`__ for more details.
+
+Installing the Dependencies
+---------------------------
+
+1. Complete steps 1 and 2 described in the
+   :doc:`Nvblox Quickstart Guide </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index>`
+   to set up your development environment and clone the required repositories.
+
+2. Complete the :doc:`/getting_started/hardware_setup/sensors/zed_setup`
+   to set up `ZED`.
+
+Example with ZED Live Data
+--------------------------
+
+1. Complete the sections above.
+
+2. Connect the ZED device to your machine using a USB 3 cable/port.
+
+3. Run the ROS Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+5. At this point, you can check that the ZED camera is connected
+   by running the ``ZED_Explorer``:
+
+   .. code:: bash
+
+      /usr/local/zed/tools/ZED_Explorer
+
+6. If successful, run the launch file to spin up the example:
+
+   .. code:: bash
+
+      ros2 launch nvblox_examples_bringup zed_example.launch.py

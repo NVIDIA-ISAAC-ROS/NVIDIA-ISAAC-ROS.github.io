@@ -1,0 +1,57 @@
+=====================================
+Tutorial For RealSense-based Encoding
+=====================================
+
+In this tutorial, you perform H.264 encoding
+using a
+`RealSense <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__
+camera and
+:ir_repo:`isaac_ros_h264_encoder <isaac_ros_compression> <isaac_ros_h264_encoder/src/encoder_node.cpp>`
+to save compressed images into a rosbag.
+
+.. note::
+
+   This tutorial requires a compatible RealSense
+   camera from the list of
+   :ref:`cameras <getting_started/hardware_setup/sensors/realsense_setup:camera compatibility>`.
+
+1. Complete the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
+2. Complete steps 1-2 as described in the :ref:`quickstart guide <repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index:quickstart>`.
+3. Open a new terminal and launch the Docker container using the
+   ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+5. Run the launch file. This launch file launches the example and
+   saves ``CompressedImage`` and ``CameraInfo`` topic data into a rosbag
+   in your current folder:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_h264_encoder isaac_ros_h264_encoder_realsense.launch.py
+
+6. (Optional) If you want to decode and visualize the images from the
+   rosbag, you can place the recorded rosbag into an x86 machine
+   equipped with NVIDIA GPU, then follow steps 7 and 8 in the
+   :ref:`Quickstart section <repositories_and_packages/isaac_ros_compression/isaac_ros_h264_encoder/index:quickstart>`. (Change the rosbag path and
+   input the dimension accordingly in step 7):
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_h264_decoder isaac_ros_h264_decoder_rosbag.launch.py rosbag_path:=<"path to your rosbag folder"> input_width:=640 input_height:=480
+
+For example, the result looks like:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/compression/h264/realsense_example.png>`
+   :align: center

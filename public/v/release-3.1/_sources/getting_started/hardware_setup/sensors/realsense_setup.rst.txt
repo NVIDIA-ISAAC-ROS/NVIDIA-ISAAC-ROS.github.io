@@ -1,0 +1,83 @@
+=========================
+Isaac ROS RealSense Setup
+=========================
+
+Camera Compatibility
+--------------------
+
+================= ==============
+RealSense Model   Supported?
+================= ==============
+D455              ✓
+D435i             ✓
+D415              ✗
+================= ==============
+
+.. note::
+
+  It is required to use RealSense firmware `version 5.13.0.50 <https://dev.intelrealsense.com/docs/firmware-releases>`__, `librealsense` `version 2.55.1 <https://github.com/IntelRealSense/librealsense/releases/tag/v2.55.1>`__ and RealSense camera ROS driver `version 4.51.1 <https://github.com/IntelRealSense/realsense-ros/tree/4.51.1>`__.
+  **Any deviation from these versions will break Isaac ROS examples.**
+
+.. note::
+
+    For best results we suggest increasing the maximum Linux kernel receive buffer size as
+    detailed `here <https://docs.ros.org/en/rolling/How-To-Guides/DDS-tuning.html#cyclone-dds-tuning>`__.
+
+Setup Instructions
+------------------
+
+.. note::
+
+  This tutorial assumes that you have completed the instructions in :doc:`Developer Environment Setup </getting_started/dev_env_setup>`.
+
+1. Clone the ``realsense-ros`` repository:
+
+  .. note::
+
+    ``${ISAAC_ROS_WS}`` is defined to point to ``/ssd/workspaces/isaac_ros-dev/`` or ``~/workspaces/isaac_ros-dev/``.
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src
+    git clone :ir_clone:`<isaac_ros_common>`
+    git clone https://github.com/IntelRealSense/realsense-ros.git -b 4.51.1
+
+  .. note::
+
+    Plug in your RealSense camera before launching the Docker container in the next step.
+
+2. Configure the container created by ``isaac_ros_common/scripts/run_dev.sh`` to include ``librealsense`` and ``realsense2-camera``. Create the ``.isaac_ros_common-config`` file in the ``isaac_ros_common/scripts`` directory:
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts && \
+    touch .isaac_ros_common-config && \
+    echo CONFIG_IMAGE_KEY=ros2_humble.realsense > .isaac_ros_common-config
+
+3. Launch the Docker container:
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+    ./scripts/run_dev.sh -d ${ISAAC_ROS_WS}
+
+  This rebuilds the container image using ``Dockerfile.realsense`` in one of its layered stage. Rebuilding can take several minutes.
+
+4. Build the ``realsense_splitter`` and ``realsense2*`` packages:
+
+   .. code:: bash
+
+       cd ${ISAAC_ROS_WS} && \
+       colcon build --symlink-install --packages-up-to-regex realsense*
+
+5. After the container image is rebuilt and you are inside the container, you can run ``realsense-viewer`` to verify that the RealSense camera is connected.
+
+  .. code:: bash
+
+    realsense-viewer
+
+  If you turn on the "Stereo Module" in the GUI, you should see something like the following:
+
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/realsense_viewer.png>`
+   :align: center

@@ -1,0 +1,219 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_pose_estimation> <isaac_ros_centerpose>`
+
+Quickstart
+----------
+
+1.  Complete steps 1-4 of the quickstart :doc:`here </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`
+
+2. Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-centerpose ros-humble-isaac-ros-triton ros-humble-isaac-ros-dnn-image-encoder
+
+3.  Create a models repository with version ``1``:
+
+    .. code:: bash
+
+       mkdir -p /tmp/models/centerpose_shoe/1
+
+4.  Copy the test model located in ``isaac_ros_centerpose`` into ``/tmp/models/centerpose_shoe/1``. Make sure it's called ``model.onnx``:
+
+    .. code:: bash
+
+        cp /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_centerpose/test/models/centerpose_shoe.onnx /tmp/models/centerpose_shoe/1/model.onnx
+
+5.  Create a configuration file for this model at path
+    ``/tmp/models/centerpose_shoe/config.pbtxt``. Note that name has to
+    be the same as the model repository name. Take a look at the example
+    at ``isaac_ros_centerpose/test/models/centerpose_shoe/config.pbtxt``
+    and copy that file to ``/tmp/models/centerpose_shoe/config.pbtxt``.
+
+    .. code:: bash
+
+       cp /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_centerpose/test/models/centerpose_shoe/config.pbtxt /tmp/models/centerpose_shoe/config.pbtxt
+
+6.  To get a TensorRT engine plan file with Triton, export the ONNX
+    model into an TensorRT engine plan file using the builtin TensorRT
+    converter ``trtexec``:
+
+    .. code:: bash
+
+       /usr/src/tensorrt/bin/trtexec --onnx=/tmp/models/centerpose_shoe/1/model.onnx --saveEngine=/tmp/models/centerpose_shoe/1/model.plan
+
+7.  Start ``isaac_ros_centerpose`` using the launch file:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_centerpose isaac_ros_centerpose_triton.launch.py model_name:=centerpose_shoe model_repository_paths:=['/tmp/models']
+
+    Then open **another** terminal, and enter the Docker container
+    again:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then, play the ROS bag:
+
+    .. code:: bash
+
+       ros2 bag play -l src/isaac_ros_pose_estimation/resources/rosbags/centerpose_rosbag/
+
+8.  Open another terminal window and attach to the same container. You
+    should be able to get the poses of the objects in the images through
+    ``ros2 topic echo``:
+
+    In a **third** terminal, enter the Docker container again:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    .. code:: bash
+
+       ros2 topic echo /centerpose/detections
+
+    Then launch ``rqt_image_view``:
+
+    .. code:: bash
+
+       ros2 run rqt_image_view rqt_image_view
+
+    Then inside the ``rqt_image_view`` GUI, change the topic to ``/centerpose/image_visualized`` to view the detections projected back onto the input image.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/centerpose_rqt.png>`
+      :width: 600px
+      :align: center
+
+.. note::
+
+   The launch file launches a visualization node for visualization purposes.
+
+   There also is an analogous launch file called ``isaac_ros_centerpose_tensor_rt.launch.py``
+   that can be used if using TensorRT is desired instead of Triton.
+
+
+.. warning::
+
+   CenterPose only produces poses up to a scale. There are a few ways to
+   obtain the scale factor. The original paper simply measured the height of each object.
+   This scale factor can be set using the ``cuboid_scaling_factor``.
+
+Use Different Models
+--------------------
+
+NGC has CenterPose class models that can detect other objects.
+Check them out `here <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/centerpose_ros>`__.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+
+API
+----
+
+Usage
+~~~~~
+
+Two launch files are provided to use this package. The first launch file launches ``isaac_ros_tensor_rt``, whereas the other one uses ``isaac_ros_triton``, along with
+the necessary components to perform encoding on images and decoding of the ``CenterPose`` network's output.
+
+.. warning::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+============================================ ====================
+Launch File                                  Components Used
+============================================ ====================
+``isaac_ros_centerpose_tensor_rt.launch.py`` :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TensorRTNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index>`, :doc:`CenterPoseDecoderNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`, :doc:`CenterPoseVisualizerNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`
+``isaac_ros_centerpose_triton.launch.py``    :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`CenterPoseDecoderNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`, :doc:`CenterPoseVisualizerNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`
+============================================ ====================
+
+CenterPoseDecoderNode
+~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+========================= ============== ========================================================================================================= ===================================================================================================================================================================================
+ROS Parameter             Type           Default                                                                                                   Description
+========================= ============== ========================================================================================================= ===================================================================================================================================================================================
+``output_field_size``     ``int list``   ``[128, 128]``                                                                                            An array of two integers that represent the size of the 2D keypoint decoding from the network output
+``cuboid_scaling_factor`` ``float``      ``1.0``                                                                                                   This parameter is used to scale the cuboid used for calculating the size of the objects detected.
+``score_threshold``       ``float``      ``0.3``                                                                                                   The threshold for scores values to discard. Any score less than this value will be discarded.
+``object_name``           ``string``     ``shoe``                                                                                                  The name of the category instance / object detected.
+========================= ============== ========================================================================================================= ===================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+=============== ==================================================================================================================================================================== ===================================================================
+ROS Topic       Interface                                                                                                                                                            Description
+=============== ==================================================================================================================================================================== ===================================================================
+``tensor_sub``  :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The TensorList that contains the outputs of the CenterPose network.
+``camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                                    The CameraInfo of the original, undistorted image.
+=============== ==================================================================================================================================================================== ===================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+========================= ================================================================================================================================= ===========================================================================================================================================
+ROS Topic                 Interface                                                                                                                         Description
+========================= ================================================================================================================================= ===========================================================================================================================================
+``centerpose/detections`` `vision_msgs/Detection3DArray <https://github.com/ros-perception/vision_msgs/blob/ros2/vision_msgs/msg/Detection3DArray.msg>`__    A ``Detection3DArray`` representing the poses of objects detected by the CenterPose network and interpreted by the CenterPose decoder node.
+========================= ================================================================================================================================= ===========================================================================================================================================
+
+
+CenterPoseVisualizerNode
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+========================= ============== ========================================================================================================= ===================================================================================================================================================================================
+ROS Parameter             Type           Default                                                                                                   Description
+========================= ============== ========================================================================================================= ===================================================================================================================================================================================
+``show_axes``             ``bool``       ``true``                                                                                                  Whether to draw the axes of the detected pose or not.
+``bounding_box_color``    ``int32_t``    ``0x000000ff``                                                                                            The color of the bounding box drawn. Only the last 24 bits are used to draw the color.
+========================= ============== ========================================================================================================= ===================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+========================= ================================================================================================================================ ===================================================================
+ROS Topic                 Interface                                                                                                                        Description
+========================= ================================================================================================================================ ===================================================================
+``image``                 `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                          The original, undistorted image.
+``camera_info``           `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                The CameraInfo of the original, undistorted image.
+``centerpose/detections`` `vision_msgs/Detection3DArray <https://github.com/ros-perception/vision_msgs/blob/ros2/vision_msgs/msg/Detection3DArray.msg>`__  The detections made the CenterPose decoder node.
+========================= ================================================================================================================================ ===================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+=============================== ======================================================================================================== ===============================================================================================================================
+ROS Topic                       Interface                                                                                                Description
+=============================== ======================================================================================================== ===============================================================================================================================
+``centerpose/image_visualized`` `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__  An image containing the detection's bounding box reprojected onto the image and, optionally, the axes of the detected objects.
+=============================== ======================================================================================================== ===============================================================================================================================
+
+.. |package_name| replace:: ``isaac_ros_centerpose``

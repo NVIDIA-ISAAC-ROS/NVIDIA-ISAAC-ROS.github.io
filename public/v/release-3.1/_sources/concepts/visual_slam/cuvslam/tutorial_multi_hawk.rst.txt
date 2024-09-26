@@ -1,0 +1,220 @@
+Tutorial for Visual Odometry Using multiple HAWK Cameras
+========================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/RViz_multicamera_vo_occlusion.gif>`
+   :align: center
+   :width: 600px
+
+Overview
+--------
+
+This tutorial walks you through setting up Multi-camera odometry based on
+:ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>` with
+a Multiple :ir_repo:`Hawk cameras <isaac_ros_argus_camera>`
+mounted on :doc:`Nova Carter </robots/nova_carter/index>`
+
+Tutorial Walkthrough - Multi-camera Visual Odometry Execution
+-------------------------------------------------------------
+
+.. tabs::
+
+    .. tab:: Live on Nova Carter
+
+        1. Complete the :doc:`Nova setup tutorial </robots/nova_carter/getting_started>`.
+
+        2. Complete the :doc:`Robot teleoperation tutorial </robots/nova_carter/demo_teleop>` with the required packages installed 
+           from the apt repository or built from source.
+
+        3. [Terminal 1] Clone the Isaac ROS Examples repository:
+
+        .. code:: bash
+ 
+            cd ${ISAAC_ROS_WS}/src
+            git clone :ir_clone:`<isaac_ros_examples>`
+
+        4. [Terminal 1] Open a new terminal and run the Docker container:
+
+        .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common
+            ./scripts/run_dev.sh 
+
+        5. [Terminal 1] Inside the running container, build and source the workspace:
+
+        .. code:: bash
+
+            cd ${ISAAC_ROS_WS}
+            colcon build --symlink-install \
+                --packages-up-to nova_carter_bringup isaac_ros_multicamera_vo \
+                --packages-skip isaac_ros_ess_models_install isaac_ros_peoplesemseg_models_install
+            source install/setup.bash
+
+        6. [Terminal 1] Run the launch file, which launches the multi-camera visual odometry and wait for 10 seconds:
+
+        .. code:: bash
+
+            ros2 launch isaac_ros_multicamera_vo isaac_ros_visual_slam_multihawk.launch.py use_rosbag:=False
+                
+
+        7. [Terminal 2] Attach another terminal to the running container to execute robot teleoperation:
+
+        .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common
+            ./scripts/run_dev.sh
+
+        8. [Terminal 2] Run the robot teleoperation with all sensors disabled:
+
+        .. code:: bash
+
+            source ${ISAAC_ROS_WS}/install/setup.bash
+            ros2 launch nova_carter_bringup teleop.launch.py \
+                enable_wheel_odometry:=False \
+                enabled_stereo_cameras:=none \
+                enabled_fisheye_cameras:=none \
+                enabled_2d_lidars:=none \
+                enable_3d_lidar:=False \
+                run_foxglove:=False
+
+
+    .. tab:: On a ROSbag
+
+        1. Complete the :doc:`Quick Start guide for Isaac ROS Visual Slam </repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index>`. 
+
+        2. [Terminal 1] Clone the Isaac ROS Examples repository:
+
+        .. code:: bash
+ 
+            cd ${ISAAC_ROS_WS}/src
+            git clone :ir_clone:`<isaac_ros_examples>`
+
+        3. [Terminal 1] Open a new terminal and run the Docker container:
+
+        .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common
+            ./scripts/run_dev.sh
+
+        4. Install the prebuilt dependencies:
+
+        :ir_apt:
+
+        .. code:: bash
+
+            sudo apt-get install -y \
+                ros-humble-image-proc \
+                ros-humble-isaac-ros-h264-decoder \
+                ros-humble-nova-carter-description
+
+        5. [Terminal 1] Inside the running container, build and source the workspace:
+
+        .. code:: bash
+
+            cd ${ISAAC_ROS_WS}
+            colcon build --symlink-install \
+                --packages-up-to isaac_ros_multicamera_vo \
+                --packages-skip isaac_ros_ess_models_install isaac_ros_peoplesemseg_models_install
+            source install/setup.bash
+        
+        6. [Terminal 1] Inside the running container launch the multi-camera visual odometry and wait for 10 seconds:
+
+        .. code:: bash
+
+            ros2 launch isaac_ros_multicamera_vo isaac_ros_visual_slam_multihawk.launch.py use_rosbag:=True
+
+        7. [Terminal 2] Attach another terminal to the running container:
+
+        .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common
+            ./scripts/run_dev.sh
+
+        8. [Terminal 2] Download example rosbags from the `r2b_2024 dataset <https://registry.ngc.nvidia.com/orgs/nvidia/teams/isaac/resources/r2bdataset2024/files>`_.
+
+        .. code:: bash
+
+            mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/rosbags/
+            cd ${ISAAC_ROS_WS}/isaac_ros_assets/rosbags/
+            wget --content-disposition https://api.ngc.nvidia.com/v2/resources/nvidia/isaac/r2bdataset2024/versions/1/zip -O r2bdataset2024_1.zip
+            unzip r2bdataset2024_1.zip
+
+        9. [Terminal 2] Replay the ``r2b_galileo`` rosbag:
+
+        .. code:: bash
+
+            ros2 bag play ${ISAAC_ROS_WS}/isaac_ros_assets/rosbags/r2b_galileo
+
+        .. note::
+
+                The rosbag contains H.264 compressed images, which means it
+                is additionally required to decode each of the 8 FHD
+                video streams. It is known that this may lead to performance
+                problems on a Jetson-based system.  To improve the quality
+                of the visual odometry tracking on rosbags, it is
+                recommended to either use a powerful workstation or slow
+                down the playback speed using the CLI parameter ``--rate``.
+
+
+
+Tutorial Walkthrough - Visualizing the Outputs
+----------------------------------------------
+
+.. note::
+
+    Images and landmarks visualization may impact the performance of Visual Odometry. Please use visualization
+    for debugging and demonstration purposes only. To enable landmark visualization, set the following parameters
+    to ``True`` in the launch file: ``enable_slam_visualization``, ``enable_landmarks_view``, ``enable_observations_view``
+
+
+Visualization with Foxglove Studio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    These examples will stream the camera images in their full resolution to
+    Foxglove Studio. This requires a substantial amount of bandwidth and is only done
+    here for exemplary purposes. Most likely the image stream will be fairly
+    choppy due to the large bandwidth. For a better visualization experience, we
+    recommend only visualizing resized images or H.264 streams.
+
+1. Complete the :ref:`foxglove setup <foxglove-setup>` guide.
+
+2. In Foxglove Studio open the ``foxglove_layout_hawk.json`` layout file, which can be
+   found in the
+   :ir_repo:`isaac_ros_multicamera_vo repository <isaac_ros_examples> <isaac_ros_multicamera_vo/foxglove_layouts/foxglove_layout_hawk.json>`.
+
+3. Validate that you can see a visualization of the Nova Carter robot,
+   images of the front and right stereo cameras, image landmarks and odometry path. 
+   You should expect a visualization similar to the following:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Foxglove_multihawk_vo.png>`
+    :width: 600px
+    :alt: Foxglove visualization of the teleop outputs.
+    :align: center
+
+
+Visualization with RViz2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. [Terminal 3] Attach another terminal to the running container to execute RViz2:
+
+.. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common
+    ./scripts/run_dev.sh
+
+2. [Terminal 3] Open RViz2 from the new terminal attached to the running docker container:
+
+.. code:: bash
+
+    source ${ISAAC_ROS_WS}/install/setup.bash
+    rviz2 -d ${ISAAC_ROS_WS}/src/isaac_ros_examples/isaac_ros_multicamera_vo/rviz/hawk_multicamera_vo.rviz
+
+3. Make sure you see the visualization of the Nova Carter robot's frame tree, images of the front
+   and right stereo camera, image landmarks and odometry path. You should expect a visualization 
+   similar to the following:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Rviz_multihawk_vo.png>`
+      :align: center
+      :width: 600px

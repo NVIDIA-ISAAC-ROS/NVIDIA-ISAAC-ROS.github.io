@@ -1,0 +1,96 @@
+Tutorial for DNN Image Segmentation with NITROS Bridge
+======================================================
+
+Overview
+--------
+
+This tutorial walks you through how to run the ``isaac_ros_unet`` on ROS 2 Humble, while playing rosbag and getting the results from ROS Noetic through ``isaac_ros_nitros_bridge``.
+The tutorial is based on the `ROS1 Bridge documentation <https://github.com/ros2/ros1_bridge>`__.
+
+.. note::
+   ROS actions are not supported by the `ROS1 Bridge <https://github.com/ros2/ros1_bridge>`__
+
+Steps
+-----
+
+#. Complete the :ref:`Isaac ROS Nitros Bridge quickstart <repositories_and_packages/isaac_ros_nitros_bridge/index:quickstart>`.
+
+#. Complete the :ref:`Isaac ROS Unet quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index:quickstart>`.
+
+#. Launch the Docker container using the run_dev.sh script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh -d ${HOME}/workspaces --docker_arg "--pid=host"
+
+#. Launch the image converter launch file of ``isaac_ros_nitros_bridge``:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev/ && \
+         source install/setup.bash && \
+         ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_nitros_bridge_image_converter.launch.py sub_image_name:=unet/colored_segmentation_mask pub_image_name:=image
+
+#. **Attach a second terminal** to the docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh -d ${HOME}/workspaces
+
+#. Run the following launch files to spin up ``isaac_ros_unet``, (you may need to re-download the ``unet models`` and convert them since now you are in a new container):
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev/ && \
+         source install/setup.bash && \
+         ros2 launch isaac_ros_unet isaac_ros_unet_tensor_rt.launch.py engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegnet/deployable_quantized_vanilla_unet_v2.0/1/model.plan input_binding_names:=['input_1:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax' input_image_width:=1200 input_image_height:=632
+
+
+#. Open another Terminal, launch the **Noetic** docker container:
+
+   .. code:: bash
+
+      docker run -it --cap-add=SYS_PTRACE --privileged --network host --pid host --runtime nvidia --name nitros_bridge --rm nitros_bridge:latest nitros_bridge_image_converter.yaml nitros_bridge_image_converter.launch /image /ros1_output_image
+
+#. **Attach a second terminal** to the **Noetic** docker container:
+
+   .. code:: bash
+
+      docker exec -it nitros_bridge /bin/bash
+
+#. Pull down a rosbag of image segmentation sample:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros_1-dev/src/isaac_ros_nitros_bridge && \
+        git lfs pull -X "" -I "resources/unet_sample_data_ros1.bag"
+
+#. Play the rosbag under ROS Noetic:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros_1-dev/ && \
+        source install_isolated/setup.bash && \
+        rosbag play -l "src/isaac_ros_nitros_bridge/resources/unet_sample_data_ros1.bag"
+
+#. **Attach a third terminal** to the **Noetic** docker container:
+
+   .. code:: bash
+
+      docker exec -it nitros_bridge /bin/bash
+
+#.  Use ``rostopic`` to echo in the container:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros_1-dev && \
+        source install_isolated/setup.bash && \
+        rostopic echo /ros1_output_image
+
+#. Example output use ``rostopic hz``:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nitros_bridge/nitros_bridge_unet.png>`
+      :width: 320px
+      :align: center

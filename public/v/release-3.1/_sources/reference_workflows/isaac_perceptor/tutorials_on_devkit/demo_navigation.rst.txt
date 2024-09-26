@@ -1,0 +1,201 @@
+Tutorial: Integrating `Isaac Perceptor` with `ROS2 Nav2` on a robot with `Nova Orin Developer Kit`
+====================================================================================================
+
+.. _ROS2 Nav2: https://nav2.org/
+
+This will guide you through the most important steps to using the `Nova Orin Developer Kit` with
+`ROS2 Nav2`_ on your own robot.
+
+
+Benefits of integrating Isaac Perceptor with a Navigation Stack
+---------------------------------------------------------------
+
+By integrating `Isaac Perceptor`` with your navigation stack you can benefit from all
+advantages of camera-based perception:
+
+- **Enhanced Obstacle Detection**: `Isaac Perceptor` leverages camera-based local
+  perception, allowing for the detection of low-lying obstacles that traditional
+  2D LiDARs may miss. This capability enhances the robot's ability to navigate
+  complex environments safely and efficiently.
+
+- **Cost-Effective Solution**: Cameras are significantly cheaper than 3D LiDARs,
+  making `Isaac Perceptor` a cost-effective alternative without compromising on the
+  quality of perception. This cost efficiency allows for broader deployment of
+  advanced perception capabilities in various robotic applications.
+
+- **Improved Semantic Understanding**: Unlike LiDARs, cameras can provide rich
+  semantic information about the environment. `Isaac Perceptor` can classify and
+  identify specific objects, such as humans, and determine their positions. This
+  advanced scene understanding enables more intelligent and context-aware
+  navigation, crucial for applications in dynamic environments.
+
+- **Future-Proofing**: By incorporating camera-based perception, you are positioning
+  your robotic system for future advancements in computer vision and AI. This
+  approach ensures that your system remains adaptable and can take advantage of
+  the latest innovations in perception technology.
+
+
+Prerequisites
+-------------
+
+For this tutorial, you must have completed the
+:doc:`Tutorial: Running Camera-based 3D Perception with Isaac Perceptor</reference_workflows/isaac_perceptor/tutorials_on_devkit/demo_perceptor>`
+It is also assumed that you are familiar with `ROS2 Nav2`_ and that you are able to use it for
+lidar-based autonomous navigation on your robot. In this tutorial, we will guide you through
+essential steps to replace the lidar-based local perception with camera-based 3D perception
+from `Isaac Perceptor`.
+
+Lastly, it is assumed that you have rigidly mounted the `Nova Orin Developer Kit` on
+your own robot and successfully completed :doc:`calibration</robots/nova_carter/demo_calibration>`.
+
+Instructions
+------------
+
+1. Install the required apt-packages into your environment
+
+    :ir_apt:
+
+    .. code:: bash
+
+        sudo apt-get install -y ros-humble-nova-developer-kit-bringup
+
+
+2. Add `Isaac Perceptor` to your existing `ROS2 Nav2`_ launch file by
+   including the
+   :ir_repo:`perceptor.launch.py of the nova_developer_kit_bringup package <nova_developer_kit> <nova_developer_kit_bringup/launch/perceptor.launch.py>`.
+
+   A rough example of the resulting launch filed is as follows. Please note that
+   this launch file is incomplete and requires modifications and additions
+   specific to your setup.
+
+    .. code:: py
+
+        from launch import LaunchDescription
+        from launch.actions import IncludeLaunchDescription
+        from launch.launch_description_sources import PythonLaunchDescriptionSource
+        from launch_ros.substitutions import FindPackageShare
+
+        def generate_launch_description():
+            # Create the LaunchDescription object.
+            launch_description = LaunchDescription()
+
+            # Include the perceptor.launch.py from the nova_developer_kit_bringup package
+            perceptor_launch = IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    FindPackageShare('nova_developer_kit_bringup'),
+                    '/launch/perceptor.launch.py'
+                ]),
+                launch_arguments={'stereo_camera_configuration': 'front_left_right_configuration'}.items()
+            )
+            ld.add_action(perceptor_launch)
+
+            # Add any other ROS2 nodes you might need here.
+            ld.add_action(...)
+
+            # Include the Nav2 lidar localization:
+            localization_launch = IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    FindPackageShare('nav2_bringup'),
+                    'launch/localization_launch.py',
+                ]),
+                # Make sure to replace the parameters below with valid paths.
+                launch_arguments={
+                    'map': 'path/to/map/yaml',
+                    'params_file': 'path/to/nav2/parameters'
+                }.items(),
+            )
+            ld.add_action(localization_launch)
+
+            # Include the Nav2 launch file:
+            nav2_launch = IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
+                    FindPackageShare('nav2_bringup'),
+                    'launch/navigation_launch.py',
+                ]),
+                # Make sure to replace the params_file below with a valid path.
+                launch_arguments={'params_file': 'path/to/nav2/parameters'}.items(),
+            )
+            ld.add_action(nav2_launch)
+
+            return launch_description
+
+.. note::
+
+   You can customize the sensor configuration of `Isaac Perceptor` by providing the
+   ``stereo_camera_configuration`` launch argument. For a detailed description of all
+   available configurations refer to
+   :doc:`Tutorial: Stereo Camera Configurations for Isaac Perceptor
+   </reference_workflows/isaac_perceptor/tutorials_on_devkit/tutorial_stereo_camera_configurations>`.
+
+.. note::
+
+    If you are using node composition please make sure to use separate ROS2
+    component containers for the Perceptor nodes and the Nav2 nodes. The
+    Perceptor nodes have to be in a ``component_container_mt`` container,
+    whereas the Nav2 nodes cannot be in a ``component_container_mt`` node due to
+    a race-condition in ROS2 humble's action server.
+
+3. Update your Nav2 parameters to include `Isaac nvblox` as a layer in the local
+   costmap. We assume you have the Nav2 parameters stored in a YAML file. You will
+   have to add the definition of the `Isaac nvblox` costmap layer to the parameters of your
+   local costmap:
+
+    .. code:: yaml
+
+        local_costmap:
+            nvblox_layer:
+            plugin: "nvblox::nav2::NvbloxCostmapLayer"
+            enabled: True
+            nav2_costmap_global_frame: odom # must match with global_frame of local_costmap
+            nvblox_map_slice_topic: "/nvblox_node/static_map_slice"
+            convert_to_binary_costmap: True
+
+   Additionally then also include the new nvblox_layer in the ``plugins`` parameter of the
+   local costmap next to any other layers you may already have:
+
+    .. code:: yaml
+
+        plugins: ['nvblox_layer', '<any-additional-layers-you-may-have>']
+
+   In summary, the parameters of your local costmap should now look
+   something like this (you will most likely have additional costmap plugins and
+   different parameters):
+
+    .. code:: yaml
+
+        local_costmap:
+            local_costmap:
+                ros__parameters:
+                    footprint_padding: 0.03
+                    update_frequency: 5.0
+                    publish_frequency: 2.0
+                    global_frame: odom
+                    robot_base_frame: base_link
+                    rolling_window: true
+                    width: 5
+                    height: 5
+                    resolution: 0.05
+                    transform_tolerance: 0.3
+                    footprint: "[ [0.14, 0.25], [0.14, -0.25], [-0.607, -0.25], [-0.607, 0.25] ]"
+                    mark_threshold: 2
+                    always_send_full_costmap: True
+                    plugins: ['nvblox_layer', 'inflation_layer']
+                    inflation_layer:
+                        plugin: "nav2_costmap_2d::InflationLayer"
+                        enabled: True
+                        cost_scaling_factor: 10.0
+                        inflation_radius: 0.8
+                    nvblox_layer:
+                        plugin: "nvblox::nav2::NvbloxCostmapLayer"
+                        enabled: True
+                        nav2_costmap_global_frame: odom # must match with global_frame of local_costmap
+                        nvblox_map_slice_topic: "/nvblox_node/static_map_slice"
+                        convert_to_binary_costmap: True
+
+Integration Reference Example
+-----------------------------
+
+For a complete example of how to integrate `Isaac Perceptor` with ROS2 Nav2 we
+recommend taking a look at the 
+:ir_repo:`navigation launch file <nova_carter> <nova_carter_bringup/launch/navigation.launch.py>` 
+for the `Nova Carter` robot.

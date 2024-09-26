@@ -1,0 +1,35 @@
+Tutorial to Run NITROS-Accelerated Graph with Argus Camera
+==========================================================
+
+.. mermaid::
+
+   graph LR;
+       argus_node("ArgusStereoNode (Raw Image)") --> left_rectify_node("RectifyNode (Rectified Image)");
+       argus_node --> right_rectify_node("RectifyNode (Rectified Image)");
+       left_rectify_node --> ess_node("ESSDisparityNode (DNN Inference)");
+       right_rectify_node --> ess_node;
+       ess_node --> point_cloud_point("PointCloudNode (Point Cloud Output)");
+
+If you have an
+:ir_repo:`Argus-compatible camera <isaac_ros_argus_camera>`,
+you can also use the launch file provided in this package to start a
+fully NITROS-accelerated stereo disparity graph.
+
+To start the graph:
+
+1. Follow the :ref:`quickstart <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index:quickstart>` up to
+   step 6.
+
+2. Inside the container, install the ``isaac_ros_argus_camera`` package.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-argus-camera
+
+3. Launch ESS Disparity Node:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_ess isaac_ros_argus_ess.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine

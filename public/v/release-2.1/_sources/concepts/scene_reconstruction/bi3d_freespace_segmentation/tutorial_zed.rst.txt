@@ -1,0 +1,70 @@
+Tutorial for Freespace Segmentation using a ZED Camera
+======================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/bi3d_freespace_rviz.gif>`
+   :width: 600px
+   :align: center
+
+Overview
+--------
+
+This tutorial demonstrates how to use a
+`ZED <https://www.stereolabs.com/>`__ camera and
+:ir_repo:`isaac_ros_bi3d_freespace <isaac_ros_freespace_segmentation> <isaac_ros_bi3d_freespace>`
+to create a local occupancy grid.
+
+.. note::
+
+   This tutorial requires a compatible ZED camera from the
+   list of available
+   :ref:`cameras <getting_started/hardware_setup/sensors/zed_setup:camera compatibility>`.
+
+Tutorial Walkthrough
+--------------------
+
+1. Complete the
+   :doc:`ZED setup tutorial </getting_started/hardware_setup/sensors/zed_setup>`.
+2. Complete steps 1-7 described in the
+   :ref:`Freespace Quickstart <repositories_and_packages/isaac_ros_freespace_segmentation/isaac_ros_bi3d_freespace/index:quickstart>`.
+3. Open a new terminal and launch the Docker container using the
+   ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+5. Set your camera as shown in the image below, which is on a
+   tripod ~5cm tall and parallel to the ground. Or you can change the
+   static transform in the launch file
+   :ir_repo:`here <isaac_ros_freespace_segmentation> <isaac_ros_bi3d_freespace/launch/isaac_ros_bi3d_freespace_zed.launch.py#L144-157>`,
+   according to the placement of your camera with respect to an occupancy
+   grid origin frame.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/zed_bi3d_freespace_position.jpg>`
+      :width: 400px
+      :align: center
+
+      **Note**: If you are not using the ZED2i camera, modify the
+      ``camera_model`` variable in the
+      :ir_repo:`launch file <isaac_ros_freespace_segmentation> <isaac_ros_bi3d_freespace/launch/isaac_ros_bi3d_freespace_zed.launch.py>`
+      to ``zed``, ``zed2``, ``zed2i``, ``zedm``, ``zedx``, or ``zedxm``.
+
+6. Run the launch file, to launch the example:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_bi3d_freespace isaac_ros_bi3d_freespace_zed.launch.py featnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_featnet.plan \
+      segnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_segnet.plan \
+      max_disparity_values:=16
+
+   You should see an output similar to the one shown at the top of this
+   page.

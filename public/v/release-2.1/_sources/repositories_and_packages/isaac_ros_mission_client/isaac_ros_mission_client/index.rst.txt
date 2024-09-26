@@ -1,0 +1,47 @@
+===============================
+|package name|
+===============================
+
+:ir_github:`<isaac_ros_mission_client> <>`
+
+Overview
+^^^^^^^^
+
+The launch script, under the launch directory, brings up the MQTT bridge nodes and the VDA5050 Nav2 Client node.
+
+.. toctree::
+
+    /concepts/missions/isaac_ros_mission_client.rst
+
+Usage
+^^^^^^
+
+.. code-block:: bash
+
+    ros2 launch isaac_ros_vda5050_nav2_client_bringup isaac_ros_vda5050_client.launch.py namespace:=<"namespace for ros graph"> mqtt_host_name:=<"mqtt_host_name"> mqtt_transport:=<"mqtt_transport"> mqtt_pub_topic:=<"mqtt_pub_topic"> ros_subscriber_type:=<"ros_subscriber_type"> ros_to_mqtt_name:=<"ros_to_mqtt_name"> mqtt_sub_topic:=<"mqtt_sub_topic"> ros_publisher_type:=<"ros_publisher_type"> mqtt_to_ros_name:=<"mqtt_to_ros_name">
+
+ROS Parameters
+^^^^^^^^^^^^^^^
+
+======================== =========== ============================= ===== ==============================================================================================================================================================
+ROS Parameter            Type        Default                             Description                                                                                                                                                 
+======================== =========== ============================= ===== ==============================================================================================================================================================
+``namespace``            ``string``  ``(Empty string)``                  The ROS namespace used for the ROS graph. e.g. `carter`                                                                                                     
+``mqtt_host_name``       ``string``  ``localhost``                       The MQTT broker IP to connect to. e.g. `192.168.25.32`                                                                                                      
+``mqtt_port``            ``string``  ``1883``                            The MQTT broker port                                                                                                                                        
+``mqtt_transport``       ``string``  ``tcp``                             The protocol to use for sending MQTT messages (either `tcp` or `websockets`)                                                                                
+``mqtt_ws_path``         ``string``  ``''``                              The path for the WebSocket if the protocol set in `mqtt_transport` is `websockets`                                                                          
+``mqtt_pub_topic``       ``string``  ``/uagv/v1/carter01/state``         The MQTT topic to publish MQTT messages                                                                                                                     
+``mqtt_sub_topic``       ``string``  ``/uagv/v1/carter01/order``         The MQTT topic to subscribe for incoming MQTT messages                                                                                                      
+``ros_publisher_type``   ``string``  ``vda5050_msgs/Order``              The ROS message type to convert incoming MQTT messages to                                                                                                   
+``ros_subscriber_type``  ``string``  ``vda5050_msgs/AGVState``           The ROS message type that outgoing MQTT message are converted from                                                                                          
+``ros_to_mqtt_name``     ``string``  ``Carter01_RosToMqttBridge``        The MQTT client name for the RosToMqtt Node                                                                                                                 
+``mqtt_to_ros_name``     ``string``  ``Carter01_MqttToRosBridge``        The MQTT client name for the MqttToRos Node                                                                                                                 
+``retry_forever``        ``bool``    ``true``                            Retry connecting forever if connection to MQTT message broker is not established                                                                            
+``reconnect_period``     ``int``     ``5``                               The period of time to wait before retrying to connect to MQTT message broker (in seconds)                                                                   
+``num_retries``          ``int``     ``10``                              The number of reconnection retries to connect to the MQTT message broker before giving up. This setting is only valid if ``retry_forever`` is set to ``false``  
+``ros_recorder``         ``bool``    ``false``                           Launches ``isaac_ros_scene_recorder``_ if set to ``true``                                                                           
+======================== =========== ============================= ===== ==============================================================================================================================================================
+
+
+.. |package name| replace:: Isaac ROS Mission Client
