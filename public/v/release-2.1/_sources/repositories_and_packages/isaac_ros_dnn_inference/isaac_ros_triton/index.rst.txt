@@ -1,0 +1,237 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_dnn_inference> <isaac_ros_triton>`
+
+Quickstart
+----------
+
+.. note::
+
+   This quickstart demonstrates |package_name| in an image segmentation application.
+   Therefore, this demo features an encoder and decoder node to perform
+   pre-processing and post-processing respectively. In reality, the
+   raw inference result is simply a tensor.
+
+   To use the packages in other useful contexts, please refer
+   :doc:`here </repositories_and_packages/isaac_ros_dnn_inference/index>`.
+
+1.  Set up your development environment by following the instructions
+    :doc:`here </getting_started/dev_env_setup>`.
+2.  Clone ``isaac_ros_common``, ``isaac_ros_image_segmentation``, and this repository under ``${ISAAC_ROS_WS}/src``.
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_image_segmentation>`
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_dnn_inference>`
+
+3.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+4.  Install this package's dependencies, along with an additional package used for this quickstart.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-triton ros-humble-isaac-ros-unet
+
+5.  This example uses ``PeopleSemSegNet ShuffleSeg``.
+    Download the ETLT file and the ``int8`` inference mode cache file:
+
+    .. code:: bash
+
+       mkdir -p /tmp/models/peoplesemsegnet_shuffleseg/1 && \
+         cd /tmp/models/peoplesemsegnet_shuffleseg && \
+         wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_etlt.etlt && \
+         wget https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_shuffleseg_unet_v1.0/files/peoplesemsegnet_shuffleseg_cache.txt
+
+6.  Convert the ETLT file to a TensorRT plan file:
+
+    .. code:: bash
+
+       /opt/nvidia/tao/tao-converter -k tlt_encode -d 3,544,960 -p input_2:0,1x3x544x960,1x3x544x960,1x3x544x960 -t int8 -c peoplesemsegnet_shuffleseg_cache.txt -e /tmp/models/peoplesemsegnet_shuffleseg/1/model.plan -o argmax_1 peoplesemsegnet_shuffleseg_etlt.etlt
+
+7.  Create a file named
+    ``/tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt`` by copying
+    the sample Triton config file:
+
+    .. code:: bash
+
+       cp /workspaces/isaac_ros-dev/src/isaac_ros_dnn_inference/resources/peoplesemsegnet_shuffleseg_config.pbtxt /tmp/models/peoplesemsegnet_shuffleseg/config.pbtxt
+
+8.  Run the following launch files to spin up a demo of this package:
+    Launch Triton:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_unet isaac_ros_unet_triton.launch.py model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax' input_image_width:=1200 input_image_height:=632
+
+    In **another** terminal, enter the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then, play the ROS bag from ``isaac_ros_image_segmentation``:
+
+    .. code:: bash
+
+       ros2 bag play -l src/isaac_ros_image_segmentation/resources/rosbags/unet_sample_data/
+
+9.  Visualize and validate the output of the package:
+
+    In a **third** terminal, enter the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then echo the inference result:
+
+    .. code:: bash
+
+       ros2 topic echo /tensor_sub
+
+    The expected result should look like this:
+
+    .. code:: bash
+
+       header:
+         stamp:
+           sec: <time>
+           nanosec: <time>
+         frame_id: <frame-id>
+       tensors:
+       - name: output_tensor
+         shape:
+           rank: 4
+           dims:
+           - 1
+           - 544
+           - 960
+           - 1
+         data_type: 5
+         strides:
+         - 2088960
+         - 3840
+         - 4
+         - 4
+         data:
+         [...]
+
+    This result is not very useful friendly. It's typically more desirable to see the network output after it's decoded.
+    The result of the entire image segmentation pipeline can be visualized by launching ``rqt_image_view``:
+
+    .. code:: bash
+
+       ros2 run rqt_image_view rqt_image_view
+
+    Then inside the ``rqt_image_view`` GUI, change the topic to ``/unet/colored_segmentation_mask`` to view a colorized segmentation mask.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/peoplesemsegnet_shuffleseg_rqt.png>`
+      :align: center
+
+   .. note::
+
+      A launch file called ``isaac_ros_triton.launch.py`` is provided in this package to launch only Triton.
+
+   .. warning::
+
+      The Triton Inference node expects tensors as input and outputs tensors.
+
+      The node inference itself is generic; as long as the input data can be converted into a tensor, and
+      the model that is used is correctly trained on said input data.
+
+      For example, Triton can be used with models that are trained on images, audio and more, but
+      the necessary encoder and decoder node must be implemented.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~
+
+This package contains a launch file that solely launches ``isaac_ros_triton``.
+
+.. warning::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+   Additionally, for most applications, an encoder node for pre-processing your data source and
+   decoder for post-processing the inference output is required.
+
+====================================== ====================
+Launch File                            Components Used
+====================================== ====================
+``isaac_ros_triton.launch.py``         :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`
+====================================== ====================
+
+TritonNode
+~~~~~~~~~~
+
+=========================== =============== ======================== ===================================================================================================================================================================================================================================
+ROS Parameter               Type            Default                  Description
+=========================== =============== ======================== ===================================================================================================================================================================================================================================
+``model_repository_paths``  ``string list`` ``['']``                 The absolute paths to your model repositories in your local file system (the structure should follow Triton requirements) E.g. ``['/tmp/models']``
+``model_name``              ``string``      ``''``                   The name of your model. Under ``model_repository_paths``, there should be a directory with this name, and it should align with the model name in the model configuration under this directory  E.g. ``peoplesemsegnet_shuffleseg``
+``max_batch_size``          ``uint16_t``    ``8``                    The maximum batch size allowed for the model. It should align with the model configuration
+``num_concurrent_requests`` ``uint16_t``    ``10``                   The number of requests the Triton server can take at a time. This should be set according to the tensor publisher frequency
+``input_tensor_names``      ``string list`` ``['input_tensor']``     A list of tensor names to be bound to specified input bindings names. Bindings occur in sequential order, so the first name here will be mapped to the first name in input_binding_names
+``input_binding_names``     ``string list`` ``['']``                 A list of input tensor binding names specified by model E.g. ``['input_2:0']``
+``input_tensor_formats``    ``string list`` ``['']``                 A list of input tensor NITROS formats. This should be given in sequential order E.g. ``['nitros_tensor_list_nchw_rgb_f32']``
+``output_tensor_names``     ``string list`` ``['output_tensor']``    A list of tensor names to be bound to specified output binding names
+``output_binding_names``    ``string list`` ``['']``                 A list of tensor names to be bound to specified output binding names E.g. ``['argmax_1']``
+``output_tensor_formats``   ``string list`` ``['']``                 A list of input tensor NITROS formats. This should be given in sequential order E.g. ``[nitros_tensor_list_nchw_rgb_f32]``
+=========================== =============== ======================== ===================================================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+============== ==================================================================================================================================================================== =======================
+ROS Topic      Type                                                                                                                                                                 Description
+============== ==================================================================================================================================================================== =======================
+``tensor_pub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The input tensor stream
+============== ==================================================================================================================================================================== =======================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============== ==================================================================================================================================================================== ==========================================================
+ROS Topic      Type                                                                                                                                                                 Description
+============== ==================================================================================================================================================================== ==========================================================
+``tensor_sub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The tensor list of output tensors from the model inference
+============== ==================================================================================================================================================================== ==========================================================
+
+.. |package_name| replace:: ``isaac_ros_triton``

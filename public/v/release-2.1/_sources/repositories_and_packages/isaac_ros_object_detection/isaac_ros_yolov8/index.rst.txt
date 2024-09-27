@@ -1,0 +1,181 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_object_detection> <isaac_ros_yolov8>`
+
+Quickstart
+----------
+
+1. Set up your development environment by following the instructions
+   :doc:`here </getting_started/dev_env_setup>`.
+2.  Clone ``isaac_ros_common`` and this repository under ``${ISAAC_ROS_WS}/src``.
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src
+
+    .. code:: bash
+
+       git clone :ir_clone:`<isaac_ros_common>`
+
+   .. code:: bash
+
+      git clone :ir_clone:`<isaac_ros_object_detection>`
+
+3. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+4. Install this package's dependencies.
+
+   :ir_apt:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-yolov8 ros-humble-isaac-ros-tensor-rt ros-humble-isaac-ros-dnn-image-encoder
+
+5. Download the model of your choice from `Ultralytics YOLOv8 <https://github.com/ultralytics/ultralytics#models>`__.
+   
+   .. warning::
+
+      This step must be performed on ``x86_64``.
+   
+   For this example, we use `YOLOv8s <https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s.pt>`__.
+
+   .. code:: bash
+
+      cd /tmp && \
+         wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8s.pt
+
+6. Export to `ONNX <https://onnx.ai/>`__ following instructions `here <https://docs.ultralytics.com/modes/export/>`__.
+   
+   .. warning::
+      
+      This step must be performed on ``x86_64``. 
+
+   Arguments can be specified for FP16 quantization during this step. This ONNX model is converted to a TensorRT engine 
+   file and used with the Isaac ROS TensorRT node for inference. You can use `netron <https://netron.app/>`__ to 
+   visualize the ONNX model and note input and output names and dimensions.
+
+   This can be done by first installing ``ultralytics`` and ``onnx`` via pip:
+
+   .. code:: bash
+
+      pip3 install ultralytics
+      pip3 install onnx
+   
+   Afterwards, convert the model from a ``.pt`` file to a ``.onnx`` model using ``ultralytics``. This can be done by running:
+   
+   .. code:: bash
+   
+      cd /tmp && \
+         python3
+
+   Then within ``python3``, export the model:
+
+   .. code:: python
+
+      >> from ultralytics import YOLO
+      >> model = YOLO('yolov8s.pt')
+      >> model.export(format='onnx')
+
+   If you are planning on using Jetson, copy the generated ``.onnx``
+   model into the Jetson, and then copy it over into ``aarch64`` Docker
+   container.
+
+   We will assume that you already performed the transfer of the model
+   onto the Jetson in the directory ``~/Downloads``.
+
+   Enter the Docker container in Jetson:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+   Make a directory called ``/tmp`` in Jetson:
+
+   .. code:: bash
+
+      mkdir -p /tmp
+
+   **Outside** the container, copy the generated ``onnx`` model:
+
+   .. code:: bash
+
+      cd ~/Downloads && \
+      docker cp yolov8s.onnx isaac_ros_dev-aarch64-container:/tmp
+
+7.  Run the following launch file to perform YOLOv8 detection using TensorRT:
+   
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+         ros2 launch isaac_ros_yolov8 isaac_ros_yolov8_visualize.launch.py model_file_path:=/tmp/yolov8s.onnx engine_file_path:=/tmp/yolov8s.plan input_binding_names:=['images'] output_binding_names:=['output0'] network_image_width:=640 network_image_height:=640 force_engine_update:=False image_mean:=[0.0,0.0,0.0] image_stddev:=[1.0,1.0,1.0] input_image_width:=640 input_image_height:=640 confidence_threshold:=0.25 nms_threshold:=0.45
+ 
+   .. note:: 
+
+      A method of running the detections without visualization is available by using the ``yolov8_tensor_rt.launch.py`` launch file in this package.
+
+      The output bounding boxes here will be published on the ``/detections/output`` topic.
+
+8.  Run the image publisher node to publish input images for inference. 
+    A sample image (``people_cycles.jpg``) is provided :ir_repo:`here <isaac_ros_object_detection> <resources/people_cycles.jpg>`:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev/src/isaac_ros_object_detection && \
+          ros2 run image_publisher image_publisher_node resources/people_cycles.jpg --ros-args --remap /image_raw:=/image 
+
+9.  Visualize and validate the output of the package in the
+    ``rqt_image_view`` window. Inside the RQT image window that should have popped up, the output should look like:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/people-cycling-results.png>`
+      :alt: RQT showing detection of people cycling and bikes
+      :align: center
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_yolov8 yolov8_tensor_rt.launch.py model_file_path:=<model_file_path> engine_file_path:=<engine_file_path> input_binding_names:=<input_binding_names> output_binding_names:=<output_binding_names> network_image_width:=<network_image_width> network_image_height:=<network_image_height> force_engine_update:=<force_engine_update> image_mean:=<image_mean> image_stddev:=<image_stddev>
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+=============================== ============ ============================= ===========================================================================================================================================================================================================================
+ROS Parameter                   Type         Default                       Description
+=============================== ============ ============================= ===========================================================================================================================================================================================================================
+``tensor_name``                 ``string``   ``"output_tensor"``           Name of the inferred output tensor published by the Managed NITROS Publisher. The decoder uses this name to get the output tensor.
+``confidence_threshold``        ``float``    ``0.25``                      Detection confidence threshold. Used to filter candidate detections during Non-Maximum Suppression (NMS).
+``nms_threshold``               ``float``    ``0.45``                      NMS IOU threshold.
+=============================== ============ ============================= ===========================================================================================================================================================================================================================
+
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+============== ==================================================================================================================================================================== ===================================================================================================
+ROS Topic      Interface                                                                                                                                                            Description
+============== ==================================================================================================================================================================== ===================================================================================================
+``tensor_sub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      Tensor list from the managed NITROS subscriber that represents the inferred aligned bounding boxes.
+============== ==================================================================================================================================================================== ===================================================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+======================== =============================================================================================================================== ==================================================
+ROS Topic                Interface                                                                                                                       Description
+======================== =============================================================================================================================== ==================================================
+``detections_output``    `vision_msgs/Detection2DArray <https://github.com/ros-perception/vision_msgs/blob/ros2/vision_msgs/msg/Detection2DArray.msg>`__ Aligned image bounding boxes with detection class.
+======================== =============================================================================================================================== ==================================================
+
+.. |package_name| replace:: ``isaac_ros_yolov8``

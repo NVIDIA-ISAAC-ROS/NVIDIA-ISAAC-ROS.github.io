@@ -1,0 +1,95 @@
+=========================
+Isaac ROS ZED Setup
+=========================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/zed_parts.png>`
+   :width: 200px
+   :align: center
+
+ZED cameras require the following to be able to publish data to ROS 2 topics:
+
+1. ZED SDK (Installed by ``Dockerfile.zed``)
+2. ``zed-ros2-wrapper`` (Cloned in Step 1 of Setup Instructions)
+3. ZED X driver (Installed by user on host machine in Step 3 of Setup Instructions)
+
+Camera Compatibility
+--------------------
+
+All cameras supported by the `zed ros2 wrapper <https://github.com/stereolabs/zed-ros2-wrapper>`_ work with Isaac ROS.
+
+================= ==============
+ZED Model         SQA Testing?
+================= ==============
+ZED 2i              ✓
+ZED X               ✓
+ZED 2               ✗
+ZED                 ✗
+ZED Mini            ✗
+ZED X Mini          ✗
+================= ==============
+
+
+Setup Instructions
+------------------
+
+.. note::
+
+  This tutorial assumes that you have set up your development environment by following the instructions :doc:`here </getting_started/dev_env_setup>`.
+
+1. Clone the ``zed-ros2-wrapper`` repository:
+
+  .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+      git clone --recurse-submodules https://github.com/stereolabs/zed-ros2-wrapper
+  .. note::
+    You must checkout humble-v4.0.8 branch of ``zed-ros2-wrapper`` repository for X86.
+      
+
+2. If you are using ZED X or ZED X Mini refer to the appropriate `stereolabs setup guide <https://www.stereolabs.com/docs/get-started-with-zed-x/>`_.
+
+  .. note::
+    You do **not** need to install the ``ZED SDK`` because this is done by ``Dockerfile.zed``.
+
+  .. note::
+    You must install the ``ZED driver``.
+
+
+3. Plug in the USB cable of your ZED camera before launching the Docker container in the next step.
+
+4. Configure the container created by ``isaac_ros_common/scripts/run_dev.sh`` to include ``Dockerfile.zed``. Create the ``.isaac_ros_common-config`` file in the ``isaac_ros_common/scripts`` directory:
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts && \
+    touch .isaac_ros_common-config && \
+    echo CONFIG_IMAGE_KEY=ros2_humble.user.zed >> .isaac_ros_common-config
+
+5. Launch the Docker container.
+
+  .. code:: bash
+
+    cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+    ./scripts/run_dev.sh
+
+  This rebuilds the container image using ``Dockerfile.zed`` in one of its layered stage. It takes some time for rebuilding.
+
+6. Install the dependencies for the ``zed_wrapper`` package and build it:
+
+  .. code:: bash
+
+      cd ${ISAAC_ROS_WS} && \
+      sudo apt update && \
+      rosdep install --from-paths src/zed-ros2-wrapper --ignore-src -r -y && \
+      colcon build --symlink-install --packages-up-to zed_wrapper
+
+7. After the container image is rebuilt and you are inside the container, you can run ``/usr/local/zed/tools/ZED_Explorer`` to check that the ZED camera is connected.
+
+  .. code:: bash
+
+    /usr/local/zed/tools/ZED_Explorer
+
+  If everything is working as expected, you should see something similar to the following:
+
+  .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/zed_explorer.png>`
+     :align: center

@@ -1,0 +1,117 @@
+===========
+|repo_name|
+===========
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_overview.png>`
+    :width: 500px
+    :align: center
+
+Overview
+--------
+
+.. include:: _snippets/overview.rst
+
+Packages
+--------
+
+.. toctree::
+    :maxdepth: 2
+    :glob:
+
+    **/index
+
+
+Supported Platforms
+-------------------
+
+.. include:: _snippets/supported_platforms.rst
+
+
+Quickstart
+----------
+
+.. include:: /concepts/nitros_bridge/_snippets/setup_ros1_steps.rst
+
+Now, we can playback a test rosbag through the bridge. The launch file will 
+send out the images from the rosbag through the NITROS bridge from ROS 2 to 
+ROS 1, then echo back to ROS2 for visualize.
+
+#. Pull down a rosbag of sample data:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_nitros_bridge && \ 
+        git lfs pull -X "" -I "resources/quickstart.bag"
+
+
+#. (Optional) Run tests to verify complete and correct installation:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
+      colcon test --executor sequential --packages-skip ros1_bridge
+
+#. Run the following launch files to spin up a demo of this package:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev/isaac_ros-dev && \
+      source install/setup.bash && \
+      ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_nitros_bridge.launch.py rosbag_path:=/workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_nitros_bridge/resources/quickstart.bag/ ros1_ws_path:=/workspaces/isaac_ros-dev/isaac_ros_1-dev/
+
+#. Attach another terminal to the container, visualize the output topic ``/ros2_output_image`` in RViz:
+
+   .. code:: bash
+
+      source isaac_ros-dev/install/setup.bash && \
+        rviz2
+
+
+Try Another Example
+-------------------
+
+For an example of a more advanced setup with talkers and listeners, see :doc:`here</concepts/nitros_bridge/ros1_bridge_setup>`.
+For an example to run DNN image segmentation with NITROS bridge, see :doc:`here</concepts/nitros_bridge/unet_with_nitros_bridge>`.
+
+.. toctree::
+    :hidden:
+
+    /concepts/nitros_bridge/ros1_bridge_setup.rst
+    /concepts/nitros_bridge/unet_with_nitros_bridge.rst
+
+    
+
+Troubleshooting
+---------------
+
+Could not find a package configuration file provided by ``ament_cmake_auto``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptoms
+~~~~~~~~
+
+If you have both ROS 1 and ROS 2 installed in the Docker environment,
+you may see the following error message while building ROS 2 packages:
+
+ .. code:: bash
+
+  Could not find a package configuration file provided by "ament_cmake_auto"
+  with any of the following names:
+    ament_cmake_autoConfig.cmake
+    ament_cmake_auto-config.cmake
+
+Solution
+~~~~~~~~
+
+You must source ``setup.bash`` from the ROS 2 installation before building:
+
+ .. code:: bash
+
+   source /opt/ros/humble/setup.bash
+
+
+Updates
+-------
+.. include:: _snippets/updates.rst
+
+.. |repo_name| replace:: Isaac ROS NITROS Bridge

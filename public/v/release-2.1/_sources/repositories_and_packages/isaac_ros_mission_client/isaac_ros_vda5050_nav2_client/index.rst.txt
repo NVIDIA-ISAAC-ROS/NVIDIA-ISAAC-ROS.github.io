@@ -1,0 +1,44 @@
+===============================
+|package name|
+===============================
+
+:ir_github:`<isaac_ros_mission_client> <isaac_ros_vda5050_nav2_client>`
+
+Overview
+^^^^^^^^
+
+Besides launching ``isaac_ros_vda5050_client.py``, this launch script
+also launches the ``nav2_bringup`` launch script (through the Nav2
+``bringup_launch.py`` script) and JsonInfoGeneratorNode in the
+``isaac_ros_json_info_generator`` package (the README for this package
+is in the ``isaac_ros_json_info_generator`` folder). This script has the
+following parameters in addition to the parameters listed above.
+
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_vda5050_nav2_client_bringup isaac_ros_vda5050_nav2_client.launch.py namespace:=<"namespace for ros graph"> mqtt_host_name:=<"mqtt_host_name"> mqtt_pub_topic:=<"mqtt_pub_topic"> ros_subscriber_type:=<"ros_subscriber_type"> ros_to_mqtt_name:=<"ros_to_mqtt_name"> mqtt_sub_topic:=<"mqtt_sub_topic"> ros_publisher_type:=<"ros_publisher_type"> mqtt_to_ros_name:=<"mqtt_to_ros_name">
+
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+============================== ========== ================================================================================================================================================== ===============================================================
+ROS Parameter                  Type       Default                                                                                                                                            Description
+============================== ========== ================================================================================================================================================== ===============================================================
+``use_namespace``              ``bool``   ``false``                                                                                                                                          Whether to apply a namespace to the navigation stack
+``use_composition``            ``bool``   ``false``                                                                                                                                          Whether to use composed Nav2 bringup
+``use_sim_time``               ``bool``   ``false``                                                                                                                                          Whether to use simulation (Omniverse Isaac Sim) clock
+``init_pose_x``                ``float``  ``0.0``                                                                                                                                            The initial position X coordinate
+``init_pose_y``                ``float``  ``0.0``                                                                                                                                            The initial position Y coordinate
+``init_pose_yaw``              ``float``  ``0.0``                                                                                                                                            The initial yaw orientation
+``map``                        ``string`` ``/home/$USER/workspaces/isaac_ros-dev/src/isaac_ros_mission_client/isaac_ros_vda5050_nav2_client_bringup/maps/carter_warehouse_navigation.yaml``  The full path to the occupancy map file to load
+``nav_params_file``            ``string`` ``/home/$USER/workspaces/isaac_ros-dev/src/isaac_ros_mission_client/isaac_ros_vda5050_nav2_client_bringup/config/carter_navigation_params.yaml``   The full path to the navigation parameter file to load
+``info_generator_params_file`` ``string`` ``/home/$USER/workspaces/isaac_ros-dev/src/isaac_ros_mission_client/isaac_ros_vda5050_nav2_client_bringup/config/json_info_generator_params.yaml`` The full path to the JSON Info Generator parameter file to load
+``launch_rviz``                ``bool``   ``false``                                                                                                                                          Launches RViz if ``true``
+============================== ========== ================================================================================================================================================== ===============================================================
+
+.. |package name| replace:: Isaac ROS VDA5050 NAV2 Client

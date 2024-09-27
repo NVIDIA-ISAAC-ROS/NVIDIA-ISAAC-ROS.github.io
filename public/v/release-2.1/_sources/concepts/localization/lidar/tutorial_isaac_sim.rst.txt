@@ -1,0 +1,68 @@
+Isaac ROS Occupancy Grid Localizer Nav2 Isaac Sim Tutorial
+==========================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/localization/lidar/nav2_isaac_sim.png>`
+    :width: 600px
+    :align: center
+
+Overview
+------------
+
+This tutorial describes how to integrate the Isaac ROS Occupancy Grid
+Localizer with a simulated robot running in Isaac Sim with Nav2.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the quickstart :ref:`here <repositories_and_packages/isaac_ros_map_localization/isaac_ros_occupancy_grid_localizer/index:quickstart>`.
+2.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+3.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`.
+
+4.  Select ``/World/Carter_v2_4_ROS/ros_lidars/publish_front_2d_lidar_scan`` in the *Stage* pane and change the topic name for front 2D lidar as follows:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/localization/lidar/isaac_sim_lidar_topic.png>`
+        :align: center
+        :width: 400px
+
+6.  Select ``/World/Carter_v2_4_ROS/ros_lidars/front_2d_lidar_render_product`` in the *Stage* pane and set ``enabled`` to True.
+
+7.  Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 600px
+
+8.  Run the launch file and validate that a Nav2 window pops up.
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_occupancy_grid_localizer isaac_ros_occupancy_grid_localizer_nav2.launch.py
+
+9.  Open a new terminal using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+10. Trigger the localization service using the command line interface:
+
+    .. code:: bash
+
+       ros2 service call /trigger_grid_search_localization std_srvs/srv/Empty {}
+
+11. You should see the laser scan in RViz. This happens when the
+    transform between map and front_2d_lidar frame is available. The robot
+    is now localized. You can give a position setpoint using the
+    ``2D Nav Goal`` button as shown below. You can relocalize again at
+    any point by running the ``ros2 service call`` command.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/localization/lidar/nav2_isaac_sim.gif>`
+    :width: 600px
+    :align: center

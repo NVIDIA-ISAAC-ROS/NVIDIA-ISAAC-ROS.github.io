@@ -1,0 +1,234 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nova> <isaac_ros_data_recorder>`
+
+Overview
+--------
+
+The |package_name| package enables recording data from the Nova sensor set. Data is recorded as an
+`MCAP <https://mcap.dev>`__ file with messages serialized in CDR format. Camera streams are
+encoded in `H.264 <https://en.wikipedia.org/wiki/Advanced_Video_Coding>`__ to reduce storage
+footprint. For more information on recording data in ROS 2, refer to the documentation for
+`rosbag2 <https://github.com/ros2/rosbag2>`__.
+
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+3. Create additional mounts for the Docker container.
+
+   If the container is already running, stop it with:
+
+   .. code:: bash
+
+      docker rm -f isaac_ros_dev-aarch64-container
+
+   Create mounts for ``/etc/nova`` and ``/mnt/nova_ssd/recordings``:
+
+   .. code:: bash
+
+      echo $'-v /etc/nova:/etc/nova\n-v /mnt/nova_ssd/recordings:/mnt/nova_ssd/recordings' > ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/.isaac_ros_dev-dockerargs
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-data-recorder
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nova>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths /workspaces/isaac_ros-dev/src/isaac_ros_nova --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --packages-up-to isaac_ros_data_recorder
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+.. _isaac-ros-data-recorder-launch:
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+1.  Continuing inside the Docker container, start data recording:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_data_recorder record_data.sh
+
+   Use ``Ctrl+C`` to stop recording. By default, recordings will be stored in ``/mnt/nova_ssd/recordings``.
+
+2. (Optional) Run teleop.
+
+   Follow :doc:`/robots/nova_carter/demo_teleop` to setup teleop.
+   Then, launch the teleop app:
+
+   .. code-block:: bash
+
+      ros2 launch nova_carter_bringup teleop_include.launch.py
+
+Try More Examples
+-----------------
+
+A sensor configuration file can be used to record a subset of sensors on the robot. For example, to
+record only the 4 stereo cameras:
+
+.. code:: bash
+
+   ros2 run isaac_ros_data_recorder record_data.sh -y hawk-4.yaml
+
+The following sensor configurations are provided. Custom sensor configurations are also supported.
+
+=============================== ==================================================================================
+Configuration File              Description
+=============================== ==================================================================================
+``hawk-1.yaml``                 Front stereo camera with IMU.
+``hawk-2.yaml``                 Front and back stereo cameras with IMU.
+``hawk-3.yaml``                 Front, left, and right stereo cameras with IMU.
+``hawk-4.yaml``                 Front, left, right and back stereo cameras with IMU.
+``owl-1.yaml``                  Front fisheye camera.
+``owl-2.yaml``                  Front and back fisheye cameras.
+``owl-3.yaml``                  Front, left, and right fisheye cameras.
+``owl-4.yaml``                  Front, left, right, and back fisheye cameras.
+``hawk-1_owl-1.yaml``           Front stereo and fisheye cameras.
+``hawk-1_owl-2.yaml``           Front stereo camera and left and right fisheye cameras.
+``hawk-2_owl-2.yaml``           Front and back stereo and fisheye cameras.
+``hawk-2_owl-4.yaml``           Front and back stereo cameras and front, left, right, and back fisheye cameras.
+``hawk-4_owl-4.yaml``           Front, left, right and back stereo and fisheye cameras.
+``nova-orin.yaml``              Sensor configuration for Nova Orin.
+``nova-orin_hawk-4.yaml``       Sensor configuration for Nova Orin without fisheye cameras or 2D lidar.
+``nova-carter.yaml``            Sensor configuration for Nova Carter.
+``nova-carter_hawk-4.yaml``     Sensor configuration for Nova Carter without fisheye cameras or 2D lidar.
+``nova-developer-kit.yaml``     Sensor configuration for Nova Orin Developer Kit.
+=============================== ==================================================================================
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+---
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_data_recorder data_recorder.launch.py
+
+ROS Launch Arguments
+~~~~~~~~~~~~~~~~~~~~
+
+========================== =============================== ======================================================
+ROS Launch Argument        Default Value                   Description
+========================== =============================== ======================================================
+``recording_dir``          ``/mnt/nova_ssd/recordings``    The directory in which to put the recording.
+``rosbag_name``            ``rosbag2``                     The name of the folder which the rosbag is stored in.
+``config``                 ``/etc/nova/systeminfo.yaml``   Sensor configuration file.
+========================== =============================== ======================================================
+
+ROS Topics Subscribed
+~~~~~~~~~~~~~~~~~~~~~
+
+===================================================== =============================================================================================================================================================== ==================================================
+ROS Topic                                             Interface                                                                                                                                                       Description
+===================================================== =============================================================================================================================================================== ==================================================
+``/rosout``                                           `rcl_interfaces/msg/Log <https://github.com/ros2/rcl_interfaces/blob/humble/rcl_interfaces/msg/Log.msg>`__                                                      Console logs.
+``/tf``                                               `tf2_msgs/msg/TFMessage <https://github.com/ros2/geometry2/blob/humble/tf2_msgs/msg/TFMessage.msg>`__                                                           Movable transforms on the robot.
+``/tf_static``                                        `tf2_msgs/msg/TFMessage <https://github.com/ros2/geometry2/blob/humble/tf2_msgs/msg/TFMessage.msg>`__                                                           Fixed transforms on the robot.
+``/front_stereo_camera/left/image_compressed``        `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Front stereo camera left camera stream.
+``/front_stereo_camera/left/camera_info``             `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Front stereo camera left camera intrinsics.
+``/front_stereo_camera/right/image_compressed``       `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Front stereo camera right camera stream.
+``/front_stereo_camera/right/camera_info``            `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Front stereo camera right camera intrinsics.
+``/back_stereo_camera/left/image_compressed``         `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Back stereo camera left camera stream.
+``/back_stereo_camera/left/camera_info``              `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Back stereo camera left camera intrinsics.
+``/back_stereo_camera/right/image_compressed``        `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Back stereo camera right camera stream.
+``/back_stereo_camera/right/camera_info``             `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Back stereo camera right camera intrinsics.
+``/left_stereo_camera/left/image_compressed``         `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Left stereo camera left camera stream.
+``/left_stereo_camera/left/camera_info``              `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Left stereo camera left camera intrinsics.
+``/left_stereo_camera/right/image_compressed``        `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Left stereo camera right camera stream.
+``/left_stereo_camera/right/camera_info``             `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Left stereo camera right camera intrinsics.
+``/right_stereo_camera/left/image_compressed``        `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Right stereo camera left camera stream.
+``/right_stereo_camera/left/camera_info``             `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Right stereo camera left camera intrinsics.
+``/right_stereo_camera/right/image_compressed``       `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Right stereo camera right camera stream.
+``/right_stereo_camera/right/camera_info``            `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Right stereo camera right camera intrinsics.
+``/front_fisheye_camera/left/image_compressed``       `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Front fisheye camera stream.
+``/front_fisheye_camera/left/camera_info``            `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Front fisheye camera intrinsics.
+``/back_fisheye_camera/left/image_compressed``        `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Back fisheye camera stream.
+``/back_fisheye_camera/left/camera_info``             `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Back fisheye camera intrinsics.
+``/left_fisheye_camera/left/image_compressed``        `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Left fisheye camera stream.
+``/left_fisheye_camera/left/camera_info``             `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Left fisheye camera intrinsics.
+``/right_fisheye_camera/left/image_compressed``       `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__                                 Right fisheye camera stream.
+``/right_fisheye_camera/left/camera_info``            `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                           Right fisheye camera intrinsics.
+``/front_2d_lidar/scan``                              `sensor_msgs/msg/LaserScan <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/LaserScan.msg>`__                                             Front 2D lidar scan.
+``/back_2d_lidar/scan``                               `sensor_msgs/msg/LaserScan <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/LaserScan.msg>`__                                             Back 2D lidar scan.
+``/front_3d_lidar/lidar_packets``                     `hesai_ros_driver/msg/UdpFrame <https://github.com/HesaiTechnology/HesaiLidar_ROS_2.0/blob/master/msg/msg_ros2/UdpFrame.msg>`__                                 Front 3D lidar UDP packets.
+``/front_stereo_imu/imu``                             `sensor_msgs/msg/Imu <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Imu.msg>`__                                                         Front stereo camera inertial measurement unit.
+``/chassis/imu``                                      `sensor_msgs/msg/Imu <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Imu.msg>`__                                                         Chassis inertial measurement unit.
+``/chassis/ticks``                                    `isaac_ros_nova_interfaces/msg/EncoderTicks <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_nova_interfaces/msg/EncoderTicks.msg>`__  Chassis encoder count.
+``/chassis/odom``                                     `nav_msgs/msg/Odometry <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Odometry.msg>`__                                                     Chassis odometry.
+``/chassis/battery_state``                            `sensor_msgs/msg/BatteryState <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/BatteryState.msg>`__                                       Chassis battery state.
+===================================================== =============================================================================================================================================================== ==================================================
+
+
+.. |package_name| replace:: ``isaac_ros_data_recorder``

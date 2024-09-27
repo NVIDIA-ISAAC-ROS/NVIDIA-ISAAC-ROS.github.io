@@ -1,0 +1,237 @@
+CUDA with NITROS
+================
+
+
+Overview
+--------
+
+CUDA is a parallel computing programming model and helps robotic applications to implement functions
+that would otherwise be too slow on a CPU.
+
+CUDA implemented in a ROS 2 node can take advantage of NITROS, the Isaac ROS implementation of type
+adaptation & type negotiation which enables accelerated computing in ROS 2.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/nitros/system_diagram.png>`
+    :width: 800px
+    :align: center
+
+By using the NITROS publisher, CUDA code in a ROS node can share its output in GPU accelerated memory
+to NITROS enabled Isaac ROS nodes. This improves performance by avoiding CPU memory copies, and increasing
+the parallel compute between the GPU compute, and CPU processing. NITROS maintains compatibility with
+other ROS nodes subscribing to the topic such as RViz.
+
+By using the NITROS subscriber, CUDA code in a ROS node can receive its input in GPU accelerated memory
+from a NITROS enabled Isaac ROS node, or another CUDA enabled ROS node publishing by using a NITROS subscriber.
+This has the same benefits of reducing CPU memory copies and increasing parallel computing between the GPU
+and CPU.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/nitros/subscriber_publisher_diagram.png>`
+    :width: 800px
+    :align: center
+
+NITROS publisher and NITROS subscriber enable many design patterns compatible with Isaac ROS accelerate
+computing nodes, and traditional CPU nodes.  For example publishing from a CUDA node directly to an Isaac ROS
+node, or visa-versa from an Isaac ROS node to a CUDA node. A CUDA node can be inserted between two Isaac ROS
+nodes, or even use multiple CUDA nodes in succession, all with the benefit of CUDA accelerated computing in each
+node. This creates more modular software designs, as CUDA accelerated functions can be packaged in individual
+nodes, instead of packing together into a larger single node.
+
+Core Concepts
+-------------
+
+Managed NITROS Publisher
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Managed NITROS Publisher provides a simple and familiar interface
+for publishing messages into NITROS-enabled graphs. The API is
+comparable to the standard ``rclcpp::Publisher`` API, making it easy to
+add a Managed NITROS Publisher to an existing ROS 2 node.
+
+Managed NITROS Publishers are specifically designed to publish
+NITROS-typed messages. These NITROS types are listed under the
+``isaac_ros_nitros_types`` subfolder.
+
+.. note::
+
+   Currently, the Managed NITROS Publisher is only compatible
+   with the ``isaac_ros_nitros_tensor_list_type``  and ``isaac_ros_nitros_image_type``. 
+   These types enable you to send and receive tensors and images to and from packages in Isaac ROS DNN
+   Inference.
+
+Managed NITROS Subscriber
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Managed NITROS Subscriber is analogous to the Managed NITROS
+Publisher, offering a straightforward, ``rclcpp::Subscriber``-like
+interface for subscribing to messages from NITROS-enabled graphs.
+
+Managed NITROS Subscribers are specifically designed to receive
+NITROS-typed messages. These NITROS types are listed under the
+``isaac_ros_nitros_types`` subfolder.
+
+.. note::
+
+   Currently, the Managed NITROS Subscriber is only compatible
+   with the ``isaac_ros_nitros_tensor_list_type`` and ``isaac_ros_nitros_image_type``.
+
+NITROS Builders
+~~~~~~~~~~~~~~~
+
+NITROS Builders are a series of utility classes that streamline the
+process of creating a NITROS-typed message. These classes offer a
+builder-style interface, allowing developers to specify relevant fields
+for object construction one at a time:
+
+.. code:: cpp
+
+   using namespace nvidia::isaac_ros::nitros;
+   NitrosTensorList tensor_list = NitrosTensorListBuilder()
+       .WithHeader(ros_header)
+       .AddTensor("tensor_1", foo_tensor)
+       .AddTensor("tensor_2", bar_tensor)
+       .Build();
+
+The collection of NITROS Builders also includes additional builders that
+construct individual components of the broader NITROS types. For
+example, a ``NitrosTensorBuilder`` can be used to produce a
+``NitrosTensor`` that is subsequently consumed by a
+``NitrosTensorListBuilder``.
+
+NITROS Views
+~~~~~~~~~~~~
+
+NITROS Views are a series of utility classes that simplify the process
+of accessing fields of a NITROS-typed message. These classes offer an
+analogous interface to the NITROS Builder, allowing developers to
+retrieve specific portions of a composite structure and process them
+accordingly.
+
+Standard Usage
+--------------
+
+The standard pattern for using Managed NITROS involves 3 key steps:
+
+1. Encoding arbitrary data into an appropriate NITROS-type message using
+   a Custom NITROS encoder node
+2. Processing the NITROS-type message using NITROS-enabled ROS 2 nodes
+3. Decoding an output NITROS-type message into an arbitrary format using
+   a Custom NITROS decoder node
+
+For example, a graph for performing DNN-based segmentation on pointclouds might involve:
+
+1. A Custom NITROS encoder node that converts a ``sensor_msgs/PointCloud2`` into a ``NitrosTensorList``
+2. The Isaac ROS TensorRT node that performs DNN inference on the TensorRT backend, taking in an input ``NitrosTensorList`` and producing an output ``NitrosTensorList``
+3. A Custom NITROS decoder node that converts the output ``NitrosTensorList`` into a segmented ``sensor_msgs/PointCloud2``
+
+Examples
+--------
+
+Custom NITROS String Encoder and Decoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ir_repo:`isaac_ros_managed_nitros_examples/custom_nitros_string <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_string/package.xml>`
+package contains a minimal example that demonstrates how a pair of
+Custom NITROS encoder and decoder nodes can leverage Managed NITROS
+utilities.
+
+The included :ir_repo:`launch test <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_string/test/custom_nitros_string_pol.py>`
+uses a minimal graph of just two nodes:
+
+1. :ir_repo:`StringEncoderNode <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_string/include/custom_nitros_string/string_encoder_node.hpp>`
+   that encodes a ``std_msgs/String`` message into a ``NitrosTensorList``
+2. :ir_repo:`StringDecoderNode <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_string/include/custom_nitros_string/string_decoder_node.hpp>`
+   that decodes a ``NitrosTensorList`` back into a ``std_msgs/String``
+
+.. note::
+   Since there is no NITROS type designed specifically for
+   strings, this examples uses the ``NitrosTensorList`` type to encode
+   string data. The flexibility of the ``NitrosTensorList`` format
+   supports the encoding of arbitrary data.
+
+The :ir_repo:`StringEncoderNode's implementation <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_string/src/string_encoder_node.cpp>`
+demonstrates usage of the NITROS Builder utilities. The
+``StringEncoderNode::InputCallback`` function begins by allocating a
+CUDA buffer to store the received ``std_msgs/String``'s data. In this
+minimal example, the character bytes are copied over to the CUDA buffer
+without any need for additional encoding. Then, a
+``NitrosTensorBuilder`` is used to build a ``NitrosTensor``, which is
+then added to a ``NitrosTensorListBuilder`` with the
+name ``"input_tensor"``. Finally, the ``NitrosTensorListBuilder::Build``
+method produces the output ``NitrosTensorList`` that is published via
+the ``StringEncoderNode``'s Managed NITROS publisher.
+
+The :ir_repo:`StringDecoderNode's implementation <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_string/src/string_decoder_node.cpp>`
+demonstrates usage of the NITROS View utilities. The
+``StringDecoderNode::InputCallback`` function begins by resizing a
+``std::string`` buffer to store the data that will eventually be
+extracted from the ``NitrosTensorList``. The Managed NITROS Subscriber
+receives a ``NitrosTensorListView``, through which it extracts the
+``NitrosTensorView`` corresponding to ``"input_tensor"`` using the
+``NitrosTensorListView::GetNamedTensor`` method. Since the data in
+``NitrosTensorView``'s CUDA buffer was originally encoded in a trivial
+way, the decoding is similarly straightforward: the character bytes are
+copied over without any need for additional decoding. Finally, the
+``std::string`` is copied to a ``std_msgs/String`` message and published
+with a standard publisher.
+
+Custom NITROS Image Builder and Viewer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ir_repo:`isaac_ros_managed_nitros_examples/custom_nitros_image <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_image/package.xml>`
+package contains an intermediate example of Managed NITROS functionality
+for passing images.
+
+The included :ir_repo:`launch test <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_image/test/custom_nitros_image_pol.py>`
+uses a minimal graph of just two nodes:
+
+1. :ir_repo:`GpuImageBuilderNode <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_image/include/custom_nitros_image/gpu_image_builder_node.hpp>`
+that encodes a ``sensor_msgs/Image`` message into a ``NitrosImage``
+2. :ir_repo:`GpuImageViewerNode <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_image/include/custom_nitros_image/gpu_image_viewer_node.hpp>`
+that decodes a ``NitrosImage`` back into a ``sensor_msgs/Image``
+
+The :ir_repo:`GpuImageBuilderNode's implementation <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_image/src/gpu_image_builder_node.cpp>`
+demonstrates usage of the NITROS Builder utilities. The
+``GpuImageBuilderNode::InputCallback`` function begins by allocating a
+CUDA buffer to store the received ``sensor_msgs/Image``'s data. In
+this minimal example, the bytes are copied over to the CUDA buffer
+without any interleaving or other processing. Then, a
+``NitrosImageBuilder`` is used to build a ``NitrosImage`` from the ROS
+header, appropriate ``sensor_msgs``-standard image encoding, image
+dimensions, and CUDA buffer from the previous step. The
+``NitrosImageBuilder::Build`` method produces the output ``NitrosImage``
+that is published via the ``GpuImageBuilderNode``'s Managed NITROS
+publisher.
+
+The :ir_repo:`GpuImageViewerNode's implementation <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_image/src/gpu_image_viewer_node.cpp>`
+demonstrates usage of the NITROS View utilities. The
+``GpuImageViewerNode::InputCallback`` function begins by creating a
+``sensor_msgs/Image`` message and populating its basic fields through
+the ``NitrosImageView`` object's straightforward getters. Next, the
+output image's data vector is resized to ensure it will appropriately
+fit the actual image data. Finally, the image's data bytes are copied
+over without any additional processing, and the output message is
+published with a standard publisher.
+
+Custom NITROS DNN Image Encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ir_repo:`isaac_ros_managed_nitros_examples/custom_nitros_dnn_image_encoder <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_dnn_image_encoder/package.xml>`
+package contains an advanced example of Managed NITROS functionality
+for encoding images as tensors for DNN inference.
+
+.. note::
+
+   This example is currently limited to ``x86_64`` platforms.
+
+.. note::
+
+   To build and run this example, complete the following steps:
+
+   1. Delete the :ir_repo:`COLCON_IGNORE file <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_dnn_image_encoder/COLCON_IGNORE` in this example's package
+   2. Add the ``cvcuda`` suffix to the Isaac ROS Dev base image key used by ``run_dev.sh``, as explained in :ref:`this guide <repositories_and_packages/isaac_ros_common/index:Isaac ROS Docker Development Environment>`
+
+As shown in the included :ir_repo:`launch file <isaac_ros_nitros> <isaac_ros_managed_nitros_examples/custom_nitros_dnn_image_encoder/launch/custom_image_isaac_ros_dope_tensor_rt.launch.py>`,
+this package's ``ImageEncoderNode`` has identical functionality to the standard :ir_repo:`Isaac ROS DNN Image Encoder Node <isaac_ros_dnn_inference> <isaac_ros_dnn_image_encoder/src/dnn_image_encoder_node.cpp>`.
+
+This example leverages NVIDIA's `CV-CUDA library <https://developer.nvidia.com/cv-cuda>`__ to perform the core image normalization operations.
+CUDA with NITROS unlocks the full value of libraries like CV-CUDA for high performance robotics applications.

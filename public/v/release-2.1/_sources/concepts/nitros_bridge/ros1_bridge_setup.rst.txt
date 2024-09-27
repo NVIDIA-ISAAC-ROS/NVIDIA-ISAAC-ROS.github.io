@@ -1,0 +1,79 @@
+ROS1 Bridge Setup
+===============================
+
+Overview
+--------
+
+This tutorial walks you through how to setup the ``ros1_bridge`` within the Isaac ROS Docker container for communication between ROS 1 and ROS 2 using topics and services.
+The tutorial is based on the `ROS1 Bridge documentation <https://github.com/ros2/ros1_bridge>`__.
+
+.. note::
+   ROS actions are not supported by the `ROS1 Bridge <https://github.com/ros2/ros1_bridge>`__
+
+Steps
+-----
+
+.. include:: _snippets/setup_ros1_steps.rst
+
+Now, we can setup a dynamic bridge and use the demo talkers/listeners.
+
+#. Run the ``ros1_bridge/dynamic_bridge``:
+    
+    .. code:: bash
+
+       export ROS_MASTER_URI=http://localhost:11311 && \
+       ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
+
+#. **Attach a third terminal** to the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+       ./scripts/run_dev.sh ${HOME}/workspaces
+
+#. Source ``ros1_noetic`` and run ``roscore``:
+
+    .. code:: bash
+
+       source /opt/ros/noetic/setup.bash && \
+       roscore
+
+#. **Attach a fourth terminal** to the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+       ./scripts/run_dev.sh ${HOME}/workspaces
+
+#. Clone ``ros2_tutorials`` into ``isaac_ros_1-dev`` directory to build 
+   and run ``rospy_tutorials talker`` publisher node:
+
+   .. code:: bash
+      
+       source /opt/ros/noetic/setup.bash && \
+       cd /workspaces/isaac_ros-dev/isaac_ros_1-dev/src && \
+       git clone https://github.com/ros/ros_tutorials.git && \
+       cd .. && \
+       catkin_make_isolated --install --only-pkg-with-deps rospy_tutorials && \
+       source install_isolated/setup.bash && \
+       rosrun rospy_tutorials talker
+
+#. **Attach a fifth terminal** to the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+       ./scripts/run_dev.sh ${HOME}/workspaces
+
+#. Source ``ros2_humble`` and run ``demo_nodes_cpp listener`` subscriber node:
+
+    .. code:: bash
+
+       source /opt/ros/humble/setup.bash && \
+       ros2 run demo_nodes_cpp listener
+
+#. You should see messages being published from ROS 1 in terminal 4 and see the same messages being received by ROS 2 in terminal 5.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/nitros_bridge/ros1-bridge-pol.gif>`   
+      :width: 1000px
+      :align: center

@@ -1,0 +1,149 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nova> <isaac_ros_hesai>`
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/hesai_xt32.png>`
+   :align: center
+
+Overview
+--------
+
+A LIDAR uses light in the form of a pulsed laser to measure ranges (variable distance) as part of a perception for understanding of the robot and its environment.
+
+The ``isaac_ros_hesai`` driver provides support for the XT32 mid-range LIDAR that provides 32 beam, 360 degree sensing with from 0.05m to >100m with a field of view of -16 to 31 degrees.
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-hesai
+   
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nova>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nova/isaac_ros_hesai --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_hesai
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+1. Continuing inside the Docker container, launch the Hesai driver:
+
+   .. code-block::
+
+      ros2 launch isaac_ros_hesai hesai.launch.py
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+2. Use ``rviz2`` to visualize the point cloud:
+
+   .. code-block::
+
+      rviz2 -d $(ros2 pkg prefix --share isaac_ros_hesai)/config/hesai.rviz
+
+   .. figure::
+       :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/hesai_rviz.png>`
+       :width: 800px
+       :alt: hesai_rviz
+       :align: center
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_hesai hesai.launch.py namespace:=<Namespace> replay:=<Enable replay from rosbag>
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+==================================== ================================================================================================================================== =====================
+ROS Topic                            Interface                                                                                                                          Description
+==================================== ================================================================================================================================== =====================
+``/hesai_lidar/lidar_packets``       `hesai_ros_driver/msg/UdpFrame <https://github.com/HesaiTechnology/HesaiLidar_ROS_2.0/blob/master/msg/msg_ros2/UdpFrame.msg>`__    Lidar UDP packets.
+``/hesai_lidar/lidar_points``        `sensor_msgs/msg/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__            Lidar point cloud.
+==================================== ================================================================================================================================== =====================
+
+.. |package_name| replace:: ``isaac_ros_hesai``

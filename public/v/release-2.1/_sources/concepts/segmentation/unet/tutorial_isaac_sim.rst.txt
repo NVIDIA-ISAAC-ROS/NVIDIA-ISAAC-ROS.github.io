@@ -1,0 +1,63 @@
+Tutorial for DNN Image Segmentation with Isaac Sim
+==================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/segmentation/unet/Isaac_sim_peoplesemsegnet_shuffleseg_rqt.png>`
+    :align: center
+
+Overview
+------------
+
+This tutorial walks you through a graph for :ir_repo:`Image Segmentation <isaac_ros_image_segmentation>`
+of people using images from Isaac Sim.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the :ref:`quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index:quickstart>` up until step 9.
+2.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+3.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`.
+4.  Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 600px
+
+5. Run the following launch files to start the inferencing:
+
+    .. code:: bash
+
+           ros2 launch isaac_ros_unet isaac_ros_unet_triton_isaac_sim.launch.py \
+           model_name:=peoplesemsegnet_shuffleseg model_repository_paths:=['/tmp/models'] \
+           input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] \
+           network_output_type:='argmax'
+
+6.  In another terminal, visualize and validate the output of the package by launching
+    ``rqt_image_view``:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+           ./scripts/run_dev.sh
+
+    Then launch ``rqt_image_view``:
+
+    .. code:: bash
+
+           ros2 run rqt_image_view rqt_image_view
+
+    To view a colorized segmentation
+    mask, inside the ``rqt_image_view`` GUI, change the topic to
+    ``/unet/colored_segmentation_mask``.
+
+    .. note::
+
+        The raw segmentation is also published to
+        ``/unet/raw_segmentation_mask``. However, the raw pixels correspond
+        to the class labels and so the output is unsuitable for human visual
+        inspection.

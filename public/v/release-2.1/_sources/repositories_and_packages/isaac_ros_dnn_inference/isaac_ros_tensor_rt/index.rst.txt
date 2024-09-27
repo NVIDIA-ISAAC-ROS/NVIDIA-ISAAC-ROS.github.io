@@ -1,0 +1,194 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_dnn_inference> <isaac_ros_tensor_rt>`
+
+Quickstart
+----------
+
+.. note::
+
+   This quickstart demonstrates |package_name| in an image segmentation application.
+   Therefore, this demo features an encoder and decoder node to perform
+   pre-processing and post-processing respectively. In reality, the
+   raw inference result is simply a tensor.
+
+   To use the packages in other useful contexts, please refer
+   :doc:`here </repositories_and_packages/isaac_ros_dnn_inference/index>`.
+
+1. Follow steps 1-6 of the :doc:`Quickstart with Triton </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`
+
+2. Install this package's dependencies.
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-tensor-rt
+
+3. Run the following launch files to spin up a demo of this package. Launch TensorRT:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_unet isaac_ros_unet_tensor_rt.launch.py  engine_file_path:=/tmp/models/peoplesemsegnet_shuffleseg/1/model.plan input_binding_names:=['input_2:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax'
+
+    Then open **another** terminal, and enter the Docker container again:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then, play the ROS bag from ``isaac_ros_image_segmentation``:
+
+    .. code:: bash
+
+       ros2 bag play -l src/isaac_ros_image_segmentation/resources/rosbags/unet_sample_data/
+
+4. Visualize and validate the output of the package:
+
+    In a **third** terminal, enter the Docker container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then echo the inference result:
+
+    .. code:: bash
+
+       ros2 topic echo /tensor_sub
+
+    The expected result should look like this:
+
+    .. code:: bash
+
+       header:
+         stamp:
+           sec: <time>
+           nanosec: <time>
+         frame_id: <frame-id>
+       tensors:
+       - name: output_tensor
+         shape:
+           rank: 4
+           dims:
+           - 1
+           - 544
+           - 960
+           - 1
+         data_type: 5
+         strides:
+         - 2088960
+         - 3840
+         - 4
+         - 4
+         data:
+         [...]
+
+    This result is not very useful friendly. It's typically more desirable to see the network output after it's decoded.
+    The result of the entire image segmentation pipeline can be visualized by launching ``rqt_image_view``:
+
+    .. code:: bash
+
+       ros2 run rqt_image_view rqt_image_view
+
+    Then inside the ``rqt_image_view`` GUI, change the topic to ``/unet/colored_segmentation_mask`` to view a colorized segmentation mask.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/peoplesemsegnet_shuffleseg_rqt.png>`
+      :align: center
+
+   .. note::
+
+      A launch file called ``isaac_ros_tensor_rt.launch.py`` is provided in this package to launch only TensorRT.
+
+   .. warning::
+
+      The TensorRT Inference node expects tensors as input and outputs tensors.
+
+      The node inference itself is generic; as long as the input data can be converted into a tensor, and
+      the model that is used is correctly trained on said input data.
+
+      For example, TensorRT can be used with models that are trained on images, audio and more, but
+      the necessary encoder and decoder node must be implemented.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~
+
+This package contains a launch file that solely launches ``isaac_ros_tensor_rt``.
+
+.. warning::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+   Additionally, for most applications, an encoder node for pre-processing your data source and
+   decoder for post-processing the inference output is required.
+
+====================================== ====================
+Launch File                            Components Used
+====================================== ====================
+``isaac_ros_tensor_rt.launch.py``      :doc:`TensorRTNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index>`
+====================================== ====================
+
+TensorRTNode
+~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+=========================== =============== ======================== ========================================================================================================================================================================================
+ROS Parameter               Type            Default                  Description
+=========================== =============== ======================== ========================================================================================================================================================================================
+``model_file_path``         ``string``      ``model.onnx``           The absolute path to your model file in the local file system (the model file must be ``.onnx``) E.g. ``model.onnx``
+``engine_file_path``        ``string``      ``/tmp/trt_engine.plan`` The absolute path to either where you want your TensorRT engine plan to be generated (from your model file) or where your pre-generated engine plan file is located E.g. ``model.plan``
+``force_engine_update``     ``bool``        ``true``                 If set to true, the node will always try to generate a TensorRT engine plan from your model file and needs to be set to false to use the pre-generated TensorRT engine plan
+``input_tensor_names``      ``string list`` ``['input_tensor']``     A list of tensor names to be bound to specified input bindings names. Bindings occur in sequential order, so the first name here will be mapped to the first name in input_binding_names
+``input_binding_names``     ``string list`` ``['']``                 A list of input tensor binding names specified by model E.g. ``['input_2:0']``
+``input_tensor_formats``    ``string list`` ``['']``                 A list of input tensor NITROS formats. This should be given in sequential order E.g. ``['nitros_tensor_list_nchw_rgb_f32']``
+``output_tensor_names``     ``string list`` ``['output_tensor']``    A list of tensor names to be bound to specified output binding names
+``output_binding_names``    ``string list`` ``['']``                 A list of tensor names to be bound to specified output binding names E.g. ``['argmax_1']``
+``output_tensor_formats``   ``string list`` ``['']``                 A list of input tensor NITROS formats. This should be given in sequential order E.g. ``[nitros_tensor_list_nchw_rgb_f32]``
+``verbose``                 ``bool``        ``true``                 If set to true, the node will enable verbose logging to console from the internal TensorRT execution
+``max_workspace_size``      ``int64_t``     ``67108864l``            The size of the working space in bytes
+``max_batch_size``          ``int32_t``     ``1``                    The maximum possible batch size in case the first dimension is dynamic and used as the batch size
+``dla_core``                ``int64_t``     ``-1``                   The DLA Core to use. Fallback to GPU is always enabled. The default setting is GPU only
+``enable_fp16``             ``bool``        ``true``                 Enables building a TensorRT engine plan file which uses FP16 precision for inference. If this setting is false, the plan file will use FP32 precision
+``relaxed_dimension_check`` ``bool``        ``true``                 Ignores dimensions of 1 for the input-tensor dimension check
+``num_blocks``              ``int``         ``40``                   The number of pre-allocated memory output blocks, should not be less than ``40``.
+=========================== =============== ======================== ========================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+============== ==================================================================================================================================================================== =======================
+ROS Topic      Type                                                                                                                                                                 Description
+============== ==================================================================================================================================================================== =======================
+``tensor_pub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The input tensor stream
+============== ==================================================================================================================================================================== =======================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============== ==================================================================================================================================================================== ==========================================================
+ROS Topic      Type                                                                                                                                                                 Description
+============== ==================================================================================================================================================================== ==========================================================
+``tensor_sub`` :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      The tensor list of output tensors from the model inference
+============== ==================================================================================================================================================================== ==========================================================
+
+.. |package_name| replace:: ``isaac_ros_tensor_rt``

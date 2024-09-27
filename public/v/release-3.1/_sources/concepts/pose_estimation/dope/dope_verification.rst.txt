@@ -1,0 +1,222 @@
+Verifying DOPE Model Performance
+================================
+
+Prerequisites
+-------------
+
+-  Input images with known dimensions
+
+   -  Sample 1080p images for the Ketchup bottle object are provided
+      `here <https://github.com/swtyree/hope-dataset/tree/master/hope-image-preview/scene_0005>`__
+
+-  Camera intrinsics for the camera used to capture the images
+-  Desired image downscale dimensions
+
+   -  By default 1920x1080 images are downscaled to 910x512
+
+-  ``.pth`` PyTorch weights for an object-specific DOPE model
+
+   -  A sample model for the Ketchup bottle object is provided
+      `here <https://drive.google.com/drive/folders/1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg?pli=1&usp=drive_open>`__
+
+-  Object dimensions for the specific object
+
+   -  The Ketchup bottle object's dimensions are included in the source
+      repositories as a default
+
+Run Python DOPE Inference
+-------------------------
+
+1. Check out the `DOPE Training <https://github.com/jaiveersinghNV/dope_training>`__
+   repository and install the dependencies as specified in its README:
+   
+   .. code:: bash
+
+      git clone https://github.com/jaiveersinghNV/dope_training.git
+
+2. Copy the input image into its own folder:
+   
+   .. code:: bash
+
+       mkdir -p /tmp/dope_inference_inputs/ && \
+          cp {PATH_TO_IMAGE.jpg} /tmp/dope_inference_inputs
+
+3. Verify that essential parameters are correctly specified in
+   ``dope_training/inference/config/config_pose.yaml``:
+   
+   .. code:: yaml
+    
+      downscale_height: {DOWNSCALE_HEIGHT}
+      ...     
+      dimensions: {         
+         ...
+         "{OBJECT_NAME}" : [ 14.860799789428711, 4.3368000984191895, 6.4513998031616211 ],
+         ... 
+      }     
+      ...     
+      thresh_angle: 0.5     
+      thresh_map: 0.01     
+      sigma: 3     
+      thresh_points: 0.0
+
+   .. note::
+    
+      Ensure that the dimensions are specified in units of **centimeters**.
+
+4. Verify that the camera intrinsics are correctly specified in the
+   ``projection_matrix`` entry of
+   ``dope_training/inference/config/camera_info.yaml``:
+   
+   .. code:: yaml
+    
+      projection_matrix:         
+         rows: 3         
+         cols: 4         
+         data: [768.16058349609375, 0, 256, 0, 0, 768.16058349609375, 256, 0, 0, 0, 1, 0]
+
+   .. note::
+    
+      Ensure that the camera intrinsics are specified based on the **original** image dimensions.
+
+5. Run inference using the DOPE Training repository’s Python inference
+   script:
+   
+   .. code:: bash
+
+      cd dope_training/inference && \
+         python3 inference.py --data /tmp/dope_inference_inputs/ --outf /tmp/dope_inference_outputs/ --object {OBJECT_NAME} --exts jpg --weight {PATH_TO_WEIGHTS.pth}
+
+6. Verify that the output of the Python inference script exists as
+   ``.json`` file: 
+   
+   .. code:: bash
+
+      ls /tmp/dope_inference_outputs/*/*.json
+
+Run Isaac ROS DOPE Inference
+----------------------------
+
+1. Complete until ``Run Launch File`` of the quickstart :doc:`quickstart </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`.
+
+2. Instead of step 1 in ``Run Launch File``, run the ``dope_converter.py`` script with the
+   two additional arguments ``row`` and ``col`` specifying the desired
+   input image size:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_dope dope_converter.py --format onnx \
+         --input {PATH_TO_WEIGHTS.pth} --output {PATH_TO_WEIGHTS.onnx} \
+         --row {DOWNSCALED_HEIGHT} --col {INPUT_WIDTH * DOWNSCALED_HEIGHT / INPUT_HEIGHT}
+         
+
+3. Verify that the object dimensions are correctly specified in the
+   ``dimensions`` entry of
+   ``isaac_ros_pose_estimation/isaac_ros_dope/config/dope_config.yaml``:
+   
+   .. code:: yaml
+
+      dimensions: {
+         ...         
+         "{OBJECT_NAME}" : [ 14.860799789428711, 4.3368000984191895, 6.4513998031616211 ],
+         ...
+      }
+
+   **Note**: Ensure that the dimensions are specified in units of
+   **centimeters**.
+
+4. Verify that the camera intrinsics are correctly specified in the
+   ``camera_matrix`` entry of
+   ``isaac_ros_pose_estimation/isaac_ros_dope/config/dope_config.yaml``:
+
+   .. code:: yaml
+    
+      camera_matrix: [
+        364.16501736,   0.0,          121.36296296,
+        0.0,            364.16501736, 121.36296296,
+        0.0,            0.0,          1.0     
+      ]
+
+   .. note::
+    
+      Ensure that the camera intrinsics are **rescaled** by
+      multiplying the top two rows of the matrix by a factor of
+      ``{DOWNSCALED_HEIGHT / INPUT_HEIGHT}``.
+
+5. At step 2 from the ``Rosbag`` tab of ``Run Launch File`` Section, launch the ROS 2 launch file with two additional arguments
+   ``network_image_height`` and ``network_image_width`` specifying the
+   desired input image size:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_dope isaac_ros_dope_tensor_rt.launch.py model_file_path:={PATH_TO_WEIGHTS.onnx} network_image_height:={DOWNSCALED_HEIGHT} network_image_width:={INPUT_WIDTH * DOWNSCALED_HEIGHT / INPUT_HEIGHT}
+
+6. Open another terminal window and attach to the same container. You
+   should be able to get the poses of the objects in the images through
+   ``ros2 topic echo``:
+
+   .. code:: bash
+
+      cd ~/workspaces/isaac_ros-dev/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+   .. code:: bash
+
+      ros2 topic echo /poses
+
+7. Publish an image using image_publisher:
+
+   .. code:: bash
+
+      ros2 run image_publisher image_publisher_node {PATH_TO_IMAGE} --remap /image_raw:=/image
+
+8. Save the output logged by ``ros2 topic echo`` for comparison later.
+
+   .. code:: bash
+
+      ros2 topic echo /poses >> {PATH_TO_LOG_FILE}
+
+
+Comparing Outputs between Isaac ROS DOPE and Python DOPE Inference
+------------------------------------------------------------------
+
+1. First, pair the outputs from both DOPE implementations based on the
+   input image used for inference.
+2. For each pair of outputs, run the following steps:
+
+   1. (Optional) Confirm that the Isaac ROS DOPE output detected at
+      least one pose. If your input data contains an image in which the
+      expected result is an empty pose array, then skip this step.
+
+   2. Collect the list of poses found in the Python DOPE Inference's
+      output ``.json`` file.
+
+      Concatenate the ``location`` and ``quaternion_xyzw`` elements to
+      produce a length-7 pose.
+
+      Multiply the translational components of the pose by a factor of
+      ``1/100`` to convert the outputs from centimeters to meters.
+
+   3. For each pose in the Isaac ROS DOPE output, run the following
+      steps:
+
+      1. Compare the XYZ position of this pose against those of all
+         poses currently remaining in the Python DOPE Inference output's
+         list of poses.
+
+      2. Find the closest match based on the L2-norm.
+
+      3. Check that each field of the Isaac ROS DOPE pose and
+         closest-matching Python DOPE Inference pose are equal up to 2
+         decimal places.
+
+         Note that the sign of the quaternion elements may be flipped,
+         due to the double-cover nature of quaternions.
+
+      4. Remove the consumed Python DOPE Inference pose from the list of
+         poses, so that it is only matched to one Isaac ROS DOPE pose.
+
+3. If all checks for all poses for all output pairs pass, the
+   verification was successful.
+
+NVIDIA has run this testing process in an automated fashion using the
+``Ketchup`` suite of example data.

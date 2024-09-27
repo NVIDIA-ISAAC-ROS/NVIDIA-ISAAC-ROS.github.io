@@ -1,0 +1,83 @@
+Getting Started
+===============
+
+.. include:: /../shared/_snippets/nova_carter/getting_started.rst
+
+.. _nova-carter-dev-setup:
+
+Prerequisites
+-------------
+
+If you consider using `Nova Carter` only through the pre-built docker image,
+continue to Visualization Setup. Otherwise, you should complete Isaac ROS Development Environment,
+repositories, and visualization setup before proceeding to run the applications.
+
+Isaac ROS Development Environment Setup (Optional)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+.. note::
+
+    Ensure you have set up the SSD and migrated the Docker directory to SSD.
+    Instructions can be found :ref:`here <robots/nova_carter/getting_started:Docker Configuration>`.
+
+.. note::
+
+    We recommend that you connect the `Nova Carter` through Ethernet in this step.
+    Building a Docker image for the development environment takes longer time in the first time
+    you run it. Expect faster spin-up of the development environment after the first cached build.
+
+Repositories Setup (Optional)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Clone ``nova_carter`` repository under ``${ISAAC_ROS_WS}/src``:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+        git clone --recursive :ir_clone:`<nova_carter>`
+
+2. Create a file called ``.isaac_ros_common-config`` with the following context:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts
+      echo -e "CONFIG_IMAGE_KEY=ros2_humble.nova_carter\nCONFIG_DOCKER_SEARCH_DIRS=(../../nova_carter/docker ../docker)" > .isaac_ros_common-config
+
+3. Create a file called ``.isaac_ros_dev-dockerargs`` with the following
+   context:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts && \
+        echo -e "-v /etc/nova/:/etc/nova/\n-v /opt/nvidia/nova/:/opt/nvidia/nova/" > .isaac_ros_dev-dockerargs
+
+4. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+5. Clone the dependency repositories using the ``vcstool`` file in the ``nova_carter`` repository:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev
+      vcs import --recursive src < src/nova_carter/nova_carter.repos
+
+.. _visualization-setup-carter:
+
+Visualization Setup
+~~~~~~~~~~~~~~~~~~~
+
+To visualize and evaluate outputs from running applications, you should
+follow these steps on your remote machine.
+
+1. Complete the :ref:`Foxglove setup <foxglove-setup>` guide. Make sure to
+   follow the instructions of
+   :ref:`installing additional Nvblox Foxglove extension <nvblox-foxglove-ext>`.
+
+2. Download all Foxglove layout configurations available in
+   :ir_repo:`nova_carter repository <nova_carter> <nova_carter_bringup/foxglove_layouts>`.

@@ -1,0 +1,110 @@
+Tutorial for Freespace Segmentation using a RealSense Camera
+============================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/realsense_example.gif>`
+   :width: 600px
+   :align: center
+
+Overview
+------------
+
+This tutorial demonstrates how to use a
+`RealSense <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__
+camera and
+:ir_repo:`isaac_ros_bi3d_freespace <isaac_ros_freespace_segmentation> <isaac_ros_bi3d_freespace>`
+to create a local occupancy grid.
+
+.. note::
+
+   This tutorial requires a compatible RealSense camera from
+   the list of available
+   :ref:`cameras <getting_started/hardware_setup/sensors/realsense_setup:Camera Compatibility>`.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
+2.  Complete steps 1-7 described in the
+    :ref:`Quickstart Guide <repositories_and_packages/isaac_ros_freespace_segmentation/isaac_ros_bi3d_freespace/index:quickstart>`.
+3.  Open a new terminal and launch the Docker container using the
+    ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+4.  Build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+         colcon build --symlink-install && \
+         source install/setup.bash
+
+5.  Set your camera as shown in the image below, which is on a
+    tripod ~10cm tall and parallel to the ground. Or you can change the
+    static transform in the launch file
+    :ir_repo:`here <isaac_ros_freespace_segmentation> <isaac_ros_bi3d_freespace/launch/isaac_ros_bi3d_freespace_realsense.launch.py#L144-157>`,
+    according to the placement of your camera with respect to an
+    occupancy grid origin frame.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/realsense_camera_position.jpg>`
+      :width: 400px
+      :align: center
+
+6.  Run the launch file, to launch the example:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_bi3d_freespace isaac_ros_bi3d_freespace_realsense.launch.py featnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_featnet.plan \
+       segnet_engine_file_path:=/tmp/models/bi3d/bi3dnet_segnet.plan \
+       max_disparity_values:=16
+
+7.  Open a second terminal and attach to the container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+       ./scripts/run_dev.sh
+
+8.  Optionally, you can run the visualizer script to visualize the
+    disparity image:
+
+    .. code:: bash
+
+       ros2 run isaac_ros_bi3d isaac_ros_bi3d_visualizer.py --disparity_topic bi3d_mask
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/visualizer_realsense.png>`
+      :width: 500px
+      :align: center
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_freespace_segmentation/visualizer_realsense_mono_pair.png>`
+      :width: 500px
+      :align: center
+
+    .. note::
+
+       For more information on how to interpret the output, refer
+       to the :ref:`interpreting the output section <bi3d interpreting the output>`.
+
+9.  Open a third terminal and attach to the container:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+       ./scripts/run_dev.sh
+
+10. Visualize the occupancy grid in RViz:
+
+    Start RViz:
+
+    .. code:: bash
+
+       rviz2
+
+    In the left pane, change the **Fixed Frame** to ``base_link``.
+
+    In the left pane, click **Add**, select **By topic**
+    followed by **Map** to add the occupancy grid. You should see an
+    output similar to the one shown at the top of this page.

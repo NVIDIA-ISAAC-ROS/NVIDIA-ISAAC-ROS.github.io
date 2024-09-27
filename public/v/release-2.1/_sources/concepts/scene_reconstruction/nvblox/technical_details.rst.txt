@@ -1,0 +1,98 @@
+Technical Details
+=================
+
+This document describes how nvblox works for its different mapping modes.
+
+Static Reconstruction
+---------------------
+
+Nvblox builds a reconstructed map in the form of a TSDF
+(Truncated Signed Distance Function) stored in a 3D voxel grid. This
+approach is similar to 3D occupancy grid mapping approaches in which
+occupancy probabilities are stored at each voxel. However, TSDF-based
+approaches like nvblox store the (signed) distance to the closest
+surface at each voxel. The surface of the environment can then be
+extracted as the zero-level set of this voxelized function. Typically,
+TSDF-based reconstructions provide higher quality surface
+reconstructions.
+
+Distance fields are useful for path planning. They provide an
+immediate means of checking potential future robot positions for
+collisions with the reconstructed environment. nvblox provides for construction
+of the full (non-truncated) distance field, also known as the ESDF
+(Euclidean Signed Distance Function).
+
+The dual utility of distance functions for reconstruction and
+planning motivates their use in nvblox.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/system_diagram_technical_details.jpg>`
+    :width: 500px
+    :align: center
+
+|
+
+The diagram above indicates data and processes in nvblox. By default,
+nvblox builds TSDF, color, mesh, and ESDF *layers*. Each
+*layer* is an independent, but aligned and co-located, voxel grid
+containing data of the appropriate type. For example, voxels on the TSDF
+layer store distance and weight data, while the color layer voxels store
+color values.
+
+Human Reconstruction
+--------------------
+
+There are
+additional options for mapping scenes containing people. In this
+configuration, humans are separated from the TSDF reconstruction into a
+separate *layer* containing an occupancy grid representing reconstructed
+humans.
+
+Human segmentation is applied to each processed color frame with
+:ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`.
+The depth masker module uses the segmentation mask from the color image
+to separate the depth-map into human and non-human parts. While the
+non-human labeled part of the depth frame is still forwarded to TSDF
+mapping, the human labeled part is processed to an
+occupancy grid map.
+
+To relax the assumption that occupancy grid maps only capture static
+objects, an occupancy decay step must be applied. At a fixed frequency, all
+voxel occupancy probabilities are decayed towards ``0.5`` over time.
+This means that the state of the map (occupied or free) becomes less
+certain after it has fallen out of the field of view, until it becomes
+unknown (``0.5`` occupancy probability).
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox_person_removal.png>`
+    :width: 750px
+    :align: center
+
+|
+
+Dynamic Reconstruction
+----------------------
+
+The algorithm used for nvblox dynamic reconstruction is based on the following paper:
+
+* | Lukas Schmid, Olov Andersson, Aurelio Sulser, Patrick Pfreundschuh, and Roland Siegwart.
+  | "**Dynablox: Real-time Detection of Diverse Dynamic Objects in Complex Environments**"
+  | in *IEEE Robotics and Automation Letters (RA-L)*,
+    Vol. 8, No. 10, pp. 6259 - 6266, October 2023.
+  | [ `IEEE <https://ieeexplore.ieee.org/document/10218983>`__ | `ArXiv <https://arxiv.org/abs/2304.10049>`__ | `Video <https://www.youtube.com/watch?v=NA13fRWlqRQ>`__]
+
+While the human reconstruction pipeline employs a Deep Neural Network (DNN)
+to generate a mask image for separating human detections into a dynamic occupancy layer,
+the general dynamic reconstruction pipeline maintains a (high-confidence)
+freespace layer dedicated to detecting dynamic objects.
+Whenever an object enters freespace, it is identified as dynamic and
+then integrated into the dynamic occupancy layer, similar to
+the human reconstruction pipeline described above.
+
+This enables the pipeline to separately reconstruct humans
+(or other specific objects that the DNN was trained for)
+and all moving objects regardless of their class or category.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/system_diagram_dynamics.jpg>`
+    :width: 500px
+    :align: center
+
+|

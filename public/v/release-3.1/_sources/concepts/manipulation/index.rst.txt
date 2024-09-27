@@ -1,0 +1,76 @@
+============
+Manipulation
+============
+
+Overview
+--------
+
+In robotics, the term "manipulator" has traditionally had a very broad definition, referring not only
+to robots used for repositioning or modifying physical objects but also to robot arms generally, even
+when used in non-contact applications such as automated optical inspection.  Increasingly, robotic
+manipulators are being used for tasks where their motion must adapt to changing conditions as
+perceived via cameras or other sensors.
+
+An example of perception-driven manipulation is unstructured picking, where the robot might be tasked
+with picking a variety of objects whose positions are not known in advance.  This requires modules
+to detect a given object, determine its pose, compute a suitable grasp (dependent on the installed gripper),
+plan a trajectory to bring the gripper to the desired pose while avoiding collisions, execute the planned
+trajectory, grasp the object, and finally plan a trajectory to the desired place point, all in real time.
+More challenging scenarios might require the planner to adapt to a changing environment where the presence
+and positions of obstacles also vary.
+
+`Isaac Manipulator <https://developer.nvidia.com/isaac/manipulator>`_ consists of a set of components and
+:doc:`reference workflows </reference_workflows/isaac_manipulator/index>` for advanced perception-driven
+manipulation.  These components include state-of-the-art packages for
+:doc:`object detection </repositories_and_packages/isaac_ros_object_detection/index>` and
+:doc:`object pose estimation </repositories_and_packages/isaac_ros_pose_estimation/index>`, as well as
+obstacle-aware motion generation, described in more detail below.
+
+
+.. _concept-cumotion:
+
+NVIDIA cuMotion
+---------------
+
+`NVIDIA cuMotion` is a software package for computing optimal-time, minimal-jerk trajectories for serial robot arms.
+It is capable of avoiding collisions with obstacles represented as a set of cuboids, meshes, signed distance fields
+(computed from one or more depth image streams using :doc:`nvblox </repositories_and_packages/isaac_ros_nvblox/index>`),
+or any combination of the three.  cuMotion leverages NVIDIA hardware acceleration to compute such trajectories in
+a fraction of a second on Jetson AGX Orin or tens of milliseconds on a discrete GPU such as RTX 6000 (Ada Generation).
+
+In the current release, the planning capabilities of cuMotion are exposed via a plugin for
+`MoveIt 2 <https://moveit.picknik.ai>`_.  In addition, a ROS 2 node is provided that uses the current joint
+configuration of the robot to perform segmentation in order to filter out the robot from a depth image,
+as needed to reconstruct obstacles in the environment without spurious contributions from the robot itself.
+
+cuMotion incorporates technology developed by `NVIDIA Research <https://www.nvidia.com/en-us/research/>`_ and
+leverages the `cuRobo library <https://curobo.org>`_ internally.
+
+See :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>` for more on cuMotion
+and instructions for getting started.
+
+
+Robot Configuration
+-------------------
+
+In order to generate motion or perform segmentation for a given robot, cuMotion requires two files:
+
+1. A universal/unified robot description format (URDF) file, describing basic kinematics.
+2. An extended robot description format (XRDF) file, supplementing the URDF file with collision geometry
+   (as a set of collision spheres), a definition of the configuration space (c-space) used for planning,
+   potential modifiers to the URDF file, and other such data.
+
+See the following specification for details on XRDF.
+
+.. toctree::
+   :glob:
+
+   xrdf.rst
+
+For convenience, Isaac Sim 4.0 and later includes a visual `Robot Description Editor` with XRDF support.
+
+.. warning::
+
+   In the current release, ``isaac_ros_cumotion`` also accepts robot description files in a legacy
+   `cuRobo format <https://curobo.org/tutorials/1_robot_configuration.html>`_,
+   but this support will be discontinued in a future release.  Please use XRDF instead.

@@ -1,0 +1,270 @@
+RealSense Camera Examples
+=========================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_example.gif>`
+    :width: 600px
+    :align: center
+
+
+This page contains tutorials for running nvblox together with Visual SLAM on a
+`RealSense <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__
+camera.
+
+.. note::
+
+   This tutorial requires a compatible RealSense camera from
+   the list of available :doc:`cameras </getting_started/hardware_setup/sensors/realsense_setup>`.
+
+
+Install
+-------
+
+1. Complete the :doc:`Isaac ROS NvBlox RealSense Setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
+
+2. Complete the :ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`.
+
+3. If you installed nvblox as a Debian package, you will also need to clone ``isaac_ros_nvblox`` under ``${ISAAC_ROS_WS}/src``:
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src
+        git clone --recursive :ir_clone:`<isaac_ros_nvblox>`
+
+
+4. Stop Git tracking the ``COLCON_IGNORE`` file in the
+   ``realsense_splitter`` package and remove it.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_nvblox/nvblox_examples/realsense_splitter && \
+            git update-index --assume-unchanged COLCON_IGNORE && \
+            rm COLCON_IGNORE
+
+    .. note::
+
+        Note: The ``COLCON_IGNORE`` file was added to remove the dependency
+        to ``realsense-ros`` for users that don't want to run the RealSense
+        examples.
+
+5. Launch the Docker container using the ``run_dev.sh`` script (if not already launched):
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+6. Build the ``realsense_splitter`` and ``realsense2*``
+
+   .. code:: bash
+
+       cd /workspaces/isaac_ros-dev
+       colcon build --symlink-install --packages-up-to-regex realsense*
+       source install/setup.bash
+
+
+RealSense Example
+------------------
+
+This example runs nvblox-based reconstruction from a single RealSense camera,
+either from live data coming directly off a RealSense camera, or from recorded
+data coming from a ROSbag.
+
+1. Start the Isaac ROS Dev Docker container (if not started in the install step)
+
+    .. code:: bash
+
+        cd $ISAAC_ROS_WS && ./src/isaac_ros_common/scripts/run_dev.sh
+
+2. Navigate (inside the docker) to the workspace folder, and source the workspace
+
+    .. code:: bash
+
+        cd /workspaces/isaac_ros-dev
+        source install/setup.bash
+
+3. Run the RealSense example, either live from a sensor or from a recorded ROSbag.
+
+    .. tabs::
+
+        .. tab:: Live from a sensor
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py
+
+        .. tab:: On a ROSbag
+
+          1. Download the :ir_ngc:`r2b_galileo2 <teams/isaac/resources/r2bdataset2024/files>` rosbag from the r2b dataset or :ref:`record your own bag. <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Recording Data With RealSense>`
+
+          2. Launch the rosbag:
+
+          .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                rosbag:=<YOUR_ROSBAG_PATH>
+
+
+.. note::
+
+   If you want to restrict odometry to a 2D plane
+   (for example, to run a robot in a flat environment),
+   you can use the ``enable_ground_constraint_in_odometry`` argument.
+
+Recording Data with RealSense
+------------------------------
+
+To record RealSense data for nvblox:
+
+1. Connect the camera, start the Docker container and source the
+   workspace as explained in :doc:`tutorial_realsense`.
+
+2. Start recording:
+
+   .. code:: bash
+
+      ros2 launch nvblox_examples_bringup record_realsense.launch.py
+
+3. Stop the recording when done
+
+4. The resulting ROSbag can be run using the `instructions above <#realsense-example>`_.
+
+
+Reconstruction With People
+--------------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_nvblox_humans.gif>`
+    :width: 600px
+    :align: center
+
+This tutorial demonstrates how to perform dynamic people
+reconstruction in nvblox using RealSense data. For more information on how
+people reconstruction works, see
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+.. note::
+
+   If you are on a desktop machine, we recommend using the
+   ``PeopleSemSegNet``.
+   On Jetson platforms we recommend the lighter ``PeopleSemSegNet ShuffleSeg``
+   model that is provided in :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`
+   for better segmentation performance.
+
+1. Download and install the PeopleSemSegNet model assets:
+
+     :ir_apt:
+
+     .. code:: bash
+
+      sudo apt-get install -y ros-humble-isaac-ros-peoplesemseg-models-install &&
+      ros2 run isaac_ros_peoplesemseg_models_install install_peoplesemsegnet_vanilla.sh --eula &&
+      ros2 run isaac_ros_peoplesemseg_models_install install_peoplesemsegnet_shuffleseg.sh --eula
+
+2. Below we provide run instructions for both the full and light segmentation models (``PeopleSemSegNet`` and ``ShuffleSeg``)
+   respectively, running from both a ROSbag and live from a RealSense camera.
+
+    .. tabs::
+
+        .. tab:: PeopleSemSegNet (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people
+
+
+        .. tab:: ShuffleSeg (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people \
+                people_segmentation:=peoplesemsegnet_shuffleseg
+
+
+        .. tab:: PeopleSemSegNet (ROSbag)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people \
+                rosbag:=<YOUR_ROSBAG_PATH>
+
+
+        .. tab:: ShuffleSeg (ROSbag)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people \
+                people_segmentation:=peoplesemsegnet_shuffleseg \
+                rosbag:=<YOUR_ROSBAG_PATH>
+
+
+Reconstruction With Dynamic Scene Elements
+------------------------------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_dynamic_example.gif>`
+    :width: 600px
+    :align: center
+
+This tutorial demonstrates how build a reconstruction with dynamic elements in the scene (people and non-people)
+using RealSense data. For more information about how dynamic reconstruction works in nvblox see
+:doc:`/concepts/scene_reconstruction/nvblox/technical_details`.
+
+1. Below we provide run instructions for running from both a ROSbag and live from a RealSense camera.
+
+    .. tabs::
+
+        .. tab:: Live from a sensor
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=dynamic
+
+        .. tab:: On a ROSbag
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=dynamic \
+                rosbag:=<YOUR_ROSBAG_PATH>
+
+
+Visualizing in Foxglove
+-----------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/realsense_in_foxglove.gif>`
+    :width: 600px
+    :align: center
+
+The examples in previous sections on this page have used `rviz <https://github.com/ros2/rviz>`__ 
+for visualization.
+RViz is our default visualization tool in the case that nvblox is running on the same computer 
+that is displaying the visualization. In the case that you'd like to visualize a reconstruction 
+streamed from a remote machine, for example a robot, our recommended method is to use 
+`Foxglove <https://foxglove.dev/>`__.
+
+To visualize with foxglove please see :doc:`/concepts/visualization/foxglove`.
+Ensure that you additionally install the nvblox Foxglove extension.
+The animation above shows the results of visualizing the ``/nvblox_node/mesh`` 
+and ``/nvblox/static_esdf_pointcloud`` topics.
+
+.. note::
+
+   When visualizing from a remote machine over WiFi, bandwidth is limited
+   and easily exceeded.
+   Exceeding this bandwidth can lead to poor visualization results.
+   For best results we recommend visualizing a limited number of topics, 
+   and to avoiding visualizing high-bandwidth topics for example images.
+   Furthermore, it is necessary to limit bandwidth of the mesh transmitted 
+   by nvblox. Nvblox exposes a parameter for this purpose ``mesh_bandwidth_limit_mbps``.
+   When visualizing over WiFi we recommend setting this to ``30`` 
+   `here <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/blob/main/nvblox_examples/nvblox_examples_bringup/config/nvblox/nvblox_base.yaml#L89>`__.
+
+
+Troubleshooting
+---------------
+
+See
+:doc:`/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense`.

@@ -1,0 +1,63 @@
+Instructions to Generate Disparity Maps for Stereo Images
+=========================================================
+
+These are instructions for generating a disparity map for a given stereo
+image pair.
+
+The ``isaac_ros_ess_visualizer.py`` script supports:
+
+* rosbag input type
+* Raw input images
+* Camera info files
+
+
+To generate a disparity estimation from raw inputs:
+
+1. Complete the :ref:`Quickstart <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index:quickstart>` guide.
+
+2. Pull the example data:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_dnn_stereo_depth && \
+      git lfs pull -X "" -I "resources/examples"
+
+3. Launch the ESS Disparity Node using one of the following options:
+
+     To run ESS at a threshold of 0.7 run:
+
+     .. code:: bash
+
+       ros2 launch isaac_ros_ess isaac_ros_ess.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine threshold:=0.7
+
+     To run ESS at a threshold of 0.0 run:
+
+     .. code:: bash
+
+       ros2 launch isaac_ros_ess isaac_ros_ess.launch.py engine_file_path:=/workspaces/isaac_ros-dev/src/isaac_ros_dnn_stereo_depth/resources/ess.engine threshold:=0.0
+
+4. Visualize and validate the output of the package:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_ess isaac_ros_ess_visualizer.py --raw_inputs
+
+
+   With threshold set to 0.7, you should see:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/ess/ess3.0_output_threshold.0.7.png>`
+      :align: center
+
+   With threshold set to 0.0, you should see:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/ess/ess3.0_output_threshold_0.0.png>`
+      :align: center
+
+5. Try your own examples:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_ess isaac_ros_ess_visualizer.py --raw_inputs \
+              --left_image_path '<Absolute path to your left image>' \
+              --right_image_path '<Absolute path to your right image>' \
+              --camera_info_path '<Absolute path your camera info json file>'
