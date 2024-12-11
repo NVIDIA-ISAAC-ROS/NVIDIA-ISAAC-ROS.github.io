@@ -8,7 +8,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-dropdown.css?v=995e94df" />
+      <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.min.css?v=21c0b90a" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=9c005bdc" />
 
   
@@ -101,7 +102,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tools/pfc.html">Nova Preflight Checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tools/pfc.html">Nova Preflight Checker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#running">Running</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#debugging">Debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#add-custom-tests">Add Custom Tests</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../tools/nova_manager.html">Nova Manager</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tools/nova_manager.html#install">Install</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tools/nova_manager.html#uninstall">Uninstall</a></li>
@@ -130,17 +136,15 @@
 <li class="toctree-l2"><a class="reference internal" href="#phc2sys-offsets-are-large">Phc2Sys offsets are large</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#generic-pfc-service-failure">Generic PFC Service Failure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#backup-already-exist">Backup Already Exist</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#cannot-access-recovery-mode-button-on-jetson-agx-orin">Cannot Access Recovery Mode Button On Jetson AGX Orin</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#symptom">Symptom</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#solution">Solution</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#cannot-access-recovery-mode-button-on-jetson-agx-orin">Cannot Access Recovery Mode Button On Jetson AGX Orin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#system-time-is-set-to-1970">System Time is Set To 1970</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reinstall-nova-orin-init-from-scratch">Reinstall Nova Orin Init from Scratch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rplidars-not-configured">RPLIDARs not Configured</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jetson-agx-orin-not-booting-entering-bash-recovery-shell">Jetson AGX Orin Not Booting/Entering Bash Recovery Shell</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../releases/index.html#nova-orin-init-1-3-1">Nova Orin Init 1.3.1</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../releases/index.html#nova-orin-init-1-3-2">Nova Orin Init 1.3.2</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../releases/index.html#new-features">New Features</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../releases/index.html#previous-release">Previous Release</a></li>
 </ul>
@@ -183,50 +187,93 @@
 <p>Troubleshooting techniques for different problems that you might run into
 while setting up Nova.</p>
 <p>It is recommended to run the <a class="reference internal" href="../tools/pfc.html"><span class="doc">Nova Preflight Checker</span></a> to diagnose specific sensor failures before proceeding.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nova_preflight_checker</span> <span class="o">-</span><span class="n">v</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nova_preflight_checker</span>
 </pre></div>
 </div>
 <section id="nova-mgbe0-latch-not-set">
 <h2>Nova MGBE0 Latch not set<a class="headerlink" href="#nova-mgbe0-latch-not-set" title="Link to this heading"></a></h2>
-<p>If the PFC test <code class="docutils literal notranslate"><span class="pre">test_service[nova-mgbe0-latch-dead-enabled]</span></code> fails this is likely because another process has unset the latch. For example, whenever <code class="docutils literal notranslate"><span class="pre">ptp4l</span></code> restarts it will unset the latch. To set the latch again run:</p>
+<p>If the PFC test <code class="docutils literal notranslate"><span class="pre">nvpps/pfc/tests.py::test_service[nova-mgbe0-latch]</span></code> fails this is likely because another process has unset the latch. For example, whenever <code class="docutils literal notranslate"><span class="pre">ptp4l</span></code> restarts it unsets the latch.</p>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">To set the latch again run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>nova-mgbe0-latch
 </pre></div>
 </div>
-</section>
+</div>
+</details></section>
 <section id="phc2sys-offsets-are-large">
 <h2>Phc2Sys offsets are large<a class="headerlink" href="#phc2sys-offsets-are-large" title="Link to this heading"></a></h2>
 <p>If you see an error from the PFC similar to this:</p>
 <div class="no-copybutton highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">================================================================================</span> <span class="n">short</span> <span class="n">test</span> <span class="n">summary</span> <span class="n">info</span> <span class="o">================================================================================</span>
-<span class="n">FAILED</span> <span class="o">../../</span><span class="n">opt</span><span class="o">/</span><span class="n">nvidia</span><span class="o">/</span><span class="n">nova</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">nova</span><span class="o">-</span><span class="n">init</span><span class="o">-</span><span class="n">py</span><span class="o">/</span><span class="n">nova_init</span><span class="o">/</span><span class="n">tests</span><span class="o">/</span><span class="n">test_nova_orin</span><span class="o">.</span><span class="n">py</span><span class="p">::</span><span class="n">test_phc2sys_offsets</span> <span class="o">-</span> <span class="ne">AssertionError</span><span class="p">:</span> <span class="n">phc2sys</span> <span class="n">reporting</span> <span class="n">offset</span> <span class="n">of</span> <span class="mi">141353</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">greater</span> <span class="n">than</span> <span class="nb">max</span> <span class="mi">150</span>
-<span class="n">FAILED</span> <span class="o">../../</span><span class="n">opt</span><span class="o">/</span><span class="n">nvidia</span><span class="o">/</span><span class="n">nova</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">nova</span><span class="o">-</span><span class="n">init</span><span class="o">-</span><span class="n">py</span><span class="o">/</span><span class="n">nova_init</span><span class="o">/</span><span class="n">tests</span><span class="o">/</span><span class="n">test_nova_orin</span><span class="o">.</span><span class="n">py</span><span class="p">::</span><span class="n">test_phc2sys_frequency</span> <span class="o">-</span> <span class="ne">AssertionError</span><span class="p">:</span> <span class="n">phc2sys</span> <span class="n">reporting</span> <span class="n">frequency</span> <span class="n">error</span> <span class="n">of</span> <span class="mi">115849</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">greater</span> <span class="n">than</span> <span class="nb">max</span> <span class="mi">150</span>
+<span class="n">FAILED</span> <span class="n">time</span><span class="o">/</span><span class="n">pfc</span><span class="o">/</span><span class="n">tests</span><span class="o">.</span><span class="n">py</span><span class="p">::</span><span class="n">test_phc2sys_offsets</span> <span class="o">-</span> <span class="ne">AssertionError</span><span class="p">:</span> <span class="n">phc2sys</span> <span class="n">reporting</span> <span class="n">offset</span> <span class="n">of</span> <span class="mi">141353</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">greater</span> <span class="n">than</span> <span class="nb">max</span> <span class="mi">150</span>
+<span class="n">FAILED</span> <span class="n">time</span><span class="o">/</span><span class="n">pfc</span><span class="o">/</span><span class="n">tests</span><span class="o">.</span><span class="n">py</span><span class="p">::</span><span class="n">test_phc2sys_frequency</span> <span class="o">-</span> <span class="ne">AssertionError</span><span class="p">:</span> <span class="n">phc2sys</span> <span class="n">reporting</span> <span class="n">frequency</span> <span class="n">error</span> <span class="n">of</span> <span class="mi">115849</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">greater</span> <span class="n">than</span> <span class="nb">max</span> <span class="mi">150</span>
 </pre></div>
 </div>
-<p>This means that the time synchronization service <code class="docutils literal notranslate"><span class="pre">phc2sys</span></code> has not settled or cannot settle. Wait about 30 seconds and try running the PFC again. On boot it takes a period of time for the service to converge. If running the PFC again does not fix the offsets it is recommended to look at this <a class="reference internal" href="#nova-mgbe0-latch-not-set"><span class="std std-ref">MGBE0 latch issue</span></a> since an unset latch can cause large jumps in <code class="docutils literal notranslate"><span class="pre">phc2sys</span></code> offsets.</p>
-</section>
+<p>This means that the time synchronization service <code class="docutils literal notranslate"><span class="pre">phc2sys</span></code> has not settled or cannot settle.</p>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">Wait about 30 seconds and try running the PFC again. On boot it takes a period of time for the service to converge. If running the PFC again does not fix the offsets it is recommended to look at this <a class="reference internal" href="#nova-mgbe0-latch-not-set"><span class="std std-ref">MGBE0 latch issue</span></a> because an unset latch can cause large frequency errors in <code class="docutils literal notranslate"><span class="pre">phc2sys</span></code>.</p>
+<p class="card-text">If the latch is set and the issue persists, restarting <code class="docutils literal notranslate"><span class="pre">phc2sys</span></code> can cause the offset to converge faster.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p class="card-text">The interface <code class="docutils literal notranslate"><span class="pre">eno1</span></code> assumes the default Nova configuration with sensors connected on the onboard Ethernet.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">systemctl</span> <span class="n">restart</span> <span class="n">nova</span><span class="o">-</span><span class="n">phc2sys</span><span class="nd">@eno1</span>
+</pre></div>
+</div>
+<p class="card-text">If this issue is repeatedly happening check if NTP or SNTP is running. When NTP or SNTP is enabled the time will synchronize with servers periodically and cause large changes in the clock. Consequently, <code class="docutils literal notranslate"><span class="pre">phc2sys</span></code> offsets will diverge. These are some known packages that use NTP/SNTP: <code class="docutils literal notranslate"><span class="pre">chrony</span></code>, <code class="docutils literal notranslate"><span class="pre">ntp</span></code>, <code class="docutils literal notranslate"><span class="pre">systemd-timesyncd</span></code>.</p>
+</div>
+</details></section>
 <section id="generic-pfc-service-failure">
 <h2>Generic PFC Service Failure<a class="headerlink" href="#generic-pfc-service-failure" title="Link to this heading"></a></h2>
-<p>If you see any PFC failures related to services like <code class="docutils literal notranslate"><span class="pre">test_service[nova-sync-time-dead-enabled]</span></code> it is recommended to look at the service logs and see if the service state matches the test. The way PFC service tests are designed is that the first part is the service name, the second is the service state, and the third is the file state. In the example given this would be <code class="docutils literal notranslate"><span class="pre">nova-sync-time</span></code>, <code class="docutils literal notranslate"><span class="pre">dead</span></code>, and <code class="docutils literal notranslate"><span class="pre">enabled</span></code> respectively. The service logs can be viewed by running.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">nova_preflight_checker</span></code> has a failure related to a service not covered by another section in this troubleshooting guide.</p>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">If you see any PFC failures related to services it is recommended to look at the service logs for more details. A typical PFC service test will have this structure <code class="docutils literal notranslate"><span class="pre">test_service[&lt;service-name&gt;]</span></code>. For example, the PFC test <code class="docutils literal notranslate"><span class="pre">test_service[nova-sync-time]</span></code> is testing the <code class="docutils literal notranslate"><span class="pre">nova-sync-time</span></code> service. The logs for the service can be viewed with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>systemctl<span class="w"> </span>status<span class="w"> </span>&lt;service-name&gt;
 </pre></div>
 </div>
-<p>If the service is expected to have run because it was enabled, try restarting the service.</p>
+<p class="card-text">If the service is expected to have run because it was enabled, try restarting the service.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>&lt;service-name&gt;
 </pre></div>
 </div>
-</section>
+</div>
+</details></section>
 <section id="backup-already-exist">
 <h2>Backup Already Exist<a class="headerlink" href="#backup-already-exist" title="Link to this heading"></a></h2>
 <p>When installing Nova you may run into the following error or something similar:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ERROR:<span class="w"> </span>backup<span class="w"> </span>/etc/logrotate.d/rsyslog.nova.disabled<span class="w"> </span>already<span class="w"> </span>exist
+<div class="no-copybutton highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ERROR</span><span class="p">:</span> <span class="n">backup</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">logrotate</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">rsyslog</span><span class="o">.</span><span class="n">nova</span><span class="o">.</span><span class="n">disabled</span> <span class="n">already</span> <span class="n">exist</span>
 </pre></div>
 </div>
 <p>Nova modifies files on the system for robotics applications. When Nova makes a change it backs up the original file with a <code class="docutils literal notranslate"><span class="pre">.nova.disabled</span></code> extension. During Nova removal it should find this file and recover it if the file placed by Nova was unmodified. However, when the file has been modified or Nova has lost track of the file for another reason it does not recover. During the follow-up Nova installation the above error happens because Nova does not want to destroy the old backup it created.</p>
-<p>To recover from this situation you can try to reinstall Nova with:</p>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">To recover from this situation you can try to reinstall Nova with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>remove<span class="w"> </span>nova-orin-init<span class="w">  </span><span class="c1"># nova must be removed since</span>
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>nova-orin-init
 </pre></div>
 </div>
-<p>If that does not work use these instructions:</p>
+<p class="card-text">If that does not work use these instructions:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remove Nova</span>
 $<span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>remove<span class="w"> </span>nova-orin-init
 <span class="c1"># Find the files Nova did not recover properly</span>
@@ -235,39 +282,49 @@ $<span class="w"> </span>sudo<span class="w"> </span>find<span class="w"> </span
 <span class="c1"># Example: sudo mv &lt;file_path&gt;.nova.disabled &lt;file_path&gt;</span>
 </pre></div>
 </div>
-</section>
+</div>
+</details></section>
 <section id="cannot-access-recovery-mode-button-on-jetson-agx-orin">
 <h2>Cannot Access Recovery Mode Button On Jetson AGX Orin<a class="headerlink" href="#cannot-access-recovery-mode-button-on-jetson-agx-orin" title="Link to this heading"></a></h2>
-<section id="symptom">
-<h3>Symptom<a class="headerlink" href="#symptom" title="Link to this heading"></a></h3>
-<p>The Jetson AGX Orin needs to be put into recovery mode but the recovery mode button is inaccessible for some reason.</p>
-</section>
-<section id="solution">
-<h3>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h3>
-<p>Put the Jetson into recovery mode by running:</p>
+<p>The Jetson AGX Orin needs to be put into recovery mode but the recovery mode button is inaccessible.</p>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">Put the Jetson into recovery mode by running:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>reboot<span class="w"> </span>--force<span class="w"> </span>forced-recovery
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</details></section>
 <section id="system-time-is-set-to-1970">
 <h2>System Time is Set To 1970<a class="headerlink" href="#system-time-is-set-to-1970" title="Link to this heading"></a></h2>
 <p>If you run <code class="docutils literal notranslate"><span class="pre">timedatectl</span></code> and see something similar to below:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>timedatectl
-<span class="w">               </span>Local<span class="w"> </span>time:<span class="w"> </span>Sat<span class="w"> </span><span class="m">1970</span>-01-03<span class="w"> </span><span class="m">23</span>:08:46<span class="w"> </span>PDT
-<span class="w">           </span>Universal<span class="w"> </span>time:<span class="w"> </span>Sat<span class="w"> </span><span class="m">1970</span>-01-03<span class="w"> </span><span class="m">06</span>:08:46<span class="w"> </span>UTC
-<span class="w">                 </span>RTC<span class="w"> </span>time:<span class="w"> </span>Sat<span class="w"> </span><span class="m">1970</span>-01-03<span class="w"> </span><span class="m">06</span>:08:46
-<span class="w">                </span>Time<span class="w"> </span>zone:<span class="w"> </span>America/Los_Angeles<span class="w"> </span><span class="o">(</span>PDT,<span class="w"> </span>-0700<span class="o">)</span>
-System<span class="w"> </span>clock<span class="w"> </span>synchronized:<span class="w"> </span>no
-<span class="w">              </span>NTP<span class="w"> </span>service:<span class="w"> </span>n/a
-<span class="w">          </span>RTC<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nb">local</span><span class="w"> </span>TZ:<span class="w"> </span>no
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ timedatectl
+            Local time: Sat 1970-01-03 23:08:46 PDT
+        Universal time: Sat 1970-01-03 06:08:46 UTC
+                RTC time: Sat 1970-01-03 06:08:46
+                Time zone: America/Los_Angeles (PDT, -0700)
+System clock synchronized: no
+            NTP service: n/a
+        RTC in local TZ: no
 </pre></div>
 </div>
 <p>This means that your system clock has not synced to wall-clock time properly. Nova only syncs to the wall-clock time on boot to avoid significant time jumps for sensors. If there is no internet on boot Nova relies on an RTC coin battery connected to the Jetson AGX Orin. Systems without an RTC coin battery cannot establish proper time without internet.</p>
-<p>To fix this issue there are two options:</p>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">To fix this issue there are two options:</p>
 <ol class="arabic">
-<li><p>Add an RTC coin battery to the Jetson AGX Orin so it tracks time between boots. The RTC coin battery can be <a class="reference external" href="https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html#rtc-backup-battery-connector-j13">connected on the bottom of the Jetson AGX Orin</a>.</p></li>
-<li><p>Connect to the internet with Ethernet or through WiFi and reboot.</p>
+<li><p class="card-text">Add an RTC coin battery to the Jetson AGX Orin so it tracks time between boots. The RTC coin battery can be <a class="reference external" href="https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html#rtc-backup-battery-connector-j13">connected on the bottom of the Jetson AGX Orin</a>.</p></li>
+<li><p class="card-text">Connect to the internet with Ethernet or through WiFi and reboot.</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>reboot
 </pre></div>
@@ -275,16 +332,110 @@ System<span class="w"> </span>clock<span class="w"> </span>synchronized:<span cl
 </div></blockquote>
 </li>
 </ol>
-</section>
+</div>
+</details></section>
 <section id="reinstall-nova-orin-init-from-scratch">
 <h2>Reinstall Nova Orin Init from Scratch<a class="headerlink" href="#reinstall-nova-orin-init-from-scratch" title="Link to this heading"></a></h2>
-<p>If Nova Orin Init is in a bad state (incorrect Nova configuration, no Nova configuration, missing files, etc.) it is recommended to do a clean install. This can be done by <a class="reference internal" href="../nova_init/index.html#remove-previous-selection"><span class="std std-ref">removing the previous Nova selection</span></a> and <a class="reference internal" href="../nova_init/index.html#install"><span class="std std-ref">installing Nova Orin Init</span></a>.</p>
+<p>Nova Orin Init is in a bad state (incorrect Nova configuration, no Nova configuration, missing files, etc.).</p>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">Do a clean install. This can be done by <a class="reference internal" href="../nova_init/index.html#remove-previous-selection"><span class="std std-ref">removing the previous Nova selection</span></a> and <a class="reference internal" href="../nova_init/index.html#install"><span class="std std-ref">installing Nova Orin Init</span></a>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>remove<span class="w"> </span>nova-orin-init
 sudo<span class="w"> </span>rm<span class="w"> </span>/etc/nova/manager_selection
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>nova-orin-init<span class="w">  </span><span class="c1"># select your system in the prompt (nova-devkit, nova-carter, etc.)</span>
 </pre></div>
 </div>
-</section>
+</div>
+</details></section>
+<section id="rplidars-not-configured">
+<h2>RPLIDARs not Configured<a class="headerlink" href="#rplidars-not-configured" title="Link to this heading"></a></h2>
+<p>During installation if you see the following, that means the RPLIDARs are not configured:</p>
+<div class="no-copybutton wrap-block highlight-default notranslate"><div class="highlight"><pre><span></span>WARN: rplidars are not configured yet
+Would you like to re-configure the rplidars? This requires physically unplugging rplidars on the robot. Respond no if you don&#39;t have access. Install when you do.
+Response (y/n):
+</pre></div>
+</div>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">Respond with “y” if you have access to the robot physically. The next prompt will say:</p>
+<div class="no-copybutton wrap-block highlight-default notranslate"><div class="highlight"><pre><span></span>Would you like to re-configure the rplidars? This requires physically unplugging rplidars on the robot. Respond no if you don&#39;t have access. Install when you do.
+Response (y/n): y
+Re-configuring. Please unplug the front rplidar at this time. Press enter once that&#39;s done.
+</pre></div>
+</div>
+<p class="card-text">Unscrew the top plate carefully to access the robots internals. After unscrewed, lift the top plate and look for the network switch. Unplug the black Ethernet cable connected to the RPLIDAR on Nova Carters front side. Press enter after this is done and continue.</p>
+<div class="no-copybutton wrap-block highlight-default notranslate"><div class="highlight"><pre><span></span>Re-configuring. Please unplug the front rplidar at this time. Press enter once that&#39;s done.
+Continuing. Please wait up to 45 seconds.
+Re-configuring rplidar ip 192.168.11.2 to 192.168.1.3
+[2023-10-05 13:50:30.313] [info] Set lidar IP address to 192.168.1.3! Resetting the lidar...
+Finished setting rplidar ip to 192.168.1.3. Plug back in the front rplidar now. Press enter when it&#39;s done.
+</pre></div>
+</div>
+<p class="card-text">Next, plug back in the front RPLIDAR and press enter again. You will see:</p>
+<div class="no-copybutton wrap-block highlight-default notranslate"><div class="highlight"><pre><span></span>Finished setting rplidar ip to 192.168.1.3. Plug back in the front rplidar now. Press enter when it&#39;s done.
+Re-configuring front rplidar now...
+[2023-10-05 13:51:07.500] [info] Set lidar IP address to 192.168.1.2! Resetting the lidar...
+Confirming rplidars are setup. Waiting for 60s...
+INFO: RPLIDARs setup! FRONT rplidar is 192.168.1.2. BACK rplidar is 192.168.1.3.
+</pre></div>
+</div>
+<p class="card-text">The RPLIDARs are now configured.</p>
+</div>
+</details></section>
+<section id="jetson-agx-orin-not-booting-entering-bash-recovery-shell">
+<h2>Jetson AGX Orin Not Booting/Entering Bash Recovery Shell<a class="headerlink" href="#jetson-agx-orin-not-booting-entering-bash-recovery-shell" title="Link to this heading"></a></h2>
+<p>The Jetson AGX Orin fails to boot into rootfs 3 consecutive times and enters the bash recovery shell. This can happen after <code class="docutils literal notranslate"><span class="pre">nova-orin-init</span></code> is installed and the device tree overlays applied to enable cameras is not compatible with the kernel. All default Jetpack kernels should be compatible with Nova.</p>
+<details class="sphinx-bs dropdown card mb-3">
+<summary class="summary-title card-header">
+Solution<div class="summary-down docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="summary-up docutils">
+<svg version="1.1" width="24" height="24" class="octicon octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="summary-content card-body docutils">
+<p class="card-text">To recover from this state you must access the Jetson AGX Orin through a monitor and keyboard or the <a class="reference external" href="https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html">USB micro-B port (9)</a> using <a class="reference external" href="https://developer.ridgerun.com/wiki/index.php/NVIDIA_Jetson_Orin/In_Board/Getting_in_Board/Serial_Console#Using_minicom">minicom</a>. After you have access, power the device on/off or reboot the device in the shell.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>reboot
+</pre></div>
+</div>
+<p class="card-text">While the device is booting press the <code class="docutils literal notranslate"><span class="pre">ESC</span></code> key on your keyboard. This will enter you into the UEFI Menu. Select these options in the UEFI Menu: Device Manager → NVIDIA Configuration → L4T Configuration → OS chain A status → (The value is Unbootable if UEFI attempts recovery kernel) choose Normal → Save and exit.</p>
+<p class="card-text">Reboot the device. During boot this time press <code class="docutils literal notranslate"><span class="pre">0</span></code> on your keyboard when the following appears on the monitor or in the serial connection.</p>
+<div class="no-copybutton highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ESC</span>   <span class="n">to</span> <span class="n">enter</span> <span class="n">Setup</span><span class="o">.</span>
+<span class="n">F11</span>   <span class="n">to</span> <span class="n">enter</span> <span class="n">Boot</span> <span class="n">Manager</span> <span class="n">Menu</span><span class="o">.</span>
+<span class="n">Enter</span> <span class="n">to</span> <span class="k">continue</span> <span class="n">boot</span><span class="o">.</span>
+<span class="o">......</span>
+<span class="n">L4TLauncher</span><span class="p">:</span> <span class="n">Attempting</span> <span class="n">Direct</span> <span class="n">Boot</span>
+<span class="n">L4T</span> <span class="n">boot</span> <span class="n">options</span>
+<span class="mi">0</span><span class="p">:</span> <span class="n">primary</span> <span class="n">kernel</span>
+<span class="mi">1</span><span class="p">:</span> <span class="n">real</span><span class="o">-</span><span class="n">time</span> <span class="n">kernel</span>
+<span class="mi">2</span><span class="p">:</span> <span class="n">Custom</span> <span class="n">Header</span> <span class="n">Config</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">HDR40</span> <span class="n">Nova</span> <span class="n">p3762</span> <span class="n">Sensor</span> <span class="n">Config</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">CSI</span> <span class="n">Jetson</span> <span class="n">Camera</span> <span class="n">Hawk</span><span class="o">-</span><span class="n">Owl</span> <span class="n">p3762</span> <span class="n">module</span><span class="o">&gt;</span>
+<span class="n">Press</span> <span class="mi">0</span><span class="o">-</span><span class="mi">2</span> <span class="n">to</span> <span class="n">boot</span> <span class="n">selection</span> <span class="n">within</span> <span class="mf">3.0</span> <span class="n">seconds</span><span class="o">.</span>
+<span class="n">Press</span> <span class="nb">any</span> <span class="n">other</span> <span class="n">key</span> <span class="n">to</span> <span class="n">boot</span> <span class="n">default</span> <span class="p">(</span><span class="n">Option</span><span class="p">:</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="card-text">The system should now boot using the primary kernel.</p>
+<p class="card-text">Further debugging to understand why the device tree overlay is incompatible with your kernel is required. These are the options you can choose from:</p>
+<ol class="arabic">
+<li><p class="card-text">Re-flash the Jetson AGX Orin and reinstall <code class="docutils literal notranslate"><span class="pre">nova-orin-init</span></code>. This should fix the issue if the kernel was modified in an unknown way. <code class="docutils literal notranslate"><span class="pre">nova-orin-init</span></code> has been tested for development on a freshly flashed system.</p></li>
+<li><p class="card-text">Connect to the <a class="reference external" href="https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html">USB micro-B port (9)</a> using <a class="reference external" href="https://developer.ridgerun.com/wiki/index.php/NVIDIA_Jetson_Orin/In_Board/Getting_in_Board/Serial_Console#Using_minicom">minicom</a>, reboot, and analyze the logs produced. The logs should give a hint to what part of the kernel is crashing. Look into how that can be fixed.</p></li>
+<li><p class="card-text">Remove <code class="docutils literal notranslate"><span class="pre">nova-orin-init</span></code> from the device to revert Nova’s changes.</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>remove<span class="w"> </span>nova-orin-init
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</div>
+</details></section>
 </section>
 
 
@@ -299,7 +450,7 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 
   <div role="contentinfo">
     <p>&#169; Copyright 2024, NVIDIA.
-      <span class="lastupdated">Last updated on Sep 27, 2024.
+      <span class="lastupdated">Last updated on Dec 10, 2024.
       </span></p>
   </div>
 

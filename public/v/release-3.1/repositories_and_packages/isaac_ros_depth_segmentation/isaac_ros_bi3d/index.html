@@ -8,9 +8,9 @@
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css?v=a5c4661c" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-dropdown.css?v=995e94df" />
       <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.min.css?v=21c0b90a" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css?v=a5c4661c" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=dca6cfb4" />
 
   
@@ -26,8 +26,8 @@
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="../../../_static/copybutton.js?v=01823362"></script>
-        <script src="../../../_static/tabs.js?v=3030b3cb"></script>
         <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script src="../../../_static/tabs.js?v=3030b3cb"></script>
         <script>mermaid.initialize({"startOnLoad": true})</script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -35,7 +35,7 @@
     <link rel="next" title="Example Usage of Isaac ROS Depth Segmentation" href="../../../concepts/stereo_depth/bi3d/bi3d_example.html" />
     <link rel="prev" title="Isaac ROS Depth Segmentation" href="../index.html" />
  
-<script src="//assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
 
 </head>
 
@@ -2797,7 +2797,7 @@
 <li><p>Set up your development environment by following the instructions in <a class="reference internal" href="../../../getting_started/dev_env_setup.html"><span class="doc">getting started</span></a>.</p></li>
 <li><p>Clone <code class="docutils literal notranslate"><span class="pre">isaac_ros_common</span></code> under <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/src</span></code>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>release-3.1<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git<span class="w"> </span>isaac_ros_common
+<span class="w">   </span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>release-3.2<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git<span class="w"> </span>isaac_ros_common
 </pre></div>
 </div>
 </li>
@@ -2825,7 +2825,7 @@ Some sensor dependencies require restarting the Isaac ROS Dev container during i
 <span class="nv">NGC_RESOURCE</span><span class="o">=</span><span class="s2">&quot;isaac_ros_bi3d_assets&quot;</span>
 <span class="nv">NGC_FILENAME</span><span class="o">=</span><span class="s2">&quot;quickstart.tar.gz&quot;</span>
 <span class="nv">MAJOR_VERSION</span><span class="o">=</span><span class="m">3</span>
-<span class="nv">MINOR_VERSION</span><span class="o">=</span><span class="m">1</span>
+<span class="nv">MINOR_VERSION</span><span class="o">=</span><span class="m">2</span>
 <span class="nv">VERSION_REQ_URL</span><span class="o">=</span><span class="s2">&quot;https://catalog.ngc.nvidia.com/api/resources/versions?orgName=</span><span class="nv">$NGC_ORG</span><span class="s2">&amp;teamName=</span><span class="nv">$NGC_TEAM</span><span class="s2">&amp;name=</span><span class="nv">$NGC_RESOURCE</span><span class="s2">&amp;isPublic=true&amp;pageNumber=0&amp;pageSize=100&amp;sortOrder=CREATED_DATE_DESC&quot;</span>
 <span class="nv">AVAILABLE_VERSIONS</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/json&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_REQ_URL</span><span class="s2">&quot;</span><span class="k">)</span>
@@ -2874,6 +2874,11 @@ wget<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/
 </div>
 </li>
 <li><p>Install the prebuilt Debian package:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+</div></blockquote>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-humble-isaac-ros-bi3d
 </pre></div>
 </div>
@@ -2882,7 +2887,7 @@ wget<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/
 </div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><ol class="arabic">
 <li><p>Clone this repository under <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/src</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>release-3.1<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_depth_segmentation.git<span class="w"> </span>isaac_ros_depth_segmentation
+<span class="w">   </span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>release-3.2<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_depth_segmentation.git<span class="w"> </span>isaac_ros_depth_segmentation
 </pre></div>
 </div>
 </li>
@@ -2893,6 +2898,11 @@ wget<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/
 </div>
 </li>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> to install the package’s dependencies:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+</div></blockquote>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_depth_segmentation<span class="w"> </span>--ignore-src<span class="w"> </span>-y
 </pre></div>
 </div>
@@ -2949,6 +2959,11 @@ will also work on Jetson, but performance will be reduced.</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-2-2-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-2-2-0" name="2-0" role="tab" tabindex="0">Rosbag</button><button aria-controls="panel-2-2-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-2-2-1" name="2-1" role="tab" tabindex="-1">RealSense Camera</button><button aria-controls="panel-2-2-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-2-2-2" name="2-2" role="tab" tabindex="-1">Hawk Camera</button><button aria-controls="panel-2-2-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-2-2-3" name="2-3" role="tab" tabindex="-1">ZED Camera</button></div><div aria-labelledby="tab-2-2-0" class="sphinx-tabs-panel" id="panel-2-2-0" name="2-0" role="tabpanel" tabindex="0"><ol class="arabic">
 <li><p>Continuing inside the container, install the following dependencies:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+</div></blockquote>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-humble-isaac-ros-examples
 </pre></div>
 </div>
@@ -3018,6 +3033,11 @@ max_disparity_values:<span class="o">=</span><span class="m">10</span>
 </div><div aria-labelledby="tab-2-2-3" class="sphinx-tabs-panel" hidden="true" id="panel-2-2-3" name="2-3" role="tabpanel" tabindex="0"><ol class="arabic">
 <li><p>Ensure that you have already set up your ZED camera using <a class="reference internal" href="../../../getting_started/hardware_setup/sensors/zed_setup.html"><span class="doc">ZED setup tutorial</span></a>.</p></li>
 <li><p>Continuing inside the Docker container, install dependencies:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+</div></blockquote>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-humble-isaac-ros-examples<span class="w"> </span>ros-humble-isaac-ros-stereo-image-proc<span class="w"> </span>ros-humble-isaac-ros-zed
 </pre></div>
 </div>
@@ -3293,7 +3313,7 @@ provided disparity planes, it is assigned a value of 0.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2024, NVIDIA.
-      <span class="lastupdated">Last updated on Sep 27, 2024.
+      <span class="lastupdated">Last updated on Dec 10, 2024.
       </span></p>
   </div>
 
@@ -3312,7 +3332,6 @@ provided disparity planes, it is assigned a value of 0.</p>
     <a href="https://www.nvidia.com/en-us/product-security/">Product Security</a> -
     <a href="https://www.nvidia.com/en-us/contact/">Contact</a>
 </div>
-<script type="text/javascript">_satellite.pageBottom();</script>
 
 
 
@@ -3333,6 +3352,7 @@ provided disparity planes, it is assigned a value of 0.</p>
             <dt>Releases</dt>
             <dd><a href="../../../../release-2.1/repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index.html">release-2.1</a></dd>
             <dd><a href="index.html">release-3.1</a></dd>
+            <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index.html">release-3.2</a></dd>
             <dd><a href="../../../../../repositories_and_packages/isaac_ros_depth_segmentation/isaac_ros_bi3d/index.html">latest</a></dd>
         </dl>
     </div>
@@ -3340,7 +3360,11 @@ provided disparity planes, it is assigned a value of 0.</p>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
 
 </body>
 </html>

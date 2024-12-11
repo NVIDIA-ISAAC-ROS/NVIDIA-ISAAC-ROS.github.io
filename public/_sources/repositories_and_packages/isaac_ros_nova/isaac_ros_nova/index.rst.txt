@@ -1,0 +1,207 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nova> <isaac_ros_nova>`
+
+Overview
+--------
+
+The ``isaac_ros_nova`` package is a meta-package that provides an easy way to bringup Nova sensors. It provides a launch file to start all ROS nodes related to a specified Nova YAML config file, and adds configurable monitoring and visualization.
+
+The Nova system monitor utilizes :doc:`NITROS Diagnostics </repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index>` and `ROS diagnostics <https://github.com/ros/diagnostics>`__ to aggregate and publish information on sensor performance and produce warnings/errors if the system is unstable.
+
+Quickstart
+----------
+
+Set Up Nova
+^^^^^^^^^^^
+
+.. include:: /../shared/_snippets/nova_orin_install.rst
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env_nova.rst
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-nova
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nova>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nova/isaac_ros_nova --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_nova --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_nova/isaac_ros_nova
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+1. Continuing inside the Docker container, run the following launch file to spin up a demo of this package:
+
+   .. note::
+
+      The config file in this example works for any Nova sensor set with a minimum of 3 Hawks and 3 Owls, this includes Nova Developer Kit and Nova Carter. If you are using a different sensor set (for example, a single hawk camera), you can use one of the samples from the ``config/`` directory. Alternatively you can supply your own custom config YAML. Finally, if the argument is not specified it will load all the drivers for your Nova sensor set, depending on your network this may cause performance issues.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS} && \
+        ros2 launch isaac_ros_nova nova.launch.py visualize:=True config:=hawk-3_owl-3
+
+.. warning::
+
+   Depending on the network and the CPU load on the system some topics may not visualize or appear laggy. You can reduce the sensor selection being launched by changing the ``config:=<Config path>`` to a different one from ``config/``, or create your own. For custom YAMLs all sensors in the config file must match a sensor name found in ``/etc/nova/systeminfo.yaml``.
+
+.. warning::
+
+   When visualizing it is recommended to subscribe to the ``resize/image_raw`` topics. Subscribing to full sized image topics may cause performance issues.
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Complete the :ref:`foxglove setup <foxglove-setup>` guide.
+
+2. In Foxglove Studio open the ``hawk-3_owl-3.json`` layout file, which can be found in the :ir_repo:`isaac_ros_nova repository <isaac_ros_nova> <isaac_ros_nova/foxglove/hawk-3_owl-3.json>`.
+
+3. Validate that you can see a visualization similar to the following:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/hawk-3_owl-3_calibrated.png>`
+      :width: 600px
+      :alt: Foxglove visualization of Nova.
+      :align: center
+
+Track System Monitors
+^^^^^^^^^^^^^^^^^^^^^
+
+The example above already includes diagnostics for system monitoring, however there are many different options for viewing and tracking this information. Here we set up a layout to explore some of these options. :doc:`Isaac ROS Nova Recorder </repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/index>` has its own visualization for diagnostics.
+
+1. Complete the :ref:`foxglove setup <foxglove-setup>` guide and run the ``nova.launch.py`` file as above.
+
+2. :ir_repo:`isaac_ros_nova repository <isaac_ros_nova> <isaac_ros_nova/foxglove/diagnostics_panels.json>` provides a ``diagnostics_panels.json`` config layout. You can customize this or create your layout with the Diagnostics Detail, Diagnostics Summary, and State Transition panels. For the state transition panel you then need to add topics to be monitored, or add them by clicking on them in the Diagnostic Detail panel.
+
+3. You can now easily track the messages being output on ``/diagnostics`` and ``/diagnostics_agg``. It should look something as below, hopefully with less dropped frames ;) :
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/nova_monitors_w_drops.png>`
+      :width: 600px
+      :alt: Foxglove visualization of Nova Monitors.
+      :align: center
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_nova nova.launch.py <launch_argument>:=<value>
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Description
+     - Default
+   * - target_container
+     - Target Container
+     - ``nova``
+   * - config
+     - Sensor Configuration File
+     - ``/etc/nova/systeminfo.yaml``
+   * - diagnostics
+     - Turn on diagnostics
+     - ``True``
+   * - visualize
+     - Starts foxglove and other nodes for visualization.
+     - ``False``
+   * - visual_image
+     - Image size for all cameras when visualizing. Note, larger images can slow performance.
+     - ``[96,60]``
+
+MonitorNode
+^^^^^^^^^^^
+
+ROS Topics Subscribed
+~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``/diagnostics``
+     - `diagnostic_msgs/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/rolling/diagnostic_msgs/msg/DiagnosticArray.msg>`__
+     - Diagnostics published by different nodes.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``/diagnostics_agg``
+     - `diagnostic_msgs/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/rolling/diagnostic_msgs/msg/DiagnosticArray.msg>`__
+     - Diagnostics aggregated into groups by topic name and origin of diagnostics. Groups are `/sensors/hawk`, `/sensors/owl`, `/sensors/bmi`, and everything else is put into `/misc`.
+
+.. |package_name| replace:: ``isaac_ros_nova``

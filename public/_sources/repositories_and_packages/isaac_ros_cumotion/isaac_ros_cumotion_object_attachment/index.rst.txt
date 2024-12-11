@@ -1,0 +1,557 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_cumotion> <isaac_ros_cumotion_object_attachment>`
+
+Object Attachment
+=================
+
+.. _object-attachment-quickstart:
+
+For automating pick-and-place tasks, integrating the geometry of the grasped object into motion planning is crucial
+for preventing collisions and ensuring smooth operation. The |package_name| package plays a key role
+in this process by attaching the object's geometry to the robot's model when the object is picked up. This geometry
+is obtained using a depth camera and approximated with spheres. These spheres are then sent to all Isaac ROS cuMotion
+nodes, which incorporate the spheres into the collision representation of the robot. By doing this, the grasped object
+avoids collisions with the environment, as demonstrated in the top and bottom panels of Figure 1-b, while also ensuring
+correct robot segmentation, as shown in the middle panel of Figure 1-b.
+
+This module's effectiveness is seen throughout the entire pick-and-place sequence on a physical robot. It handles the
+object's geometry during the attachment phase, after which the planning modules move the robot to the desired location.
+Once the object is placed, the module detaches the geometry from the robot. If the object geometry is not taken into
+account, as shown in Figure 1-a, it can lead to failures in segmentation or collisions with the environment. These
+failures highlight the importance of integrating this module to avoid planning disruptions.
+
+  .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/attachment_compare.gif>`
+    :width: 823px
+    :align: center
+    :alt: Figure 1: Object attachment
+
+    Figure 1: Motion planning and segmentation with and without accounting for grasped object geometry in cuMotion.
+
+
+The module performs the following steps in sequence:
+
+1. Given a point cloud computed from one or more depth images, it identifies clusters of points close to the object,
+   using heuristics to select the correct cluster.
+2. A mesh is fit to the point cloud cluster.
+3. The mesh is approximated by a set of collision spheres, which are then attached to collision geometry for the
+   gripper of the robot.
+4. An axis-aligned bounding box (AABB) encompassing the attached object is sent to nvblox for the purpose
+   of clearing its contribution to the Euclidean signed distance field (ESDF), ensuring that the object itself isn't treated as an
+   obstacle by the planner.
+
+Three approaches are supported for generating the collision spheres for the attached object:
+
+1. **Point cloud clustering**: For situations with minimal object information. Provides
+   robust performance across a range of objects.
+
+2. **Cuboid proxy**: For use when the object pose and a conservative bounding box is known. The user specifies the
+   dimensions of the box (cuboid), along with an optional object-to-grasp pose; the latter defaults to the identity.
+
+3. **Object mesh**: For use when detailed object information is available. User provides the mesh and scale,
+   along with the object-to-grasp pose which is obtained from the inverse of the grasp pose.
+   
+  .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/cloud_cuboid_mesh_compare.png>`
+    :width: 823px
+    :align: center
+    :alt: Figure 2: Comparison of the three approaches.
+
+    Figure 2: Object attachment results using the point cloud, cuboid, and mesh approaches, respectively.
+
+These steps, shown in Figure 3, ensure that cuMotion takes into account the geometry of grasped objects,
+enabling smooth and collision-free motion planning.
+
+  .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/objects.jpg>`
+    :width: 720px
+    :align: center
+    :alt: Figure 3: Objects
+
+    Figure 3: Object attachment workflow for multiple objects, from point cloud to collision spheres.
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Download quickstart data from NGC:
+
+   :ir_assets:`<cumotion_object_attachment> <quickstart.tar.gz>`
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-cumotion-object-attachment
+
+   .. tab:: Build from Source
+
+      3. Clone this repository under ``${ISAAC_ROS_WS}/src``.
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone --recurse-submodules :ir_clone:`<isaac_ros_cumotion>`
+
+      4. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      5. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment --ignore-src -y
+
+      6. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --packages-up-to isaac_ros_cumotion_object_attachment
+
+      7. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File for |package_name|
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      1. Within the Docker container, execute the following launch file to initialize the action server that triggers the object attachment/detachment workflow:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_cumotion_object_attachment cumotion_bringup.launch.py
+
+         .. note::
+
+            Wait until cuMotion is ready for planning queries and the nodes ``robot_segmenter_node`` and ``attach_object_server_node`` are initialized.
+
+
+      2. Open a **second** terminal in the Docker container and navigate to the development environment:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      3. Use the rosbag to simulate an image stream that includes a grasped object by running the following command:
+
+         .. code:: bash
+
+            ros2 bag play --clock -l ${ISAAC_ROS_WS}/isaac_ros_assets/mac_cheese \
+               --remap /cumotion/camera_1/world_depth:=/segmented_depth_image
+
+      4. Open a **third** terminal in the Docker container and navigate to the development environment:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      5. Attach and detach the grasped object using one of the following modes:
+
+         - **Cyclic Mode:** Repeatedly attach and detach the object in a continuous loop:
+
+            .. code:: bash
+
+               ros2 run isaac_ros_cumotion_object_attachment attach_object_client_node \
+                 --ros-args -p object_attachment_mode:=cycle
+
+         - **Single Action Mode:** Perform a single attach or detach action.
+
+            1. **Attach the object:**
+
+               .. code:: bash
+
+                  ros2 run isaac_ros_cumotion_object_attachment attach_object_client_node \
+                    --ros-args -p object_attachment_mode:=once \
+                    -p object_attachment_attach_object:=True
+
+            2. **Detach the object:**
+
+               .. code:: bash
+
+                  ros2 run isaac_ros_cumotion_object_attachment attach_object_client_node \
+                    --ros-args -p object_attachment_mode:=once \
+                    -p object_attachment_attach_object:=False
+
+.. note::
+
+    The following parameters can also be adjusted in the ``attach_object_client_node`` to
+    try out the other object attachment approaches:
+
+
+    .. list-table::
+      :header-rows: 1
+
+      * - ROS Parameter
+        - Type
+        - Default
+        - Description
+
+      * - ``object_attachment_object_shape``
+        - ``string``
+        - ``'sphere'``
+        - **sphere**: Represents an object that is either a perfect sphere
+          or reconstructed using a point cloud that lies inside a spherical boundary.
+          **cuboid**: Represents an object that is either a perfect cuboid or
+          is approximated by a cuboid (e.g., the bounding box of the object mesh).
+          **custom_mesh**: Represents an object that is reconstructed from a user-provided
+          custom mesh, allowing for arbitrary and complex geometries beyond standard shapes.
+
+
+      * - ``object_attachment_mesh_resource``
+        - ``string``
+        - ``'/workspaces/isaac_ros-dev/temp/nontextured.stl'``
+        - Path of the mesh file
+
+      * - ``object_attachment_object_pose``
+        - ``float array``
+        - ``[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]``
+        - Pose of the attached object with respect to the gripper frame. The order is
+          translation x, y, z followed by a quaternion in order x, y, z, w
+
+      * - ``object_attachment_object_scale``
+        - ``float array``
+        - ``[0.09, 0.185, 0.035]``
+        - Represents the dimensions of the cuboid if cuboid is chosen as shape.
+          If mesh is chosen, this would represent the scale of the mesh in different
+          dimensions.
+
+
+Visualize Results of |package_name|
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+2. Launch ``RViz`` for visualization:
+
+   .. code:: bash
+
+      rviz2
+
+   In ``RViz``, set the ``Fixed Frame`` to ``base``. Then click **Add** and select **By topic** to visualize the following topics:
+
+   - **Segmented Mask**: Choose the ``Image`` option from ``/cumotion/camera_1/robot_mask`` to visualize the segmented mask that includes both the robot and the attached object.
+
+   - **Depth Image**: Choose the ``Image`` option from ``/cumotion/camera_1/world_depth`` to visualize the depth image, excluding the robot and the attached object.
+
+   - **Camera Feed**: Add the camera feed by selecting ``Camera`` from ``/camera_1/color/image_raw``. This helps verify alignment between the robot mask and the actual camera image.
+
+   - **Collision Spheres**: Select ``MarkerArray`` from ``viz_all_spheres/segmenter_attach_object`` to visualize all collision spheres managed by the ``robot_segmenter_node``, including those associated with both the robot and the attached object.
+
+   .. note::
+
+      Visualization may take up to 1 minute to appear due to initial warm-up time. During this period, the depth mask might lag behind the camera image.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/cycle_attachment_rviz.gif>`
+      :width: 600px
+      :align: center
+      :alt: Figure 4: Cyclic attachment and detachment of an object visualized in RViz.
+
+      Figure 4: Cyclic object attachment and detachment in RViz.
+      Top left: RGB image with robot and object collision spheres.
+      Bottom left: Depth image mask showing robot-object segmentation.
+      Right: 3D view of robot and object collision spheres.
+
+3. Open another terminal inside the Docker container and repeat step 1.
+
+4. In ``RViz``, visualize the collision spheres managed by the cuMotion planner node:
+
+   - Select ``MarkerArray`` from ``viz_all_spheres/planner_attach_object``. This topic visualizes all collision spheres managed by the cuMotion planner node, which includes spheres associated with both the robot and the advertised object.
+
+   The success of these visualizations indicates that the ``robot_segmenter_node`` and ``cumotion_planner_node`` received the new object collision spheres via the action server and updated their kinematics accordingly. If running the ``attach_object_client_node`` in ``cycle`` mode, you should see spheres being added and removed in ``RViz``, indicating successful attachment and detachment of object spheres.
+
+   .. note::
+
+      If the ``action_names`` argument in ``cumotion_bringup.launch.py`` is changed, the topics to visualize collision spheres will follow the naming convention ``viz_all_spheres/<action_name>``.
+
+Troubleshooting
+===============
+
+Isaac ROS Troubleshooting
+-------------------------
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+===
+
+AttachObjectServer
+------------------
+
+ROS Parameters
+~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``robot``
+     - ``string``
+     - ``'ur5e_robotiq_2f_140.xrdf'``
+     - Path or name of the XRDF file for the robot.
+
+   * - ``urdf_path``
+     - ``string``
+     - ``'rclpy.Parameter.Type.STRING'``
+     - Path to the URDF file for the robot.
+
+   * - ``cuda_device``
+     - ``int``
+     - ``'0'``
+     - CUDA device index to use
+
+   * - ``time_sync_slop``
+     - ``float``
+     - ``0.1``
+     - Maximum allowed delay (in seconds) for which depth image and joint state messages are considered synchronized.
+
+   * - ``tf_lookup_duration``
+     - ``float``
+     - ``5.0``
+     - Maximum duration (in seconds) for which to block while waiting for a transform to become available.
+
+   * - ``joint_states_topic``
+     - ``string``
+     - ``'/joint_states'``
+     - Topic to subscribe to for the robot's joint states.
+
+   * - ``depth_image_topics``
+     - ``string array``
+     - ``['/cumotion/camera_1/world_depth']``
+     - List of topics to subscribe to for input depth images.
+
+   * - ``depth_camera_infos``
+     - ``string array``
+     - ``['/camera_1/aligned_depth_to_color/camera_info']``
+     - List of topics to subscribe to for camera info corresponding to the input depth image streams.
+
+   * - ``object_link_name``
+     - ``string``
+     - ``'attached_object'``
+     - Names of actions used by dependent action servers in other nodes.
+
+   * - ``action_names``
+     - ``string array``
+     - ``['segmenter_attach_object', 'planner_attach_object']``
+     - Names of actions used by dependent action servers in other nodes.
+
+   * - ``search_radius``
+     - ``float``
+     - ``0.2``
+     - Radius (in meters) centered around the gripper's origin for depth point clustering.
+
+   * - ``surface_sphere_radius``
+     - ``float``
+     - ``0.01``
+     - Radius (in meters) to use for points sampled on surface of the object. A smaller radius will allow for generating motions very close to obstacles.
+
+   * - ``clustering_bypass_clustering``
+     - ``bool``
+     - ``False``
+     - Whether to bypass clustering entirely.
+
+   * - ``clustering_hdbscan_min_samples``
+     - ``int``
+     - ``20``
+     - Minimum number of neighboring points required for a point to be considered a core point in HDBSCAN.
+
+   * - ``clustering_hdbscan_min_cluster_size``
+     - ``int``
+     - ``30``
+     - Smallest group size that will be considered a cluster in HDBSCAN.
+
+   * - ``clustering_hdbscan_cluster_selection_epsilon``
+     - ``float``
+     - ``0.5``
+     - Threshold distance for merging clusters in HDBSCAN.
+
+   * - ``clustering_num_top_clusters_to_select``
+     - ``int``
+     - ``3``
+     - Number of top clusters to select after clustering.
+
+   * - ``clustering_group_clusters``
+     - ``bool``
+     - ``False``
+     - Whether to group clusters after selection.
+
+   * - ``clustering_min_points``
+     - ``int``
+     - ``100``
+     - Minimum number of points required in a cluster.
+
+   * - ``update_esdf_on_request``
+     - ``bool``
+     - ``True``
+     - Whether the Euclidean Signed Distance Function (ESDF) should be updated upon receiving this service call or not.
+
+   * - ``object_esdf_clearing_padding``
+     - ``double list``
+     - ``[0.05, 0.05, 0.05]``
+     - Amount by which to pad each dimension of the axis-aligned bounding box enclosing the object, in meters, for the purpose of ESDF clearing.
+
+ROS Topics Subscribed
+~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``joint_states_topic``
+     - `sensor_msgs/JointState <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/JointState.msg>`__
+     - Joint states of the robot.
+
+   * - ``depth_image_topics``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__
+     - Input depth images including the object to be attached.
+
+   * - ``depth_camera_infos``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Topics to subscribe to for camera info corresponding to the input depth image streams.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``object_origin_frame``
+     - `geometry_msgs/PointStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PointStamped.msg>`__
+     - Origin of the object in the robot's frame.
+
+   * - ``nearby_point_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__
+     - Nearby points detected around the gripper.
+
+   * - ``clustered_point_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__
+     - Clustered points representing the object.
+
+   * - ``object_point_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/PointCloud2.msg>`__
+     - Final point cloud representing the object.
+
+   * - ``robot_sphere_markers``
+     - `visualization_msgs/MarkerArray <https://github.com/ros2/common_interfaces/blob/humble/visualization_msgs/msg/MarkerArray.msg>`__
+     - Collision spheres representing the robot.
+
+ROS Services Requested
+~~~~~~~~~~~~~~~~~~~~~~
+
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+
+   * - ``nvblox_node/get_esdf_and_gradient``
+     - :ir_repo:`nvblox_msgs/EsdfAndGradients <isaac_ros_nvblox> <nvblox_msgs/srv/EsdfAndGradients.srv>`
+     - Service that is used to clear the axis-aligned bounding box (AABB) of the object in the Euclidean Signed Distance Function (ESDF).
+
+ROS Actions Advertised
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Action
+     - Interface
+     - Description
+
+   * - ``attach_object``
+     - `AttachObject.action`
+     - This action triggers the attachment or detachment of an object in the robot's kinematic model.
+
+       - **Goal Parameters:**
+
+         - ``bool attach_object``: True to attach the object; False to detach it.
+         - ``float64 fallback_radius``: Radius of a fallback sphere if geometry generation fails.
+
+       - **Result:**
+
+         - ``string outcome``: Outcome of the action (e.g., success, failure).
+
+       - **Feedback:**
+
+         - ``string status``: Status updates during the action's execution.
+
+   * - ``UpdateLinkSpheres``
+     - `UpdateLinkSpheres.action`
+     - This action updates the kinematic model of the robot by attaching an object and specifying its collision geometry using a set of spheres.
+
+       - **Goal Parameters:**
+
+         - ``bool attach_object``: True to attach the object; False to detach it.
+         - ``float32[] flattened_sphere_arr``: A flattened array representing the collision spheres, each described by x, y, z coordinates and radius.
+
+       - **Result:**
+
+         - ``string outcome``: Outcome of the action (e.g., success, failure).
+
+       - **Feedback:**
+
+         - ``string status``: Status updates during the update process.
+
+
+.. |package_name| replace:: ``isaac_ros_cumotion_object_attachment``

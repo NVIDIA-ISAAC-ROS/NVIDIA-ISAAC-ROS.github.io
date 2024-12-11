@@ -2,75 +2,91 @@
 Nova Preflight Checker
 ======================
 
+Running
+-------
+
 After installing :doc:`Nova Init </nova_init/index>` on your platform, run the Nova Preflight Checker by executing this
 command from any folder:
 
 .. code-block:: bash
 
-    $ nova_preflight_checker -v
-    ================================================================================== test session starts ==================================================================================
-    platform linux -- Python 3.8.10, pytest-7.4.2, pluggy-1.3.0 -- /opt/nvidia/nova/nova-init-py/venv/bin/python3
+    $ nova_preflight_checker
+    =========================================== test session starts ============================================
+    platform linux -- Python 3.10.12, pytest-8.3.3, pluggy-1.5.0 -- /opt/nvidia/nova/python/venv/bin/python3
     cachedir: .pytest_cache
-    rootdir: /opt/nvidia/nova/nova-init-py
-    configfile: pyproject.toml
-    collected 68 items
+    rootdir: /opt/nvidia/nova
+    configfile: pytest.ini
+    plugins: timeout-2.3.1
+    timeout: 30.0s
+    timeout method: signal
+    timeout func_only: False
+    collected 92 items
 
-    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_dev[/dev/ptp0] PASSED                                                                     [  1%]
-    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_dev[/dev/nvpps0] PASSED                                                                   [  2%]
+    compute/pfc/tests.py::test_service[nova-tegra-stats@1000] PASSED                                     [  1%]
+    compute/pfc/tests.py::test_service[nova-over-current-monitor@1] PASSED                               [  2%]
+    compute/pfc/tests.py::test_service[nova-power-monitor@1] PASSED                                      [  3%]
+    compute/pfc/tests.py::test_service[nova-nvpower] PASSED                                              [  4%]
+    compute/pfc/tests.py::test_service[nova-jetson-clocks] PASSED                                        [  5%]
+    time/pfc/tests.py::test_rtc0_device PASSED                                                           [ 21%]
+    metadata/pfc/tests.py::test_service[nova-metadata-generator] PASSED                                  [ 22%]
     ...
-    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::TestHawkEeprom::test_img_size[left_stereo_camera-right_cam_intr] PASSED                                   [ 75%]
-    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::TestHawkEeprom::test_gravity_acceleration[left_stereo_camera] PASSED                                      [ 76%]
-    ...
-    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_phc2sys_frequency PASSED                                                                             [ 98%]
-    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_calibration_host PASSED                                                                              [100%]
+    owl/pfc/tests.py::test_total_owl_devices PASSED                                                      [ 89%]
+    owl/pfc/tests.py::test_owl_capture[front_fisheye_camera] PASSED                                      [ 90%]
+    owl/pfc/tests.py::test_owl_capture[back_fisheye_camera] PASSED                                       [ 91%]
+    owl/pfc/tests.py::test_owl_capture[left_fisheye_camera] PASSED                                       [ 92%]
+    owl/pfc/tests.py::test_owl_capture[right_fisheye_camera] PASSED                                      [ 93%]
+    segway/pfc/tests.py::test_service[nova-can-setup] PASSED                                             [ 94%]
+    ssd/pfc/tests.py::test_ssd_write_speed PASSED                                                        [ 95%]
+    ssd/pfc/tests.py::test_filesystem_ssd PASSED                                                         [ 96%]
+    calibration/pfc/tests.py::test_calibration_host PASSED                                               [ 97%]
+    led/pfc/tests.py::test_service[nova-carter-led] PASSED                                               [ 98%]
+    isaac_cloud/pfc/tests.py::test_service[nova-isaac-ota] PASSED                                        [100%]
 
-    ================================================================================== 68 passed in 24.24s ==================================================================================
-    ```
+    =========================================== 92 passed in 47.33s ============================================
 
-If errors appear, we recommended that you check the relevant system on Nova Orin. Below is an
-example:
+Debugging
+---------
+
+The PFC is organized modularly. Folders under ``/opt/nvidia/nova/`` with an ``INSTALL.yaml`` are modules that setup a different part of the Nova system. Each module can have its own PFC tests to validate for the system. Here is an example of a PFC run that has failed some tests:
 
 .. code-block:: shell
     :class: no-copybutton
 
-    ================================================================================== test session starts ==================================================================================
-    platform linux -- Python 3.8.10, pytest-7.4.0, pluggy-1.3.0
-    rootdir: /opt/nvidia/nova/nova-init-py
-    configfile: pyproject.toml
-    collected 68 items
+    =========================================== test session starts ============================================
+    platform linux -- Python 3.10.12, pytest-8.3.3, pluggy-1.5.0 -- /opt/nvidia/nova/python/venv/bin/python3
+    cachedir: .pytest_cache
+    rootdir: /opt/nvidia/nova
+    configfile: pytest.ini
+    plugins: timeout-2.3.1
+    timeout: 30.0s
+    timeout method: signal
+    timeout func_only: False
+    collected 72 items
 
-    ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py .....F...........F..................................................                                       [100%]
-
-    ======================================================================================= FAILURES ========================================================================================
-    _____________________________________________________________________________ test_filesystem_camera[owl-4] _____________________________________________________________________________
-
-    camera = <CameraType.OWL: 2>, exp_cams = 4
-
-        @pytest.mark.parametrize("camera,exp_cams", FS_CAMERA_PARAMS, ids=reduceidfn)
-        def test_filesystem_camera(camera, exp_cams):
-            assert camera in FS_CAMERA_MAP, "Camera not mapped with pattern."
-            pattern, feeds_per_cam = FS_CAMERA_MAP[camera]
-            devices = get_matched_camera_devices(pattern)
-            assert len(devices) % feeds_per_cam == 0, \
-                f"Number of devices isn't a multiple of the expected number of feeds " + \
-                f"on a camera {feeds_per_cam}. Found {len(devices)} devices."
-    >       assert len(devices) / feeds_per_cam == exp_cams, f"Not enough cameras. Found {len(devices)}"
-    E       AssertionError: Not enough cameras. Found 0
-
-    /opt/nvidia/nova/nova-init-py/nova_init/tests/filesystem.py:164: AssertionError
-
+    compute/pfc/tests.py::test_service[nova-tegra-stats@1000] PASSED                                     [  1%]
+    compute/pfc/tests.py::test_service[nova-over-current-monitor@1] PASSED                               [  2%]
+    compute/pfc/tests.py::test_service[nova-power-monitor@1] PASSED                                      [  4%]
     ...
+    ptp/pfc/tests.py::test_service[nova-ptp4l@eno1] FAILED                                               [ 50%]
+    ...
+    hawk/pfc/tests.py::test_hawk_capture[front_stereo_camera] FAILED                                     [ 77%]
+    ...
+    ========================================= short test summary info ==========================================
+    FAILED hawk/pfc/tests.py::test_hawk_capture[front_stereo_camera] - AssertionError: Could not capture image for front_stereo_camera. Device ids:  3(left) 4(right)
+    ...
+    FAILED ptp/pfc/tests.py::test_service[nova-ptp4l@eno1] - AssertionError: Service not in expected state (RUNNING). Found DEAD.
+    ...
+    ================================= 10 failed, 62 passed in 64.44s (0:01:04) =================================
 
-    ================================================================================ short test summary info ================================================================================
-    FAILED ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_camera[owl-4] - AssertionError: Not enough cameras. Found 0
-    FAILED ../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_service[nova-carter-led-{exited-dead}-enabled] - AssertionError: Service not in expected state (EXITED,DEAD). Found FAILED.
-    ============================================================================= 2 failed, 66 passed in 25.03s =============================================================================
-    ERROR: /usr/bin/nova_preflight_checker:39 ('sudo -E env PATH=$PATH pytest $test_file $@' exited with code 1)
+The logs can be analyzed first by looking at where the tests are being called from. The first part before the ``::`` is the path to the test on the system. It typically follows the structure ``<module>/pfc/<test>``. This is relative to ``/opt/nvidia/nova/``. For example, the failing test ``hawk/pfc/tests.py::test_hawk_capture[front_stereo_camera]`` is part of the ``hawk`` module and its test can be found at ``/opt/nvidia/nova/hawk/pfc/tests.py``. It is running an image capture test on the ``front_stereo_camera``. The other failing check is a standard service test ``ptp/pfc/tests.py::test_service[nova-ptp4l@eno1]``. This is part of the ``ptp`` module and it's testing that the service ``nova-ptp4l@eno1`` is in its expected state. The Hawk can be debugged by checking that it's connected and the GMSL board is powered. The service can be debugged by determining why it failed with ``systemctl status nova-ptp4l@eno1``.
 
-In this case two tests failed, a filesystem check for the Owl cameras and a service status check.
-The Owl test expects 4 Owls (specified by ``owl-4``) and the service failure expects the
-``nova-carter-led`` service to be ``dead`` or ``exited`` and ``enabled``. The Owls can be debugged by
-checking that they're connected and undamaged. The service can be debugged by determining why it failed
-with ``systemctl status nova-carter-led``.
+Add Custom Tests
+----------------
 
-After installing ``nova-orin-init``, source code for the Nova Preflight Checker can be found at: ``/opt/nvidia/nova/python/nova-init-py/nova_init/tests/``.
+To add custom tests to the PFC create a standard ``pytest`` file or directory and run:
+
+.. code-block::
+
+    $ nova_preflight_checker <custom_test_file_or_dir> <custom_test_file_or_dir> ...
+
+Any number of custom tests can be forwarded to the PFC. The PFC will execute them alongside the tests for the Nova system.

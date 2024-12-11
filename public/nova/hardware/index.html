@@ -8,7 +8,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-dropdown.css?v=995e94df" />
+      <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.min.css?v=21c0b90a" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=9c005bdc" />
 
   
@@ -101,7 +102,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tools/pfc.html">Nova Preflight Checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tools/pfc.html">Nova Preflight Checker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#running">Running</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#debugging">Debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#add-custom-tests">Add Custom Tests</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../tools/nova_manager.html">Nova Manager</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tools/nova_manager.html#install">Install</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tools/nova_manager.html#uninstall">Uninstall</a></li>
@@ -130,17 +136,15 @@
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#phc2sys-offsets-are-large">Phc2Sys offsets are large</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#generic-pfc-service-failure">Generic PFC Service Failure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#backup-already-exist">Backup Already Exist</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#cannot-access-recovery-mode-button-on-jetson-agx-orin">Cannot Access Recovery Mode Button On Jetson AGX Orin</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../troubleshooting/index.html#symptom">Symptom</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../troubleshooting/index.html#solution">Solution</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#cannot-access-recovery-mode-button-on-jetson-agx-orin">Cannot Access Recovery Mode Button On Jetson AGX Orin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#system-time-is-set-to-1970">System Time is Set To 1970</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#reinstall-nova-orin-init-from-scratch">Reinstall Nova Orin Init from Scratch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#rplidars-not-configured">RPLIDARs not Configured</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#jetson-agx-orin-not-booting-entering-bash-recovery-shell">Jetson AGX Orin Not Booting/Entering Bash Recovery Shell</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../releases/index.html#nova-orin-init-1-3-1">Nova Orin Init 1.3.1</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../releases/index.html#nova-orin-init-1-3-2">Nova Orin Init 1.3.2</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../releases/index.html#new-features">New Features</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../releases/index.html#previous-release">Previous Release</a></li>
 </ul>
@@ -209,10 +213,14 @@
 cameras are connected to the Orin via a GMSL board.</p>
 <section id="connecting-cameras">
 <h3>Connecting Cameras<a class="headerlink" href="#connecting-cameras" title="Link to this heading"></a></h3>
-<p>Nova Orin Kit only supports p3762 GMSL boards, older e3653 boards are not currently supported.
+<p>Nova Orin Kit only supports P3762_A03 GMSL boards, older revisions (P3762_A01, P3762_A02) and e3653 boards are not currently supported.
 Your GMSL board must have two inputs that accept up to four cameras each and a 12v power input.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The map of connector positions to channel number is looking into the male connector, not the female connector. The cameras must be plugged in increasing order (according to the channel number). Not following this order will result in no cameras found.</p>
+</div>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ngc/nova_carter/p3762-diagram.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ngc/nova_carter/p3762-diagram.png/" />
+<img alt="https://gitlab-master.nvidia.com/isaac_ros/nvidia-isaac-ros/-/raw/dev/resources/isaac_ngc/nova_carter/p3762-diagram.png/" src="https://gitlab-master.nvidia.com/isaac_ros/nvidia-isaac-ros/-/raw/dev/resources/isaac_ngc/nova_carter/p3762-diagram.png/" />
 </figure>
 <p>It’s important to note that the 12V power input is <em>required</em> for proper functioning of cameras.
 When connecting cameras, it is important to attach the cameras in order. For example, if you have
@@ -236,7 +244,7 @@ system where the camera is placed. If you are using Nova Carter or related softw
 
   <div role="contentinfo">
     <p>&#169; Copyright 2024, NVIDIA.
-      <span class="lastupdated">Last updated on Sep 27, 2024.
+      <span class="lastupdated">Last updated on Dec 10, 2024.
       </span></p>
   </div>
 

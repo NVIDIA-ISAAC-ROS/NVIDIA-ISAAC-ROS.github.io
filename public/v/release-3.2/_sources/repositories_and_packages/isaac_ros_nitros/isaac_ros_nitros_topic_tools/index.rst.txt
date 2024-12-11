@@ -1,0 +1,71 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nitros> <isaac_ros_nitros_topic_tools>`
+
+``isaac_ros_nitros_topic_tools`` contains NITROS based nodes that synchronize the input topics using ``message_filters::sync_policies::ExactTime`` and filter the rate of synchronized data. The nodes are based on the implementation of `topic_tools package <https://github.com/ros-tooling/topic_tools>`__.
+
+The package has implementations for the following filters:
+
+* **NitrosCameraDrop** - Synchronizes monocular, stereo or depth images and camera_info messages. And drops ``X`` out of ``Y`` synchronized messages received.
+
+Visit :ir_repo:`isaac_ros_nitros_topic_tools <isaac_ros_nitros> <isaac_ros_nitros_topic_tools>`.
+
+.. |package_name| replace:: ``isaac_ros_nitros_topic_tools``
+
+NitrosCameraDrop Node
+~~~~~~~~~~~~~~~~~~~~~
+
+Usage
+^^^^^
+
+========================================== ===============================================================================================================
+Launch File                                     Components Used
+========================================== ===============================================================================================================
+``isaac_ros_nitros_camera_drop.launch.py`` :doc:`NitrosCameraDropNode </repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_topic_tools/index>`
+========================================== ===============================================================================================================
+
+ROS Parameters
+^^^^^^^^^^^^^^
+=============================== ============== ========================= ====================================================================================================================================================================================
+ROS Parameter                   Type           Default                   Description
+=============================== ============== ========================= ====================================================================================================================================================================================
+``mode``                        ``string``     ``mono``                  The synchronization mode decides which all topics to subscribe to. Option are: ``mono``, ``stereo`` or ``mono+depth``.
+``X``                           ``int``        ``15``                    Number of messages to be dropped. The node drops X out of Y messages.
+``Y``                           ``int``        ``30``                    Number of messages expected in a set. The node drops X out of Y messages.
+``use_wall_clock``              ``bool``       ``False``                 Flag to choose whether to use ``rclcpp::Clock{}.now()`` to get the clock time. If set to ``False``, the node will use ``node.now()`` to get the clock time.
+``sync_queue_size``             ``int``        ``10``                    The size of the synchronizer queue.
+``input_queue_size``            ``int``        ``10``                    The size of the input queue.
+``output_queue_size``           ``int``        ``10``                    The size of the output queue.
+``input_qos``                   ``string``     ``DEFAULT``               The quality of service for the input topics. Option are: ``SYSTEM_DEFAULT``, ``DEFAULT``, ``PARAMETER_EVENTS``, ``SERVICES_DEFAULT``, ``PARAMETERS`` or ``SENSOR_DATA``
+``output_qos``                  ``string``     ``DEFAULT``               The quality of service for the output topics. Option are: ``SYSTEM_DEFAULT``, ``DEFAULT``, ``PARAMETER_EVENTS``, ``SERVICES_DEFAULT``, ``PARAMETERS`` ``SENSOR_DATA``
+``depth_format_string``         ``string``     ``nitros_image_32FC1``    The NITROS format format for the depth image topic if using mode ``mono+depth``
+=============================== ============== ========================= ====================================================================================================================================================================================
+
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+=============================== ==================================================================================================================================================================== ====================================================================================
+ROS Topic                       Interface                                                                                                                                                            Description
+=============================== ==================================================================================================================================================================== ====================================================================================
+``image_1``                     `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                                              The input image 1. Subscribed in all modes.
+``camera_info_1``               `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                                    The input image 1 camera_info. Subscribed in all modes. 
+``image_2``                     `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                                              The input image 2. Subscribed only in ``stereo`` mode.
+``camera_info_2``               `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                                    The input image 2 camera_info. Subscribed only in ``stereo`` mode.
+``depth_1``                     `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                                              The input depth image. Subscribed only in ``mono+depth`` mode.
+=============================== ==================================================================================================================================================================== ====================================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+================================ ================================================================================================================================ =======================================================================================================
+ROS Topic                        Interface                                                                                                                        Description
+================================ ================================================================================================================================ =======================================================================================================
+``image_1_drop``                 `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                          The input image 1. Published in all modes.
+``camera_info_1_drop``           `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                The input image 1 camera_info. Published in all modes. 
+``image_2_drop``                 `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                          The input image 2. Published only in ``stereo`` mode.
+``camera_info_2_drop``           `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                The input image 2 camera_info. Published only in ``stereo`` mode.
+``depth_1_drop``                 `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                          The input depth image. Published only in ``mono+depth`` mode.
+================================ ================================================================================================================================ =======================================================================================================
