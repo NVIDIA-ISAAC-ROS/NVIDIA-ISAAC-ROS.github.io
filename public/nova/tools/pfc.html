@@ -8,7 +8,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-dropdown.css?v=995e94df" />
+      <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.min.css?v=21c0b90a" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=9c005bdc" />
 
   
@@ -101,7 +102,12 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Nova Preflight Checker</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nova Preflight Checker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#running">Running</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#debugging">Debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-custom-tests">Add Custom Tests</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="nova_manager.html">Nova Manager</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="nova_manager.html#install">Install</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nova_manager.html#uninstall">Uninstall</a></li>
@@ -130,17 +136,15 @@
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#phc2sys-offsets-are-large">Phc2Sys offsets are large</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#generic-pfc-service-failure">Generic PFC Service Failure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#backup-already-exist">Backup Already Exist</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#cannot-access-recovery-mode-button-on-jetson-agx-orin">Cannot Access Recovery Mode Button On Jetson AGX Orin</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../troubleshooting/index.html#symptom">Symptom</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../troubleshooting/index.html#solution">Solution</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#cannot-access-recovery-mode-button-on-jetson-agx-orin">Cannot Access Recovery Mode Button On Jetson AGX Orin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#system-time-is-set-to-1970">System Time is Set To 1970</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#reinstall-nova-orin-init-from-scratch">Reinstall Nova Orin Init from Scratch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#rplidars-not-configured">RPLIDARs not Configured</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#jetson-agx-orin-not-booting-entering-bash-recovery-shell">Jetson AGX Orin Not Booting/Entering Bash Recovery Shell</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../releases/index.html#nova-orin-init-1-3-1">Nova Orin Init 1.3.1</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../releases/index.html#nova-orin-init-1-3-2">Nova Orin Init 1.3.2</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../releases/index.html#new-features">New Features</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../releases/index.html#previous-release">Previous Release</a></li>
 </ul>
@@ -181,72 +185,86 @@
              
   <section id="nova-preflight-checker">
 <h1>Nova Preflight Checker<a class="headerlink" href="#nova-preflight-checker" title="Link to this heading"></a></h1>
+<section id="running">
+<h2>Running<a class="headerlink" href="#running" title="Link to this heading"></a></h2>
 <p>After installing <a class="reference internal" href="../nova_init/index.html"><span class="doc">Nova Init</span></a> on your platform, run the Nova Preflight Checker by executing this
 command from any folder:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>nova_preflight_checker<span class="w"> </span>-v
-<span class="o">==================================================================================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">==================================================================================</span>
-platform<span class="w"> </span>linux<span class="w"> </span>--<span class="w"> </span>Python<span class="w"> </span><span class="m">3</span>.8.10,<span class="w"> </span>pytest-7.4.2,<span class="w"> </span>pluggy-1.3.0<span class="w"> </span>--<span class="w"> </span>/opt/nvidia/nova/nova-init-py/venv/bin/python3
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nv">nova_preflight_checker</span>
+<span class="o">===========================================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">============================================</span>
+platform<span class="w"> </span>linux<span class="w"> </span>--<span class="w"> </span>Python<span class="w"> </span><span class="m">3</span>.10.12,<span class="w"> </span>pytest-8.3.3,<span class="w"> </span>pluggy-1.5.0<span class="w"> </span>--<span class="w"> </span>/opt/nvidia/nova/python/venv/bin/python3
 cachedir:<span class="w"> </span>.pytest_cache
-rootdir:<span class="w"> </span>/opt/nvidia/nova/nova-init-py
-configfile:<span class="w"> </span>pyproject.toml
-collected<span class="w"> </span><span class="m">68</span><span class="w"> </span>items
+rootdir:<span class="w"> </span>/opt/nvidia/nova
+configfile:<span class="w"> </span>pytest.ini
+plugins:<span class="w"> </span>timeout-2.3.1
+timeout:<span class="w"> </span><span class="m">30</span>.0s
+timeout<span class="w"> </span>method:<span class="w"> </span>signal
+timeout<span class="w"> </span>func_only:<span class="w"> </span>False
+collected<span class="w"> </span><span class="m">92</span><span class="w"> </span>items
 
-../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_dev<span class="o">[</span>/dev/ptp0<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                                                     </span><span class="o">[</span><span class="w">  </span><span class="m">1</span>%<span class="o">]</span>
-../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_dev<span class="o">[</span>/dev/nvpps0<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                                                   </span><span class="o">[</span><span class="w">  </span><span class="m">2</span>%<span class="o">]</span>
+compute/pfc/tests.py::test_service<span class="o">[</span>nova-tegra-stats@1000<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                     </span><span class="o">[</span><span class="w">  </span><span class="m">1</span>%<span class="o">]</span>
+compute/pfc/tests.py::test_service<span class="o">[</span>nova-over-current-monitor@1<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                               </span><span class="o">[</span><span class="w">  </span><span class="m">2</span>%<span class="o">]</span>
+compute/pfc/tests.py::test_service<span class="o">[</span>nova-power-monitor@1<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                      </span><span class="o">[</span><span class="w">  </span><span class="m">3</span>%<span class="o">]</span>
+compute/pfc/tests.py::test_service<span class="o">[</span>nova-nvpower<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                              </span><span class="o">[</span><span class="w">  </span><span class="m">4</span>%<span class="o">]</span>
+compute/pfc/tests.py::test_service<span class="o">[</span>nova-jetson-clocks<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                        </span><span class="o">[</span><span class="w">  </span><span class="m">5</span>%<span class="o">]</span>
+time/pfc/tests.py::test_rtc0_device<span class="w"> </span>PASSED<span class="w">                                                           </span><span class="o">[</span><span class="w"> </span><span class="m">21</span>%<span class="o">]</span>
+metadata/pfc/tests.py::test_service<span class="o">[</span>nova-metadata-generator<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                  </span><span class="o">[</span><span class="w"> </span><span class="m">22</span>%<span class="o">]</span>
 ...
-../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::TestHawkEeprom::test_img_size<span class="o">[</span>left_stereo_camera-right_cam_intr<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                   </span><span class="o">[</span><span class="w"> </span><span class="m">75</span>%<span class="o">]</span>
-../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::TestHawkEeprom::test_gravity_acceleration<span class="o">[</span>left_stereo_camera<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                      </span><span class="o">[</span><span class="w"> </span><span class="m">76</span>%<span class="o">]</span>
-...
-../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_phc2sys_frequency<span class="w"> </span>PASSED<span class="w">                                                                             </span><span class="o">[</span><span class="w"> </span><span class="m">98</span>%<span class="o">]</span>
-../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_calibration_host<span class="w"> </span>PASSED<span class="w">                                                                              </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+owl/pfc/tests.py::test_total_owl_devices<span class="w"> </span>PASSED<span class="w">                                                      </span><span class="o">[</span><span class="w"> </span><span class="m">89</span>%<span class="o">]</span>
+owl/pfc/tests.py::test_owl_capture<span class="o">[</span>front_fisheye_camera<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                      </span><span class="o">[</span><span class="w"> </span><span class="m">90</span>%<span class="o">]</span>
+owl/pfc/tests.py::test_owl_capture<span class="o">[</span>back_fisheye_camera<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                       </span><span class="o">[</span><span class="w"> </span><span class="m">91</span>%<span class="o">]</span>
+owl/pfc/tests.py::test_owl_capture<span class="o">[</span>left_fisheye_camera<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                       </span><span class="o">[</span><span class="w"> </span><span class="m">92</span>%<span class="o">]</span>
+owl/pfc/tests.py::test_owl_capture<span class="o">[</span>right_fisheye_camera<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                      </span><span class="o">[</span><span class="w"> </span><span class="m">93</span>%<span class="o">]</span>
+segway/pfc/tests.py::test_service<span class="o">[</span>nova-can-setup<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                             </span><span class="o">[</span><span class="w"> </span><span class="m">94</span>%<span class="o">]</span>
+ssd/pfc/tests.py::test_ssd_write_speed<span class="w"> </span>PASSED<span class="w">                                                        </span><span class="o">[</span><span class="w"> </span><span class="m">95</span>%<span class="o">]</span>
+ssd/pfc/tests.py::test_filesystem_ssd<span class="w"> </span>PASSED<span class="w">                                                         </span><span class="o">[</span><span class="w"> </span><span class="m">96</span>%<span class="o">]</span>
+calibration/pfc/tests.py::test_calibration_host<span class="w"> </span>PASSED<span class="w">                                               </span><span class="o">[</span><span class="w"> </span><span class="m">97</span>%<span class="o">]</span>
+led/pfc/tests.py::test_service<span class="o">[</span>nova-carter-led<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                               </span><span class="o">[</span><span class="w"> </span><span class="m">98</span>%<span class="o">]</span>
+isaac_cloud/pfc/tests.py::test_service<span class="o">[</span>nova-isaac-ota<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                        </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
 
-<span class="o">==================================================================================</span><span class="w"> </span><span class="m">68</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">24</span>.24s<span class="w"> </span><span class="o">==================================================================================</span>
-<span class="sb">```</span>
+<span class="o">===========================================</span><span class="w"> </span><span class="m">92</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">47</span>.33s<span class="w"> </span><span class="o">============================================</span>
 </pre></div>
 </div>
-<p>If errors appear, we recommended that you check the relevant system on Nova Orin. Below is an
-example:</p>
-<div class="no-copybutton highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">==================================================================================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">==================================================================================</span>
-platform<span class="w"> </span>linux<span class="w"> </span>--<span class="w"> </span>Python<span class="w"> </span><span class="m">3</span>.8.10,<span class="w"> </span>pytest-7.4.0,<span class="w"> </span>pluggy-1.3.0
-rootdir:<span class="w"> </span>/opt/nvidia/nova/nova-init-py
-configfile:<span class="w"> </span>pyproject.toml
-collected<span class="w"> </span><span class="m">68</span><span class="w"> </span>items
+</section>
+<section id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Link to this heading"></a></h2>
+<p>The PFC is organized modularly. Folders under <code class="docutils literal notranslate"><span class="pre">/opt/nvidia/nova/</span></code> with an <code class="docutils literal notranslate"><span class="pre">INSTALL.yaml</span></code> are modules that setup a different part of the Nova system. Each module can have its own PFC tests to validate for the system. Here is an example of a PFC run that has failed some tests:</p>
+<div class="no-copybutton highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">===========================================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">============================================</span>
+platform<span class="w"> </span>linux<span class="w"> </span>--<span class="w"> </span>Python<span class="w"> </span><span class="m">3</span>.10.12,<span class="w"> </span>pytest-8.3.3,<span class="w"> </span>pluggy-1.5.0<span class="w"> </span>--<span class="w"> </span>/opt/nvidia/nova/python/venv/bin/python3
+cachedir:<span class="w"> </span>.pytest_cache
+rootdir:<span class="w"> </span>/opt/nvidia/nova
+configfile:<span class="w"> </span>pytest.ini
+plugins:<span class="w"> </span>timeout-2.3.1
+timeout:<span class="w"> </span><span class="m">30</span>.0s
+timeout<span class="w"> </span>method:<span class="w"> </span>signal
+timeout<span class="w"> </span>func_only:<span class="w"> </span>False
+collected<span class="w"> </span><span class="m">72</span><span class="w"> </span>items
 
-../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py<span class="w"> </span>.....F...........F..................................................<span class="w">                                       </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
-
-<span class="o">=======================================================================================</span><span class="w"> </span><span class="nv">FAILURES</span><span class="w"> </span><span class="o">========================================================================================</span>
-_____________________________________________________________________________<span class="w"> </span>test_filesystem_camera<span class="o">[</span>owl-4<span class="o">]</span><span class="w"> </span>_____________________________________________________________________________
-
-<span class="nv">camera</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;CameraType.OWL:<span class="w"> </span><span class="m">2</span>&gt;,<span class="w"> </span><span class="nv">exp_cams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span>
-
-<span class="w">    </span>@pytest.mark.parametrize<span class="o">(</span><span class="s2">&quot;camera,exp_cams&quot;</span>,<span class="w"> </span>FS_CAMERA_PARAMS,<span class="w"> </span><span class="nv">ids</span><span class="o">=</span>reduceidfn<span class="o">)</span>
-<span class="w">    </span>def<span class="w"> </span>test_filesystem_camera<span class="o">(</span>camera,<span class="w"> </span>exp_cams<span class="o">)</span>:
-<span class="w">        </span>assert<span class="w"> </span>camera<span class="w"> </span><span class="k">in</span><span class="w"> </span>FS_CAMERA_MAP,<span class="w"> </span><span class="s2">&quot;Camera not mapped with pattern.&quot;</span>
-<span class="w">        </span>pattern,<span class="w"> </span><span class="nv">feeds_per_cam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>FS_CAMERA_MAP<span class="o">[</span>camera<span class="o">]</span>
-<span class="w">        </span><span class="nv">devices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>get_matched_camera_devices<span class="o">(</span>pattern<span class="o">)</span>
-<span class="w">        </span>assert<span class="w"> </span>len<span class="o">(</span>devices<span class="o">)</span><span class="w"> </span>%<span class="w"> </span><span class="nv">feeds_per_cam</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span>,<span class="w"> </span><span class="se">\</span>
-<span class="w">            </span>f<span class="s2">&quot;Number of devices isn&#39;t a multiple of the expected number of feeds &quot;</span><span class="w"> </span>+<span class="w"> </span><span class="se">\</span>
-<span class="w">            </span>f<span class="s2">&quot;on a camera {feeds_per_cam}. Found {len(devices)} devices.&quot;</span>
-&gt;<span class="w">       </span>assert<span class="w"> </span>len<span class="o">(</span>devices<span class="o">)</span><span class="w"> </span>/<span class="w"> </span><span class="nv">feeds_per_cam</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>exp_cams,<span class="w"> </span>f<span class="s2">&quot;Not enough cameras. Found {len(devices)}&quot;</span>
-E<span class="w">       </span>AssertionError:<span class="w"> </span>Not<span class="w"> </span>enough<span class="w"> </span>cameras.<span class="w"> </span>Found<span class="w"> </span><span class="m">0</span>
-
-/opt/nvidia/nova/nova-init-py/nova_init/tests/filesystem.py:164:<span class="w"> </span>AssertionError
-
+compute/pfc/tests.py::test_service<span class="o">[</span>nova-tegra-stats@1000<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                     </span><span class="o">[</span><span class="w">  </span><span class="m">1</span>%<span class="o">]</span>
+compute/pfc/tests.py::test_service<span class="o">[</span>nova-over-current-monitor@1<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                               </span><span class="o">[</span><span class="w">  </span><span class="m">2</span>%<span class="o">]</span>
+compute/pfc/tests.py::test_service<span class="o">[</span>nova-power-monitor@1<span class="o">]</span><span class="w"> </span>PASSED<span class="w">                                      </span><span class="o">[</span><span class="w">  </span><span class="m">4</span>%<span class="o">]</span>
 ...
-
-<span class="o">================================================================================</span><span class="w"> </span>short<span class="w"> </span><span class="nb">test</span><span class="w"> </span>summary<span class="w"> </span><span class="nv">info</span><span class="w"> </span><span class="o">================================================================================</span>
-FAILED<span class="w"> </span>../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_filesystem_camera<span class="o">[</span>owl-4<span class="o">]</span><span class="w"> </span>-<span class="w"> </span>AssertionError:<span class="w"> </span>Not<span class="w"> </span>enough<span class="w"> </span>cameras.<span class="w"> </span>Found<span class="w"> </span><span class="m">0</span>
-FAILED<span class="w"> </span>../../opt/nvidia/nova/nova-init-py/nova_init/tests/test_nova_carter.py::test_service<span class="o">[</span>nova-carter-led-<span class="o">{</span>exited-dead<span class="o">}</span>-enabled<span class="o">]</span><span class="w"> </span>-<span class="w"> </span>AssertionError:<span class="w"> </span>Service<span class="w"> </span>not<span class="w"> </span><span class="k">in</span><span class="w"> </span>expected<span class="w"> </span>state<span class="w"> </span><span class="o">(</span>EXITED,DEAD<span class="o">)</span>.<span class="w"> </span>Found<span class="w"> </span>FAILED.
-<span class="o">=============================================================================</span><span class="w"> </span><span class="m">2</span><span class="w"> </span>failed,<span class="w"> </span><span class="m">66</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">25</span>.03s<span class="w"> </span><span class="o">=============================================================================</span>
-ERROR:<span class="w"> </span>/usr/bin/nova_preflight_checker:39<span class="w"> </span><span class="o">(</span><span class="s1">&#39;sudo -E env PATH=$PATH pytest $test_file $@&#39;</span><span class="w"> </span>exited<span class="w"> </span>with<span class="w"> </span>code<span class="w"> </span><span class="m">1</span><span class="o">)</span>
+ptp/pfc/tests.py::test_service<span class="o">[</span>nova-ptp4l@eno1<span class="o">]</span><span class="w"> </span>FAILED<span class="w">                                               </span><span class="o">[</span><span class="w"> </span><span class="m">50</span>%<span class="o">]</span>
+...
+hawk/pfc/tests.py::test_hawk_capture<span class="o">[</span>front_stereo_camera<span class="o">]</span><span class="w"> </span>FAILED<span class="w">                                     </span><span class="o">[</span><span class="w"> </span><span class="m">77</span>%<span class="o">]</span>
+...
+<span class="o">=========================================</span><span class="w"> </span>short<span class="w"> </span><span class="nb">test</span><span class="w"> </span>summary<span class="w"> </span><span class="nv">info</span><span class="w"> </span><span class="o">==========================================</span>
+FAILED<span class="w"> </span>hawk/pfc/tests.py::test_hawk_capture<span class="o">[</span>front_stereo_camera<span class="o">]</span><span class="w"> </span>-<span class="w"> </span>AssertionError:<span class="w"> </span>Could<span class="w"> </span>not<span class="w"> </span>capture<span class="w"> </span>image<span class="w"> </span><span class="k">for</span><span class="w"> </span>front_stereo_camera.<span class="w"> </span>Device<span class="w"> </span>ids:<span class="w">  </span><span class="m">3</span><span class="o">(</span>left<span class="o">)</span><span class="w"> </span><span class="m">4</span><span class="o">(</span>right<span class="o">)</span>
+...
+FAILED<span class="w"> </span>ptp/pfc/tests.py::test_service<span class="o">[</span>nova-ptp4l@eno1<span class="o">]</span><span class="w"> </span>-<span class="w"> </span>AssertionError:<span class="w"> </span>Service<span class="w"> </span>not<span class="w"> </span><span class="k">in</span><span class="w"> </span>expected<span class="w"> </span>state<span class="w"> </span><span class="o">(</span>RUNNING<span class="o">)</span>.<span class="w"> </span>Found<span class="w"> </span>DEAD.
+...
+<span class="o">=================================</span><span class="w"> </span><span class="m">10</span><span class="w"> </span>failed,<span class="w"> </span><span class="m">62</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">64</span>.44s<span class="w"> </span><span class="o">(</span><span class="m">0</span>:01:04<span class="o">)</span><span class="w"> </span><span class="o">=================================</span>
 </pre></div>
 </div>
-<p>In this case two tests failed, a filesystem check for the Owl cameras and a service status check.
-The Owl test expects 4 Owls (specified by <code class="docutils literal notranslate"><span class="pre">owl-4</span></code>) and the service failure expects the
-<code class="docutils literal notranslate"><span class="pre">nova-carter-led</span></code> service to be <code class="docutils literal notranslate"><span class="pre">dead</span></code> or <code class="docutils literal notranslate"><span class="pre">exited</span></code> and <code class="docutils literal notranslate"><span class="pre">enabled</span></code>. The Owls can be debugged by
-checking that they’re connected and undamaged. The service can be debugged by determining why it failed
-with <code class="docutils literal notranslate"><span class="pre">systemctl</span> <span class="pre">status</span> <span class="pre">nova-carter-led</span></code>.</p>
-<p>After installing <code class="docutils literal notranslate"><span class="pre">nova-orin-init</span></code>, source code for the Nova Preflight Checker can be found at: <code class="docutils literal notranslate"><span class="pre">/opt/nvidia/nova/python/nova-init-py/nova_init/tests/</span></code>.</p>
+<p>The logs can be analyzed first by looking at where the tests are being called from. The first part before the <code class="docutils literal notranslate"><span class="pre">::</span></code> is the path to the test on the system. It typically follows the structure <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;/pfc/&lt;test&gt;</span></code>. This is relative to <code class="docutils literal notranslate"><span class="pre">/opt/nvidia/nova/</span></code>. For example, the failing test <code class="docutils literal notranslate"><span class="pre">hawk/pfc/tests.py::test_hawk_capture[front_stereo_camera]</span></code> is part of the <code class="docutils literal notranslate"><span class="pre">hawk</span></code> module and its test can be found at <code class="docutils literal notranslate"><span class="pre">/opt/nvidia/nova/hawk/pfc/tests.py</span></code>. It is running an image capture test on the <code class="docutils literal notranslate"><span class="pre">front_stereo_camera</span></code>. The other failing check is a standard service test <code class="docutils literal notranslate"><span class="pre">ptp/pfc/tests.py::test_service[nova-ptp4l&#64;eno1]</span></code>. This is part of the <code class="docutils literal notranslate"><span class="pre">ptp</span></code> module and it’s testing that the service <code class="docutils literal notranslate"><span class="pre">nova-ptp4l&#64;eno1</span></code> is in its expected state. The Hawk can be debugged by checking that it’s connected and the GMSL board is powered. The service can be debugged by determining why it failed with <code class="docutils literal notranslate"><span class="pre">systemctl</span> <span class="pre">status</span> <span class="pre">nova-ptp4l&#64;eno1</span></code>.</p>
+</section>
+<section id="add-custom-tests">
+<h2>Add Custom Tests<a class="headerlink" href="#add-custom-tests" title="Link to this heading"></a></h2>
+<p>To add custom tests to the PFC create a standard <code class="docutils literal notranslate"><span class="pre">pytest</span></code> file or directory and run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nova_preflight_checker &lt;custom_test_file_or_dir&gt; &lt;custom_test_file_or_dir&gt; ...
+</pre></div>
+</div>
+<p>Any number of custom tests can be forwarded to the PFC. The PFC will execute them alongside the tests for the Nova system.</p>
+</section>
 </section>
 
 
@@ -261,7 +279,7 @@ with <code class="docutils literal notranslate"><span class="pre">systemctl</spa
 
   <div role="contentinfo">
     <p>&#169; Copyright 2024, NVIDIA.
-      <span class="lastupdated">Last updated on Sep 27, 2024.
+      <span class="lastupdated">Last updated on Dec 10, 2024.
       </span></p>
   </div>
 

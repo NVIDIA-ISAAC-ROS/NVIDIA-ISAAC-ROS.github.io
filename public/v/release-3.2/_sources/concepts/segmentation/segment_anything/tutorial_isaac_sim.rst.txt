@@ -1,0 +1,72 @@
+Tutorial for Segment Anything with Isaac Sim 
+============================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/segmentation/segment_anything/segment_anything_isaac_sim.png>`
+    :align: center
+
+Overview
+------------
+
+This tutorial demonstrates how to:
+
+1. Setup and stream images using :doc:`Isaac Sim </getting_started/isaac_sim/index>`.
+   
+2. Segment objects using :ir_repo:`Isaac ROS Segment Anything <isaac_ros_image_segmentation> <isaac_ros_segment_anything>`.
+   
+3. Detect object bounding boxes using :ir_repo:`Isaac ROS YoloV8 object detection <isaac_ros_object_detection> <isaac_ros_yolov8>`.
+
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the :ref:`quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index:quickstart>` up until model preparation step.
+
+2.  Complete the :ref:`Isaac ROS YoloV8 tutorial <repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index:quickstart>` up until the build step.
+
+3.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+4.  Install and launch Isaac Sim following the steps in the :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`.
+5.  Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 600px
+
+6. Run the following launch files to start the inferencing:
+
+    .. code:: bash
+
+           ros2 launch isaac_ros_segment_anything isaac_ros_segment_anything_isaac_sim.launch.py model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8/yolov8s.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/yolov8/yolov8s.plan confidence_threshold:=0.25 nms_threshold:=0.45 model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+
+7. Start a new terminal and attach to the container.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+    Then run the Python script to generate the colored segmentation mask from raw mask.
+
+    .. code:: bash
+
+        ros2 run isaac_ros_segment_anything visualize_mask.py
+
+8.  Visualize and validate the output of the package by launching ``rqt_image_view``. In another terminal enter the Docker container:
+
+   .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+   Then launch ``rqt_image_view``:
+
+    .. code:: bash
+
+        ros2 run rqt_image_view rqt_image_view
+
+   Inside the ``rqt_image_view`` GUI, change the topic to ``/segment_anything/colored_segmentation_mask`` to view a colorized segmentation mask.

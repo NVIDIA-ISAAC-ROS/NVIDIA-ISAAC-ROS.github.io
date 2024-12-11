@@ -8,7 +8,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-dropdown.css?v=995e94df" />
+      <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.min.css?v=21c0b90a" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=9c005bdc" />
 
   
@@ -101,7 +102,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tools/pfc.html">Nova Preflight Checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tools/pfc.html">Nova Preflight Checker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#running">Running</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#debugging">Debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tools/pfc.html#add-custom-tests">Add Custom Tests</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../tools/nova_manager.html">Nova Manager</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tools/nova_manager.html#install">Install</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tools/nova_manager.html#uninstall">Uninstall</a></li>
@@ -130,17 +136,15 @@
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#phc2sys-offsets-are-large">Phc2Sys offsets are large</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#generic-pfc-service-failure">Generic PFC Service Failure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#backup-already-exist">Backup Already Exist</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#cannot-access-recovery-mode-button-on-jetson-agx-orin">Cannot Access Recovery Mode Button On Jetson AGX Orin</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../troubleshooting/index.html#symptom">Symptom</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../troubleshooting/index.html#solution">Solution</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#cannot-access-recovery-mode-button-on-jetson-agx-orin">Cannot Access Recovery Mode Button On Jetson AGX Orin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#system-time-is-set-to-1970">System Time is Set To 1970</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#reinstall-nova-orin-init-from-scratch">Reinstall Nova Orin Init from Scratch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#rplidars-not-configured">RPLIDARs not Configured</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting/index.html#jetson-agx-orin-not-booting-entering-bash-recovery-shell">Jetson AGX Orin Not Booting/Entering Bash Recovery Shell</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../releases/index.html#nova-orin-init-1-3-1">Nova Orin Init 1.3.1</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../releases/index.html#nova-orin-init-1-3-2">Nova Orin Init 1.3.2</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../releases/index.html#new-features">New Features</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../releases/index.html#previous-release">Previous Release</a></li>
 </ul>
@@ -183,31 +187,14 @@
 <p>Nova Orin Init is a Debian package that includes drivers, device trees, system services, configurations, and tools provided for users to start working on robotics software on Jetson Orin.</p>
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Link to this heading"></a></h2>
-<p>Run one of the following commands to add the apt repository. Two options are listed, one for <code class="docutils literal notranslate"><span class="pre">.com</span></code> (US CDN) and one for <code class="docutils literal notranslate"><span class="pre">.cn</span></code> (China CDN) - choose whichever you prefer.</p>
-<ol class="arabic">
-<li><p><code class="docutils literal notranslate"><span class="pre">.com</span></code> (US CDN)</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>curl<span class="w"> </span>-y
-<span class="nv">k</span><span class="o">=</span><span class="s2">&quot;/usr/share/keyrings/nvidia-nova.gpg&quot;</span><span class="p">;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://isaac.download.nvidia.com/nova-init/repos.key<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span><span class="nv">$k</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
-<span class="nv">f</span><span class="o">=</span><span class="s2">&quot;/etc/apt/sources.list.d/nvidia-nova.list&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>touch<span class="w"> </span><span class="nv">$f</span>
-<span class="nv">s</span><span class="o">=</span><span class="s2">&quot;deb [signed-by=</span><span class="nv">$k</span><span class="s2">] https://isaac.download.nvidia.com/nova-init jammy main&quot;</span>
-grep<span class="w"> </span>-qxF<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s</span><span class="s2">&quot;</span><span class="w"> </span><span class="nv">$f</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span><span class="nv">$f</span>
+<p><strong>NVIDIA Internal:</strong> Run these commands to add the apt repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>curl<span class="w"> </span>-y
+<span class="nv">k</span><span class="o">=</span><span class="s2">&quot;/usr/share/keyrings/nvidia-nova-internal.gpg&quot;</span><span class="p">;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://urm.nvidia.com/artifactory/api/security/keypair/default-gpg-key/public<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span><span class="nv">$k</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="nv">f</span><span class="o">=</span><span class="s2">&quot;/etc/apt/sources.list.d/nvidia-nova-internal.list&quot;</span>
+<span class="nv">s</span><span class="o">=</span><span class="s2">&quot;deb [signed-by=</span><span class="nv">$k</span><span class="s2">] https://urm.nvidia.com/artifactory/sw-rpt-debian-local jammy main&quot;</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span><span class="nv">$f</span>
 </pre></div>
 </div>
-</div></blockquote>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">.cn</span></code> (China CDN)</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>curl<span class="w"> </span>-y
-<span class="nv">k</span><span class="o">=</span><span class="s2">&quot;/usr/share/keyrings/nvidia-nova.gpg&quot;</span><span class="p">;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://isaac.download.nvidia.cn/nova-init/repos.key<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span><span class="nv">$k</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
-<span class="nv">f</span><span class="o">=</span><span class="s2">&quot;/etc/apt/sources.list.d/nvidia-nova.list&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>touch<span class="w"> </span><span class="nv">$f</span>
-<span class="nv">s</span><span class="o">=</span><span class="s2">&quot;deb [signed-by=</span><span class="nv">$k</span><span class="s2">] https://isaac.download.nvidia.cn/nova-init jammy main&quot;</span>
-grep<span class="w"> </span>-qxF<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s</span><span class="s2">&quot;</span><span class="w"> </span><span class="nv">$f</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span><span class="nv">$f</span>
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-</ol>
 <p>Install Nova.</p>
 <ol class="arabic">
 <li><p>Update APT and install the Debian:</p>
@@ -219,7 +206,7 @@ grep<span class="w"> </span>-qxF<span class="w"> </span><span class="s2">&quot;<
 <div class="no-copybutton wrap-block highlight-default notranslate"><div class="highlight"><pre><span></span>No Nova YAML specified. The following example files are available: none, hawk-2_owl-4, owl-4, nova-devkit, nova-orin, hawk-1, hawk-4_owl-4, hawk-2, nova-carter. Select one of the examples for a predefined yaml or none if you would like to write your own custom. Use `show &lt;example&gt;` if you want to see the YAML. Response:
 </pre></div>
 </div>
-<p>Select the example YAML you want to install (<code class="docutils literal notranslate"><span class="pre">nova-devkit</span></code>, <code class="docutils literal notranslate"><span class="pre">nova-carter</span></code>, etc.) or add your own custom YAML by selecting <code class="docutils literal notranslate"><span class="pre">none</span></code> and following the <a class="reference internal" href="../getting_started/platforms/adapting_nova.html#customizing-nova"><span class="std std-ref">guide here</span></a>.</p>
+<p>The examples provided are either products (<code class="docutils literal notranslate"><span class="pre">nova-devkit</span></code>, <code class="docutils literal notranslate"><span class="pre">nova-carter</span></code>, etc.) related to Nova or configurations commonly used on a Jetson with Nova. Examples <code class="docutils literal notranslate"><span class="pre">hawk-1</span></code>, <code class="docutils literal notranslate"><span class="pre">owl-4</span></code>, <code class="docutils literal notranslate"><span class="pre">hawk-4_owl-4</span></code>, etc., are named after the type of sensors Nova expects are connected to the Jetson. For instance, if there is only 1 Hawk connected to the Jetson the <code class="docutils literal notranslate"><span class="pre">hawk-1</span></code> YAML should be selected. Not all configurations have examples, if no example suits your configuration add your own custom YAML by selecting <code class="docutils literal notranslate"><span class="pre">none</span></code> and following the <a class="reference internal" href="../getting_started/platforms/adapting_nova.html#customizing-nova"><span class="std std-ref">guide here</span></a>.</p>
 <p>Continue if no question appears. No question means that it’s using the old config on the Nova platform.</p>
 </li>
 <li><p>Reboot the platform by pressing the power button or running:</p>
@@ -228,7 +215,7 @@ grep<span class="w"> </span>-qxF<span class="w"> </span><span class="s2">&quot;<
 </div>
 </li>
 <li><p>Verify that sensors are working by running the <a class="reference internal" href="../tools/pfc.html"><span class="doc">PFC</span></a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nova_preflight_checker<span class="w"> </span>-v
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nova_preflight_checker
 </pre></div>
 </div>
 </li>
@@ -248,7 +235,7 @@ grep<span class="w"> </span>-qxF<span class="w"> </span><span class="s2">&quot;<
 </div>
 </li>
 <li><p>Verify that sensors are working by running the <a class="reference internal" href="../tools/pfc.html"><span class="doc">PFC</span></a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nova_preflight_checker<span class="w"> </span>-v
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nova_preflight_checker
 </pre></div>
 </div>
 </li>
@@ -290,7 +277,7 @@ sudo<span class="w"> </span>rm<span class="w"> </span>/etc/nova/manager_selectio
 </section>
 <section id="add-real-time-support">
 <h2>Add Real-Time Support<a class="headerlink" href="#add-real-time-support" title="Link to this heading"></a></h2>
-<p>Real-time capabilities can be added to any Jetson AGX Orin with JP6 GA by following the <a class="reference external" href="https://docs.nvidia.com/jetson/archives/r36.3/DeveloperGuide/SD/SoftwarePackagesAndTheUpdateMechanism.html?_gl=1*754wy0*_gcl_au*MTQwMzE0MDA4Ny4xNzE2MzMyMTYy#installing-the-real-time-kernel-packages-on-a-jetson-device">installing real-time guide provided by Jetpack</a>. This is useful for applications like robotic arms.</p>
+<p>Real-time capabilities can be added to any Jetson AGX Orin with JP6 GA by following the <a class="reference external" href="https://docs.nvidia.com/jetson/archives/r36.4/DeveloperGuide/SD/Kernel/KernelCustomization.html?real-time-kernel-using-ota-update#real-time-kernel-using-ota-update">installing real-time guide provided by Jetpack</a>. This is useful for applications like robotic arms.</p>
 <p>Nova Orin Init does not currently support real-time by default it must be modified after every installation/upgrade. To support real-time the system must use the real-time image. Run the following commands to update Nova’s boot config to use the real-time image:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -318,7 +305,7 @@ sudo<span class="w"> </span>rm<span class="w"> </span>/etc/nova/manager_selectio
 
   <div role="contentinfo">
     <p>&#169; Copyright 2024, NVIDIA.
-      <span class="lastupdated">Last updated on Sep 27, 2024.
+      <span class="lastupdated">Last updated on Dec 10, 2024.
       </span></p>
   </div>
 

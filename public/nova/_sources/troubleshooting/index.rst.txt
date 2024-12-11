@@ -9,16 +9,20 @@ It is recommended to run the :doc:`Nova Preflight Checker</tools/pfc>` to diagno
 
 .. code-block::
 
-    nova_preflight_checker -v
+    nova_preflight_checker
 
 Nova MGBE0 Latch not set
 ------------------------
 
-If the PFC test ``test_service[nova-mgbe0-latch-dead-enabled]`` fails this is likely because another process has unset the latch. For example, whenever ``ptp4l`` restarts it will unset the latch. To set the latch again run:
+If the PFC test ``nvpps/pfc/tests.py::test_service[nova-mgbe0-latch]`` fails this is likely because another process has unset the latch. For example, whenever ``ptp4l`` restarts it unsets the latch.
 
-.. code-block:: bash
+.. dropdown:: Solution
 
-    sudo systemctl restart nova-mgbe0-latch
+    To set the latch again run:
+
+    .. code-block:: bash
+
+        sudo systemctl restart nova-mgbe0-latch
 
 Phc2Sys offsets are large
 -------------------------
@@ -29,54 +33,77 @@ If you see an error from the PFC similar to this:
     :class: no-copybutton
 
     ================================================================================ short test summary info ================================================================================
-    FAILED ../../opt/nvidia/nova/python/nova-init-py/nova_init/tests/test_nova_orin.py::test_phc2sys_offsets - AssertionError: phc2sys reporting offset of 141353, which is greater than max 150
-    FAILED ../../opt/nvidia/nova/python/nova-init-py/nova_init/tests/test_nova_orin.py::test_phc2sys_frequency - AssertionError: phc2sys reporting frequency error of 115849, which is greater than max 150
+    FAILED time/pfc/tests.py::test_phc2sys_offsets - AssertionError: phc2sys reporting offset of 141353, which is greater than max 150
+    FAILED time/pfc/tests.py::test_phc2sys_frequency - AssertionError: phc2sys reporting frequency error of 115849, which is greater than max 150
 
-This means that the time synchronization service ``phc2sys`` has not settled or cannot settle. Wait about 30 seconds and try running the PFC again. On boot it takes a period of time for the service to converge. If running the PFC again does not fix the offsets it is recommended to look at this :ref:`MGBE0 latch issue <troubleshooting/index:nova mgbe0 latch not set>` since an unset latch can cause large jumps in ``phc2sys`` offsets.
+This means that the time synchronization service ``phc2sys`` has not settled or cannot settle.
+
+.. dropdown:: Solution
+
+    Wait about 30 seconds and try running the PFC again. On boot it takes a period of time for the service to converge. If running the PFC again does not fix the offsets it is recommended to look at this :ref:`MGBE0 latch issue <troubleshooting/index:nova mgbe0 latch not set>` because an unset latch can cause large frequency errors in ``phc2sys``.
+
+    If the latch is set and the issue persists, restarting ``phc2sys`` can cause the offset to converge faster.
+
+    .. note::
+
+        The interface ``eno1`` assumes the default Nova configuration with sensors connected on the onboard Ethernet.
+
+    .. code-block::
+
+        sudo systemctl restart nova-phc2sys@eno1
+
+    If this issue is repeatedly happening check if NTP or SNTP is running. When NTP or SNTP is enabled the time will synchronize with servers periodically and cause large changes in the clock. Consequently, ``phc2sys`` offsets will diverge. These are some known packages that use NTP/SNTP: ``chrony``, ``ntp``, ``systemd-timesyncd``.
 
 Generic PFC Service Failure
 ---------------------------
 
-If you see any PFC failures related to services like ``test_service[nova-sync-time-dead-enabled]`` it is recommended to look at the service logs and see if the service state matches the test. The way PFC service tests are designed is that the first part is the service name, the second is the service state, and the third is the file state. In the example given this would be ``nova-sync-time``, ``dead``, and ``enabled`` respectively. The service logs can be viewed by running.
+The ``nova_preflight_checker`` has a failure related to a service not covered by another section in this troubleshooting guide.
 
-.. code-block:: bash
+.. dropdown:: Solution
 
-    systemctl status <service-name>
+    If you see any PFC failures related to services it is recommended to look at the service logs for more details. A typical PFC service test will have this structure ``test_service[<service-name>]``. For example, the PFC test ``test_service[nova-sync-time]`` is testing the ``nova-sync-time`` service. The logs for the service can be viewed with:
 
-If the service is expected to have run because it was enabled, try restarting the service.
+    .. code-block:: bash
 
-.. code-block:: bash
+        systemctl status <service-name>
 
-    sudo systemctl restart <service-name>
+    If the service is expected to have run because it was enabled, try restarting the service.
+
+    .. code-block:: bash
+
+        sudo systemctl restart <service-name>
 
 Backup Already Exist
 --------------------
 
 When installing Nova you may run into the following error or something similar:
 
-.. code-block:: bash
+.. code-block::
+    :class: no-copybutton
 
     ERROR: backup /etc/logrotate.d/rsyslog.nova.disabled already exist
 
 Nova modifies files on the system for robotics applications. When Nova makes a change it backs up the original file with a ``.nova.disabled`` extension. During Nova removal it should find this file and recover it if the file placed by Nova was unmodified. However, when the file has been modified or Nova has lost track of the file for another reason it does not recover. During the follow-up Nova installation the above error happens because Nova does not want to destroy the old backup it created.
 
-To recover from this situation you can try to reinstall Nova with:
+.. dropdown:: Solution
 
-.. code-block:: bash
+    To recover from this situation you can try to reinstall Nova with:
 
-    sudo apt remove nova-orin-init  # nova must be removed since
-    sudo apt install nova-orin-init
+    .. code-block:: bash
 
-If that does not work use these instructions:
+        sudo apt remove nova-orin-init  # nova must be removed since
+        sudo apt install nova-orin-init
 
-.. code-block:: bash
+    If that does not work use these instructions:
 
-    # Remove Nova
-    $ sudo apt remove nova-orin-init
-    # Find the files Nova did not recover properly
-    $ sudo find / -path /mnt/nova_ssd -prune -o -name "*.nova.disabled"
-    # Recover those files by moving the file to a place with the same name but the .nova.disabled extension removed
-    # Example: sudo mv <file_path>.nova.disabled <file_path>
+    .. code-block:: bash
+
+        # Remove Nova
+        $ sudo apt remove nova-orin-init
+        # Find the files Nova did not recover properly
+        $ sudo find / -path /mnt/nova_ssd -prune -o -name "*.nova.disabled"
+        # Recover those files by moving the file to a place with the same name but the .nova.disabled extension removed
+        # Example: sudo mv <file_path>.nova.disabled <file_path>
 
 .. include:: /../shared/_snippets/troubleshooting/jetson_recovery_mode.rst
 
@@ -85,36 +112,137 @@ System Time is Set To 1970
 
 If you run ``timedatectl`` and see something similar to below:
 
-.. code-block:: bash
+.. code-block::
 
     $ timedatectl
-                   Local time: Sat 1970-01-03 23:08:46 PDT
-               Universal time: Sat 1970-01-03 06:08:46 UTC
-                     RTC time: Sat 1970-01-03 06:08:46
+                Local time: Sat 1970-01-03 23:08:46 PDT
+            Universal time: Sat 1970-01-03 06:08:46 UTC
+                    RTC time: Sat 1970-01-03 06:08:46
                     Time zone: America/Los_Angeles (PDT, -0700)
     System clock synchronized: no
-                  NTP service: n/a
-              RTC in local TZ: no
+                NTP service: n/a
+            RTC in local TZ: no
 
 This means that your system clock has not synced to wall-clock time properly. Nova only syncs to the wall-clock time on boot to avoid significant time jumps for sensors. If there is no internet on boot Nova relies on an RTC coin battery connected to the Jetson AGX Orin. Systems without an RTC coin battery cannot establish proper time without internet.
 
-To fix this issue there are two options:
+.. dropdown:: Solution
 
-#. Add an RTC coin battery to the Jetson AGX Orin so it tracks time between boots. The RTC coin battery can be `connected on the bottom of the Jetson AGX Orin <https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html#rtc-backup-battery-connector-j13>`__.
+    To fix this issue there are two options:
 
-#. Connect to the internet with Ethernet or through WiFi and reboot.
+    #. Add an RTC coin battery to the Jetson AGX Orin so it tracks time between boots. The RTC coin battery can be `connected on the bottom of the Jetson AGX Orin <https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html#rtc-backup-battery-connector-j13>`__.
 
-    .. code-block:: bash
+    #. Connect to the internet with Ethernet or through WiFi and reboot.
 
-        sudo reboot
+        .. code-block:: bash
+
+            sudo reboot
 
 Reinstall Nova Orin Init from Scratch
 -------------------------------------
 
-If Nova Orin Init is in a bad state (incorrect Nova configuration, no Nova configuration, missing files, etc.) it is recommended to do a clean install. This can be done by :ref:`removing the previous Nova selection <nova_init/index:remove previous selection>` and :ref:`installing Nova Orin Init <nova_init/index:install>`.
+Nova Orin Init is in a bad state (incorrect Nova configuration, no Nova configuration, missing files, etc.).
 
-.. code-block:: bash
+.. dropdown:: Solution
 
-    sudo apt remove nova-orin-init
-    sudo rm /etc/nova/manager_selection
-    sudo apt install nova-orin-init  # select your system in the prompt (nova-devkit, nova-carter, etc.)
+    Do a clean install. This can be done by :ref:`removing the previous Nova selection <nova_init/index:remove previous selection>` and :ref:`installing Nova Orin Init <nova_init/index:install>`.
+
+    .. code-block:: bash
+
+        sudo apt remove nova-orin-init
+        sudo rm /etc/nova/manager_selection
+        sudo apt install nova-orin-init  # select your system in the prompt (nova-devkit, nova-carter, etc.)
+
+RPLIDARs not Configured
+-----------------------
+
+During installation if you see the following, that means the RPLIDARs are not configured:
+
+.. code-block::
+    :class: no-copybutton wrap-block
+
+    WARN: rplidars are not configured yet
+    Would you like to re-configure the rplidars? This requires physically unplugging rplidars on the robot. Respond no if you don't have access. Install when you do.
+    Response (y/n):
+
+.. dropdown:: Solution
+
+    Respond with "y" if you have access to the robot physically. The next prompt will say:
+
+    .. code-block::
+        :class: no-copybutton wrap-block
+
+        Would you like to re-configure the rplidars? This requires physically unplugging rplidars on the robot. Respond no if you don't have access. Install when you do.
+        Response (y/n): y
+        Re-configuring. Please unplug the front rplidar at this time. Press enter once that's done.
+
+    Unscrew the top plate carefully to access the robots internals. After unscrewed, lift the top plate and look for the network switch. Unplug the black Ethernet cable connected to the RPLIDAR on Nova Carters front side. Press enter after this is done and continue.
+
+    .. code-block::
+        :class: no-copybutton wrap-block
+
+        Re-configuring. Please unplug the front rplidar at this time. Press enter once that's done.
+        Continuing. Please wait up to 45 seconds.
+        Re-configuring rplidar ip 192.168.11.2 to 192.168.1.3
+        [2023-10-05 13:50:30.313] [info] Set lidar IP address to 192.168.1.3! Resetting the lidar...
+        Finished setting rplidar ip to 192.168.1.3. Plug back in the front rplidar now. Press enter when it's done.
+
+    Next, plug back in the front RPLIDAR and press enter again. You will see:
+
+    .. code-block::
+        :class: no-copybutton wrap-block
+
+        Finished setting rplidar ip to 192.168.1.3. Plug back in the front rplidar now. Press enter when it's done.
+        Re-configuring front rplidar now...
+        [2023-10-05 13:51:07.500] [info] Set lidar IP address to 192.168.1.2! Resetting the lidar...
+        Confirming rplidars are setup. Waiting for 60s...
+        INFO: RPLIDARs setup! FRONT rplidar is 192.168.1.2. BACK rplidar is 192.168.1.3.
+
+    The RPLIDARs are now configured.
+
+Jetson AGX Orin Not Booting/Entering Bash Recovery Shell
+--------------------------------------------------------
+
+The Jetson AGX Orin fails to boot into rootfs 3 consecutive times and enters the bash recovery shell. This can happen after ``nova-orin-init`` is installed and the device tree overlays applied to enable cameras is not compatible with the kernel. All default Jetpack kernels should be compatible with Nova.
+
+.. dropdown:: Solution
+
+    To recover from this state you must access the Jetson AGX Orin through a monitor and keyboard or the `USB micro-B port (9) <https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html>`__ using `minicom <https://developer.ridgerun.com/wiki/index.php/NVIDIA_Jetson_Orin/In_Board/Getting_in_Board/Serial_Console#Using_minicom>`__. After you have access, power the device on/off or reboot the device in the shell.
+
+    .. code-block:: bash
+
+        reboot
+
+    .. https://forums.developer.nvidia.com/t/orin-nano-wont-boot-lt4launcher-attempting-recovery-boot/255302
+
+    While the device is booting press the ``ESC`` key on your keyboard. This will enter you into the UEFI Menu. Select these options in the UEFI Menu: Device Manager → NVIDIA Configuration → L4T Configuration → OS chain A status → (The value is Unbootable if UEFI attempts recovery kernel) choose Normal → Save and exit.
+
+    Reboot the device. During boot this time press ``0`` on your keyboard when the following appears on the monitor or in the serial connection.
+
+    .. code-block::
+        :class: no-copybutton
+
+        ESC   to enter Setup.
+        F11   to enter Boot Manager Menu.
+        Enter to continue boot.
+        ......
+        L4TLauncher: Attempting Direct Boot
+        L4T boot options
+        0: primary kernel
+        1: real-time kernel
+        2: Custom Header Config: <HDR40 Nova p3762 Sensor Config> <CSI Jetson Camera Hawk-Owl p3762 module>
+        Press 0-2 to boot selection within 3.0 seconds.
+        Press any other key to boot default (Option: 2)
+
+    The system should now boot using the primary kernel.
+
+    Further debugging to understand why the device tree overlay is incompatible with your kernel is required. These are the options you can choose from:
+
+    #. Re-flash the Jetson AGX Orin and reinstall ``nova-orin-init``. This should fix the issue if the kernel was modified in an unknown way. ``nova-orin-init`` has been tested for development on a freshly flashed system.
+
+    #. Connect to the `USB micro-B port (9) <https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html>`__ using `minicom <https://developer.ridgerun.com/wiki/index.php/NVIDIA_Jetson_Orin/In_Board/Getting_in_Board/Serial_Console#Using_minicom>`__, reboot, and analyze the logs produced. The logs should give a hint to what part of the kernel is crashing. Look into how that can be fixed.
+
+    #. Remove ``nova-orin-init`` from the device to revert Nova's changes.
+
+        .. code-block:: bash
+
+            sudo apt remove nova-orin-init

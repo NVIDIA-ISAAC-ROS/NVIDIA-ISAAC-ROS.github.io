@@ -24,7 +24,7 @@ Install Nova.
 
       No Nova YAML specified. The following example files are available: none, hawk-2_owl-4, owl-4, nova-devkit, nova-orin, hawk-1, hawk-4_owl-4, hawk-2, nova-carter. Select one of the examples for a predefined yaml or none if you would like to write your own custom. Use `show <example>` if you want to see the YAML. Response:
 
-   Select the example YAML you want to install (``nova-devkit``, ``nova-carter``, etc.) or add your own custom YAML by selecting ``none`` and following the :ref:`guide here <getting_started/platforms/adapting_nova:customizing nova>`.
+   The examples provided are either products (``nova-devkit``, ``nova-carter``, etc.) related to Nova or configurations commonly used on a Jetson with Nova. Examples ``hawk-1``, ``owl-4``, ``hawk-4_owl-4``, etc., are named after the type of sensors Nova expects are connected to the Jetson. For instance, if there is only 1 Hawk connected to the Jetson the ``hawk-1`` YAML should be selected. Not all configurations have examples, if no example suits your configuration add your own custom YAML by selecting ``none`` and following the :ref:`guide here <getting_started/platforms/adapting_nova:customizing nova>`.
 
    Continue if no question appears. No question means that it's using the old config on the Nova platform.
 
@@ -38,7 +38,7 @@ Install Nova.
    
    .. code-block:: bash
 
-      nova_preflight_checker -v
+      nova_preflight_checker
 
 Upgrade
 -------
@@ -59,7 +59,7 @@ Upgrade
    
    .. code-block:: bash
 
-      nova_preflight_checker -v
+      nova_preflight_checker
 
 Uninstall
 ---------
@@ -100,7 +100,7 @@ During Nova Orin Init install it asks for a Nova YAML selection. This selection 
 Add Real-Time Support
 ---------------------
 
-Real-time capabilities can be added to any Jetson AGX Orin with JP6 GA by following the `installing real-time guide provided by Jetpack <https://docs.nvidia.com/jetson/archives/r36.3/DeveloperGuide/SD/SoftwarePackagesAndTheUpdateMechanism.html?_gl=1*754wy0*_gcl_au*MTQwMzE0MDA4Ny4xNzE2MzMyMTYy#installing-the-real-time-kernel-packages-on-a-jetson-device>`__. This is useful for applications like robotic arms.
+Real-time capabilities can be added to any Jetson AGX Orin with JP6 GA by following the `installing real-time guide provided by Jetpack <https://docs.nvidia.com/jetson/archives/r36.4/DeveloperGuide/SD/Kernel/KernelCustomization.html?real-time-kernel-using-ota-update#real-time-kernel-using-ota-update>`__. This is useful for applications like robotic arms.
 
 Nova Orin Init does not currently support real-time by default it must be modified after every installation/upgrade. To support real-time the system must use the real-time image. Run the following commands to update Nova's boot config to use the real-time image:
 

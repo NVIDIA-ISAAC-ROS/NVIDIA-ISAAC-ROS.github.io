@@ -1,0 +1,458 @@
+==================================
+Camera Calibration for Manipulator
+==================================
+
+.. note::
+
+   These instructions are for extrinsics calibration of a Hawk or RealSense camera with a UR e-Series robot (tested with UR5e and UR10e).
+   For dual-camera setups, please follow the :ref:`Calibration Procedure <getting_started/hardware_setup/sensors/manipulator_camera_calibration:Calibration Procedure>` twice, once for each camera.
+
+Calibration Target
+------------------
+
+Supported Patterns
+~~~~~~~~~~~~~~~~~~
+
+Both ArUco and ChArUco calibration targets are supported with this tutorial. For best results, we recommend a ChArUco
+pattern with an odd number of rows and a high number of markers, printed on the largest sized board that is suitable for the robot being calibrated.
+
+The following ArUco pattern dictionaries are supported.
+
++----------------------+
+| DICT_4X4_250         |
++----------------------+
+| DICT_5X5_250         |
++----------------------+
+| DICT_6X6_250         |
++----------------------+
+| DICT_7X7_250         |
++----------------------+
+| DICT_ARUCO_ORIGINAL  |
++----------------------+
+
+
+Target Printing
+~~~~~~~~~~~~~~~
+
+The calibration targets must be rigid without any noticeable bending when flat and during operation.
+We recommend using aluminum/LDPE composite for the required flatness and stiffness.
+
+.. note::
+
+    We recommend using `calib.io <https://calib.io/>`__ to obtain high quality calibration targets. The targets used in this tutorial
+    were purchased from calib.io.
+
+If printing from a different source, ensure that the printed targets are:
+
+    *   Non-glossy to minimize light reflections and glare.
+    *   Black and white in color.
+
+The calibration targets used in this tutorial are from `calib.io <https://calib.io/>`__ and shown below: left - UR5e target, right - UR10e target.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_targets.jpg>`
+        :width: 79%
+
+The specifications for the calibration targets used in this tutorial are as follows.
+
+========== ================ ================== ===================
+Robot type Board dimension  ChArUco resolution ArUco dictionary
+========== ================ ================== ===================
+UR5e       200x300 (mm)     14x9               DICT_5X5_250
+UR10e      300x400 (mm)     12x9               DICT_5X5_250
+========== ================ ================== ===================
+
+Physical Setup
+--------------
+
+The calibration board should be mounted firmly to the end of the manipulator arm such that the board
+does not shift its position when the arm is moved. Any relative movement between the board and arm during
+calibration will result in inaccurate results. We recommend using a mount such as the one shown
+`here <https://calib.io/products/robot-flange-mount>`__.
+
+A calibration target attached to a UR10e robot using the mount is shown below.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/ur10_w_calibration_target.jpg>`
+        :width: 79%
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_mount_rear.jpg>`
+        :width: 79%
+
+
+.. note::
+
+   The calibration board can also be held by the robot via a gripper. If using this method to hold the target and a portion of the
+   ChAuCo pattern is obstructed, ensure that the calibration tool is able to successfully detect the target. Refer to **Step 11** of
+   :ref:`Calibration Procedure <getting_started/hardware_setup/sensors/manipulator_camera_calibration:Calibration Procedure>` for instructions
+   on how to visualize the detection of the calibration target.
+
+
+Software Setup
+--------------
+
+#.  Set up your development environment by following the instructions
+    here: :doc:`Developer Environment Setup </getting_started/dev_env_setup>`.
+
+#.  Set up the UR Robot by following the instructions
+    here: :ref:`Set Up UR Robot<set-up-ur-robot>`.
+
+#.  Complete the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`
+    if using a Hawk stereo camera.
+    Complete the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`
+    if using a RealSense camera.
+
+#.  Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src && \
+            git clone :ir_clone:`<isaac_ros_common>`
+
+#.  Clone ``isaac_manipulator`` under ``${ISAAC_ROS_WS}/src``.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src && \
+            git clone --recursive :ir_clone:`<isaac_manipulator>`
+
+#.  Launch the Docker container using the ``run_dev.sh`` script.
+
+    .. code:: bash
+
+        cd $ISAAC_ROS_WS && ./src/isaac_ros_common/scripts/run_dev.sh
+
+#.  Build from source and install the `moveit_calibration package <https://github.com/illumo-robotics/moveit_calibration>`__.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}
+        git clone https://github.com/illumo-robotics/moveit_calibration.git src/third_party
+        rosdep update && rosdep install -r --from-paths src/third_party/moveit_calibration --ignore-src --rosdistro ${ROS_DISTRO} -y
+        colcon build --symlink-install --packages-up-to-regex moveit_calibration* --cmake-args -DCMAKE_BUILD_TYPE=Release
+        source install/setup.bash
+
+#.  Install the Isaac Manipulator packages. There are two options: installation
+    from source, or installation from Debian.
+
+    .. tabs::
+
+        .. tab:: Installation from source
+
+            #. Use ``rosdep`` to install the package’s dependencies:
+
+                :ir_apt:
+
+                .. code:: bash
+
+                        rosdep update && \
+                            rosdep install -i -r \
+                            --from-paths ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/ \
+                            --rosdistro humble -y
+
+            #. Build and source the ROS workspace
+
+                .. code:: bash
+
+                    cd ${ISAAC_ROS_WS}
+                    colcon build --symlink-install --packages-up-to isaac_manipulator_bringup
+                    source install/setup.bash
+
+        .. tab:: Installation from Debian
+
+            #. Get ``isaac_manipulator_bringup`` and its dependencies.
+
+                :ir_apt:
+
+                .. code:: bash
+
+                    sudo apt-get install -y ros-humble-isaac-manipulator-bringup
+
+
+
+Calibration Procedure
+---------------------
+
+.. note::
+
+    Before proceeding, complete the steps in :ref:`Software Setup <getting_started/hardware_setup/sensors/manipulator_camera_calibration:Software Setup>`.
+
+#.  Open a new terminal window and launch the Docker container using the ``run_dev.sh`` script.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+
+.. note::
+
+    We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
+    new terminal you run ROS commands to avoid interference
+    with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
+
+
+
+#.  Inside the container, source the workspace.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS} && \
+        source install/setup.bash
+
+
+
+#.  Launch the UR robot driver:
+
+    .. code:: bash
+
+        ros2 launch ur_robot_driver ur_control.launch.py ur_type:=<ROBOT_TYPE> robot_ip:=<ROBOT_IP_ADDRESS> launch_rviz:=false
+
+    The supported robot types are: [``ur3e``, ``ur5e``, ``ur10e``, ``ur16e``]
+
+
+
+#.  Open a second terminal window and launch the Docker container using the ``run_dev.sh`` script.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+
+
+#.  Inside the container, source the workspace and launch the camera feed.
+
+    .. tabs::
+
+        .. tab:: Hawk
+
+            1.  Install the Hawk stereo camera package.
+
+                .. code:: bash
+
+                    sudo apt-get install -y ros-humble-isaac-ros-hawk
+
+            2.  Launch the camera feed.
+
+                .. code:: bash
+
+                    source install/setup.bash
+                    ros2 launch isaac_manipulator_bringup camera_calibration.launch.py camera_type:=hawk
+            
+            3.  This launch file launches the camera pipeline for Hawk. After launch you can verify that camera topics are publishing data, e.g., ``/left/rect/image``.
+
+        .. tab:: RealSense
+
+            1.  Launch the camera feed.
+
+                .. code:: bash
+
+                    source install/setup.bash
+                    ros2 launch isaac_manipulator_bringup camera_calibration.launch.py camera_type:=realsense
+            
+            3.  This launch file launches the camera pipeline for RealSense. After launch you can verify that camera topics are publishing data, e.g., ``/camera_1/color/image_raw``.
+
+
+
+#.  Open a third terminal window and launch the Docker container using the ``run_dev.sh`` script.
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+.. note::
+
+    If the RViz window with the **HandEyeCalibration** crashes, restart the window by rerunning the commands below.
+
+
+#.  Inside the container, source the workspace and launch the robot with RViz.
+
+    .. code:: bash
+
+        source install/setup.bash
+        ros2 launch isaac_ros_cumotion_examples ur.launch.py ur_type:=<ROBOT_TYPE> robot_ip:=<ROBOT_IP_ADDRESS> launch_rviz:=true
+
+    The supported robot types are: [``ur3e``, ``ur5e``, ``ur10e``, ``ur16e``]
+
+
+#. Close the ``MotionPlanning`` panel on the left side of the window. This must be done to allow for image panels to be added to RViz in a later step. **If this step is not done, the application may crash**.
+
+
+#.  In the RViz window that opens, click on **Add** > **By display type** > **moveit_calibration_gui** > **HandEyeCalibration**.
+    Click on **OK** to add the calibration panel to the window. You should see a new panel added to the left side of the RViz
+    window titled **HandEye Calibration**.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_add.png>`
+        :width: 59%
+
+
+#.  In the **HandEye Calibration** panel, click on the **Target** tab and set the following parameters.
+
+    ======================== ================================================================
+    Target Type              HandEyeTarget/Charuco
+    squares, X               *Number of squares in calibration target along X direction*
+    squares, Y               *Number of squares in calibration target along Y direction*
+    marker size (px)         1500
+    square size (px)         2400
+    margin size (px)         60
+    marker border (bits)     *Number of bits around marker border*
+    ArUco dictionary         DICT_5X5_250
+    longest board side (m)   *Measured length of longest side of the board pattern in meters*
+    measured marker size (m) *Measured length of marker in meters*
+    ======================== ================================================================
+
+    The following values may be used directly if using the `calib.io <https://calib.io/>`__ calibration targets that were recommended in the
+    :ref:`Calibration Target <getting_started/hardware_setup/sensors/manipulator_camera_calibration:Calibration Target>` section above.
+
+    ======================== ================================================================
+    Target Type              ``HandEyeTarget/Charuco``
+    squares, X               ``12`` (for UR10e target), ``14`` (for UR5e target)
+    squares, Y               ``9``
+    marker size (px)         ``1500``
+    square size (px)         ``2400``
+    margin size (px)         ``60``
+    marker border (bits)     ``1``
+    ArUco dictionary         ``DICT_5X5_250``
+    longest board side (m)   ``0.36`` (for UR10e target), ``0.28`` (for UR5e target)
+    measured marker size (m) ``0.022`` (for UR10e target), ``0.015`` (for UR5e target)
+    ======================== ================================================================
+
+    Once the above values have been set, click on **Create Target**.
+
+    Lastly, click on the **Camera Image Topic** drop down menu and select the appropriate image topic.
+    For Hawk the topic is ``/left/rect/image``, for RealSense the topic is ``/camera_1/color/image_raw``.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_target_small.png>`
+        :width: 79%
+
+
+
+#.  In the **HandEye Calibration** panel, click on the **Context** tab and set the following parameters.
+
+    ======================== ====================================================
+    Sensor Configuration     Eye-to-hand
+    Sensor frame             ``hawk`` (Hawk); ``camera_1_link`` (RealSense)
+    Object frame             ``handeye_target``
+    End-effector frame       ``wrist_3_link``
+    Robot base frame         ``world``
+    ======================== ====================================================
+
+    .. note::
+
+        After setting the ``Sensor frame``, the UI may freeze for a few seconds before becoming responsive again.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_context_small.png>`
+        :width: 59%
+
+
+
+#.  Add a panel to visualize the calibration target detection by clicking
+    **Add** > **By topic** > **/handeye_calibration** > **/target_detection** > **Image**. Click on **OK** to add.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_vis_rviz_add.png>`
+        :width: 59%
+
+    You should see a new panel added to the left side of the RViz
+    window titled **Image** which shows the detected pose of the calibration target.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_detection.png>`
+        :width: 79%
+
+
+
+#.  Add TF visualizations for the camera and target. In the RViz window, click on **Add** > **By display type** > **rviz_default_plugins** > **TF**.
+    Click on **OK** to add the visualization to the window.
+    You should now see an entry titled **TF** in the **Displays** panel on the left side of the window. Expand
+    the **TF** entry and then click on **Frames** and deselect the option titled **All Enabled**. Scroll through the
+    list of frames and re-enable ``hawk`` (for Hawk), ``camera_1_link`` (for RealSense), and ``handeye_target``
+    (for both Hawk or RealSense). These are the camera frame and target frame, respectively.
+
+
+
+#.  In the **HandEye Calibration** panel, click on the **Context** tab and use the sliders under **Camera Pose Initial Guess**
+    to provide an initial pose estimation. Adjust the translation and rotation values until the TF visualizations on the
+    right side of the window roughly correspond with the position of the camera and target board in real life with respect
+    to the manipulator arm.
+
+
+
+#.  In the **HandEye Calibration** panel, click on the **Calibrate** tab. Make sure the calibration board is visible in the camera
+    image. Move the manipulator arm to a desired pose and click **Take sample**. If the sample is successfully taken, it will
+    it appear in the box titled **Pose samples**. After a minimum of 5 samples are taken, the tool will compute a camera pose
+    together with a corresponding reprojection error (it appears at the bottom-left of the **HandEyeCalibration** window). Continue to move the manipulator arm and collect samples until the desired number
+    of samples is achieved.
+
+    .. note::
+
+        Adding more diverse samples will typically lead to a more robust calibration. It is recommended that a minimum of **2** translational poses are used with approximately **10** rotations for each translation.
+        The rotations should be made by moving the board along all three axes (roll, pitch, yaw) at the same time to ensure each rotation
+        is sufficiently different from the prior. Additional rotations can be added to improve the accuracy of the calibration.
+        The translational poses should be positioned within the workspace of the manipulator arm.
+
+    .. note::
+        Verify that reprojection error is low enough for your application, and that the camera
+        position in RViz looks reasonable and aligns with the simulated robot.
+        The procedure described in these instructions have been tested to provide reprojection error
+        under 0.002 m and 0.002 rad.
+
+    Once the desired number of samples are taken, save the calibration results by clicking **Save camera pose**.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_calibrate_small.png>`
+        :width: 79%
+
+    .. note::
+
+        Different solvers yield different calibration results, we recommend experimenting with different solvers to see which yields the
+        best results for your use case. To select a different solver, click on the drop down menu next to **AX=XB Solver** and click
+        on the desired solver. Then click on the **Solve** button to recompute the calibration results with the selected solver.
+
+    The ``calibration.launch.py`` output from the calibration tool will include a code snippet similar to the following example (values included for illustration only as they will differ for different setups):
+
+    .. code:: bash
+
+        """ Static transform publisher acquired via MoveIt 2 hand-eye calibration """
+        """ EYE-TO-HAND: world -> camera """
+        from launch import LaunchDescription
+        from launch_ros.actions import Node
+
+
+        def generate_launch_description() -> LaunchDescription:
+            nodes = [
+                Node(
+                    package="tf2_ros",
+                    executable="static_transform_publisher",
+                    output="log",
+                    arguments=[
+                        "--frame-id",
+                        "world",
+                        "--child-frame-id",
+                        "camera",
+                        "--x",
+                        "1.77278",
+                        "--y",
+                        "0.939827",
+                        "--z",
+                        "-0.0753478",
+                        "--qx",
+                        "-0.128117",
+                        "--qy",
+                        "-0.0317539",
+                        "--qz",
+                        "0.955077",
+                        "--qw",
+                        "-0.265339",
+                        # "--roll",
+                        # "0.132507",
+                        # "--pitch",
+                        # "-0.229891",
+                        # "--yaw",
+                        # "-2.5843",
+                    ],
+                ),
+            ]
+            return LaunchDescription(nodes)
+
+
+#.  The calibrated pose values can now be used with the rest of the :doc:`Isaac Manipulator </reference_workflows/isaac_manipulator/index>` suite
+    by updating the values in :ir_repo:`static_transforms.launch.py <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`
+    as described :ref:`here <set-up-cameras-for-robot>`.

@@ -1,0 +1,132 @@
+Tutorial: Running Event Recorder with RealSense
+===============================================
+
+Overview
+--------
+
+This tutorial will demonstrate how to run the event recorder with a RealSense camera.
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Set Up RealSense
+^^^^^^^^^^^^^^^^
+
+Follow :doc:`Isaac ROS RealSense Setup </getting_started/hardware_setup/sensors/realsense_setup>`
+to set up the RealSense camera.
+
+Build ``isaac_ros_data_recorder``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+              ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-data-recorder
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nova>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nova/isaac_ros_data_recorder --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --packages-up-to isaac_ros_data_recorder --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_nova/isaac_ros_data_recorder
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+1. Run the RealSense node:
+
+   .. code:: bash
+
+      ros2 launch realsense2_camera rs_launch.py
+
+2.  In a separate terminal, run the event recorder node:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_data_recorder data_recorder.launch.py event_recorder:=True \
+        topics:="[ '/rosout', '/diagnostics', '/tf', '/tf_static', '/camera/color/image_raw/compressed', '/camera/color/camera_info', '/camera/color/metadata', '/camera/imu' ]"
+
+   .. note::
+
+      By default, the event recorder will save 60 seconds of RealSense data in each MCAP file.
+      This can be configured via the ``max_bag_duration`` launch argument.
+
+   .. warning::
+      If ``max_bag_duration`` is greater than ``look_back_window``, then ``max_bag_duration`` will be reduced to ``look_back_window``.
+
+3. In a separate terminal, use the ``event_start`` service to signal the start of an event:
+
+   .. code:: bash
+
+      ros2 service call event_start isaac_ros_data_recorder/srv/Event
+
+   .. note::
+
+      By default, the event recorder will save 60 seconds of RealSense data before the start of the event.
+      This can be configured via the ``look_back_window`` launch argument.
+
+4. In the same terminal as Step 3, use the ``event_end`` service to signal the end of an event:
+
+   .. code:: bash
+
+      ros2 service call event_end isaac_ros_data_recorder/srv/Event
+
+   .. note::
+
+      By default, the event recorder will save 60 seconds of RealSense data after the end of the event.
+      This can be configured via the ``look_ahead_window`` launch argument.

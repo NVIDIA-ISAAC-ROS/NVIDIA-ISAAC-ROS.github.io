@@ -2,22 +2,38 @@
 Release Notes
 =============
 
-Nova Orin Init 1.3.1
+Nova Orin Init 1.3.2
 --------------------
 
-Nova Orin Init 1.3.1 is a hot-fix release that corresponds to Isaac ROS 3.0.1. Both v1.3.1 and v1.3.0 support JetPack 6. It improves support for Nova Orin Developer Kit calibration and bug fixes.
+The Nova Orin Init 1.3.2 release corresponds with Isaac ROS 3.2. Release ``>=`` 1.3.2 supports JP6.1. For JP6.0 support use ``<=`` 1.3.1. This release focuses on improving the architecture for Nova Manager and Nova Preflight Checker to make them more adaptable/extensible for the user.
 
 New Features
 ^^^^^^^^^^^^
 
-Nova Orin Init release 1.3.1
+Nova Orin Init release 1.3.2:
+
+- Overhaul Nova Preflight Checker to integrate with ``pytest`` better and make it easier for users to add their own ``pytest`` tests
+- Restructure Nova Manager and add arguments to introspect into Nova modules (``--list-modules``, ``--dry-run``, ``--list-modules-tree``)
+- The ``systeminfo.yaml`` file explicitly states all modules that have been enabled on the system
+- ``systeminfo.yaml`` has a reserved field ``name`` for identifying its use case
+- Add Segway charging status to ``nova_battery_status``
+- Prevent PFC from running after boot until prerequisites are met
+- Network interfaces for LIDARs use standard Ubuntu naming scheme ``eno1`` instead of ``eth0``
+- Tools (``print_eeprom``, ``print_battery_status``, etc.) have moved from the tools folder to their respective modules
+- Programmable Vision Accelerator (PVA) module added to enable it for use by default
+- ``jtop`` module added to enable it as a tool by default
+- PHC<->TSC latch is now monitored and set again if it is reset
+- More PFC tests (SSD speed, Hesai return mode, NVPPS, etc.)
+- Minor bug fixes to PFC and Nova Manager
+
+Previous Release
+^^^^^^^^^^^^^^^^
+
+Nova Orin Init release 1.3.1:
 
 - Update Nova Orin Developer Kit nominal calibration files
 - Added PFC test for device tree
 - Removed ``nova-orin`` YAML to avoid confusion
-
-Previous Release
-^^^^^^^^^^^^^^^^
 
 Nova Orin Init release 1.3.0:
 
