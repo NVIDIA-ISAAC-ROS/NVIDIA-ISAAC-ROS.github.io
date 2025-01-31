@@ -16,7 +16,7 @@ The ``isaac_ros_owl`` driver provides support for the ``LI-AR0234CS-GMSL2-OWL`` 
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/li_owl_ar0234cs_visual.jpg>`
    :align: center
-   
+
    Example image captured using ``LI-AR0234CS-GMSL2-OWL`` with long exposure.
 
 Quickstart
@@ -48,7 +48,7 @@ Build |package_name|
          .. code:: bash
 
             sudo apt-get install -y ros-humble-isaac-ros-owl
-   
+
    .. tab:: Build from Source
 
       1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
@@ -57,7 +57,7 @@ Build |package_name|
 
             cd ${ISAAC_ROS_WS}/src && \
                git clone :ir_clone:`<isaac_ros_nova>`
-     
+
       2. Launch the Docker container using the ``run_dev.sh`` script:
 
          .. code:: bash
@@ -85,7 +85,7 @@ Build |package_name|
          .. note::
 
             Make sure to repeat this step in **every** terminal created inside the Docker container.
-            
+
             Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
 
          .. code:: bash
@@ -146,7 +146,7 @@ ROS Parameter               Type             Default             Description
 =========================== ================ =================== ===========================================================================================================================================================================================
 ``camera_id``               ``uint``         ``0``               The video device index E.g. ``/dev/video0``
 ``module_id``               ``uint``         ``0``               The camera module index in the device tree when there is more than one of the same camera module connected
-``mode``                    ``uint``         ``0``               The resolution mode supported by the camera sensor and driver.
+``mode``                    ``uint``         ``0``               The resolution mode supported by the camera sensor and driver. Currently only 1920x1200 (mode 0) is supported.
 ``fsync_type``              ``uint``         ``1``               Specifies what kind of Frame Synchronization to use, supported values are 0 for internal and 1 for external. For e3653 boards (carter 2.3) choose 0, for p3762 boards (carter 2.4) choose 1
 ``camera_link_frame_name``  ``string``       ``camera``          The frame name associated with the origin of the camera body.
 ``optical_frame_name``      ``string``       ``left_cam``        The frame name associated with the imager inside camera body (for monocular camera).

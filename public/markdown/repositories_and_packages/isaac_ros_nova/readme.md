@@ -19,7 +19,7 @@ Sensor data streams through Isaac ROS graphs using [NITROS](https://nvidia-isaac
 
 ## Quickstart
 
-It is recommended to use Nova through the Isaac ROS Nova meta-package. This package will launch all the sensor drivers for your defined Nova system. Guidelines and instructions on its use can be found [here](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_nova/isaac_ros_nova/index.html).
+It is recommended to use Nova through the [Isaac ROS Nova meta-package](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nova/blob/main/isaac_ros_nova). This package will launch all the sensor drivers for your defined Nova system. Guidelines and instructions on its use can be found [here](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_nova/isaac_ros_nova/index.html).
 
 ## Isaac ROS NITROS Acceleration
 

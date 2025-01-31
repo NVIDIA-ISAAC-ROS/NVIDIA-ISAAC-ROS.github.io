@@ -92,18 +92,16 @@ Grippers:
 
 Cameras:
 
-- Up to two RealSense cameras :doc:`supported by Isaac ROS </getting_started/hardware_setup/sensors/realsense_setup>` or one :doc:`Hawk stereo camera </getting_started/hardware_setup/sensors/hawk_setup>`
+Up to two RealSense cameras :doc:`supported by Isaac ROS </getting_started/hardware_setup/sensors/realsense_setup>` or one :doc:`Hawk stereo camera </getting_started/hardware_setup/sensors/hawk_setup>`.
 
-.. note::
+Multiple cameras can help reduce occlusion and noise in the scene and therefore increase the quality and completeness of the 3D reconstruction  used for collision avoidance.
+While the object following tutorial with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras, object detection and pose estimation are only enabled on the camera with the lowest index.
 
-   * Multiple cameras can help reduce occlusion and noise in the scene and therefore increase the quality and completeness of the 3D reconstruction  used for collision avoidance.
-   * While the object following tutorial with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras, object detection and pose estimation are only enabled on the camera with the lowest index.
-   * Reflective or smooth, featureless surfaces in the environment may increase noise in the depth estimation.
-   * Use of multiple cameras is recommended.
+Reflective or smooth, featureless surfaces in the environment may increase noise in the depth estimation.
 
-.. note::
+Use of multiple cameras is recommended.
 
-   Mixing stereo camera types is untested but may work with modifications to the launch files.
+Mixing stereo camera types is untested but may work with modifications to the launch files.
 
 .. warning::
 
@@ -115,15 +113,11 @@ Cameras:
 Requirements
 ------------
 
-Ensure that you have the following available:
+Ensure that you have one of the NGC catalog objects that can be grasped, for example :ir_ngc:`sdetr_grasp <teams/isaac/models/synthetica_detr>`. This tutorial uses the **Mac and Cheese Box**.
 
-- One of the NGC catalog objects that can be grasped, for example :ir_ngc:`sdetr_grasp <teams/isaac/models/synthetica_detr>`. This tutorial uses the **Mac and Cheese Box**.
-
-.. note::
-
-   If using FoundationPose, for the desired object, ensure that you have a mesh and a texture file available for it.
-   To prepare an object, review
-   :doc:`FoundationPose's documentation </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`.
+If you are using FoundationPose, for the desired object, ensure that you have a mesh and a texture file available for it.
+   
+To prepare an object, review :doc:`FoundationPose's documentation </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`.
 
 Tutorial
 --------
@@ -149,12 +143,12 @@ Set Up Development Environment
 Set Up UR Robot
 ~~~~~~~~~~~~~~~
 
-#. Please refer to the :ref:`Set Up UR Robot section <set-up-ur-robot>`.
+#. Refer to the :ref:`Set Up UR Robot section <set-up-ur-robot>`.
 
 Set Up Cameras for Robot
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-#. Please refer to the :ref:`Set Up Cameras for Robot section <set-up-cameras-for-robot>`.
+#. Refer to the :ref:`Set Up Cameras for Robot section <set-up-cameras-for-robot>`.
 
 Build the Code
 ~~~~~~~~~~~~~~
@@ -176,11 +170,9 @@ Build the Code
 
    .. note::
 
-      The fork is used to fix `this bug <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/57>`__ in the original repository.
+      - The fork is used to fix `this bug <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/57>`__ in the original repository.
 
-   .. note::
-
-      The custom ``serial`` package build is required because of `Issue 21 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/21>`__
+      - The custom ``serial`` package build is required because of `Issue 21 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/21>`__
 
 #. Building dependencies:
 
@@ -194,7 +186,7 @@ Build the Code
 
    .. tabs::
 
-      .. tab:: Installation from source
+      .. tab:: Installation from Source
 
                #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
 
@@ -233,24 +225,20 @@ Build the Code
 Set Up Perception Deep Learning Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
+#. Make sure to follow the FoundationPose tab of the tutorial.
 
-   Make sure to follow the FoundationPose tab of the tutorial.
-
-#. Please refer to the :ref:`Set Up Perception Deep Learning Models section <set-up-perception-deep-learning-models>`.
+#. Refer to the :ref:`Set Up Perception Deep Learning Models section <set-up-perception-deep-learning-models>`.
 
 Run Launch Files and Deploy to Robot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
+We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
+new terminal where you run ROS commands, to avoid interference
+with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
 
-   We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
-   new terminal where you run ROS commands, to avoid interference
-   with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
-
-.. note::
-   We recommend using Cyclone DDS for this tutorial when trying on real robot for better performance.
-   To enable Cyclone DDS, run the following command in each terminal (once) before running any other command.
+We recommend using Cyclone DDS for this tutorial when trying on real robot for better performance.
+   
+#. To enable Cyclone DDS, run the following command in each terminal (once) before running any other command.
 
    .. code:: bash
 
@@ -271,9 +259,7 @@ Run Launch Files and Deploy to Robot
 
      ros2 run ur_robot_driver tool_communication.py --ros-args -p robot_ip:=<ROBOT_IP_ADDRESS>
    
-   .. note::
-
-      This is an important step as it interacts with the Robotiq gripper and allows for programmatic control of the gripper.
+   This is an important step because it interacts with the Robotiq gripper and allows for programmatic control of the gripper.
 
 #. Open a **new** terminal inside the Docker container:
 
@@ -283,6 +269,16 @@ Run Launch Files and Deploy to Robot
         ./scripts/run_dev.sh
 
 #. Launch perception nodes along with cuMotion for the UR robot:
+
+   This tutorial was validated using ``ur_type:=ur5e``, ``ur_type:=ur10e`` with gripper types of ``robotiq_2f_140`` and ``robotiq_2f_85``, respectively. The default launch arguments assume
+   that the model to be used is SyntheticaDETR v1.0.0 and that the object to be picked is the
+   Mac and Cheese box. To pick a different object, change the object class ID and optionally
+   the file path to the desired RT-DETR model file.
+
+   .. warning::
+
+      Add any obstacles that are not visible by the camera into the scene to prevent potential collisions.
+      Consult the documentation :doc:`here </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index>`.
 
    .. tabs::
 
@@ -304,7 +300,7 @@ Run Launch Files and Deploy to Robot
                   use_pose_from_rviz:=True \
                   ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.1.0_onnx/ess.engine
 
-      .. tab:: Realsense
+      .. tab:: RealSense
 
          .. code:: bash
 
@@ -313,9 +309,7 @@ Run Launch Files and Deploy to Robot
                   gripper_type:=<GRIPPER_TYPE> camera_type:=realsense setup:=<SETUP_NAME> \
                   use_pose_from_rviz:=True num_cameras:=<NUM_CAMERAS>
 
-      .. note::
-
-         For increased reliability, we recommend using the ``custom_mesh`` or ``cuboid`` approach.
+         For increased reliability, we recommend using the ``custom_mesh`` or ``cuboid`` approach:
 
          * For ``custom_mesh``, this can be done by setting ``object_attachment_type:=custom_mesh``
            and ``attach_object_mesh_file_path:=<PATH-TO-MESH>`` in the launch files above.
@@ -331,28 +325,21 @@ Run Launch Files and Deploy to Robot
          ``filter_depth_buffer_time:=`` to a higher value (the unit is seconds). This will
          allow object attachment to buffer more depth images from the past. The caveat
          is that the software will operate on an older set of data that might lead to
-         creating object spheres that might not model the object position accurately. The
+         creating object spheres that might not model the object position accurately. 
+         
+         The
          other parameter of interest is the ``time_sync_slop`` parameter. It defines the
          synchronization threshold for finding a matched pair of depth images, joint states
          and transforms. For slower systems, slightly tweaking the value up will allow for
-         collision sphere and obstacle avoidance to work. But be warned, using a very large
+         collision sphere and obstacle avoidance to work. Using a very large
          value will synchronize older pieces of data together leading to unpredictable
          downstream effects in planning, collision voxel cloud generation and obstacle
-         avoidance. Note that this only applies when ``SPHERE`` is used as the object attachment
+         avoidance. 
+         
+         This only applies when ``SPHERE`` is used as the object attachment
          type. The other modes do not use depth as input to create the object spheres.
 
-      .. note::
-
-         This tutorial was validated using ``ur_type:=ur5e``, ``ur_type:=ur10e`` with gripper types
-         of ``robotiq_2f_140`` and ``robotiq_2f_85``, respectively. The default launch arguments assume
-         that the model to be used is SyntheticaDETR v1.0.0 and that the object to be picked is the
-         Mac and Cheese box. To pick a different object, change the object class ID and optionally
-         the file path to the desired RT-DETR model file.
-
-      .. warning::
-
-         Add any obstacles that are not visible by the camera into the scene to prevent potential collisions.
-         Consult the documentation :doc:`here </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index>`.
+   
 
 #. Open **another** terminal inside the Docker container:
 
@@ -361,7 +348,7 @@ Run Launch Files and Deploy to Robot
       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
         ./scripts/run_dev.sh
 
-#. On the UR teach pendant, press the **play** button to enable the robot.
+#. On the UR teach pendant, press  **play** to enable the robot.
 
 #. Trigger the object detection:
 
@@ -369,11 +356,10 @@ Run Launch Files and Deploy to Robot
 
       ros2 action send_goal /get_objects isaac_manipulator_interfaces/action/GetObjects {}
 
-   .. note::
-
-     If the above action call does not return in a few seconds, it is possible that the object detection did not return any objects. In this case, try again.
+   If the action call does not return in a few seconds, it is possible that the object detection did not return any objects. In this case, try again.
 
 #. Trigger the pick and place pipeline:
+
    When launching the ROS graph earlier, ```use_pose_from_rviz``` is set to ```True``` which creates a interactive marker that can be used to set the place pose.
    Use the marker controls to set the desired position and orientation. In this mode, the ```place_pose``` in the below command is ignored.
 
@@ -381,13 +367,10 @@ Run Launch Files and Deploy to Robot
 
       ros2 action send_goal /pick_and_place isaac_manipulator_interfaces/action/PickAndPlace "{object_id : 0}"
 
-   .. note::
 
-     Wait for the terminal log to show ``cuMotion is ready for planning queries!``, before triggering the pick and place pipeline.
+   #. Wait for the terminal log to show ``cuMotion is ready for planning queries!``, before triggering the pick and place pipeline.
 
-   .. note::
-
-     If the above action call does not return in a few seconds, it is possible that the pose estimation did not return any results. In this case, try again by calling the object detection action from previous step.
+   #. If the above action call does not return in a few seconds, it is possible that the pose estimation did not return any results. In this case, try again by calling the object detection action from previous step.
 
 #. To do another object pick and place, one would need to do a service call to clear all current
    objects in the cache. One can do that via this service call. After this, one can run the entire
@@ -397,7 +380,5 @@ Run Launch Files and Deploy to Robot
 
       ros2 service call /clear_objects isaac_manipulator_interfaces/srv/ClearObjects
 
-   .. note::
-
-      This will clear all objects from the cache, if you only want to clear a certain object then
-      one will need to specify the object id in the request.
+   This will clear all objects from the cache, if you only want to clear a certain object then
+   you will need to specify the object id in the request.
