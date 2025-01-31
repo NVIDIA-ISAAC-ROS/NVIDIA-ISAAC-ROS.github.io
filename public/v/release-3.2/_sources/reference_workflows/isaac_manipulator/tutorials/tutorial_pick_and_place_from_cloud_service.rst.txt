@@ -4,18 +4,20 @@ Tutorial for Pick and Place from Isaac Cloud Service
 
 Overview
 --------
-This tutorial walks through the process of triggering pick and place workflow from Isaac cloud service using Mission Dispatch APIs.
-Please complete the :doc:`pick and place tutorial </reference_workflows/isaac_manipulator/tutorials/tutorial_pick_and_place>` for pick and place using
-ROS2 action servers first. If you are using Isaac Sim, complete the following sections
-in the :doc:`pick and place tutorial for Isaac Sim </reference_workflows/isaac_manipulator/tutorials/tutorial_isaac_sim>`:
+This tutorial walks through the process of triggering pick and place workflow from Isaac cloud service using Mission Dispatch APIs. In this tutorial, you will setup Mission Dispatch on one x86_64 machine, launch mission client along with other ROS2 nodes on the robot and trigger pick and place workflow by cloud APIs.
 
-1. Set Up Development Environment
-2. Build the Code
-3. Set Up Perception Deep Learning Models
+Prerequisites
+--------------
 
-If you have a real manipulator, you should complete all sections except "Run Pick and Place with Isaac Sim Platform."
-In this tutorial, you will setup Mission Dispatch on one x86_64 machine, launch mission client along with other ROS2 nodes on the robot
-and trigger pick and place workflow by cloud APIs.
+- Complete the :doc:`pick and place tutorial </reference_workflows/isaac_manipulator/tutorials/tutorial_pick_and_place>` for pick and place using ROS2 action servers first. 
+- If you are using Isaac Sim, complete the following sections in the :doc:`pick and place tutorial for Isaac Sim </reference_workflows/isaac_manipulator/tutorials/tutorial_isaac_sim>`:
+
+  1. Set Up Development Environment
+  2. Build the Code
+  3. Set Up Perception Deep Learning Models
+
+- If you have a RealSense manipulator, complete all sections except "Run Pick and Place with Isaac Sim Platform."
+
 
 Tutorial Walkthrough
 --------------------
@@ -28,7 +30,7 @@ The following steps should be done on an x86_64 machine.
 
     The MQTT broker is used for communication between the Mission Dispatch and the robots. There are many ways to run an MQTT broker, including as a system daemon, a standalone application, or a Docker container. The following example uses `mosquitto` as the MQTT broker.
 
-    Create a file ``~/mosquitto.sh`` with the following contents outside the container:
+    1. Create a file ``~/mosquitto.sh`` with the following contents outside the container:
 
       .. code-block:: bash
 
@@ -45,7 +47,7 @@ The following steps should be done on an x86_64 machine.
         echo "protocol websockets" >> $CONFIG_FILE
         mosquitto -c $CONFIG_FILE
 
-    Run the command outside the container:
+    2. Run the command outside the container:
 
       .. code-block:: bash
 
@@ -53,53 +55,43 @@ The following steps should be done on an x86_64 machine.
 
 2. Start `Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`__ with Docker.
 
-    - On the Postgres database:
+    .. tabs::
 
-      Set the following environment variable:
+        .. tab:: On the Postgres Database
 
-      .. code-block:: bash
+         1. Set the following environment variable:
 
-          export POSTGRES_PASSWORD=<Any password>
+           .. code-block:: bash
 
-      Start the Postgres database by running the following:
+               export POSTGRES_PASSWORD=<Any password>
 
-      .. code-block:: bash
+         2. Start the Postgres database by running the following:
 
-          docker run --rm --name postgres \
-            --network host \
-            -p 5432:5432 \
-            -e POSTGRES_USER=postgres \
-            -e POSTGRES_PASSWORD \
-            -e POSTGRES_DB=mission \
-            -d postgres:14.5
+            .. code-block:: bash
 
-    - Launch the Mission Database microservice:
+                 docker run --rm --name postgres \
+                    --network host \
+                    -p 5432:5432 \
+                    -e POSTGRES_USER=postgres \
+                    -e POSTGRES_PASSWORD \
+                    -e POSTGRES_DB=mission \
+                   -d postgres:14.5
 
-      Start the API and database server with the official Docker container.
+        .. tab:: Launch the Mission Database Microservice
 
-      .. code-block:: bash
+         1. Start the API and database server with the official Docker container.
 
-          docker run -it --network host nvcr.io/nvidia/isaac/mission-database:3.2.0
+           .. code-block:: bash
 
-      To see what configuration options are, run:
+               docker run -it --network host nvcr.io/nvidia/isaac/mission-database:3.2.0
 
-      .. code-block:: bash
+         2. To see what the configuration options are, add ``--help`` option after the command:
 
-          docker run -it --network host nvcr.io/nvidia/isaac/mission-database:3.2.0 --help
+            .. code-block:: bash
 
-      #. For example, if you want to change the port for the user API from the default 5000 to 5002, add ``--port 5002`` configuration option in the command.
+              docker run -it --network host nvcr.io/nvidia/isaac/mission-database:3.2.0 --help
 
-    - Launch the Mission Dispatch microservice:
-
-      Start the Mission Dispatch server with the official Docker container.
-
-      .. code-block:: bash
-
-          docker run -it --network host nvcr.io/nvidia/isaac/mission-dispatch:3.2.0
-
-      #. To see what the configuration options are, add ``--help`` option after the command.
-
-.. note::
+           For example, if you want to change the port for the user API from the default 5000 to 5002, add ``--port 5002`` configuration option in the command.
 
     Read `this tutorial <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`_ for more deployment options for Mission Dispatch.
 
@@ -123,20 +115,21 @@ Complete the following steps on the robot.
             serial_number:=arm01 \
             mqtt_host_name:=<mission_dispatch_ip>
 
-3. Complete the required sections in the :doc:`pick and place tutorial </reference_workflows/isaac_manipulator/tutorials/tutorial_pick_and_place>` or the :doc:`pick and place tutorial for Isaac Sim </reference_workflows/isaac_manipulator/tutorials/tutorial_isaac_sim>`
-   first as described in :ref:`Overview <reference_workflows/isaac_manipulator/tutorials/tutorial_pick_and_place_from_cloud_service:overview>`. Launch pick and place servers:
+3. Complete the required sections in the :doc:`pick and place tutorial </reference_workflows/isaac_manipulator/tutorials/tutorial_pick_and_place>` or the :doc:`pick and place tutorial for Isaac Sim </reference_workflows/isaac_manipulator/tutorials/tutorial_isaac_sim>` first as described in :ref:`Overview <reference_workflows/isaac_manipulator/tutorials/tutorial_pick_and_place_from_cloud_service:overview>`. 
+
+4. Launch pick and place servers:
 
     .. tabs::
 
-        .. tab:: On Real Robot
+        .. tab:: On RealSense Robot
 
-            Inside the container, launch the `tool_communication.py` script:
+            #. Inside the container, launch the `tool_communication.py` script:
 
             .. code:: bash
 
                 ros2 run ur_robot_driver tool_communication.py --ros-args -p robot_ip:=<ROBOT_IP_ADDRESS>
 
-            Open a new terminal inside the container and run:
+           #. Open a new terminal inside the container and run:
 
             .. code:: bash
 
@@ -154,7 +147,7 @@ Complete the following steps on the robot.
                             gripper_type:=<GRIPPER_TYPE> camera_type:=hawk setup:=<SETUP_NAME> \
                             ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.1.0_onnx/ess.engine
 
-                .. tab:: Realsense
+                .. tab:: RealSense
 
                     .. code:: bash
 
@@ -162,37 +155,33 @@ Complete the following steps on the robot.
                             ur_type:=<UR_TYPE> robot_ip:=<ROBOT_IP_ADDRESS> \
                             gripper_type:=<GRIPPER_TYPE> camera_type:=realsense setup:=<SETUP_NAME>
 
-            .. note::
-
-                This tutorial was validated using ``ur_type:=ur5e``, ``ur_type:=ur10e`` with gripper types
-                of ``robotiq_2f_140`` and ``robotiq_2f_85``.
+            This tutorial was validated using ``ur_type:=ur5e``, ``ur_type:=ur10e`` with gripper types
+            of ``robotiq_2f_140`` and ``robotiq_2f_85``.
 
         .. tab:: In Isaac Sim
 
-            Open Isaac Sim and load the scene below and hit Play.
+            #. Open Isaac Sim and load the scene below and hit **Play**.
 
             .. code:: bash
 
                 https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.2/Isaac/Samples/ROS2/Scenario/isaac_manipulator_ur10e_robotiq_2f_140.usd
 
-            Please set this flag to disable SHM on Isaac Sim. Make sure that file exists in the Docker
-            container before running it. Please do this on all terminals. This makes sure that all
+            #. Set this flag to disable SHM on Isaac Sim. Make sure that file exists in the Docker
+            container before running it. Do this on all terminals to make sure that all
             DDS communication runs over UDP.
 
             .. code:: bash
 
                 export FASTRTPS_DEFAULT_PROFILES_FILE=/usr/local/share/middleware_profiles/rtps_udp_profile.xml
 
-            Inside the container, run.
+            #. Inside the container, run:
 
             .. code:: bash
 
                 ros2 launch isaac_manipulator_pick_and_place isaac_sim_workflows.launch.py \
                     workflow_type:=pick_and_place
 
-            .. note::
-
-               For increased reliability, we recommend using the ``custom_mesh`` or ``cuboid`` approach.
+            For increased reliability, we recommend using the ``custom_mesh`` or ``cuboid`` approach:
 
                * For ``custom_mesh``, this can be done by setting ``object_attachment_type:=custom_mesh``
                  and ``attach_object_mesh_file_path:=<PATH-TO-MESH>`` in the launch files above.
@@ -208,23 +197,24 @@ Complete the following steps on the robot.
                 ``filter_depth_buffer_time`` to a higher value (the unit is seconds). This will
                 allow object attachment to buffer more depth images from the past. The caveat
                 is that the software will operate on an older set of data that might lead to
-                creating object spheres that might not model the object position accurately. The
+                creating object spheres that might not model the object position accurately. 
+                
+                The
                 other parameter of interest is the ``time_sync_slop`` parameter. It defines the
                 synchronization threshold for finding a matched pair of depth images, joint states
                 and transforms. For slower systems, slightly tweaking the value up will allow for
-                collision sphere and obstacle avoidance to work. But be warned, using a very large
+                collision sphere and obstacle avoidance to work. Using a very large
                 value will synchronize older pieces of data together leading to unpredictable
                 downstream effects in planning, collision voxel cloud generation and obstacle
-                avoidance. Note that this only applies when ``SPHERE`` is used as the object
+                avoidance. 
+                
+                This only applies when ``SPHERE`` is used as the object
                 attachment type. The other modes do not use depth as input to create the object
                 spheres.
 
-            .. note::
-
-                If gripper is in a bad state, i.e it is moving in on it self and causing the robot movement to
-                self collide, you need to open the gripper as Isaac Sim caches the last known joint state in it's
-                action graphs and pushes that in when you hit Play. Not if you need to close the gripper, just
-                make position ``0.623``. Note that you need to have the launch file running in order to run this command.
+            #. If the gripper is in a bad state, that is, it is moving in on it self and causing the robot movement to self collide, you need to open the gripper as Isaac Sim caches the last known joint state in it's action graphs and pushes that in when you hit **Play**. If you need to close the gripper, just make position ``0.623``. 
+            
+                You must have the launch file running to run this command.
 
                 .. code:: bash
 
@@ -233,9 +223,10 @@ Complete the following steps on the robot.
 
 Trigger Pick and Place Workflow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Open ``http://localhost:5000/docs`` in a web browser.
 
-1. Use the ``POST /robot`` endpoint to create robot with name ``arm01``.
+1. Open ``http://localhost:5000/docs`` in a web browser.
+
+2. Use the ``POST /robot`` endpoint to create robot with name ``arm01``.
 
     .. code:: json
 
@@ -245,13 +236,11 @@ Open ``http://localhost:5000/docs`` in a web browser.
             "name": "arm01"
         }
 
-.. note::
-
     When using the interactive documentation page, the default value for the the robot object
     ``name`` in the ``spec`` is 'string', you must change it from 'string' to another name that has
     more meaning, like 'arm01'. Delete the ``prefix`` entry as shown in the video.
 
-2. Trigger object detection using ``POST /mission`` endpoint. Here is an example input:
+3. Trigger object detection using ``POST /mission`` endpoint. Here is an example input:
 
     .. code:: json
 
@@ -272,14 +261,11 @@ Open ``http://localhost:5000/docs`` in a web browser.
             "needs_canceled": false
         }
 
-3. If the mission completes successfully, use ``GET /detection_results`` endpoint to get object detection results. The detection results contain ``object_id`` and ``class_id``, which are needed for pick and place workflow.
+4. If the mission completes successfully, use ``GET /detection_results`` endpoint to get object detection results. The detection results contain ``object_id`` and ``class_id``, which are needed for pick and place workflow.
 
-.. note::
+    If the ``get_objects`` mission fails or ``GET /detection_results`` endpoint returns an empty list, repeat step 2 to send the mission again.
 
-    If the ``get_objects`` mission fails or ``GET /detection_results`` endpoint returns an empty list, please repeat step 2 to send the mission again.
-
-4. Trigger pick and place using ``POST /mission`` endpoint. ``object_id`` and ``class_id`` come from the detection results. ``place_pose`` is a comma separated string with 7 floats, representing the position and quaternion of where the gripper drops the object
-   in the manipulator ``base_link`` frame. For the example scene in Isaac Sim, set ``place_pose`` as ``"-0.35,0.2,0.4,0.996,0.066,0.042,0.034"`` to drop the object into the bin.
+5. Trigger pick and place using ``POST /mission`` endpoint. ``object_id`` and ``class_id`` come from the detection results. ``place_pose`` is a comma separated string with 7 floats, representing the position and quaternion of where the gripper drops the object in the manipulator ``base_link`` frame. For the example scene in Isaac Sim, set ``place_pose`` as ``"-0.35,0.2,0.4,0.996,0.066,0.042,0.034"`` to drop the object into the bin.
 
     .. code:: json
 
@@ -304,58 +290,57 @@ Open ``http://localhost:5000/docs`` in a web browser.
             "needs_canceled": false
         }
 
-.. note::
-
-    If the ``pick_and_place`` mission fails, please repeat steps 2-4 to try again.
-
-.. note::
-
-    The pick and place server will cache object poses. If you rerun the pipeline and the object position is different, you should clear the cache
-    using ``POST /mission`` endpoint. The ``object_ids`` parameter can be either empty to clear all objects or a comma separated string to clear specific objects.
-
-    .. code:: json
-
-        {
-            "robot": "arm01",
-            "mission_tree": [
-                {
-                    "name": "clear_objects",
-                    "parent": "root",
-                    "action": {
-                        "action_type": "clear_objects",
-                        "action_parameters": {
-                            "object_ids": ""
-                        }
-                    }
-
-                }
-            ],
-            "timeout": 300,
-            "needs_canceled": false
-        }
-
-
-5. Steps above shows how to trigger pick and place workflow using Mission Dispatch APIs. We provide a simple UI as an example showing how you can develop applications
-using our cloud APIs. You can find the source code in ``mission_dispatch/scripts/pick_and_place_ui.py``. To start the UI on your x86_64 machine:
-
-    .. code-block:: bash
-
-        git clone --recurse-submodules :ic_clone:`<mission_dispatch>`
-        cd mission_dispatch && scripts/run_dev.sh
-
-    Run the UI in the docker container
-
-    .. code-block:: bash
-
-        bazel run //scripts:pick_and_place_ui -- http://localhost:5000 ws://<robot_ip>:9090 /resize/image
-
     .. note::
 
-        If you are using Isaac Sim, ``robot_ip`` should be ``localhost``. If you are running on a real manipulator,
-        it is the IP address of your Jetson machine.
+        - If the ``pick_and_place`` mission fails, repeat steps 2-4 to try again.
 
-6. Enter the robot name ``arm01`` and click **Run Object Detection** button to trigger object detection. The UI will show an image with bounding boxes for detected objects.
+        - The pick and place server will cache object poses. If you rerun the pipeline and the object position is different, clear the cache using the ``POST /mission`` endpoint. The ``object_ids`` parameter can be either empty to clear all objects or a comma separated string to clear specific objects.
 
-7. Click on the image to select the object to pick and enter the place pose. Click **Submit** button to trigger pick and place pipeline.
+        .. code:: json
 
-8. To run clear objects mission, click **Clear Objects** button.
+            {
+                "robot": "arm01",
+                "mission_tree": [
+                    {
+                        "name": "clear_objects",
+                        "parent": "root",
+                        "action": {
+                            "action_type": "clear_objects",
+                            "action_parameters": {
+                                "object_ids": ""
+                            }
+                        }
+
+                    }
+                ],
+                "timeout": 300,
+                "needs_canceled": false
+            }
+
+
+    The steps above shows how to trigger pick and place workflow using Mission Dispatch APIs. We provide a basic UI as an example showing how you can develop applications using our cloud APIs. 
+
+    You can find the source code in ``mission_dispatch/scripts/pick_and_place_ui.py``. 
+
+    To start the UI on your x86_64 machine:
+
+        #. Clone the code, navigate to the start script, and start the UI:
+
+            .. code-block:: bash
+
+                git clone --recurse-submodules :ic_clone:`<mission_dispatch>`
+                cd mission_dispatch && scripts/run_dev.sh
+
+        #. Run the UI in the Docker container
+
+            .. code-block:: bash
+
+                bazel run //scripts:pick_and_place_ui -- http://localhost:5000 ws://<robot_ip>:9090 /resize/image
+
+            If you are using Isaac Sim, ``robot_ip`` must be ``localhost``. If you are running on a RealSense manipulator, it is the IP address of your Jetson machine.
+
+6. Enter the robot name ``arm01`` and click **Run Object Detection**  to trigger object detection. The UI will show an image with bounding boxes for detected objects.
+
+7. Click on the image to select the object to pick and enter the place pose. 
+8. Click **Submit** to trigger pick and place pipeline.
+9. To run clear objects mission, click **Clear Objects**.

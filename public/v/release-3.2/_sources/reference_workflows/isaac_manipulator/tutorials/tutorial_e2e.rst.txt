@@ -57,7 +57,7 @@ For each tutorial, the following number of stereo cameras are supported:
 .. list-table::
    :header-rows: 1
 
-   * - Number of cameras per tutorial
+   * - Number of Cameras per Tutorial
      - Hawk
      - RealSense
 
@@ -69,14 +69,15 @@ For each tutorial, the following number of stereo cameras are supported:
      - 1
      - 2
 
-.. note::
+Use of multiple cameras is recommended.
+Multiple cameras can help reduce occlusion and noise in the scene and therefore increase the quality and completeness of the 3D reconstruction used for collision avoidance.
+The object following tutorial with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras. Testing has been done with configurations of 2 RealSense cameras and (separately) 1 Hawk camera. Configurations with multiple Hawk cameras have not been tested.
 
-   * Multiple cameras can help reduce occlusion and noise in the scene and therefore increase the quality and completeness of the 3D reconstruction used for collision avoidance.
-   * While the object following tutorial with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras, object detection and pose estimation are only enabled on the camera with the lowest index.
-   * Reflective or smooth, featureless surfaces in the environment may increase noise in the depth estimation.
-   * Use of multiple cameras is recommended.
-   * Testing has been done with configurations of 2 RealSense cameras and (separately) 1 Hawk camera. Configurations with multiple Hawk cameras have not been tested.
-   * Mixing different types has not been tested but may work with modifications to the launch files.
+Object detection and pose estimation are only enabled on the camera with the lowest index.
+
+Reflective or smooth, featureless surfaces in the environment may increase noise in the depth estimation.
+
+Mixing different types has not been tested but may work with modifications to the launch files.
 
 .. warning::
 
@@ -114,11 +115,10 @@ Ensure that you have the following available:
    :align: center
    :alt: Mac and Cheese object
 
-.. note::
 
-   If using FoundationPose, for the desired object, ensure that you have a mesh and a texture file available for it.
-   To prepare an object, consult the FoundationPose documentation:
-   :doc:`isaac_ros_foundationpose </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`.
+If you are using FoundationPose for an object, ensure that you have a mesh and a texture file available for it. To prepare an object, consult the FoundationPose documentation:
+
+   :doc:`isaac_ros_foundationpose </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`
 
 Tutorial
 --------
@@ -159,10 +159,10 @@ Build Isaac ROS cuMotion
         git clone --recursive https://github.com/NVIDIA-ISAAC-ROS/ros2_robotiq_gripper && \
         git clone -b ros2 https://github.com/tylerjw/serial
 
-   .. note::
+   
 
-      * The fork of ``ros2_robotiq_gripper`` is required because it includes a fix for `Issue #57 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/57>`__ in the upstream repository.
-      * The fork of ``tylerjw/serial`` is required because it includes a fix for `Issue #21 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/21>`__ in the upstream repository.
+   * The fork of ``ros2_robotiq_gripper`` is required because it includes a fix for `Issue #57 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/57>`__ in the upstream repository.
+   * The fork of ``tylerjw/serial`` is required because it includes a fix for `Issue #21 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/21>`__ in the upstream repository.
 
 
 #. Launch the Docker container using the ``run_dev.sh`` script:
@@ -176,7 +176,7 @@ Build Isaac ROS cuMotion
 
    .. tabs::
 
-      .. tab:: Installation from source
+      .. tab:: Installation from Source
 
                #. Use ``rosdep`` to install the package’s dependencies:
 
@@ -235,18 +235,14 @@ Set Up UR Robot
 Set Up Cameras for Robot
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-#. If using a **Hawk** stereo camera, :ir_nova_docs:`connect your camera via GMSL <hardware/index.html#hawk-owl-and-gmsl-setup>`.
-   If using **RealSense** cameras, connect them via USB 3
-   (see available USB ports of the Jetson AGX Orin `here <https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html>`__).
+#. Connect your cameras:
 
-   .. note::
-
-      When connecting your RealSense cameras via USB, make sure to use a USB 3 port and cable.
-      It is recommended to use cables shorter than 3 m to guarantee stable transmission.
+   - If you are using a **Hawk** stereo camera, :ir_nova_docs:`connect your camera via GMSL <hardware/index.html#hawk-owl-and-gmsl-setup>`.
+   - If you are using **RealSense** cameras, connect them via USB 3. See available USB ports of the Jetson AGX Orin `here <https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html>`__. When connecting your RealSense cameras via USB, make sure to use a USB 3 port and cable.
+   
+   It is recommended to use cables shorter than 3 m to guarantee stable transmission.
 
 #. Place your stereo cameras such that their field of view fully covers the workspace that the robot arm will be operating in.
-
-   .. note::
 
       **Camera Placement Guide:** Object detection networks, as well as ``nvblox``, which is used for collision avoidance, are affected
       by the placement of cameras with respect to the workspace. Here we provide guidelines for placing cameras to
@@ -374,7 +370,7 @@ Set Up Cameras for Robot
 
    .. tabs::
 
-      .. tab:: Installation from source
+      .. tab:: Installation from Source
 
          #. Copy :ir_repo:`hubble_test_bench.yaml <isaac_manipulator> <isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_test_bench.yaml>`
             to a new file named ``<SETUP_NAME>.yaml`` in the same folder and update the workspace bound corners.
@@ -393,7 +389,7 @@ Set Up Cameras for Robot
          to a new file named ``<SETUP_NAME>.yaml`` in
          ``/opt/ros/humble/share/isaac_manipulator_bringup/config/nvblox/workspace_bounds/``.
 
-   .. note::
+  
 
       **How to choose the workspace bounds:**
 
@@ -408,10 +404,7 @@ Set Up Cameras for Robot
 Set Up Perception Deep Learning Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
-
-   The `ESS <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`_ model is only required
-   when using a Hawk stereo camera.
+The `ESS <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`_ model is only required when using a Hawk stereo camera.
 
 **If you are building from source**, prepare the ESS model to run depth estimation:
 
@@ -495,7 +488,6 @@ Set Up Perception Deep Learning Models
                mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/ && \
                   mv ~/Downloads/soup_60.pth ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope
 
-            .. note::
 
                NVLabs has provided a DOPE pre-trained model using the `HOPE <https://github.com/swtyree/hope-dataset>`__ dataset.
                To train your own DOPE model, see :doc:`here </concepts/pose_estimation/dope/tutorial_custom_model>`.
@@ -518,11 +510,7 @@ Set Up Perception Deep Learning Models
 Run Launch Files and Deploy to Robot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
-
-   We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
-   new terminal where you run ROS commands, to avoid interference
-   with other computers on the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
+We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every new terminal where you run ROS commands, to avoid interference with other computers on the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
 
 #. On the UR teach pendant, ensure that the robot's **remote program** is loaded and that the robot is **paused** or **stopped** for safety purposes.
 
@@ -532,11 +520,9 @@ Run Launch Files and Deploy to Robot
 
          ros2 launch ur_robot_driver ur_control.launch.py ur_type:=<UR_TYPE> robot_ip:=<ROBOT_IP_ADDRESS> launch_rviz:=false
 
-   .. note::
+   The robot driver is needed to publish joint states and transforms to the robot and is required for the pipeline to work.
 
-      The robot driver is needed to publish joint states and transforms to the robot and is required for the pipeline to work.
-
-      This tutorial was validated using ``ur_type:=ur5e`` and ``ur_type:=ur10e``.
+   This tutorial was validated using ``ur_type:=ur5e`` and ``ur_type:=ur10e``.
 
 #. Open a **new** terminal inside the Docker container:
 
@@ -581,14 +567,16 @@ Run Launch Files and Deploy to Robot
 
 #. Launch the desired Isaac Manipulator example:
 
-   .. note::
-
-      The ``robot_file_name`` corresponds to the robot parameter found :ref:`here <repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index:API>`.
-      This tutorial has been tested with UR5e and UR10e robots, using URDF and XRDF files that incorporate the Robotiq 2F-140 gripper.
-      The files can be found in the ``share`` directory of the ``isaac_ros_cumotion_robot_description`` package, with the following names:
+   The ``robot_file_name`` corresponds to the robot parameter found :ref:`here <repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index:API>`.
+   
+   This tutorial has been tested with UR5e and UR10e robots, using URDF and XRDF files that incorporate the Robotiq 2F-140 gripper.
+      
+   The files can be found in the ``share`` directory of the ``isaac_ros_cumotion_robot_description`` package, with the following names:
 
       * **UR5e**: ``ur5e_robotiq_2f_140.urdf`` and ``ur5e_robotiq_2f_140.xrdf``
       * **UR10e**: ``ur10e_robotiq_2f_140.urdf``and ``ur10e_robotiq_2f_140.xrdf``
+
+   To launch the example without robot arm control, that is, with perception only, you can add the ``no_robot_mode:=True`` flag to any of the launch commands below.
 
    .. tabs::
       .. tab:: Hawk stereo camera with object following, using FoundationPose
@@ -615,11 +603,7 @@ Run Launch Files and Deploy to Robot
                 urdf_file_path:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/urdf/<URDF_FILE_NAME>.urdf \
                 camera_type:=hawk setup:=<SETUP_NAME>
 
-         .. note::
-
-            The robot end effector will move to match the pose of the object at a fixed offset.  If that pose would bring the
-            robot into collision (e.g., with a table surface), cuMotion will report a planning failure and the robot will
-            remain stationary until the object is repositioned.
+         The robot end effector will move to match the pose of the object at a fixed offset.  If that pose would bring the robot into collision (for example, with a table surface), cuMotion will report a planning failure and the robot will remain stationary until the object is repositioned.
 
       .. tab:: RealSense camera with object following, using FoundationPose
 
@@ -638,11 +622,7 @@ Run Launch Files and Deploy to Robot
                 robot_file_name:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/xrdf/<XRDF_FILE_NAME>.xrdf \
                 urdf_file_path:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/urdf/<URDF_FILE_NAME>.urdf
 
-         .. note::
-
-            The robot end effector will move to match the pose of the object at a fixed offset.  If that pose would bring the
-            robot into collision (e.g., with a table surface), cuMotion will report a planning failure and the robot will
-            remain stationary until the object is repositioned.
+         The robot end effector will move to match the pose of the object at a fixed offset.  If that pose would bring the robot into collision (for example, with a table surface), cuMotion will report a planning failure and the robot will remain stationary until the object is repositioned.
 
       .. tab:: Hawk stereo camera with object following. using DOPE
 
@@ -665,13 +645,9 @@ Run Launch Files and Deploy to Robot
                 robot_file_name:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/xrdf/<XRDF_FILE_NAME>.xrdf \
                 urdf_file_path:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/urdf/<URDF_FILE_NAME>.urdf
 
-         .. note::
+            The robot end effector will move to match the pose of the object at a fixed offset.  If that pose would bring the robot into collision (e.g., with a table surface), cuMotion will report a planning failure and the robot will remain stationary until the object is repositioned.
 
-            * The robot end effector will move to match the pose of the object at a fixed offset.  If that pose would bring the
-              robot into collision (e.g., with a table surface), cuMotion will report a planning failure and the robot will
-              remain stationary until the object is repositioned.
-
-            * Select the ``detections`` topic in the ``Pose Estimate`` tab in RViz to see the DOPE pose estimation results in the 3D viewport.
+         #. Select the ``detections`` topic in the ``Pose Estimate`` tab in RViz to see the DOPE pose estimation results in the 3D viewport.
 
       .. tab:: RealSense camera with object following, using DOPE
 
@@ -687,13 +663,9 @@ Run Launch Files and Deploy to Robot
                 robot_file_name:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/xrdf/<XRDF_FILE_NAME>.xrdf \
                 urdf_file_path:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/urdf/<URDF_FILE_NAME>.urdf
 
-         .. note::
+            The robot end effector will move to match the pose of the object at a fixed offset.  If that pose would bring the robot into collision (for example, with a table surface), cuMotion will report a planning failure and the robot will remain stationary until the object is repositioned.
 
-            * The robot end effector will move to match the pose of the object at a fixed offset.  If that pose would bring the
-              robot into collision (e.g., with a table surface), cuMotion will report a planning failure and the robot will
-              remain stationary until the object is repositioned.
-
-            * Select the ``detections`` topic in the ``Pose Estimate`` tab in RViz to see the DOPE pose estimation results in the 3D viewport.
+         #. Select the ``detections`` topic in the ``Pose Estimate`` tab in RViz to see the DOPE pose estimation results in the 3D viewport.
 
       .. tab:: Hawk stereo camera for pose-to-pose example
 
@@ -724,12 +696,9 @@ Run Launch Files and Deploy to Robot
                 robot_file_name:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/xrdf/<XRDF_FILE_NAME>.xrdf \
                 urdf_file_path:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/urdf/<URDF_FILE_NAME>.urdf
 
-      .. note::
+      
 
-         To launch the example without robot arm control, that is, with perception only,
-         you can add the ``no_robot_mode:=True`` flag to any of the launch commands above.
-
-#. On the UR teach pendant, press the **play** button to enable the robot.
+#. On the UR teach pendant, press **play** to enable the robot.
 
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif>`
    :width: 576px
@@ -738,7 +707,7 @@ Run Launch Files and Deploy to Robot
    "Pose-to-pose" example with obstacle avoidance via cuMotion and nvblox on a UR5e robot.
 
 For additional details about the launch files, consult the
-:doc:`documentation </repositories_and_packages/isaac_manipulator/isaac_manipulator_bringup/index>`
+:doc:`documentation </reference_workflows/isaac_manipulator/packages/isaac_manipulator_bringup/index>`
 for the ``isaac_manipulator_bringup`` package.
 
 Visualizing in Foxglove

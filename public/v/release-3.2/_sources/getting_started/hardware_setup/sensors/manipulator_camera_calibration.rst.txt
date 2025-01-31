@@ -5,7 +5,8 @@ Camera Calibration for Manipulator
 .. note::
 
    These instructions are for extrinsics calibration of a Hawk or RealSense camera with a UR e-Series robot (tested with UR5e and UR10e).
-   For dual-camera setups, please follow the :ref:`Calibration Procedure <getting_started/hardware_setup/sensors/manipulator_camera_calibration:Calibration Procedure>` twice, once for each camera.
+   For dual-camera setups, please follow the :ref:`Calibration Procedure <getting_started/hardware_setup/sensors/manipulator_camera_calibration:Calibration Procedure>` twice (once for each camera),
+   with only one camera plugged into the system each time.
 
 Calibration Target
 ------------------
@@ -455,4 +456,6 @@ Calibration Procedure
 
 #.  The calibrated pose values can now be used with the rest of the :doc:`Isaac Manipulator </reference_workflows/isaac_manipulator/index>` suite
     by updating the values in :ir_repo:`static_transforms.launch.py <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`
-    as described :ref:`here <set-up-cameras-for-robot>`.
+    as described :ref:`here <set-up-cameras-for-robot>`, and specifying the frame name defined
+    during :ref:`Camera Setup <set-up-cameras-for-robot>` in the  ``--child-frame-id``  field.
+    For dual-camera setups, make sure to use a different frame name for each calibrated camera.

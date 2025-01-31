@@ -15,12 +15,11 @@ previous 2 scenarios and adding grasping behavior to set up a pick and place.
 
 The object-following tutorial supports the same perception models as the one on the real robot.
 
-.. note::
+Multiple cameras can help reduce occlusion in the scene, and therefore increase the quality and completeness of the 3D reconstruction being used for collision avoidance. While the object following tutorial with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras, object detection and pose estimation are only enabled on the camera with the lowest index.
 
-   * Multiple cameras can help reduce occlusion in the scene, and therefore increase the quality and completeness of the 3D reconstruction being used for collision avoidance.
-   * While the object following tutorial with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras, object detection and pose estimation are only enabled on the camera with the lowest index.
-   * We use rectified image streams from simulation and do not need to perform lens distortion and rectification that would need to be performed on a real robot.
-   * We use perfect ground truth depth from the simulation which drives up accuracy and allows one to focus on the software stack in a perfect albeit unrealistic environment.
+We use rectified image streams from simulation and do not need to perform lens distortion and rectification that would need to be performed on a real robot.
+
+We use perfect ground truth depth from the simulation which drives up accuracy and allows one to focus on the software stack in a perfect albeit unrealistic environment.
 
 
 .. warning::
@@ -84,10 +83,8 @@ Build Isaac ROS cuMotion
         git clone --recursive https://github.com/NVIDIA-ISAAC-ROS/ros2_robotiq_gripper && \
         git clone -b ros2 https://github.com/tylerjw/serial
 
-   .. note::
-
-      * The fork of ``ros2_robotiq_gripper`` is required because it includes a fix for `Issue #57 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/57>`__ in the upstream repository.
-      * The fork of ``tylerjw/serial`` is required because it includes a fix for `Issue #21 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/21>`__ in the upstream repository.
+   * The fork of ``ros2_robotiq_gripper`` is required because it includes a fix for `Issue #57 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/57>`__ in the upstream repository.
+   * The fork of ``tylerjw/serial`` is required because it includes a fix for `Issue #21 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/21>`__ in the upstream repository.
 
 #. Building dependencies:
 
@@ -117,7 +114,7 @@ Build Isaac ROS cuMotion
 
    .. tabs::
 
-      .. tab:: Installation from source
+      .. tab:: Installation from Source
 
                #. Use ``rosdep`` to install the package’s dependencies:
 
@@ -158,23 +155,18 @@ Build Isaac ROS cuMotion
 Set Up Perception Deep Learning Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
-
-   Make sure to follow the FoundationPose tab of the tutorial.
+If you choose to set up perception deep leaning models, you must:
 
 #. Refer to the :ref:`Set Up Perception Deep Learning Models section <set-up-perception-deep-learning-models>`.
+#. Later in the tutorial, you must use the instructions in the "Object Following using FoundationPose" tab.
 
 
 Run Launch Files on the Isaac Sim Platform
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
+We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every new terminal where you run ROS commands, to avoid interference with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
 
-   We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
-   new terminal where you run ROS commands, to avoid interference
-   with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
-
-#. Open Isaac Sim and load the scene below and hit Play.
+#. Open Isaac Sim and load the scene below and hit **Play**.
 
    .. code:: bash
 
@@ -190,7 +182,7 @@ Run Launch Files on the Isaac Sim Platform
 #. Run the following examples:
 
    .. tabs::
-      .. tab:: Object following using FoundationPose
+      .. tab:: Object Following using FoundationPose
 
          #. Launch the object following example:
 
@@ -199,16 +191,14 @@ Run Launch Files on the Isaac Sim Platform
                ros2 launch isaac_manipulator_pick_and_place isaac_sim_workflows.launch.py \
                   workflow_type:=object_following pose_estimation_type:=foundationpose
 
-            .. warning::
-
-               * If your asset path is different from the default, run the following command to override the paths to FoundationPose assets.
-               * The FoundationPose-specific parameters are prefixed by ``foundation_pose_`` and ``rtdetr_``.
+            * If your asset path is different from the default, run the following command to override the paths to FoundationPose assets.
+            * The FoundationPose-specific parameters are prefixed by ``foundation_pose_`` and ``rtdetr_``.
 
             .. code:: bash
 
                ros2 launch isaac_manipulator_pick_and_place isaac_sim_workflows.launch.py -s
 
-      .. tab:: Object following using DOPE
+      .. tab:: Object Following using DOPE
 
          #. Make sure to generate the DOPE ``onnx`` file for 1920 x 1200 input image.
 
@@ -226,20 +216,16 @@ Run Launch Files on the Isaac Sim Platform
                ros2 launch isaac_manipulator_pick_and_place isaac_sim_workflows.launch.py \
                   workflow_type:=object_following pose_estimation_type:=dope
 
-            .. note::
+         #. Select the ``detections`` topic in the ``Pose Estimate`` tab in RViz to see the DOPE pose estimation results in the 3D viewport.
 
-               Select the ``detections`` topic in the ``Pose Estimate`` tab in RViz to see the DOPE pose estimation results in the 3D viewport.
-
-            .. warning::
-
-               * If your output path is different from the default, run the following command to override the paths to DOPE assets.
-               * The DOPE-specific parameters are prefixed by ``dope_``.
+            * If your output path is different from the default, run the following command to override the paths to DOPE assets.
+            * The DOPE-specific parameters are prefixed by ``dope_``.
 
             .. code:: bash
 
                ros2 launch isaac_manipulator_pick_and_place isaac_sim_workflows.launch.py -s
 
-      .. tab:: Pose to Pose example
+      .. tab:: Pose to Pose Example
 
          #. Launch the following example:
 
@@ -253,13 +239,9 @@ Run Launch Files on the Isaac Sim Platform
 Run Pick and Place with Isaac Sim Platform
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
+We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every new terminal where you run ROS commands, to avoid interference with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
 
-   We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
-   new terminal where you run ROS commands, to avoid interference
-   with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
-
-#. Open Isaac Sim and load the scene below and hit Play.
+#. Open Isaac Sim and load the scene below and hit **Play**.
 
    .. code:: bash
 
@@ -280,9 +262,7 @@ Run Pick and Place with Isaac Sim Platform
          workflow_type:=pick_and_place object_attachment_type:=sphere use_pose_from_rviz:=True
 
 
-   .. note::
-
-      For increased reliability, we recommend using the ``custom_mesh`` or ``cuboid`` approach.
+   For increased reliability, we recommend using the ``custom_mesh`` or ``cuboid`` approach:
 
       * For ``custom_mesh``, this can be done by setting ``object_attachment_type:=custom_mesh``
         and ``attach_object_mesh_file_path:=<PATH-TO-MESH>`` in the launch files above.
@@ -298,20 +278,24 @@ Run Pick and Place with Isaac Sim Platform
       ``filter_depth_buffer_time:=`` to a higher value (the unit is seconds). This will
       allow object attachment to buffer more depth images from the past. The caveat
       is that the software will operate on an older set of data that might lead to
-      creating object spheres that might not model the object position accurately. The
-      other parameter of interest is the ``time_sync_slop`` parameter. It defines the
+      creating object spheres that might not model the object position accurately. 
+      
+      The
+      other parameter to tune is the ``time_sync_slop`` parameter. It defines the
       synchronization threshold for finding a matched pair of depth images, joint states
       and transforms. For slower systems, slightly tweaking the value up will allow for
-      collision sphere and obstacle avoidance to work. But be warned, using a very large
-      value will synchronize older pieces of data together leading to unpredictable
-      downstream effects in planning, collision voxel cloud generation and obstacle
-      avoidance. Note that this only applies when ``SPHERE`` is used as the object attachment
+      collision sphere and obstacle avoidance to work. Using a very large
+      value will synchronize older pieces of data together, leading to unpredictable
+      downstream effects in planning, collision voxel cloud generation, and obstacle
+      avoidance. 
+      
+      This only applies when ``SPHERE`` is used as the object attachment
       type. The other modes do not use depth as input to create the object spheres.
 
 #. Optional: To test out pick and place with a different set of grasps, follow the
    `Isaac Sim Grasp Editor tutorial <https://docs.omniverse.nvidia.com/isaacsim/latest/advanced_tutorials/tutorial_grasp_editor.html>`__
    using the provided scene for the Robotiq 2F-140 gripper, ensuring that the selected "gripper frame" is ``robotiq_base_link``.
-   For the soup can, the selected "rigid body frame" should be ``soup_can``.
+   For the soup can, the selected "rigid body frame" must be ``soup_can``.
 
 
     .. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_manipulator/grasp_author_scene.png>`
@@ -331,11 +315,9 @@ Run Pick and Place with Isaac Sim Platform
          workflow_type:=pick_and_place grasp_file_path:=<PATH-TO-YAML-FILE-PATH> \
          use_ground_truth_pose_in_sim:=true
 
-   .. note::
-
-      If you want to run Isaac Sim example with pose estimation via FoundationPose, remove
-      the ``use_ground_truth_pose_in_sim`` flag and, before running the action call, run
-      the following action call to get objects:
+   If you want to run Isaac Sim example with pose estimation via FoundationPose, remove
+   the ``use_ground_truth_pose_in_sim`` flag and, before running the action call, run
+   the following action call to get objects:
 
       .. code:: bash
 
@@ -345,31 +327,23 @@ Run Pick and Place with Isaac Sim Platform
    in a new terminal (make sure ``ROS_DOMAIN_ID`` is correct, to see the topics),
    run the following action call to trigger the pick and place:
 
-   .. note::
+      .. code:: bash
 
-      When launching the ROS graph earlier, ```use_pose_from_rviz``` is set to ```True``` which creates a interactive marker that can be used to set the place pose.
-      Use the marker controls to set the desired position and orientation. In this mode, the ```place_pose``` in the below command is ignored.
+         ros2 action send_goal /pick_and_place isaac_manipulator_interfaces/action/PickAndPlace "{object_id : 0}"
 
+   Or, use the marker controls to set the desired position and orientation. In this mode, the ```place_pose``` in the below command is ignored. When launching the ROS graph earlier, ```use_pose_from_rviz``` is set to ```True``` which created an interactive marker that could be used here to set the place pose.
 
-   .. code:: bash
-
-      ros2 action send_goal /pick_and_place isaac_manipulator_interfaces/action/PickAndPlace "{object_id : 0}"
-
-   .. note::
-
-       Rather than specifying the place pose via an interactive marker in RViz, the pose may instead be specified
-       on the command line, as in the following example where the pose is centered over the bin.  For this to work,
-       ``isaac_sim_workflows.launch.py`` above should be launched with ``use_pose_from_rviz:=False``.
+   Or, rather than specifying the place pose via an interactive marker in RViz, the pose may instead be specified
+   on the command line, as in the following example where the pose is centered over the bin.  For this to work,
+   ``isaac_sim_workflows.launch.py`` above should be launched with ``use_pose_from_rviz:=False``.
 
       .. code:: bash
 
          ros2 action send_goal /pick_and_place isaac_manipulator_interfaces/action/PickAndPlace \
          "{object_id : 0, place_pose : { position : { x : -0.35, y : 0.2, z : 0.4}, orientation : { w : 0.034, x : 0.996, y : 0.066, z : 0.042}}}"
 
-.. note::
-
-   Isaac Sim caches the last known joint state in its action graphs and pushes that in when "Play" is pressed.
-   If the gripper is in a bad state (e.g., if it is in self-collision), open the gripper.
+#. Isaac Sim caches the last known joint state in its action graphs and pushes that in when **Play** is pressed.
+   If the gripper is in a bad state (for example, if it is in self-collision), open the gripper.
    To later close the gripper, set the position to ``0.623``. You must have a launch file running to run the
    following command:
 
@@ -378,15 +352,13 @@ Run Pick and Place with Isaac Sim Platform
       ros2 action send_goal /robotiq_gripper_controller/gripper_cmd \
          control_msgs/action/GripperCommand "{command: {position: 0.0, max_effort: 0.0}}"
 
-#. To do another object pick and place, one would need to do a service call to clear all current
-   objects in the cache. One can do that via this service call. After this, one can run the entire
+#. To do another object pick and place, you must do a service call to clear all current
+   objects in the cache. You can do that via this service call. After this, you can run the entire
    pipeline again to pick and place another object.
 
    .. code:: bash
 
       ros2 service call /clear_objects isaac_manipulator_interfaces/srv/ClearObjects
 
-   .. note::
-
-      This will clear all objects from the cache, if you only want to clear a certain object then
-      one will need to specify the object id in the request.
+   This will clear all objects from the cache, if you only want to clear a certain object then
+   you need to specify the object id in the request.
