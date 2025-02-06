@@ -20,59 +20,12 @@ For example, Isaac ROS packages being tested on a Jetson device before deploymen
 
 In both the configurations, Isaac Sim always runs on a ``x86_64`` machine providing sensor data and world information.
 
-1. Install `Isaac Sim <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/requirements.html>`__, choosing the appropriate working environment:
+.. tabs::
 
-   -  `Native <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html>`__
-   -  `Docker <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_container.html>`__
-   -  `Cloud <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_cloud.html>`__
+   .. tab:: Isaac Sim 4.2
 
-   .. note::
+      .. include:: _snippets/isaac_sim_4_2.rst
 
-      This tutorial assumes the Native environment for Isaac Sim.
+   .. tab:: Isaac Sim 4.5
 
-2. Follow the `Running Native ROS instructions <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html>`__ to ensure that ROS 2 and the required packages are installed to successfully enable the ROS 2 Bridge in Omniverse Isaac Sim. 
-
-3. Follow the `instructions <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html#isaac-sim-setup-native-workstation-launcher>`__
-   to launch Isaac Sim App Selector window.
-
-   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_main_app_selector.png>`
-      :width: 400px
-      :align: center
-
-
-4.
-   .. tabs::
-
-      .. tab:: Using Isaac Sim ROS 2 library
-
-         If you don't have a system level ROS 2 install, follow the steps outlined `here <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html#running-ros-without-a-system-level-install>`__ under ``ROS 2 -> Humble``. 
-
-      .. tab:: Using bare-metal ROS 2 library
-
-         If you have a system level ROS 2 install, click **Open in Terminal** button. 
-         It should open a terminal window and then follow the steps outlined `here <https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html#running-native-ros>`__ under ``ROS 2 -> Ubuntu 22.04 -> Humble``. Ensure your ROS 2 install is sourced before proceeding.
-
-   Optionally, if ``ROS_DOMAIN_ID`` is needed to create a `separate logical network <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html#overview>`__, run the the following commands.
-
-   .. code:: bash
-
-      export ROS_DOMAIN_ID=<your_domain_id>
-
-
-5. Launch Isaac Sim.
-
-   .. code:: bash
-
-      ./isaac-sim.sh
-
-6. Open Isaac ROS Sample scene as shown below.
-   
-   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_ros_sample_scene.png>`
-      :width: 400px
-      :align: center
-
-7. Continue with the next steps in your specific Isaac ROS package
-   tutorial.
-
-   .. note::
-      Make sure to set the ``ROS_DOMAIN_ID`` environment variable (if set earlier) before running the sample application.
+      .. include:: _snippets/isaac_sim_4_5.rst
