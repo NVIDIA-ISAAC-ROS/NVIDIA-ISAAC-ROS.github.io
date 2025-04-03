@@ -23,15 +23,10 @@ Download Quickstart Assets
 
    .. code:: bash
 
-      wget --content-disposition https://api.ngc.nvidia.com/v2/models/nvidia/isaac/foundationpose/versions/1.0.0/zip -O foundationpose_1.0.0.zip
-
-3. Copy the models to the required directory:
-
-    .. code:: bash
-
       mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose && \
-         unzip foundationpose_1.0.0.zip -d ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose
-
+         cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationpose && \
+         wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/foundationpose/versions/1.0.0/files/refine_model.etlt' -O refine_model.etlt && \
+         wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/foundationpose/versions/1.0.0/files/score_model.etlt' -O score_model.etlt
 
 Build |package_name|
 ~~~~~~~~~~~~~~~~~~~~

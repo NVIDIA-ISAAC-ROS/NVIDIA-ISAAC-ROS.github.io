@@ -2854,17 +2854,12 @@ Some sensor dependencies require restarting the Isaac ROS Dev container during i
 </div>
 </li>
 <li><p>Download the pre-trained <a class="reference external" href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/foundationpose">FoundationPose</a> models from NGC:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>--content-disposition<span class="w"> </span>https://api.ngc.nvidia.com/v2/models/nvidia/isaac/foundationpose/versions/1.0.0/zip<span class="w"> </span>-O<span class="w"> </span>foundationpose_1.0.0.zip
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models/foundationpose<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models/foundationpose<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>wget<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/models/nvidia/isaac/foundationpose/versions/1.0.0/files/refine_model.etlt&#39;</span><span class="w"> </span>-O<span class="w"> </span>refine_model.etlt<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>wget<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/models/nvidia/isaac/foundationpose/versions/1.0.0/files/score_model.etlt&#39;</span><span class="w"> </span>-O<span class="w"> </span>score_model.etlt
 </pre></div>
 </div>
-</li>
-<li><p>Copy the models to the required directory:</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models/foundationpose<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>unzip<span class="w"> </span>foundationpose_1.0.0.zip<span class="w"> </span>-d<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models/foundationpose
-</pre></div>
-</div>
-</div></blockquote>
 </li>
 </ol>
 </section>
@@ -3588,7 +3583,7 @@ for their own target objects using synthetic data generation and/or real-world d
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2025, NVIDIA.
-      <span class="lastupdated">Last updated on Feb 27, 2025.
+      <span class="lastupdated">Last updated on Apr 03, 2025.
       </span></p>
   </div>
 
@@ -3626,10 +3621,10 @@ for their own target objects using synthetic data generation and/or real-world d
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
+            <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
             <dd><a href="index.html">release-3.1</a></dd>
             <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html">release-3.2</a></dd>
             <dd><a href="../../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html">latest</a></dd>
-            <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
         </dl>
     </div>
 </div><script>

@@ -32,7 +32,8 @@ Packages
     :maxdepth: 2
     :glob:
 
-    **/index
+    isaac_ros_benchmark/index
+    benchmarks/**/index
 
 Latest
 ------
