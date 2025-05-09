@@ -162,7 +162,7 @@ Usage
 ^^^^^
 .. code:: bash
 
-   ros2 launch isaac_ros_mapping_and_localization isaac_ros_visual_global_localization_node.launch.py
+   ros2 launch isaac_ros_visual_global_localization isaac_ros_visual_global_localization_node.launch.py
 
 ROS Parameters
 ^^^^^^^^^^^^^^
@@ -182,7 +182,7 @@ ROS Parameter                            Type                         Default   
 ``model_dir``                            ``std::string``              ``""``                                The directory of model file. This value can be set in config file.
 ``input_image_topic_name``               ``std::string``              ``visual_localization/image``         The topic name of the input image.
 ``input_camera_info_topic_name``         ``std::string``              ``visual_localization/camera_info``   The topic name of the input camera info.
-``localization_precision_level``          ``int``                     ``2``                                 The localization precision level: 0 for lowest precision, returning more poses; 1 for medium precision; 2 for highest precision, returning fewer poses.
+``localization_precision_level``         ``int``                      ``2``                                 The localization precision level: 0 for lowest precision, returning more poses; 1 for medium precision; 2 for highest precision, returning fewer poses.
 *Frame Parameters*
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ``map_frame``                            ``std::string``              ``vmap``                              The frame name associated with the map origin.
@@ -194,15 +194,15 @@ ROS Parameter                            Type                         Default   
 ``image_qos_profile``                    ``std::string``              ``DEFAULT``                           QoS profile for the image subscribers.
 *Output Parameters*
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-``publish_map_to_base_tf``               ``bool``                     ``true``                              Enable ``tf`` broadcaster for ``map_frame`` -> ``odom_frame`` transform.
-``invert_map_to_base_tf``                ``bool``                     ``false``                             Invert the ``map_frame`` -> ``odom_frame`` transform before broadcasting to the ``tf`` tree.
+``publish_map_to_base_tf``               ``bool``                     ``true``                              Enable ``tf`` broadcaster for ``map_frame`` -> ``base_frame`` transform.
+``invert_map_to_base_tf``                ``bool``                     ``false``                             Invert the ``map_frame`` -> ``base_frame`` transform before broadcasting to the ``tf`` tree.
 *Debug/Visualization Parameters*
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-``debug_dir``                            ``std::string``              ``false``                             If it is set, will generate debug images to this folder.
+``debug_dir``                            ``std::string``              ``""``                                If it is set, will generate debug images to this folder.
 ``debug_map_raw_dir``                    ``std::string``              ``""``                                Optional, the directory that saves the raw images of the map frames.
 ``publish_rectified_images``             ``bool``                     ``false``                             Optional, if to publish the rectified images. This flag is used only when ``enable_rectify_image`` is true.
-``verbose_logging``                      ``bool``                     ``flase``                             Optional, if to print more verbose ROS logs.
-``init_glog``                            ``bool``                     ``flase``                             Optional, if to initialize `glog <https://google.github.io/glog/stable/>`__. Note that glog can be initialized only once per process, otherwise it raises error.
+``verbose_logging``                      ``bool``                     ``false``                             Optional, if to print more verbose ROS logs.
+``init_glog``                            ``bool``                     ``false``                             Optional, if to initialize `glog <https://google.github.io/glog/stable/>`__. Note that glog can be initialized only once per process, otherwise it raises error.
 ``glog_v``                               ``int``                      ``0``                                 Optional, the verbose level for glog.
 ======================================== ============================ ===================================== =====================================================================================================================================================================================================================
 
