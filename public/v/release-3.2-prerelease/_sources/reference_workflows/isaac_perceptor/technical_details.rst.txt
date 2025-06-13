@@ -1,0 +1,52 @@
+Technical Details
+===================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_perceptor/perceptor_diagram.png>`
+    :width: 600px
+    :align: center
+
+    A high-level description of the data-flow in the `Isaac Perceptor` system. Images flow from
+    either the Hawk cameras on the `Nova Orin Developer Kit`, a (compressed) rosbag,
+    or Isaac Sim into a series of
+    GPU-accelerated modules which work together to build a 3D reconstruction of the world.
+    The reconstruction is converted to 2D/3D costmap which can be used by a downstream
+    application, for example a path-planner.
+
+`Isaac Perceptor` leverages multiple Isaac ROS modules:
+
+* :doc:`Isaac ROS Nova </repositories_and_packages/isaac_ros_nova/index>` for time-synchronized multi-cam data.
+* :doc:`Isaac ROS Visual SLAM </repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index>` for GPU-accelerated camera-based odometry.
+* :doc:`Isaac ROS Depth Estimation </repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index>` for learning-based stereo-depth estimation.
+* :doc:`Isaac ROS Nvblox </repositories_and_packages/isaac_ros_nvblox/index>` for GPU-accelerated local 3D reconstruction.
+* :doc:`Isaac ROS Image Pipeline </repositories_and_packages/isaac_ros_image_pipeline/index>` for GPU-accelerated image processing.
+
+
+`Isaac Perceptor` provides a 3D map of the world around the robot
+using the Nova sensor suite, as well as providing access to the raw sensor output.
+
+The input to the `Isaac Perceptor` system is several time-synchronized image streams from the
+`HAWK stereo cameras <https://leopardimaging.com/leopard-imaging-hawk-stereo-camera/>`__
+which are part of the Nova sensor suite on the `Nova Orin Developer Kit`,
+from recorded data stored in a (compressed) rosbag, or from Isaac Sim.
+The NITROS images coming from these cameras are passed through the Hawk processing pipeline
+which is a combination of GPU-accelerated image operations, notably rectification and
+undistortion.
+The left and right side-camera image pairs are also throttled in order to reduce GPU load.
+
+Several Isaac ROS components are involved in building a 3D map of the world.
+The rectified stereo image streams are passed through
+:doc:`ESS Depth Estimation </repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index>`
+in order to produce depth-image streams for the front, left, and right cameras.
+Concurrently, the stereo image streams are passed to
+:doc:`Isaac ROS Visual SLAM </repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index>`
+in order to estimate the motion of the system through the world.
+The depth images plus the visual SLAM poses are passed to nvblox to compute a voxelized
+map of the world.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_perceptor/perceptor_warehouse.png>`
+    :width: 600px
+    :align: center
+
+This map is then converted to a distance map for downstream applications, and
+a visualization mesh transmitting over the Foxglove bridge to a base station for
+visualization.

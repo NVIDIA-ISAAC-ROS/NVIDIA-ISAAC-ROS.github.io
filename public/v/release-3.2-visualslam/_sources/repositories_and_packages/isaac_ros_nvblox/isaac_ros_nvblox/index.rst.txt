@@ -1,0 +1,134 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nvblox> <isaac_ros_nvblox>`
+
+A meta-package containing the relevant nvblox ROS 2 packages.
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_nvblox> <quickstart.tar.gz>`
+
+Set Up |package_name|
+^^^^^^^^^^^^^^^^^^^^^
+
+There are two options for installing nvblox:
+installation from Debian, and installation from source.
+
+    .. tabs::
+
+        .. tab:: Installation from Debian
+
+            1.  Launch the Docker container using the ``run_dev.sh`` script:
+
+                .. code:: bash
+
+                   cd $ISAAC_ROS_WS && ./src/isaac_ros_common/scripts/run_dev.sh
+
+            2.  Install ``isaac_ros_nvblox`` and its dependencies.
+
+                :ir_apt:
+
+                .. code:: bash
+
+                    sudo apt update &&
+                    sudo apt-get install -y ros-humble-isaac-ros-nvblox && \
+                    rosdep update && \
+                    rosdep install isaac_ros_nvblox
+
+
+        .. tab:: Installation from source
+
+            1. Clone ``isaac_ros_nvblox`` under ``${ISAAC_ROS_WS}/src``.
+
+                .. code:: bash
+
+                    cd ${ISAAC_ROS_WS}/src
+                    git clone --recursive :ir_clone:`<isaac_ros_nvblox>`
+
+            2.  Launch the Docker container using the ``run_dev.sh`` script:
+
+                .. code:: bash
+
+                   cd $ISAAC_ROS_WS/src/isaac_ros_common && \
+                   ./scripts/run_dev.sh
+
+            3. Use ``rosdep`` to install the package’s dependencies.
+
+                :ir_apt:
+
+                .. code:: bash
+
+                    rosdep update && rosdep install -i -r --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nvblox/ --rosdistro humble -y
+
+            2. Build and source the ROS workspace
+
+                .. code:: bash
+
+                    cd /workspaces/isaac_ros-dev
+                    colcon build --symlink-install --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_nvblox/
+                    source install/setup.bash
+
+Run Example Launch File
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Run the example with:
+
+    .. code:: bash
+
+        ros2 launch nvblox_examples_bringup isaac_sim_example.launch.py \
+        rosbag:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_nvblox/quickstart \
+        navigation:=False
+
+Verify that you see the robot reconstructing a mesh, with the 2d ESDF slice
+overlaid on top.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/basic_example_rviz.png>`
+    :width: 600px
+    :align: center
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested nvblox examples:
+
+======================================== ========================================================================================
+Launch file                              Description
+======================================== ========================================================================================
+``isaac_sim_example.launch.py``          Example to run with Isaac Sim (:doc:`tutorial </concepts/scene_reconstruction/nvblox/tutorials/tutorial_isaac_sim>`)
+``realsense_example.launch.py``          Example to run with RealSense camera(s) (:doc:`tutorial </concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense>`)
+``zed_example.launch.py``                Example to run with a ZED camera (:doc:`tutorial </concepts/scene_reconstruction/nvblox/tutorials/tutorial_zed>`)
+======================================== ========================================================================================
+
+API
+----
+
+.. toctree::
+    :glob:
+    :maxdepth: 2
+
+    api/*
+
+
+Troubleshooting
+---------------
+
+.. toctree::
+    :glob:
+    :maxdepth: 1
+
+    troubleshooting/*
+
+.. |package_name| replace:: ``isaac_ros_nvblox``

@@ -1,0 +1,275 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_jetson> <isaac_ros_jetson_stats>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+1. Install ``jtop`` on the host machine:
+
+   .. code:: bash
+
+      sudo pip3 install -U jetson-stats
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-jetson-stats
+
+   .. tab:: Build from Source
+
+      2. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_jetson>`
+
+      3. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      4. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo pip3 install -U jetson-stats && \
+               rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_jetson/isaac_ros_jetson_stats --ignore-src -y
+
+      5. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_jetson_stats --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_jetson/isaac_ros_jetson_stats
+
+      6. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+   1. Run the following launch files to spin up a demo of this package:
+
+      .. code:: bash
+
+         ros2 launch isaac_ros_jetson_stats jtop.launch.py
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+      ./scripts/run_dev.sh
+
+   Check that the ``rqt`` robot monitor plugin is installed.
+
+   .. code:: bash
+
+      sudo apt-get install ros-humble-rqt-robot-monitor
+
+   Open robot monitor.
+
+   .. code:: bash
+
+      rqt
+
+2. Open ``rqt`` view
+
+   From menu open the Diagnostics Viewer  Plugins -> Robots Tools -> Diagnostics Viewer
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_jetson/rqt_diagnostic_viewer.png>`
+      :width: 600px
+      :align: center
+
+3. Select the checkbox "Alternative View"
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_jetson/diagnostic_viewer_alternative_view.png>`
+      :width: 600px
+      :align: center
+
+4. Verify that ``rqt`` starts displaying the diagnostic status of the Jetson:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_jetson/isaac_ros_jetson_diagnostics.png>`
+      :width: 600px
+      :align: center
+
+
+Control your Jetson
+-------------------
+
+You can control your Jetson using the following services:
+   * ``jtop/fan``: Change the fan speed configuration.
+   * ``jtop/nvpmodel``: Change the NVPmodel of your board.
+   * ``jtop/jetson_clocks``: Enable or disable Jetson Clocks.
+
+Change the Fan Speed Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An example to change the fan speed configuration:
+
+   .. code:: bash
+
+	   ros2 service call /jtop/fan isaac_ros_jetson_stats_services/srv/Fan "{'profile':quiet ,'speed':100}"
+
+This command will change the fan speed configuration to 100% and the profile to quiet. You can change the profile to quiet, cool, or manual.
+
+These profile can change depending on JetPack version and Jetson model. You can check the available profiles from the documentation reference.
+
+Change the NVPmodel of your board
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An example to change the NVPmodel of your board:
+   
+      .. code:: bash
+   
+         ros2 service call /jtop/nvpmodel isaac_ros_jetson_stats_services/srv/NVPModel  "{'nvpmodel':0 }"
+
+This command will change NVPmodel on your board. To check the available NVPmodel, you can check the documentation reference.
+
+   .. note::
+
+      Not all NVPmodel are available on all Jetson models. You can check the available NVPmodel from the NVIDIA Jetson documentation reference.
+
+   .. note::
+
+      Not all NVPmodel can be set without a reboot. If it fails you need to change manually on your board.
+
+
+Change the Jetson Clocks
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+An example to enable Jetson Clocks:
+
+   .. code:: bash
+
+      ros2 service call /jtop/jetson_clocks isaac_ros_jetson_stats_services/srv/JetsonClocks "{'status':true}"
+
+This command enables Jetson Clocks. You can disable Jetson Clocks by changing the value to false.
+
+
+Troubleshooting
+---------------
+
+``jtop`` Not Working
+~~~~~~~~~~~~~~~~~~~~
+
+Symptoms
+^^^^^^^^
+
+The ``jtop`` node fails to start.
+
+Solution
+^^^^^^^^
+
+Exit the Docker container and install ``jetson-stats`` on your host:
+
+.. code:: bash
+
+   sudo pip3 install -U jetson-stats
+
+Mismatch version ``jtop`` service and client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please update your ``jtop`` package on your host and reboot the Isaac ROS container.
+
+.. code:: bash
+
+   sudo pip3 install -U jetson-stats
+
+You may need to reboot the host.
+
+Diagnostics Viewer doesn't appear
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the Diagnostics Viewer doesn't appear when you are running ``rqt``:
+
+.. code:: bash
+
+   rm ~/.config/ros.org/rqt_gui.ini
+
+This command will refresh ``rqt``, updating the list of all plugins available.
+
+API
+----
+
+Launch ``jtop`` Diagnostic Monitor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+   ros2 launch isaac_ros_jetson_stats jtop.launch.py
+
+ROS Parameters
+~~~~~~~~~~~~~~
+
+============================ ========== ============= ===========================================================================================================================================================================================
+ROS Parameter                Type       Default       Description
+============================ ========== ============= ===========================================================================================================================================================================================
+``interval``                 ``double`` ``0.5``       When you initialize ``jtop`` you can setup a communication speed interval; if there is another ``jtop`` running, this speed will be not used.
+============================ ========== ============= ===========================================================================================================================================================================================
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+===================== ============================================================================================================================================= =================================
+ROS Topic             Interface                                                                                                                                     Description
+===================== ============================================================================================================================================= =================================
+``diagnostics``       `diagnostic_msgs/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/humble/diagnostic_msgs/msg/DiagnosticArray.msg>`__           Diagnostic message.
+===================== ============================================================================================================================================= =================================
+
+ROS Services Advertised
+~~~~~~~~~~~~~~~~~~~~~~~
+
+================================= ================================================================================================================================================================================ ============================================================
+ROS Service                       Interface                                                                                                                                                                        Description
+================================= ================================================================================================================================================================================ ============================================================
+``jtop/fan``                      :ir_repo:`isaac_ros_jetson_stats_interfaces/Fan <isaac_ros_jetson> <isaac_ros_jetson_stats_services/srv/Fan.srv>`                                                                A service change the fan speed configuration.
+``jtop/nvpmodel``                 :ir_repo:`isaac_ros_jetson_stats_interfaces/NVPModel <isaac_ros_jetson> <isaac_ros_jetson_stats_services/srv/NVPModel.srv>`                                                      A service to change the NVPmodel of your board.
+``jtop/jetson_clocks``            :ir_repo:`isaac_ros_jetson_stats_interfaces/JetsonClocks <isaac_ros_jetson> <isaac_ros_jetson_stats_services/srv/JetsonClocks.srv>`                                              A service to enable or disable Jetson Clocks
+================================= ================================================================================================================================================================================ ============================================================
+
+.. |package_name| replace:: ``isaac_ros_jetson_stats``
+

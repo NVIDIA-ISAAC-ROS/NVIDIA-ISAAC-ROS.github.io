@@ -1,0 +1,684 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_manipulator> <isaac_manipulator_bringup>`
+
+Overview
+--------
+
+|package_name| contains the launch files for `Isaac Manipulator`.
+These launch files are used in the
+:doc:`Pose-to-Pose, Object Following </reference_workflows/isaac_manipulator/tutorials/tutorial_e2e>` and
+:doc:`Pick and Place </reference_workflows/isaac_manipulator/tutorials/tutorial_pick_and_place>`
+reference workflows.
+
+Main Launch File Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This section documents the main launch files used in :doc:`Pose-to-Pose, Object Following </reference_workflows/isaac_manipulator/tutorials/tutorial_e2e>`.
+
+``cumotion_nvblox_pose_to_pose.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the pose to pose example.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``camera_type``
+     - ``hawk``
+     - ``hawk``, ``realsense``
+     - Camera sensor to use for this example
+
+   * - ``hawk_depth_mode``
+     - ``ess_full``
+     - ``ess_light``, ``ess_full``
+     - Depth mode for Hawk camera
+
+   * - ``num_cameras``
+     - ``1``
+     - ``1``, ``2``
+     - Number of cameras to run 3d reconstruction on
+
+   * - ``no_robot_mode``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to run without a robot arm (perception only mode)
+
+   * - ``setup``
+     - ``None``
+     - N/A
+     - The name of the setup you are running on (specifying calibration, workspace bounds and camera ids)
+
+   * - ``rosbag``
+     - ``None``
+     - N/A
+     - Path to rosbag (running on sensor if not set)
+
+   * - ``log_level``
+     - ``error``
+     - ``debug``, ``info``, ``warn``, ``error``
+     - The log level to report errors at
+
+
+``cumotion_object_following.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the object following example. It defaults to
+tracking the Mac and Cheese box mentioned in the tutorial.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``camera_type``
+     - ``hawk``
+     - ``hawk``, ``realsense``
+     - Camera sensor to use for this example
+
+   * - ``hawk_depth_mode``
+     - ``ess_full``
+     - ``ess_light``, ``ess_full``
+     - Depth mode for Hawk camera
+
+   * - ``num_cameras``
+     - ``1``
+     - ``1``, ``2``
+     - Number of cameras to run 3d reconstruction on
+
+   * - ``no_robot_mode``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to run without a robot arm (perception only mode)
+
+   * - ``setup``
+     - ``None``
+     - N/A
+     - The name of the setup you are running on (specifying calibration, workspace bounds, and camera IDs)
+
+   * - ``rosbag``
+     - ``None``
+     - N/A
+     - Path to rosbag (running on sensor if not set)
+
+   * - ```rtdetr_class_id```
+     - ``22``
+     - N/A
+     - The RT-DETR class ID of the object to be detected.
+
+   * - ``rosbag``
+     - ``None``
+     - N/A
+     - Path to rosbag (running on sensor if not set)
+
+   * - ``log_level``
+     - ``error``
+     - ``debug``, ``info``, ``warn``, ``error``
+     - The log level to report errors at
+
+   * - ``pose_estimation_type``
+     - ``foundationpose``
+     - ``dope``, ``foundationpose``
+     - Pose estimation model to use for this example
+
+``record_realsense.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch files records a rosbag containing the RealSense's data,
+which can be useful for debugging purposes.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``run_realsense``
+     - ``True``
+     - ``True``, ``False``
+     - Whether to run the RealSense or not
+
+   * - ``num_cameras``
+     - ``1``
+     - ``1``, ``2``
+     - The number of cameras to run
+
+   * - ``run_rqt``
+     - ``True``
+     - ``True``, ``False``
+     - Whether or not to run RQT to visualize the image
+
+   * - ``output``
+     - ``'None'``
+     - N/A
+     - The file path to write the rosbag
+
+``camera_calibration.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file is used to perform camera calibration. Please
+consult the :doc:`Manipulator Camera Calibration </getting_started/hardware_setup/sensors/manipulator_camera_calibration>` page.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``camera_type``
+     - ``hawk``
+     - ``hawk``, ``realsense``
+     - Camera sensor used for calibration
+
+Sub Launch File Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``cumotion.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches components related to cuMotion. If no robot mode is enabled,
+it will launch the ``cuMotion Planner`` and ``Robot Segmentation`` nodes. If object attachment is enabled with
+no robot mode, it will also launch the ``Object Attachment`` node. If no robot mode is enabled,
+then it will launch the ``ESDF Visualizer node``. Please consult the
+:doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>` documentation
+for more information.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``urdf_file_path``
+     - ``ur5e_robotiq_2f_140.urdf``
+     - N/A
+     - The URDF for cuMotion to use for planning - used by sim
+
+   * - ``robot_file_name``
+     - ``ur5e_robotiq_2f_140.xrdf``
+     - N/A
+     - The file path that describes the robot. You must specify the full file path and the files can be found in the ``isaac_ros_cumotion_robot_description`` package
+
+   * - ``time_dilation_factor``
+     - ``0.25``
+     - N/A
+     - Speed scaling factor for the planner
+
+   * - ``distance_threshold``
+     - ``0.15``
+     - N/A
+     - Maximum distance from a given collision sphere (in meters) at which to mask points in the CumotionRobotSegmenter
+
+   * - ``time_sync_slop``
+     - ``0.1``
+     - N/A
+     - Maximum allowed delay (in seconds) for which depth image and joint state messages are considered synchronized in the CumotionRobotSegmenter
+
+   * - ``filter_depth_buffer_time``
+     - ``0.1``
+     - N/A
+     - Maximum allowed delayed between the buffer of depth images with respect to the current time
+
+   * - ``joint_states_topic``
+     - ``/joint_states``
+     - N/A
+     - The joint states topic that receives robot position
+
+   * - ``tool_frame``
+     - ``wrist_3_link``
+     - N/A
+     - The tool frame of the robot
+
+   * - ``read_esdf_world``
+     - ``True``
+     - ``True``, ``False``
+     - When true, indicates that cuMotion should read a Euclidean signed distance field (ESDF) as part of its world
+
+   * - ``object_link_name``
+     - ``attached_object``
+     - N/A
+     - Object link name for object attachment
+
+   * - ``search_radius``
+     - ``0.1``
+     - N/A
+     - Search radius for object attachment.
+
+   * - ``update_link_sphere_server_segmenter``
+     - ``planner_attach_object``
+     - N/A
+     - Update link sphere server for the Robot Segmentation node
+
+   * - ``update_link_sphere_server_planner``
+     - ``planner_attach_object``
+     - N/A
+     - Update link sphere server for cuMotion planner
+
+
+   * - ``clustering_bypass``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to bypass clustering
+
+   * - ``action_names``
+     - ``['segmenter_attach_object', 'planner_attach_object']``
+     - N/A
+     - List of action names for object attachment
+
+   * - ``clustering_hdbscan_min_samples``
+     - ``20``
+     - N/A
+     - HDBSCAN min samples for clustering
+
+   * - ``clustering_hdbscan_min_cluster_size``
+     - ``30``
+     - N/A
+     - HDBSCAN min cluster size for clustering
+
+   * - ``clustering_hdbscan_cluster_selection_epsilon``
+     - ``0.5``
+     - N/A
+     - HDBSCAN cluster selection epsilon
+
+   * - ``clustering_num_top_clusters_to_select``
+     - ``3``
+     - N/A
+     - Number of top clusters to select
+
+   * - ``clustering_group_clusters``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to group clusters
+
+   * - ``clustering_min_points``
+     - ``100``
+     - N/A
+     - Minimum points for clustering
+
+   * - ``publish_curobo_world_as_voxels``
+     - ``True``
+     - ``True``, ``False``
+     - When true, indicates that cuMotion should publish its world representation
+
+   * - ``qos_setting``
+     - ``SENSOR_DATA``
+     - N/A
+     - Indicates what QOS setting is used in the app
+
+   * - ``surface_sphere_radius``
+     - ``0.01``
+     - N/A
+     - Radius for object surface collision spheres
+
+   * - ``object_esdf_clearing_padding``
+     - ``[0.025, 0.025, 0.025]``
+     - N/A
+     - Amount by which to pad each dimension of the AABB enclosing the object, in meters, for the purpose of ESDF clearing
+
+``dope.launch.py``
+^^^^^^^^^^^^^^^^^^
+
+This launch file launches the DOPE network, which performs pose estimation.
+This pose is used as the target to follow in object following.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``dope_model_file_path``
+     - ``''``
+     - N/A
+     - The absolute file path to the ONNX file
+
+   * - ``dope_engine_file_path``
+     - ``''``
+     - N/A
+     - The absolute file path to the TensorRT engine file
+
+   * - ``object_name``
+     - ``soup``
+     - N/A
+     - The object class that the DOPE network is detecting
+
+   * - ``dope_map_peak_threshold``
+     - ``0.1``
+     - N/A
+     - The minimum value of a peak in a DOPE belief map
+
+   * - ``dope_enable_tf_publishing``
+     - ``False``
+     - N/A
+     - Whether Dope Decoder will broadcast poses to the TF tree or not
+
+   * - ``stability_num_samples``
+     - ``2``
+     - N/A
+     - Number of samples to ensure pose stability
+
+   * - ``stability_distance_threshold``
+     - ``0.1``
+     - N/A
+     - Maximum distance in meters between poses for stability
+
+   * - ``stability_angle_threshold``
+     - ``5.0``
+     - N/A
+     - Maximum angle in degrees between poses for stability
+
+   * - ``rotation_y_axis``
+     - ``0.0``
+     - N/A
+     - Enable DOPE pose estimation to be rotated by X degrees along y axis
+
+   * - ``rotation_x_axis``
+     - ``0.0``
+     - N/A
+     - Enable DOPE pose estimation to be rotated by X degrees along x axis
+
+   * - ``rotation_z_axis``
+     - ``0.0``
+     - N/A
+     - Enable DOPE pose estimation to be rotated by X degrees along z axis
+
+   * - ``input_fps``
+     - ``30``
+     - N/A
+     - FPS for input messages to the drop node of DOPE
+
+   * - ``dropped_fps``
+     - ``28``
+     - N/A
+     - FPS that are dropped by the drop node of DOPE
+
+   * - ``dope_input_qos``
+     - ``'SENSOR_DATA'``
+     - N/A
+     - QOS setting used for DOPE input
+
+``ess.launch.py``
+^^^^^^^^^^^^^^^^^
+
+This launch file launches the ESS network to estimate depth images, and is only used if Hawk is used.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``ess_engine_file_path``
+     - ``''``
+     - N/A
+     - The absolute path to the ESS engine plan
+
+   * - ``ess_threshold``
+     - ``0.4``
+     - N/A
+     - Threshold value ranges between 0.0 and 1.0 for filtering disparity with confidence
+
+   * - ``ess_mode``
+     - ``ess_full``
+     - ``ess_light``, ``ess_full``
+     - ESS model type.
+
+``foundationpose.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch files launches the FoundationPose network to estimate the pose of 
+an object detected by the object detection network (RT-DETR).
+This is used as the target for object following and as the object to
+grasp in pick and place.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``mesh_file_path``
+     - ``/tmp/textured_simple.obj``
+     - N/A
+     - The absolute file path to the mesh file
+
+   * - ``texture_path``
+     - ``/tmp/texture_map.png``
+     - N/A
+     - The absolute file path to the texture map
+
+   * - ``refine_model_file_path``
+     - ``/tmp/refine_model.onnx``
+     - N/A
+     - The absolute file path to the refine model
+
+   * - ``refine_engine_file_path``
+     - ``/tmp/refine_trt_engine.plan``
+     - N/A
+     - The absolute file path to the refine engine plan
+
+   * - ``score_model_file_path``
+     - ``/tmp/score_model.onnx``
+     - N/A
+     - The absolute file path to the score model
+
+   * - ``score_engine_file_path``
+     - ``/tmp/score_trt_engine.plan``
+     - N/A
+     - The absolute file path to the score engine plan
+
+   * - ``object_class_id``
+     - ``22``
+     - N/A
+     - The RT-DETR class ID of the object
+
+   * - ``refine_iterations``
+     - ``3``
+     - N/A
+     - The number of pose refinement iterations to run
+
+   * - ``symmetry_planes``
+     - ``'["x", "y", "z"]'``
+     - N/A
+     - The plane or planes across which the object is symmetric
+
+``goal.launch.py``
+^^^^^^^^^^^^^^^^^^
+
+This launch file launches the ``Goal Initializer`` node, which is used to
+set goals given the object pose in object following.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``world_frame``
+     - ``base_link``
+     - N/A
+     - The world frame of the robot
+
+   * - ``grasp_frame``
+     - ``grasp_frame``
+     - N/A
+     - The grasp frame (goal) that the robot should target
+
+   * - ``grasp_frame_stale_time_threshold``
+     - ``30.0``
+     - N/A
+     - The duration until a grasp frame (goal) not updating is considered stale
+
+   * - ``goal_change_position_threshold``
+     - ``0.1``
+     - N/A
+     - The minimum amount that the goal must move to be targeted
+
+   * - ``plan_timer_period``
+     - ``0.5``
+     - N/A
+     - The time in seconds for which the goal should request a plan
+
+   * - ``planner_group_name``
+     - ``ur_manipulator``
+     - N/A
+     - The MoveIt group name that the planner should plan for
+
+   * - ``pipeline_id``
+     - ``isaac_ros_cumotion``
+     - N/A
+     - The MoveIt pipeline ID to use
+
+   * - ``planner_id``
+     - ``cuMotion``
+     - N/A
+     - The MoveIt planner ID to use
+
+   * - ``end_effector_link``
+     - ``wrist_3_link``
+     - N/A
+     - The name of the end effector link for planning
+
+``hawk.launch.py``
+^^^^^^^^^^^^^^^^^^
+
+This launch file launches the hawk stereo camera's drivers.
+It does not have any configurable parameters.
+
+``nvblox.launch.py``
+^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches nvblox to provide a 3D voxel representation of the world as an Euclidean Signed Distance Function (ESDF).
+It's used to determine obstacles that the planner should avoid.
+
+For the base configuration of nvblox, see the configuration found :ir_repo:`here <isaac_ros_nvblox> <nvblox_examples/nvblox_examples_bringup/config/nvblox/nvblox_base.yaml>`
+and the documentation found :doc:`here </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/api/parameters>`.
+
+The modifications that are made from the base configuration can be found :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/config/nvblox/nvblox_manipulator_base.yaml>`.
+
+``pose_to_pose.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the pose-to-pose node, which is used to
+set goals between two different poses in the Pose to Pose example.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``world_frame``
+     - ``base_link``
+     - N/A
+     - The world frame of the robot
+
+   * - ``target_frames``
+     - ``["target1_frame", "target2_frame"]``
+     - N/A
+     - The list of target frames that the robot should plan towards
+
+   * - ``plan_timer_period``
+     - ``0.5``
+     - N/A
+     - The time in seconds for which the goal should request a plan
+
+   * - ``planner_group_name``
+     - ``ur_manipulator``
+     - N/A
+     - The MoveIt group name that the planner should plan for
+
+   * - ``pipeline_id``
+     - ``isaac_ros_cumotion``
+     - N/A
+     - The MoveIt pipeline ID to use
+
+   * - ``planner_id``
+     - ``cuMotion``
+     - N/A
+     - The MoveIt planner ID to use
+
+   * - ``end_effector_link``
+     - ``wrist_3_link``
+     - N/A
+     - The name of the end effector link for planning
+
+``realsense.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the RealSense camera.
+See the configuration file that can be found :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/config/sensors/realsense.yaml>`.
+
+``rtdetr.launch.py``
+^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the RT-DETR pipeline for object detection in order
+to determine the object's location in the image.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``rtdetr_engine_file_path``
+     - ``/tmp/rtdetr.plan``
+     - N/A
+     - The absolute path to the RT-DETR engine plan
+
+   * - ``rt_detr_confidence_threshold``
+     - ``0.7``
+     - N/A
+     - The minimum score for a bounding box to be published
+
+   * - ``input_fps``
+     - ``30``
+     - N/A
+     - FPS for input message to the drop node of RT-DETR
+
+   * - ``dropped_fps``
+     - ``28``
+     - N/A
+     - FPS that are dropped by the drop node of RT-DETR
+
+   * - ``rtdetr_input_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for RT-DETR input
+
+``static_transforms.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This file contains the calibration of various camera setups.
+It does not have any configurable parameters, however the tutorials
+expects one to create their own setup, with any required transforms.
+
+.. |package_name| replace:: ``isaac_manipulator_bringup``

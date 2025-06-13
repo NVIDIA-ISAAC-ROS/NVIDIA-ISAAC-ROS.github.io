@@ -1,0 +1,367 @@
+==============
+Hardware Setup
+==============
+
+RealSense camera not found
+--------------------------
+
+Symptom
+~~~~~~~
+
+No RealSense cameras detected when running `realsense-viewer` or `ros2 launch realsense2_camera rs_launch.py`
+
+Solution
+~~~~~~~~
+
+Ensure that you follow the :doc:`cameras </getting_started/hardware_setup/sensors/realsense_setup>` to install the correct versions for both `librealsense` and `realsense2_camera` as mentioned in the doc.
+
+To confirm this, run `ros2 launch realsense2_camera rs_launch.py` inside the docker container. You should see the following:
+
+.. code:: bash
+
+   [realsense2_camera_node-1] [INFO] [1715878272.636553721] [camera.camera]: RealSense ROS v4.54.1
+   [realsense2_camera_node-1] [INFO] [1715878272.636742684] [camera.camera]: Built with LibRealSense v2.55.1
+   [realsense2_camera_node-1] [INFO] [1715878272.636772605] [camera.camera]: Running with LibRealSense v2.55.1
+
+RealSense Driver Does Not Work with ROS 2 Humble
+------------------------------------------------
+
+Symptom
+~~~~~~~
+
+As of Sep 13 2022, the `Realsense ROS 2 wrapper package's ros2 branch <https://github.com/IntelRealSense/realsense-ros/tree/ros2>`__
+does not support ROS 2 Humble. Building the package on Humble produces
+the below error:
+
+``CMake Error at CMakeLists.txt:142 (message):   Unsupported ROS Distribution: humble``
+
+Solution
+~~~~~~~~
+
+Use the `RealSense ROS 2 driver ros2-development branch <https://github.com/IntelRealSense/realsense-ros/tree/ros2-development>`__
+
+Input Images Must Have an Even Height and Width
+------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+Isaac ROS nodes terminate when given images that have an odd width or
+height:
+
+.. code:: bash
+
+   [component_container_mt-1] [INFO] [1655745951.986574909] [NitrosContext]: [NitrosContext] Loading application: '/workspaces/isaac_ros-dev/ros_ws/install/isaac_ros_nitros/share/isaac_ros_nitros/config/type_adapter_nitros_context_graph.yaml'
+   [component_container_mt-1] [ERROR] [1655747175.384136779] [NitrosImage]: [convert_to_custom] Image width/height must be even for creation of gxf::VideoBuffer
+   [component_container_mt-1] terminate called after throwing an instance of 'std::runtime_error'
+   [component_container_mt-1]   what():  [convert_to_custom] Odd Image width or height.
+   [ERROR] [component_container_mt-1]: process has died [pid 28538, exit code -6, cmd '/opt/ros/humble/install/lib/rclcpp_components/component_container_mt --ros-args -r __node:=apriltag_container -r __ns:=/'].
+
+
+Solution
+~~~~~~~~
+
+Replace the input image source with one that produces images that have
+even width and height.
+
+
+RealSense ``ros2 launch realsense2_camera rs_launch.py`` Error
+--------------------------------------------------------------
+
+Symptoms
+~~~~~~~~
+
+Launching the RealSense node using
+``ros2 launch realsense2_camera rs_launch.py``, produces the following error
+message:
+
+.. code:: bash
+
+   [realsense2_camera_node-1]  29/06 01:10:27,431 WARNING [140061797918464] (rs.cpp:310) null pointer passed for argument "device"
+   [realsense2_camera_node-1] [WARN] [1656465033.464454660] [camera.camera]: Device 1/1 failed with exception: failed to set power state
+   [realsense2_camera_node-1] [ERROR] [1656465033.464505994] [camera.camera]: The requested device with  is NOT found. Will Try again.
+   [realsense2_camera_node-1]  29/06 01:10:33,463 ERROR [140061781133056] (handle-libusb.h:51) failed to open usb interface: 0, error: RS2_USB_STATUS_NO_DEVICE
+   [realsense2_camera_node-1]  29/06 01:10:33,463 ERROR [140061797918464] (sensor.cpp:572) acquire_power failed: failed to set power state
+
+
+Solution
+~~~~~~~~
+
+**Before** starting the ``isaac_ros-dev`` Docker container using ``run_dev.sh``,
+run
+`setup_udev_rules.sh <https://github.com/IntelRealSense/librealsense/blob/master/scripts/setup_udev_rules.sh>`__
+from `librealsense <https://github.com/IntelRealSense/librealsense>`__
+**in a terminal outside Docker**.
+
+Solution 2
+~~~~~~~~~~
+
+1. Check if the ``99-realsense-libusb.rules`` file exists in
+   ``/etc/udev/rules.d/``.
+2. If not, disconnect the camera, copy this
+   `file <https://github.com/IntelRealSense/librealsense/blob/master/config/99-realsense-libusb.rules>`__
+   to ``/etc/udev/rules.d/``, then reconnect the camera.
+
+Failed to Get Valid Output from Isaac ROS Rectify or AprilTag Node
+------------------------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+If there is no available calibration data for an Argus camera, you
+see warning messages similar to:
+
+.. code:: bash
+
+   WARN  extensions/hawk/argus_camera.cpp@677: Failed to get calibration data from Argus!
+
+
+Solution
+~~~~~~~~
+
+Most camera modules require calibration for lens distortion. Without
+camera calibration, rectification outputs invalid results and impacts
+the accuracy of downstream Nodes in the graph, such as AprilTag
+detection.
+
+See :doc:`the camera calibration guide </getting_started/hardware_setup/sensors/camera_calibration>` to calibrate
+the camera. If you use Argus cameras, the Isaac ROS Argus Node provides
+options to get the calibration parameters from either the device driver
+or a ``.ini`` file. See :ref:`this
+section <CameraInfo Message>`
+for additional details.
+
+RealSense Does Not Stream IR Stereo Images
+---------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+**Within the Docker container**: Cannot see any IR images in
+``realsense-viewer``, but depth images can be streamed.
+
+**Outside the Docker container**: No metadata containing projector
+status attached to the IR frames.
+
+
+Solution
+~~~~~~~~
+
+1. Download and install the ``dkms`` for Kernel 5.15 from
+   `GitHub <https://github.com/mengyui/librealsense2-dkms/releases/tag/initial-support-for-kernel-5.15>`__
+
+   1. Download the .deb file named
+      ``librealsense2-dkms-dkms_1.3.14_amd64.deb``.
+   2. In the directory where you downloaded the file run:
+      ``sudo apt install ./librealsense2-dkms-dkms_1.3.14_amd64.deb``
+
+2. Build ``librealsense`` within the container without CUDA. Run
+   the following commands within the Docker container:
+
+-  ``git clone https://github.com/JetsonHacksNano/installLibrealsense``
+-  ``cd installLibrealsense``
+-  ``./installLibrealsense.sh``
+-  ``./buildLibrealsense.sh --no_cuda``
+
+.. note::
+
+   For more details on this issue, refer to the 
+   :doc:`nvblox troubleshooting section </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense>`
+
+RealSense Error ``Failed to resolve the request``
+-------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+When any RealSense tutorial is launched, no images are streamed and the
+following error is found in the terminal logs:
+
+.. code:: bash
+
+   [component_container_mt-1] [ERROR] [1665684669.343408502] [camera]: /workspaces/isaac_ros-dev/ros_ws/src/third_party/realsense-ros/realsense2_camera/src/rs_node_setup.cpp:344:An exception has been thrown: 
+   [component_container_mt-1] Failed to resolve the request: 
+   [component_container_mt-1]  Format: Y8, width: 640, height: 480
+   [component_container_mt-1]  Format: Y8, width: 640, height: 480
+   [component_container_mt-1] 
+   [component_container_mt-1] Into:
+   [component_container_mt-1]  Formats: 
+   [component_container_mt-1]   Y8I
+   [component_container_mt-1] 
+   [component_container_mt-1] 
+   [component_container_mt-1] [ERROR] [1665684669.343506391] [camera]: Error starting device: 
+   [component_container_mt-1] Failed to resolve the request: 
+   [component_container_mt-1]  Format: Y8, width: 640, height: 480
+   [component_container_mt-1]  Format: Y8, width: 640, height: 480
+   [component_container_mt-1] 
+   [component_container_mt-1] Into:
+   [component_container_mt-1]  Formats: 
+   [component_container_mt-1]   Y8I
+   [component_container_mt-1]
+
+
+Solution
+~~~~~~~~
+
+Update the RealSense driver to the latest version using the following
+steps:
+
+1. Install ``librealsense`` on your local system using instructions from
+   `IntelRealSense/librealsense <https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md>`__,
+2. Download the latest firmware
+   binary(for example: Signed_Image_UVC_5_13_0_55.bin) from `Firmware releases D400 <https://dev.intelrealsense.com/docs/firmware-releases>`__.
+3. Extract the binary from the .zip file.
+4. Run the following command, being sure to replace `<binary_filename>` with the name of the binary you
+   downloaded:
+
+.. code:: bash
+
+   rs-fw-update -f <binary_filename>
+
+..
+
+.. note::
+
+   For more information refer to the `RealSense update
+   tool <https://dev.intelrealsense.com/docs/firmware-update-tool>`__.
+
+RealSense ``incompatible QoS Policy`` Error
+-------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+When any RealSense tutorial is launched, the output topic from RealSense
+is not subscribed and the following warning is found in the terminal
+logs:
+
+.. code:: Makefile
+
+   [component_container_mt-2] [WARN] [1666117836.386565040] [left_encoder_node]: New publisher discovered on topic '/color/image_raw', offering incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+   [component_container_mt-2] [WARN] [1666117836.392021093] [camera]: New subscription discovered on topic '/color/image_raw', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+
+
+Solution
+~~~~~~~~
+
+Change the QoS policy in ``realsense.yaml`` file from the launched
+package. Take ``isaac_ros_h264_encoder`` as an example, change
+:ir_repo:`policy <isaac_ros_compression> <isaac_ros_h264_encoder/config/realsense.yaml#L7>`
+from ``SENSOR_DATA`` to ``SYSTEM_DEFAULT`` could make the RealSense
+``rgb_camera`` publisher compatible with the subscriber of
+``isaac_ros_h264_encoder``.
+
+.. note::
+
+   For more information on Quality of Service compatibilities see `Quality of Service settings <https://docs.ros.org/en/humble/Concepts/About-Quality-of-Service-Settings.html>`__
+
+Linker Error ``foo.so: file format not recognized; treating as linker script``
+------------------------------------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+When attempting to build an Isaac ROS package by running
+``colcon build``, the linker complains with an error that resembles the
+following:
+
+.. code:: bash
+
+   --- stderr: isaac_ros_nitros                                                                                      
+   /usr/bin/ld:/workspaces/isaac_ros-dev/src/isaac_ros_nitros/isaac_ros_nitros/gxf/lib/gxf_x86_64_cuda_11_7/core/libgxf_core.so: file format not recognized; treating as linker script
+   /usr/bin/ld:/workspaces/isaac_ros-dev/src/isaac_ros_nitros/isaac_ros_nitros/gxf/lib/gxf_x86_64_cuda_11_7/core/libgxf_core.so:1: syntax error
+   collect2: error: ld returned 1 exit status
+   make[2]: *** [CMakeFiles/isaac_ros_nitros.dir/build.make:311: libisaac_ros_nitros.so] Error 1
+   make[1]: *** [CMakeFiles/Makefile2:139: CMakeFiles/isaac_ros_nitros.dir/all] Error 2
+   make: *** [Makefile:146: all] Error 2
+   ---
+   Failed   <<< isaac_ros_nitros [0.52s, exited with code 2]
+
+
+Solution
+~~~~~~~~
+
+This error typically arises when the local copy of a ``.so`` binary on
+your machine contains only the Git LFS pointer, instead of the actual
+binary contents.
+
+.. note::
+
+   If you're encountering this error, you may have forgotten
+   to install and perform one-time setup for Git LFS on your machine.
+   See the instructions for :doc:`development environment setup </getting_started/dev_env_setup>`.
+
+To correct this, navigate to the Isaac ROS package that is failing to
+build and re-pull the binary files using Git LFS.
+
+For example, if ``isaac_ros_nitros`` is failing to build as shown above:
+
+1. Navigate to the package:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_nitros
+
+2. Pull from Git LFS:
+
+   .. code:: bash
+
+      git lfs pull
+
+3. Return to the workspace and run the build command again:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS} && colcon build --symlink-install
+
+Intel RealSense Camera Accidentally Enables Laser Emitter
+---------------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+Despite ``emitter_enabled`` set to ``0``, the laser emitter on Intel
+RealSense comes on.
+
+
+Solution
+~~~~~~~~
+
+Run the following command in the run time:
+
+.. code:: bash
+
+   ros2 param set /camera/camera depth_module.emitter_enabled 0
+
+Intel RealSense D455's Infra Camera Capped at 15fps
+---------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+Even though it's specified to run at 90fps, Intel RealSense D455's
+infra camera capped at 15fps.
+
+
+Solution
+~~~~~~~~
+
+Due to a `known
+issue <https://github.com/IntelRealSense/realsense-ros/issues/2507#issuecomment-1411214372>`__,
+the initial framerate might be capped around 15fps.
+
+If that is the case, you need to issue this command:
+
+.. code:: bash
+
+   ros2 param set /camera/camera depth_module.enable_auto_exposure true
+
+.. include:: /../shared/_snippets/troubleshooting/jetson_recovery_mode.rst

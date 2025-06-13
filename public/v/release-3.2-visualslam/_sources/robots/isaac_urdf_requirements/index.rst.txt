@@ -1,0 +1,249 @@
+..
+   Copyright (c) 2024, NVIDIA CORPORATION. All rights reserved.
+   NVIDIA CORPORATION and its licensors retain all intellectual property
+   and proprietary rights in and to this software, related documentation
+   and any modifications thereto. Any use, reproduction, disclosure or
+   distribution of this software and related documentation without an express
+   license agreement from NVIDIA CORPORATION is strictly prohibited.
+
+Calibration File Requirements for Isaac 
+=======================================
+
+Overview
+--------
+
+This guide details the Isaac requirements for calibration files (that is,
+`URDF <https://wiki.ros.org/urdf>`_ files) encoding extrinsic calibration between sensors, as
+well as requirements on sensors publishing transformations to the ``/tf_static`` tree.
+
+
+Definitions
+-----------
+
+This guide focuses exclusively on requirements for extrinsic calibrations.
+
+**Sensor calibration** includes intrinsic and extrinsic calibration. 
+
+**Intrinsic calibration**
+refers to the internal properties of each sensors (for example, distortion coefficients or focal
+length in cameras).
+
+**Extrinsic calibration** refers to the relative 3D transformation
+(rotation and translation) between two frames (either sensors or other reference frames such as
+robot origin or ``base_link``). 
+
+**Complex sensor systems (CSS)** are defined here as hardware modules including at least one sensor,
+such that the main frame (or origin) of the complex sensor system is different from the origin of
+any of the sensors frames that are part of the system. Any camera system with more than one
+camera is a complex sensor system. By contrast, a monocular camera is not a complex sensor system,
+as long as the origin of the camera matches the origin of the hardware module.
+
+   - Examples of CSS include: Leopard Imaging HAWK and RealSense D455 cameras.
+   - Examples of non-CSS include: Leopard Imaging OWL camera and Hesai XT-32 LIDAR.
+
+There exist different types of **cameras**, for example:
+
+- Mono (AKA monocular) cameras (for example, Leopard Imaging OWL) only include one camera in the body frame.
+- Stereo cameras (for example, Leopard Imaging HAWK) include two cameras (usually left and right), and may include an IMU.
+- RGB-D cameras (for example, RealSense D455) provide both color (RGB) and depth (D) including multiple cameras in the same body, such as infrared or Time-of-Flight cameras.
+
+**Canonical frame** and **optical frame** are defined in
+`ROS REP-0103 <https://www.ros.org/reps/rep-0103.html>`_. 
+    
+    - Canonical (or standard, or body frame) is defined as: X-forward, Y-left, Z-up.
+    - Optical frame is defined as Z-forward, X-right, Y-down. 
+    
+All cameras are expected to have at least two frames: ``<camera_frame>``
+(canonical), and ``<camera_frame>_optical`` (optical). Both frames are required for all cameras.
+
+
+Frame Requirements for Sensor Drivers
+-------------------------------------
+
+The list of requirements regarding sensor frames published from drivers include:
+
+- All frames must follow the conventions defined `ROS REP-0103 <https://www.ros.org/reps/rep-0103.html>`_.
+- All calibration transforms must be published to ``/tf_static`` with a `tf2 <https://wiki.ros.org/tf2>`_ static transform broadcaster.
+
+    - It is recommended that you publish only one (1) message per sensor during initialization or with the first published data message.
+    - The ``/tf_static`` topic has *transient_local* durability, hence the publisher is responsible for persisting samples for "late-joining" subscriptions.
+
+- Sensors drivers must publish transformation sub-trees for any sensor they are responsible for:
+
+    - Mono cameras (for example, OWL) and camera sub-sensors within a CSS must publish the transformation between the camera frame and their optical frame (to ``/tf_static``).
+
+        - The main frame must be the parent and the optical frame must be the child of the transformation.
+        - The naming convention must follow the pattern ``<frame_name>`` and ``<frame_name>_optical``  (`ROS REP-0103 <https://www.ros.org/reps/rep-0103.html>`_).
+
+    - The CSS must publish all the transformations between the main frame (origin) of the CSS and the main frames of all their sub-sensors to ``/tf_static``. Other rules are applied in a hierarchical way as follows:
+
+        - Sub-sensor frames must be children of the main frame and optical frames must be children of any sub-sensors that are cameras.
+        - Intermediate frames are allowed, as long as the parent-children directions of transformations are preserved.
+    - The root (parent) of the CSS and camera transformation trees (described in previous points) must be the sensor/camera main frame (origin).
+    - The root of each sensor sub-tree must be in canonical frame.
+    - Sensor frame names must be unique and follow the requirements below:
+
+        - The root of each sensor sub-tree must be named with a unique sensor identifier (for example, ``front_stereo_camera``).
+        - Descendant nodes must be built with suffixes separated by underscores (for example, ``front_stereo_camera`` → ``front_stereo_camera_left`` → ``front_stereo_camera_left_optical``)
+
+The following is an example of ``/tf_static`` sub-tree published by a ``front_stereo_camera`` stereo camera and a
+``left_fisheye_camera`` mono camera:
+
+.. code-block:: bash
+
+    front_stereo_camera
+    |_ front_stereo_camera_imu
+    |_ front_stereo_camera_left
+    |    |_ front_stereo_camera_left_optical
+    |_ front_stereo_camera_right_optical
+         |_ front_stereo_camera_right_optical
+    
+    left_fisheye_camera
+    |_ left_fisheye_camera_optical
+
+
+Extrinsics Calibration URDF Requirements
+----------------------------------------
+
+The list of requirements for the URDF calibration file encoding extrinsics transformations include:
+
+- Transformations requirements:
+
+    - All frames must follow the conventions defined `ROS REP-0103 <https://www.ros.org/reps/rep-0103.html>`_.
+    - All frames in the calibration file must be canonical.
+    - The calibration file must encode transformations for all the sensors in the robot, such that they are reachable from ``base_link``.
+    - The calibration file must include the main frame of each sensor. It may also include intermediate frames (for example, mount points) as long as they are not being published by sensor drivers.
+
+        - Formally: the calibration file must not include transformations for any sub-sensor of a CSS, optical frame of a camera, or any other frame under the root of a sub-tree published by sensor drivers.
+    - The ``base_link`` is the root (parent) of the transformation tree.
+    - The ``base_link`` must be on the ground, with its X-Y axes representing the ground plane.
+
+- URDF-specific requirements:
+
+    - The calibration file must be parsable by the `xacro <http://wiki.ros.org/xacro>`_ command.
+
+        - The calibration file format may be either native `URDF <https://wiki.ros.org/urdf>`_ or using xacro templates.
+        - The resulting calibration URDF (after running the xacro command) must be a valid URDF file.
+
+    - Joint type must be ``fixed`` for all joints connecting sensors to ``base_link``.
+
+- Sensor naming requirements:
+
+    - For supported platforms, sensors in the Nova Sensor set must be named as defined in the provided nominals packages: :ir_repo:`nova_carter_description <isaac_ros_nova> <nova_carter_description>`, :ir_repo:`nova_developer_kit_description <nova_developer_kit> <nova_developer_kit_description>`.
+    - If nominals do not exist for a given platform, sensors must be named as listed in the :ir_repo:`robot configuration YAML <isaac_ros_nova> <isaac_ros_nova/config/>`.
+
+       - Example for `Nova Orin Developer Kit` (:ir_repo:`nova-developer-kit.yaml <isaac_ros_nova> <isaac_ros_nova/config/nova-developer-kit.yaml>`):
+
+             - ``front_stereo_camera``
+             - ``left_stereo_camera``
+             - ``right_stereo_camera``
+             - ``front_fisheye_camera``
+             - ``left_fisheye_camera``
+             - ``right_fisheye_camera``
+
+       - Example for `Nova Carter` (:ir_repo:`nova-carter_2d-lidar.yaml <isaac_ros_nova> <isaac_ros_nova/config/nova-carter_2d-lidar.yaml>`):
+
+             - ``front_stereo_camera``
+             - ``back_stereo_camera``
+             - ``left_stereo_camera``
+             - ``right_stereo_camera``
+             - ``front_3d_lidar``
+             - ``front_fisheye_camera``
+             - ``back_fisheye_camera``
+             - ``left_fisheye_camera``
+             - ``right_fisheye_camera``
+             - ``front_2d_lidar``
+             - ``back_2d_lidar``
+             - ``chassis_imu``
+
+URDF Example
+^^^^^^^^^^^^
+
+URDF example of for the `Nova Carter <https://robotics.segway.com/nova-carter/>`_ robot:
+
+.. code-block:: xml
+
+    <!--
+    Copyright (c) 2024, NVIDIA CORPORATION. All rights reserved.
+    
+    NVIDIA CORPORATION and its licensors retain all intellectual property
+    and proprietary rights in and to this software, related documentation
+    and any modifications thereto. Any use, reproduction, disclosure or
+    distribution of this software and related documentation without an express
+    license agreement from NVIDIA CORPORATION is strictly prohibited.
+    -->
+    <robot name="carter-v24-example">
+        <link name="right_stereo_camera"/>
+        <link name="right_fisheye_camera"/>
+        <link name="left_stereo_camera"/>
+        <link name="left_fisheye_camera"/>
+        <link name="front_stereo_camera"/>
+        <link name="front_fisheye_camera"/>
+        <link name="front_3d_lidar"/>
+        <link name="front_2d_lidar"/>
+        <link name="chassis_imu"/>
+        <link name="back_stereo_camera"/>
+        <link name="back_fisheye_camera"/>
+        <link name="back_2d_lidar"/>
+        <link name="base_link"/>
+        <joint name="back_2d_lidar_joint" type="fixed">
+            <origin xyz="-0.489400 0.000000 0.418000" rpy="0.000000 0.000000 0.000000"/>
+            <parent link="base_link"/>
+            <child link="back_2d_lidar"/>
+        </joint>
+        <joint name="back_fisheye_camera_joint" type="fixed">
+            <origin xyz="-0.570700 0.000000 0.374400" rpy="0.000000 0.000000 3.141593"/>
+            <parent link="base_link"/>
+            <child link="back_fisheye_camera"/>
+        </joint>
+        <joint name="back_stereo_camera_joint" type="fixed">
+            <origin xyz="-0.563700 -0.075000 0.344400" rpy="0.000000 0.000000 3.141593"/>
+            <parent link="base_link"/>
+            <child link="back_stereo_camera"/>
+        </joint>
+        <joint name="chassis_imu_joint" type="fixed">
+            <origin xyz="-0.218480 0.024460 0.156430" rpy="0.000000 0.000000 0.000000"/>
+            <parent link="base_link"/>
+            <child link="chassis_imu"/>
+        </joint>
+        <joint name="front_2d_lidar_joint" type="fixed">
+            <origin xyz="0.026000 0.000000 0.418000" rpy="0.000000 0.000000 3.141593"/>
+            <parent link="base_link"/>
+            <child link="front_2d_lidar"/>
+        </joint>
+        <joint name="front_3d_lidar_joint" type="fixed">
+            <origin xyz="-0.231700 0.000000 0.526300" rpy="0.000000 0.000000 0.000000"/>
+            <parent link="base_link"/>
+            <child link="front_3d_lidar"/>
+        </joint>
+        <joint name="front_fisheye_camera_joint" type="fixed">
+            <origin xyz="0.107300 0.000000 0.374400" rpy="0.000000 0.000000 0.000000"/>
+            <parent link="base_link"/>
+            <child link="front_fisheye_camera"/>
+        </joint>
+        <joint name="front_stereo_camera_joint" type="fixed">
+            <origin xyz="0.100300 0.075000 0.344400" rpy="0.000000 0.000000 0.000000"/>
+            <parent link="base_link"/>
+            <child link="front_stereo_camera"/>
+        </joint>
+        <joint name="left_fisheye_camera_joint" type="fixed">
+            <origin xyz="-0.231700 0.157100 0.344400" rpy="0.000000 0.000000 1.570796"/>
+            <parent link="base_link"/>
+            <child link="left_fisheye_camera"/>
+        </joint>
+        <joint name="left_stereo_camera_joint" type="fixed">
+            <origin xyz="-0.430400 0.150000 0.344400" rpy="0.000000 0.000000 1.570796"/>
+            <parent link="base_link"/>
+            <child link="left_stereo_camera"/>
+        </joint>
+        <joint name="right_fisheye_camera_joint" type="fixed">
+            <origin xyz="-0.231700 -0.157100 0.344400" rpy="0.000000 0.000000 -1.570796"/>
+            <parent link="base_link"/>
+            <child link="right_fisheye_camera"/>
+        </joint>
+        <joint name="right_stereo_camera_joint" type="fixed">
+            <origin xyz="-0.280400 -0.150000 0.344400" rpy="0.000000 0.000000 -1.570796"/>
+            <parent link="base_link"/>
+            <child link="right_stereo_camera"/>
+        </joint>
+    </robot>

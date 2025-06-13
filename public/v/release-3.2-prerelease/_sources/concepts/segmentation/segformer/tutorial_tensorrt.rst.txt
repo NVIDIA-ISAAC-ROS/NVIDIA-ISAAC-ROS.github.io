@@ -1,0 +1,63 @@
+Tutorial for People Segmentation with Segformer and TensorRT 
+=============================================================
+
+Overview
+------------
+
+This tutorial walks you through a graph for :ir_repo:`Image Segmentation <isaac_ros_image_segmentation>`
+for segmenting people in an image using TensorRT.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the :ref:`quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index:quickstart>` up until model preparation step.
+2.  Launch the Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+3.  Run the following launch files to start the inferencing:
+
+    .. code:: bash
+
+        ros2 launch isaac_ros_segformer isaac_ros_people_sem_segformer_tensor_rt.launch.py engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegformer/1/model.plan
+
+4.  Open **another** terminal and play the rosbag:
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+    .. code:: bash
+
+        ros2 bag play -l isaac_ros_assets/isaac_ros_segformer/segformer_sample_data --remap image_rect:=image camera_info_rect:=camera_info
+
+5.  In another terminal, visualize and validate the output of the package by launching
+    ``rqt_image_view``:
+
+    .. code:: bash
+
+        cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+           ./scripts/run_dev.sh
+
+    Then launch ``rqt_image_view``:
+
+    .. code:: bash
+
+        ros2 run rqt_image_view rqt_image_view
+
+    Then inside the ``rqt_image_view`` GUI, change the topic to ``/segformer/colored_segmentation_mask`` to view a colorized segmentation mask.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/peoplesemsegformer_output_rqt.png>`
+        :width: 320px
+        :align: center
+
+    .. note::
+
+        The raw segmentation is also published to
+        ``/segformer/raw_segmentation_mask``. However, the raw pixels correspond
+        to the class labels and so the output is unsuitable for human visual
+        inspection.

@@ -1,0 +1,164 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nitros> <isaac_ros_nitros>`
+
+Quickstart
+----------
+
+.. _Creating Graphs with NITROS-Accelerated Nodes:
+
+Creating Graphs with NITROS-Accelerated Nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Besides the fully tested :ref:`graphs <concepts/nitros/index:NITROS-Accelerated Graphs>`,
+it is also possible to construct your own graphs with any of the Isaac ROS NITROS-accelerated
+nodes to enjoy the performance benefit of NITROS.
+
+The key to successfully constructing a NITROS-accelerated graph is to
+ensure that all NITROS-accelerated nodes start in the same process
+(which permits zero-copy between nodes). To do so, follow the steps
+below to create your own launch file:
+
+1. Create a Python ROS 2 launch file following the official
+   `guide <https://docs.ros.org/en/humble/How-To-Guides/Launching-composable-nodes.html>`__.
+
+2. Create NITROS-accelerated nodes using ``ComposableNode``. Taking
+   ``ArgusMonoNode`` and ``RectifyNode`` as an example, the nodes can be
+   created as follows:
+
+   .. code:: python
+
+      argus_mono_node = ComposableNode(
+          name='argus_mono_node',
+          package='isaac_ros_argus_camera',
+          plugin='nvidia::isaac_ros::argus::ArgusMonoNode',
+      )
+
+      rectify_node = ComposableNode(
+          name='rectify_node',
+          package='isaac_ros_image_proc',
+          plugin='nvidia::isaac_ros::image_proc::RectifyNode',
+          parameters=[{
+              'output_width': 1920,
+              'output_height': 1200,
+          }],
+          remapping=[
+              ('image_raw', 'left/image_raw'),
+              ('camera_info', 'left/camera_info')
+          ],
+      )
+
+3. Place the created nodes in ``ComposableNodeContainer``:
+
+   .. code:: python
+
+      nitros_container = ComposableNodeContainer(
+          name='nitros_container',
+          package='rclcpp_components',
+          executable='component_container_mt',
+          composable_node_descriptions=[argus_mono_node, rectify_node],
+      )
+
+   ..
+
+      **Note:** It is crucial that the ``executable`` field is set to be
+      ``component_container_mt`` so that the created nodes can be
+      started and communicated correctly within the same process.
+
+4. Finally, place the created composable node container in
+   ``LaunchDescription`` to finalize the launch script.
+
+   .. code:: python
+
+      return launch.LaunchDescription([nitros_container])
+
+
+Using NITROS-Accelerated Nodes in Existing Non-NITROS Graphs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is also possible to use any NITROS-accelerated nodes in an existing
+ROS 2 graph, as all Isaac ROS nodes are compatible with non-NITROS ROS 2
+nodes.
+
+Follow these steps to integrate one or more NITROS-accelerated nodes
+into your graph:
+
+1. Follow the same steps introduced in the :ref:`previous section <Creating Graphs with NITROS-Accelerated Nodes>` to create
+   a ``ComposableNodeContainer`` that contains all the
+   NITROS-accelerated nodes with multi-thread enabled
+   (i.e. ``executable='component_container_mt'``).
+
+2. Place the created composable node container in ``LaunchDescription``
+   together with your own, regular ROS 2 node or composable node
+   container declarations.
+
+Now the NITROS-accelerated nodes will be able to choose the best
+compatible way to communicate with their adjacent nodes.
+
+-  When connected to non-NITROS nodes, NITROS-accelerated nodes will
+   function like regular ROS 2 nodes.
+-  When connected to NITROS-accelerated nodes, zero-copy data
+   transmission via type adaptation and type negotiation will be
+   adopted.
+
+Please visit the link below for an example graph that consists of
+NITROS-accelerated and non-NITROS nodes:
+
+-  :doc:`NITROS-accelerated AprilTag node + non-NITROS USB camera node </concepts/fiducials/apriltag/tutorial_usb_cam>`
+
+.. note:: 
+
+   NITROS nodes enable `CUDA memory pool <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY__POOLS.html>`__ by default. To disable it, set the
+   environment variable ``DISABLE_NITROS_CUDA_MEM_POOL`` parameter to ``true``.
+
+Enabling diagnostics for NITROS Nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+NITROS Nodes allow the publishing of diagnostics to the ``/diagnostics`` topic.
+The diagnostic messages are published using ``diagnostic_msgs/DiagnosticArray``.
+Therefore, they are compatible with `ros2 diagnostics <https://github.com/ros/diagnostics>`__.
+Diagnostics published are:
+
+-  ``frame_rate_msg``: Windowed mean frame rate calculated using the message timestamp
+-  ``frame_rate_node``: Windowed mean frame rate calculated using the node clock
+-  ``mean_abs_jitter_msg``: Mean absolute jitter calculated using the message timestamp
+-  ``mean_abs_jitter_node``: Mean absolute jitter calculated using the node clock
+-  ``max_abs_jitter_msg``: Maximum absolute jitter calculated using the message timestamp
+-  ``max_abs_jitter_node``: Maximum absolute jitter calculated using the node clock
+-  ``num_non_increasing_msg``: Number of messages with non-increasing message times
+-  ``num_jitter_outliers_msg``: Number of messages outside the jitter tolerance using the message timestamp
+-  ``num_jitter_outliers_node``: Number of messages outside the jitter tolerance using the node clock
+-  ``total_dropped_frames``: Currently equivalent to ``num_jitter_outliers_msg``. Accurate only for topics with low jitter (such as the hawk camera and IMU)
+
+Jitter is the deviation in time between messages as compared to the expected FPS and it is
+measured using the node clock or the message timestamps. Units are in microseconds.
+Stats ending in ``_msg`` use the timestamp in the header of the message, often reflecting a sensor acquisition timestamp.
+Stats ending in ``_node`` use the node's clock to note the timestamp when publishing/receiving.
+To enable publishing to ``/diagnostics``, set one or more of ``enable_msg_time_diagnostics``, ``enable_increasing_msg_time_diagnostics`` and ``enable_node_time_diagnostics``.
+Following are parameters associated with publishing `/diagnostics`.
+
+========================================== ================== ============= ====================================================================================================================================
+ROS Parameter                              Type               Default       Description
+========================================== ================== ============= ====================================================================================================================================
+``enable_node_time_diagnostics``           ``bool``           ``False``     Enable diagnostics publishing using message timestamps (``_node`` stats).
+``enable_msg_time_diagnostics``            ``bool``           ``False``     Enable diagnostics publishing using node clock (``_msg`` stats).
+``enable_increasing_msg_time_diagnostics`` ``bool``           ``False``     Enable tracking and identification of non-monotonic timestamps on messages.
+``diagnostics_publish_rate``               ``float``          ``1.0``       Frequency at which diagnostics are published to ``/diagnostics``
+``filter_window_size``                     ``int``            ``100``       Window size of the mean filter in terms of number of messages received
+``topics_list``                            ``vector<string>`` ``[]``        A list of names of topics we want the NITROS node to track diagnostics of. Use pre-remapping names and not the re-mapped topic names.
+``expected_fps_list``                      ``vector<float>``  ``[]``        Each topic's expected frames per seconds. Length of list must match number of topics passed into the previous parameter.
+========================================== ================== ============= ====================================================================================================================================
+
+Additionally, one can enable publishing FPS for all by setting the ``ENABLE_GLOBAL_NITROS_DIAGNOSTICS``
+environment variable to 1 before launching the node. This will enable FPS diagnostics for all, while
+still publishing drop rates and other data for nodes with expected topics and expected FPS.
+
+You can view these topics with the following utility:
+
+.. code:: bash
+
+   ros2 run isaac_ros_nitros diagnostic_viewer.py
+
+.. |package_name| replace:: ``isaac_ros_nitros``

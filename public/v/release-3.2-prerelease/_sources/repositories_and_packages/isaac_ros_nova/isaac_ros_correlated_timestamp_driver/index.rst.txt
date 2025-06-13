@@ -1,0 +1,193 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nova> <isaac_ros_correlated_timestamp_driver>`
+
+Overview
+--------
+
+An autonomous robotics system needs to perceive itself, its environment, and plan its actions to achieve a task,
+and control those actions, in a closed loop. Perception is provided by a combination of sensors, for example
+camera, LIDAR, IMU, touch, motor positions, wheel ticks, and others. Each of these sensors operate independently
+running at different frequencies and many on their own clocks. This is a challenge when more than one sensor is
+needed to reconstruct an understanding of the environment for planning of actions.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/correlated_sensor_timeline.png>`
+   :align: center
+
+   Example of 10hz LIDAR, 30Hz camera, and 100hz IMU sensors operating concurrently.
+
+A common practice is to use the system time as the clock on which all sensor data is tracked in a single timeline.
+When the sensor's data is received, an interrupt occurs causing the software to record the sensor acquisition time
+as the current system time. This lacks accuracy as the current system time does not account for time spent transmitting
+the sensor data to the processor, or kernel delays in servicing the interrupt which records the system time. The
+acquisition time of the sensor data will be both late, and subject to jitter. For some applications this lack of
+accuracy in the single timeline for sensor data is a problem for a precise reconstruction of the environment and
+precise planning at higher action speeds.
+
+The ``isaac_ros_correlated_timestamp_driver`` provides functionality for highly accurate acquisition time of sensor
+data translated to the system time. This is needed for precise reconstruction of the environment such as 3D maps, cost
+maps, and obstacle avoidance from multiple concurrent sensors. This enables high action speeds as multi-sensor perception
+has 2x orders of magnitude lower jitter (from 1ms to <10us).
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/correlated_timestamp_driver_dag.png>`
+   :align: center
+
+This accuracy is provided by ``isaac_ros_correlated_timemestamp_driver`` by leveraging hardware features in Jetson platforms.
+A hardware feature uses TSC as the sensor acquisition time when an interrupt is received. This eliminates jitter in sensor
+acquisition time measurements caused by delays in the kernel servicing interrupts. This is used for camera, and IMU data in Nova.
+``isaac_ros_correlated_timemestamp_driver`` converts TSC measurements to system time. In addition, time synchronization between
+system time, and Ethernet is maintained with PTP, using ``phc2sys``. Hardware provides time synchronization between TSC and PTP,
+for highly precise sensor data acquisition times between camera and LIDAR sensors needed for sensor fusion in 3D reconstruction.
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-correlated-timestamp-driver
+   
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nova>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nova/isaac_ros_correlated_timestamp_driver --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_correlated_timestamp_driver
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+1. Continuing inside the Docker container, launch the correlated timestamp driver:
+
+   .. code-block::
+
+      ros2 launch isaac_ros_correlated_timestamp_driver correlated_timestamp_driver.launch.py
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+2. Output the timestamps:
+
+   .. code-block::
+
+      ros2 topic echo /correlated_timestamp
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_correlated_timestamp_driver correlated_timestamp_driver.launch.py target_container:=<Target Container> nvpps_dev_file:=<NVPPS Dev Name> use_time_since_epoch:=<Use Time Since Epoch>
+
+CorrelatedTimestampDriverNode
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Parameters
+~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``use_time_since_epoch``
+     - ``boolean``
+     - ``false``
+     - Use time since epoch.
+
+   * - ``nvpps_dev_file``
+     - ``string``
+     - ``/dev/nvpps0``
+     - NVPPS device name.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+========================== ========================================================================================================================================= ===================================
+ROS Topic                  Interface                                                                                                                                 Description
+========================== ========================================================================================================================================= ===================================
+``correlated_timestamp``   :ir_repo:`isaac_ros_nova_interfaces::msg::CorrelatedTimestamp <isaac_ros_common> <isaac_ros_nova_interfaces/msg/CorrelatedTimestamp.msg>` Timestamp correlation data.
+========================== ========================================================================================================================================= ===================================
+
+.. |package_name| replace:: ``isaac_ros_correlated_timestamp_driver``

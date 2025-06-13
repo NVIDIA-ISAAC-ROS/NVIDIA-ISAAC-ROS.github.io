@@ -1,0 +1,322 @@
+==================================================
+Tutorial for cuMotion MoveIt Plugin with Isaac Sim
+==================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/manipulation/cumotion_moveit/isaac_sim.jpg>`
+    :align: center
+    :width: 800px
+
+Overview
+------------
+
+This tutorial walks through the process of planning trajectories for a simulated Franka or UR robot
+in Isaac Sim leveraging the cuMotion plugin for MoveIt 2 provided by
+:ir_repo:`Isaac ROS cuMotion <isaac_ros_cumotion>`. It is based on an
+`example <https://moveit.picknik.ai/main/doc/how_to_guides/isaac_panda/isaac_panda_tutorial.html>`_
+developed by PickNik Robotics, which in turn was based on a MoveIt example with fewer features provided
+with Isaac Sim.
+
+This tutorial has been tested with Isaac Sim 4.2.0
+
+Tutorial Walkthrough
+--------------------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Set up your development environment by following the instructions in :doc:`Compute Setup </getting_started/hardware_setup/compute/index>` and :doc:`Getting Started </getting_started/dev_env_setup>`.
+
+#. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_common>`
+
+
+Install ``isaac_ros_cumotion_moveit`` and Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Install the ``isaac_ros_cumotion_examples`` package and its dependencies
+   (including ``isaac_ros_cumotion`` and ``isaac_ros_cumotion_moveit``):
+
+   .. include:: /repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/_snippets/install.rst
+
+#. Install and configure Isaac Sim following the steps in the
+   :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/isaac_sim/index>`, stopping after step 4.
+
+#. This tutorial uses the Isaac Sim standalone workflow, in which Isaac Sim is launched via a Python script.  In the
+   terminal opened using the **Open in Terminal** button in the Isaac Sim App Selector (and notably **not** in a shell
+   within the Isaac ROS Docker container), source your ROS 2 workspace. For example:
+
+   .. code:: bash
+
+      source /opt/ros/humble/setup.bash
+
+#. Set up your robot using the instructions below:
+
+.. tabs::
+
+   .. group-tab:: Universal Robot (UR)
+
+      #. Start Isaac Sim and open the following scene:
+
+         .. code:: bash
+
+            https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.2/Isaac/Samples/ROS2/Scenario/isaac_manipulator_ur10e_robotiq_2f_140.usd
+
+      #. **Optional:** The above scene contains a UR10e robot.  If you would like to experiment with a different UR robot,
+         first delete the UR10e from the scene.  Then find the alternative robot in Isaac Sim's robot assets folder
+         and drag it onto the table in the scene.  Finally, edit the Action Graph so that the ``ROS2 Publish Joint State``
+         and ``Articulation Controller`` nodes refer to the new robot, and save the USD file.
+
+      #. Once the scene is fully loaded, click **Play**.
+
+         .. note::
+
+            Before launching MoveIt, ensure that the scene is loaded in Isaac Sim and that the timeline is playing.
+
+            Running ``ros2 topic list`` in your ROS workspace should show a number of topics streaming data from
+            Isaac Sim.
+
+   .. group-tab:: Franka
+
+      #. Run ``python.sh`` with the full path to the ``start_isaac_sim_franka.py`` script provided by the
+         ``isaac_ros_cumotion_examples`` package. Please note that this is a standalone script and could be copied to
+         another location for convenience.
+
+         .. tabs::
+
+            .. group-tab:: Binary Package
+
+               Clone or download the script from :ir_repo:`here <isaac_ros_cumotion> <isaac_ros_cumotion_examples/isaac_sim_scripts/start_isaac_sim_franka.py>`. Then run it with ``python.sh`` as follows.
+
+               .. code:: bash
+
+                  ./python.sh <DOWNLOAD_PATH>/start_isaac_sim_franka.py
+
+            .. group-tab:: Build from Source
+
+               .. code:: bash
+
+                  ./python.sh ${ISAAC_ROS_WS}/src/isaac_ros_cumotion/isaac_ros_cumotion_examples/isaac_sim_scripts/start_isaac_sim_franka.py
+
+      #. Once Isaac Sim fully loads, the timeline will begin playing automatically.
+
+         .. note::
+
+            The example should be loaded in Isaac Sim before MoveIt is launched.
+
+            Running ``ros2 topic list`` in your ROS workspace should show a number of topics streaming data from
+            Isaac Sim.
+
+   .. group-tab:: Another Robot
+
+      #. Follow the entire :doc:`Custom Manipulator tutorial </concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator>`.
+
+      #. Start Isaac Sim and open the following scene:
+
+         .. code:: bash
+
+            https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.2/Isaac/Samples/ROS2/Scenario/isaac_manipulator_ur10e_robotiq_2f_140.usd
+
+      #. Delete the UR10e robot from the scene.
+
+      #. Find your robot's USD file in Isaac Sim's robot assets folder (or use the one you made by following the
+         :doc:`Custom Manipulator tutorial </concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator>`)
+         and drag it onto the table in the scene.
+
+      #. In the Action Graph, edit the ``ROS2 Publish Joint State`` and ``Articulation Controller`` nodes to refer to
+         the new robot.
+
+      #. Save the USD file, and click **Play**.
+
+         .. note::
+
+            Before launching MoveIt, ensure that the scene is loaded in Isaac Sim and that the timeline is playing.
+
+            Running ``ros2 topic list`` in your ROS workspace should show a number of topics streaming data from
+            Isaac Sim.
+
+
+Set Up MoveIt 2 with cuMotion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. group-tab:: Franka
+
+      #. Open a new terminal inside the Docker container.
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      #. Launch MoveIt (including RViz) using the provided launch file. Remember to first run ``source install/setup.bash``
+         if package was built from source.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_cumotion_examples franka_isaac_sim.launch.py
+
+         Verify that the visualization of the robot in RViz reflects the current joint state of the
+         simulated robot in Isaac Sim.
+
+      #. Open another terminal inside the Docker container.
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      #. Run the cuMotion planner node. Remember to first run ``source install/setup.bash`` if package was built
+         from source.
+
+         .. code:: bash
+
+            ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args \
+               -p robot:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/xrdf/franka.xrdf \
+               -p urdf_path:=/opt/ros/humble/share/moveit_resources_panda_description/urdf/panda.urdf
+
+   .. group-tab:: Universal Robot (UR)
+
+      .. note::
+
+         If you are using a UR robot other than UR5e or UR10e, follow the
+         :ref:`Creating an XRDF file for a Custom Manipulator <concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator:Creating an XRDF file for a Custom Manipulator>`
+         section of the
+         :doc:`Custom Manipulator tutorial </concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator>`
+         before proceeding to the instructions below.
+
+         The Isaac Sim scene contains a UR10e by default and will have to be modified for other robots.
+         See section above.
+
+      #. Open a new terminal inside the Docker container.
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      #. Launch MoveIt (including RViz) using the provided launch file.  Remember to first run
+         ``source install/setup.bash`` if package was built from source.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_cumotion_examples ur_isaac_sim.launch.py ur_type:=<UR_TYPE>
+
+         .. note::
+
+            Replace ``<UR_TYPE>`` with the type of your UR robot (e.g., ``ur10e``).
+
+         The visualization of the robot in RViz should reflect the current joint state of the
+         simulated robot in Isaac Sim.
+
+      #. Open another terminal inside the Docker container.
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      #. Generate a URDF for the UR10e from the corresponding xacro:
+
+         .. code:: bash
+
+            mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/urdf && \
+               xacro -o ${ISAAC_ROS_WS}/isaac_ros_assets/urdf/<UR_TYPE>.urdf \
+               /opt/ros/humble/share/ur_description/urdf/ur.urdf.xacro \
+               ur_type:=<UR_TYPE> name:=<UR_TYPE>
+
+         .. note::
+
+            Replace ``<UR_TYPE>`` with the type of your UR robot (e.g., ``ur10e``).
+
+      #. Remove the ``ros2_control`` section from the URDF.  The following is a simplified URDF with the section
+         to be removed shown in red:
+
+         .. code:: diff
+
+             <robot name="robot">
+                <link name="link"/>
+            -   <ros2_control name="robot" type="system">
+            -      <hardware>
+            -         <!-- content -->
+            -      </hardware>
+            -      <joint name="joint">
+            -         <!-- joint information -->
+            -      </joint>
+            -      <!-- more joints -->
+            -   </ros2_control>
+                <link name="link">
+                   <!-- link information -->
+                </link>
+                <!-- more links -->
+                <joint name="joint" type="revolute">
+                   <!-- joint information -->
+                </joint>
+                <!-- more joints -->
+             </robot>
+
+      #. In the same terminal, run the cuMotion planner node. Remember to first run ``source install/setup.bash``
+         if package was built from source.
+
+         As an example, the following command runs the planner node for a UR10e robot with the provided XRDF:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args
+               -p robot:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/xrdf/ur10e.xrdf \
+               -p urdf_path:=${ISAAC_ROS_WS}/isaac_ros_assets/urdf/ur10e.urdf
+
+   .. group-tab:: Another Robot
+
+      1. Open a new terminal inside the Docker container.
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      #. Launch MoveIt (including RViz) using the launch file you created in the :doc:`Custom Manipulator tutorial </concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator>`. Remember to first run ``source install/setup.bash``
+         if package was built from source.
+
+         .. code:: bash
+
+            ros2 launch <PACKAGE_CONTAINING_LAUNCH_FILE> <ROBOT>.launch.py
+
+         Verify that the visualization of the robot in RViz reflects the current joint state of the
+         simulated robot in Isaac Sim.
+
+      #. Open another terminal inside the Docker container.
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      #. Run the cuMotion planner node. Remember to first run ``source install/setup.bash`` if package was built
+         from source.
+
+         .. code:: bash
+
+            ros2 run isaac_ros_cumotion cumotion_planner_node --ros-args \
+               -p robot:=<FULL_PATH_TO_XRDF> \
+               -p urdf_path:=<FULL_PATH_TO_URDF>
+
+
+Using the cuMotion Planner in MoveIt
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. In RViz, enable cuMotion by ensuring that ``isaac_ros_cumotion`` and ``cuMotion`` are selected within the
+   **"Planning Library"** pane within the **"Context"** tab in the bottom left corner of the RViz window.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/moveit_context.png>`
+    :align: center
+
+#. Select a target pose for the robot end effector, and click the **Plan** button in the **Planning** tab.
+   If planning is successful, an animation of the trajectory will be visualized in RViz.
+
+#. Click the **Execute** button in RViz. The simulated Franka robot in Isaac Sim will follow the motion of
+   the robot in RViz.

@@ -1,0 +1,563 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nova> <isaac_ros_nova_recorder>`
+
+Overview
+--------
+
+The |package_name| package enables recording data from the Nova sensor set. For more information
+on data recording, refer to :doc:`isaac_ros_data_recorder </repositories_and_packages/isaac_ros_nova/isaac_ros_data_recorder/index>`.
+
+Quickstart
+----------
+
+Set Up AWS (Optional)
+^^^^^^^^^^^^^^^^^^^^^
+
+1. Follow `Get Started With S3 <https://docs.aws.amazon.com/AmazonS3/latest/userguide/GetStartedWithS3.html>`__ until
+   `Step 1: Create your first S3 bucket <https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html>`__.
+   The bucket name will be used for the ``s3_bucket`` parameter when launching the data recorder.
+
+2. Sign in to the AWS Management Console and open the IAM console at https://console.aws.amazon.com/iam.
+
+   a. In the navigation pane of the IAM console, select Users and then select the User name of the user that you created previously.
+
+   b. On the user's page, select the Security credentials page. Then, under Access keys, select Create access key.
+
+3. Use the information from Step 2 to create the AWS credentials and configuration files.
+
+   a. Create ``~/.aws/credentials`` with the following content:
+
+      .. code:: bash
+
+         [default]
+         aws_access_key_id=<AWS_ACCESS_KEY_ID>
+         aws_secret_access_key=<AWS_SECRET_ACCESS_KEY>
+
+   b. Create ``~/.aws/config`` with the following content:
+
+      .. code:: bash
+
+         [default]
+         region=<REGION>
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+3. Create additional mounts for the Docker container.
+
+   If the container is already running, stop it with:
+
+   .. code:: bash
+
+      docker rm -f isaac_ros_dev-aarch64-container
+
+   Create mounts for ``/etc/nova``, ``/mnt/nova_ssd/recordings``, and ``~/.aws``:
+
+   .. code:: bash
+
+      echo $'-v /etc/nova:/etc/nova\n-v /mnt/nova_ssd/recordings:/mnt/nova_ssd/recordings\n-v `realpath ~/.aws`:/home/admin/.aws:ro' > ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts/.isaac_ros_dev-dockerargs
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+              ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-nova-recorder
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nova>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+               ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nova/isaac_ros_nova_recorder --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --packages-up-to isaac_ros_nova_recorder --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_nova/isaac_ros_nova_recorder
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+.. _isaac-ros-nova-recorder-launch:
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+1.  Continuing inside the Docker container, start data recording:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_nova_recorder nova_recorder.launch.py config:=nova-carter s3_bucket:=<s3_bucket>
+
+2. Once the launch process is complete, open a web browser and navigate to ``https://<ROBOT_IP_ADDRESS>:8080`` to access the data_recorder UI.
+
+   a. Select Open connection to connect to the robot.
+
+      .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/open_connection.png>`
+
+   b. Type in ``ws://<ROBOT_IP_ADDRESS>:8765`` in WebSocket URL.
+
+   c. Click the shield/triangle icon at the top right of the Chrome address bar when the page is blocked from connecting.
+
+   d. From the menu that appears, select ``Load Unsafe Scripts`` to allow the connection to the WebSocket.
+
+      .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/enable_websocket.png>`
+
+3. In the data_recorder UI, to start a new recording session, follow these steps:
+
+   a. Input Author: Enter the name of the person or entity responsible for the recording.
+
+   b. Input Title: Provide a title for the recording session.
+
+   c. Input Location: Specify the location where the recording is being conducted.
+
+4. Start Recording: Once all three fields (Author, Title, and Location) are filled out, the ``Start`` button will be enabled. Press "Start" to begin recording.
+
+5. Stop Recording: To stop recording, use the ``Stop`` button in the UI.
+
+6. Switch Preview: Click on the image panel, then navigate to the left sidebar and use the "Select Camera" drop-down to change the camera view.
+
+      .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/switch_preview.png>`
+
+7. Upload Recorded Data: After stopping the recording, follow these steps to upload the recorded data:
+
+   a. Navigate to the ``Upload`` tab in the data_recorder UI.
+
+   b. In the ``Upload`` tab, select the files you want to upload by clicking the check-boxes next to each file.
+
+   c. Once the files are selected, click the ``Upload`` button to start the upload process.
+
+   d. The upload status will be displayed in the **Status** column, showing stages like **PENDING**, the upload percentage, and **COMPLETE** when the upload is finished.
+
+8. By default, recordings will be stored in ``/mnt/nova_ssd/recordings``.
+
+Try More Examples
+-----------------
+
+Event Recorder
+^^^^^^^^^^^^^^
+
+Event recording enables recording data during specific events. To run the event recorder:
+
+.. code:: bash
+
+   ros2 launch isaac_ros_nova_recorder nova_recorder.launch.py event_recorder:=True config:=nova-carter s3_bucket:=<s3_bucket>
+
+The Cross button on the joystick will signal the start of an event while the Square button will signal the end of an event.
+By default, 60 seconds of data will be buffered and saved before an event starts while 60 seconds of data will be saved after an event ends.
+
+.. note::
+
+   If a sensor configuration without ``drivetrain`` is used, then events will have to be
+   triggered using ``ros2 service call`` in a separate terminal:
+
+   .. code:: bash
+
+      ros2 service call event_start isaac_ros_data_recorder/srv/Event
+
+   .. code:: bash
+
+      ros2 service call event_end isaac_ros_data_recorder/srv/Event
+
+Sensor Configuration
+^^^^^^^^^^^^^^^^^^^^
+
+A sensor configuration file can be used to record a subset of sensors on the robot. For example, to
+record only the 4 stereo cameras:
+
+.. code:: bash
+
+   ros2 launch isaac_ros_nova_recorder nova_recorder.launch.py config:=nova-carter_hawk-4_imu s3_bucket:=<s3_bucket>
+
+The following sensor configurations are provided. Custom sensor configurations are also supported.
+
+=============================== ==================================================================================
+Configuration                   Description
+=============================== ==================================================================================
+``hawk-1``                      Front stereo camera.
+``hawk-2``                      Front and back stereo cameras.
+``hawk-3``                      Front, left, and right stereo cameras.
+``hawk-4``                      Front, left, right and back stereo cameras.
+``owl-1``                       Front fisheye camera.
+``owl-2``                       Front and back fisheye cameras.
+``owl-3``                       Front, left, and right fisheye cameras.
+``owl-4``                       Front, left, right, and back fisheye cameras.
+``hawk-4_owl-4``                Front, left, right and back stereo and fisheye cameras.
+``nova-carter``                 Sensor configuration for Nova Carter.
+``nova-carter_hawk-4_imu``      Sensor configuration for Nova Carter with only stereo cameras and IMU.
+``nova-carter_owl-4_imu``       Sensor configuration for Nova Carter with only fisheye cameras and IMU.
+``nova-benchtop``               Sensor configuration for Nova Carter without drivetrain.
+``nova-benchtop_hawk-4_imu``    Sensor configuration for Nova Carter without drivetrain and only stereo cameras and IMU.
+``nova-benchtop_owl-4_imu``     Sensor configuration for Nova Carter without drivetrain and only fisheye cameras and IMU.
+``nova-developer-kit``          Sensor configuration for Nova Orin Developer Kit.
+=============================== ==================================================================================
+
+Sensor Monitoring
+^^^^^^^^^^^^^^^^^^^^
+To monitor the status of various sensors during a recording session, the Sensor Indicators Panel in
+the data recorder UI provides real-time feedback on sensor health and connectivity.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/sensor_indicators.png>`
+
+Sensor Health Color Code:
+Green: OK
+Yellow: Warning
+Red: Error
+Grey: Stale
+
+Hovering over each sensor will display a tool-tip with detailed information, including frame rates
+and the total number of dropped frames for each sensor.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/sensor_tooltip.png>`
+
+You can switch between two views using the button at the top of the panel:
+
+Summary View: Groups related topics under each sensor. For example, both left/right camera_info and
+image_raw topics are grouped under the front Hawk camera.
+Full View: Displays all topics individually for each sensor.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/sensor_full_view.png>`
+
+For more detailed sensor monitoring information, navigate to the ``Diagnostics`` tab at the top.
+This section provides comprehensive details for each sensor.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/diagnostics.png>`
+
+For more information, refer to Visualize Results and Track System Monitors in Isaac ROS nova doc
+
+:doc:`isaac_ros_nova </repositories_and_packages/isaac_ros_nova/isaac_ros_nova/index>`.
+
+
+Recording Via Command Line
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The data recorder can be run in headless mode to record data using only the command line:
+
+.. code:: bash
+
+   ros2 launch isaac_ros_nova_recorder nova_recorder.launch.py headless:=True config:=nova-carter s3_bucket:=<s3_bucket>
+
+This will start recording data immediately and will stop when the application is terminated via  ``Ctrl+C``.
+
+Troubleshooting
+---------------
+
+| :doc:`Isaac ROS Troubleshooting </troubleshooting/index>`
+| `AWS S3 Troubleshooting <https://docs.aws.amazon.com/AmazonS3/latest/userguide/troubleshooting.html>`__
+
+
+If the Data Recorder Panel is not visible, click on ``Layouts`` in the left sidebar, right-click on ``Default``, and select ``Revert`` to restore the default layout.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/revert_layout.png>`
+
+API
+---
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_nova_recorder nova_recorder.launch.py
+
+ROS Launch Arguments
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Launch Argument
+     - Default Value
+     - Description
+
+   * - ``s3_bucket``
+     - None
+     - S3 bucket.
+
+   * - ``config``
+     - ``/etc/nova/systeminfo.yaml``
+     - Sensor configuration file.
+
+   * - ``topics``
+     - ``[]``
+     - Additional topics to record.
+
+   * - ``recording_directory``
+     - ``/mnt/nova_ssd/recordings``
+     - Recording directory.
+
+   * - ``recording_name``
+     - ``rosbag2``
+     - Recording name.
+
+   * - ``headless``
+     - ``False``
+     - Record data without the UI.
+
+   * - ``event_recorder``
+     - ``False``
+     - Enable event recording.
+
+   * - ``encoder_qp``
+     - ``20``
+     - H.264 encoder quality parameter, 0-50, higher values mean lower quality.
+
+.. note::
+   In low light or occluded conditions, the quality parameter may need to be adjusted to prevent frame drops
+
+
+ROS Topics Subscribed
+~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``/rosout``
+     - `rcl_interfaces/msg/Log <https://github.com/ros2/rcl_interfaces/blob/humble/rcl_interfaces/msg/Log.msg>`__
+     - Console logs.
+
+   * - ``/diagnostics``
+     - `diagnostic_msgs/msg/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/humble/diagnostic_msgs/msg/DiagnosticArray.msg>`__
+     - Sensor diagnostics.
+
+   * - ``/diagnostics_agg``
+     - `diagnostic_msgs/msg/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/humble/diagnostic_msgs/msg/DiagnosticArray.msg>`__
+     - System diagnostics.
+
+   * - ``/tf``
+     - `tf2_msgs/msg/TFMessage <https://github.com/ros2/geometry2/blob/humble/tf2_msgs/msg/TFMessage.msg>`__
+     - Movable transforms on the robot.
+
+   * - ``/tf_static``
+     - `tf2_msgs/msg/TFMessage <https://github.com/ros2/geometry2/blob/humble/tf2_msgs/msg/TFMessage.msg>`__
+     - Fixed transforms on the robot.
+
+   * - ``/robot_description``
+     - `std_msgs/msg/String <https://github.com/ros2/common_interfaces/blob/humble/std_msgs/msg/String.msg>`__
+     - The description of the robot URDF as a string.
+
+   * - ``/front_stereo_camera/left/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Front stereo camera left camera stream.
+
+   * - ``/front_stereo_camera/left/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Front stereo camera left camera intrinsics.
+
+   * - ``/front_stereo_camera/right/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Front stereo camera right camera stream.
+
+   * - ``/front_stereo_camera/right/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Front stereo camera right camera intrinsics.
+
+   * - ``/back_stereo_camera/left/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Back stereo camera left camera stream.
+
+   * - ``/back_stereo_camera/left/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Back stereo camera left camera intrinsics.
+
+   * - ``/back_stereo_camera/right/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Back stereo camera right camera stream.
+
+   * - ``/back_stereo_camera/right/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Back stereo camera right camera intrinsics.
+
+   * - ``/left_stereo_camera/left/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Left stereo camera left camera stream.
+
+   * - ``/left_stereo_camera/left/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Left stereo camera left camera intrinsics.
+
+   * - ``/left_stereo_camera/right/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Left stereo camera right camera stream.
+
+   * - ``/left_stereo_camera/right/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Left stereo camera right camera intrinsics.
+
+   * - ``/right_stereo_camera/left/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Right stereo camera left camera stream.
+
+   * - ``/right_stereo_camera/left/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Right stereo camera left camera intrinsics.
+
+   * - ``/right_stereo_camera/right/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Right stereo camera right camera stream.
+
+   * - ``/right_stereo_camera/right/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Right stereo camera right camera intrinsics.
+
+   * - ``/front_fisheye_camera/left/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Front fisheye camera stream.
+
+   * - ``/front_fisheye_camera/left/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Front fisheye camera intrinsics.
+
+   * - ``/back_fisheye_camera/left/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Back fisheye camera stream.
+
+   * - ``/back_fisheye_camera/left/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Back fisheye camera intrinsics.
+
+   * - ``/left_fisheye_camera/left/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Left fisheye camera stream.
+
+   * - ``/left_fisheye_camera/left/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Left fisheye camera intrinsics.
+
+   * - ``/right_fisheye_camera/left/image_compressed``
+     - `sensor_msgs/msg/CompressedImage <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CompressedImage.msg>`__
+     - Right fisheye camera stream.
+
+   * - ``/right_fisheye_camera/left/camera_info``
+     - `sensor_msgs/msg/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__
+     - Right fisheye camera intrinsics.
+
+   * - ``/front_2d_lidar/scan``
+     - `sensor_msgs/msg/LaserScan <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/LaserScan.msg>`__
+     - Front 2D lidar scan.
+
+   * - ``/back_2d_lidar/scan``
+     - `sensor_msgs/msg/LaserScan <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/LaserScan.msg>`__
+     - Back 2D lidar scan.
+
+   * - ``/front_3d_lidar/lidar_packets``
+     - `hesai_ros_driver/msg/UdpFrame <https://github.com/HesaiTechnology/HesaiLidar_ROS_2.0/blob/master/msg/msg_ros2/UdpFrame.msg>`__
+     - Front 3D lidar UDP packets.
+
+   * - ``/front_stereo_imu/imu``
+     - `sensor_msgs/msg/Imu <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Imu.msg>`__
+     - Front stereo camera inertial measurement unit.
+
+   * - ``/chassis/imu``
+     - `sensor_msgs/msg/Imu <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Imu.msg>`__
+     - Chassis inertial measurement unit.
+
+   * - ``/chassis/ticks``
+     - `isaac_ros_nova_interfaces/msg/EncoderTicks <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_nova_interfaces/msg/EncoderTicks.msg>`__
+     - Chassis encoder count.
+
+   * - ``/chassis/odom``
+     - `nav_msgs/msg/Odometry <https://github.com/ros2/common_interfaces/blob/humble/nav_msgs/msg/Odometry.msg>`__
+     - Chassis odometry.
+
+   * - ``/chassis/battery_state``
+     - `sensor_msgs/msg/BatteryState <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/BatteryState.msg>`__
+     - Chassis battery state.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``directory_info``
+     - :ir_repo:`isaac_ros_nova_recorder/DirectoryInfo <isaac_ros_nova> <isaac_ros_nova_recorder/msg/DirectoryInfo.msg`
+     - Directory information.
+
+
+ROS Services Advertised
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+
+   * - ``delete_rosbag``
+     - :ir_repo:`isaac_ros_nova_recorder/DeleteRosbag <isaac_ros_nova> <isaac_ros_nova_recorder/srv/DeleteRosbag.srv`
+     - Deletes a rosbag from disk.
+
+ROS Actions Advertised
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Action
+     - Interface
+     - Description
+
+   * - ``upload_rosbag``
+     - :ir_repo:`isaac_ros_nova_recorder/UploadRosbag <isaac_ros_nova> <isaac_ros_nova_recorder/action/UploadRosbag.action`
+     - Uploads a rosbag to S3.
+
+.. |package_name| replace:: ``isaac_ros_nova_recorder``

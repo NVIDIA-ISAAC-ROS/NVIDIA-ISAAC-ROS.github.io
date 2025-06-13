@@ -1,0 +1,79 @@
+=============
+Compute Setup
+=============
+
+x86 Platforms
+-------------
+
+1. Prepare a NVIDIA-powered platform with the following minimum specs:
+
+   -  Ubuntu 22.04+
+
+      -  **Experimental**: WSL2 on Windows 11
+
+   -  16 GB general RAM
+   -  Discrete NVIDIA GPU with the following specs:
+
+      -  supports CUDA 12.6+ with ``Ampere`` NVIDIA GPU Architecture or newer
+      -  minimum 8GB of VRAM and recommended 12GB+
+      
+      .. note::
+
+         Various DNN models when loaded together can consume more memory than you may have available.
+
+2. Install Docker from official instructions (`here <https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository>`__). (Recommended 27.2.0 or newer)
+
+3. Install the latest NVIDIA GPU Driver from official instructions (`here <https://ubuntu.com/server/docs/nvidia-drivers-installation>`__). (Minimum 560+ is required, see `here <https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html#id5>`__).
+
+Jetson Platforms
+----------------
+
+1. `Install Jetpack <https://docs.nvidia.com/jetson/jetpack/install-setup/index.html>`__ including the ``nvidia-container`` package.
+
+2. After boot, confirm that you have installed the correct version of ``Jetpack`` by
+   running the following command. Confirm that the output has the terms
+   ``R36 (release), REVISION: 4.0``.
+
+   .. code:: bash
+
+      cat /etc/nv_tegra_release
+
+3. Run the following command to set the GPU and CPU clock to max. See
+   `Maximizing Jetson
+   Performance <https://docs.nvidia.com/jetson/archives/r35.1/DeveloperGuide/text/SD/PlatformPowerAndPerformance/JetsonOrinNxSeriesAndJetsonAgxOrinSeries.html?highlight=maxn#maximizing-jetson-orin-performance>`__
+   for more details.
+
+   .. code:: bash
+
+      sudo /usr/bin/jetson_clocks
+
+4. Run the following command to set the to power to MAX settings. See
+   `Power Mode
+   Controls <https://docs.nvidia.com/jetson/archives/r35.1/DeveloperGuide/text/SD/PlatformPowerAndPerformance/JetsonOrinNxSeriesAndJetsonAgxOrinSeries.html?highlight=maxn#power-mode-controls>`__
+   for more details.
+
+   .. code:: bash
+
+      sudo /usr/sbin/nvpmodel -m 0
+
+5. Add your user to the ``docker`` group.
+
+   .. code:: bash
+      
+      sudo usermod -aG docker $USER
+      newgrp docker
+
+6. Setup Docker.
+
+   .. include:: /_snippets/docker_buildx.rst
+
+
+Consider adding more storage to your Jetson for a better experience: :doc:`Developer Environment Setup for Jetson <jetson_storage>`
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+   jetson_storage.rst
+   preempt_setup.rst
+   jetson_vpi.rst

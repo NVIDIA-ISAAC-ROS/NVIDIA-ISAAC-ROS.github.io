@@ -1,0 +1,219 @@
+===========
+|repo_name|
+===========
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_overview.png>`
+    :width: 500px
+    :align: center
+
+Overview
+--------
+
+.. include:: _snippets/overview.rst
+
+
+Performance
+-----------
+
+.. include:: _snippets/performance.rst
+
+
+Packages
+--------
+
+.. toctree::
+    :maxdepth: 2
+    :glob:
+
+    **/index
+
+Quickstart
+----------
+
+.. note::
+
+   NITROS Bridge is functional on both x86 and Jetson platforms. However, Noetic is not supported on Ubuntu 22.04. https://www.ros.org/reps/rep-0003.html.
+ 
+   In order to leverage NITROS Bridge on ROS Noetic applications, you may consider to wrap the ROS Noetic applications
+   in a docker container with Ubuntu 20.04 or use other alternatives.
+
+   Here we provide an example docker file to build a docker container with ROS Noetic and NITROS Bridge on x86.
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Set up your development environment by following the instructions in :doc:`getting started </getting_started/dev_env_setup>`.
+
+2. Set up your ``Noetic`` docker follow the instructions :doc:`here</concepts/nitros_bridge/setup_ros1_docker>`.
+
+3. Start the ``Noetic`` container with baked ``nitros-bridge-entrypoint``,
+   which will initiate the ``ros1_bridge`` and ``isaac_ros_nitros_bridge_ros1`` within the container:
+
+    .. code:: bash
+
+        docker run -it --cap-add=SYS_PTRACE --privileged --network host --pid host --ipc host --runtime nvidia --name nitros_bridge -e FASTRTPS_DEFAULT_PROFILES_FILE=/usr/local/share/middleware_profiles/rtps_udp_profile.xml --rm nitros_bridge:latest nitros_bridge_convert_forward.yaml nitros_bridge_convert_forward.launch
+
+    .. note::
+        In order to enable the CUDA IPC for NITROS Bridge, the ``nitros-bridge-entrypoint`` will change the host ``ptrace_scope`` to ``0``.
+
+4. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_common>`
+
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_nitros_bridge_ros2> <quickstart.tar.gz>`
+
+
+Build ``isaac_ros_nitros_bridge_ros2``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh -a --pid=host
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-nitros-bridge-ros2
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nitros>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh -a --pid=host
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2 --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_nitros_bridge_ros2 --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+         
+      1.  Run the following launch files to spin up a demo of this package:
+
+          .. code:: bash
+
+            cd /workspaces/isaac_ros-dev && \
+              source install/setup.bash && \
+              ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_nitros_bridge_quickstart.launch.py rosbag_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_nitros_bridge_ros2/quickstart.bag
+
+      2.  **Attach a second terminal** to the docker container:
+
+          .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+              ./scripts/run_dev.sh -d ${HOME}/workspaces
+
+      3.  Visualize the output topic ``/r2b/ros2_output_image`` in RViz:
+
+          .. code:: bash
+
+            cd /workspaces/isaac_ros-dev/ && \
+              source install/setup.bash && \
+              rviz2
+
+
+Try Another Example
+-------------------
+
+For an example to run DNN image segmentation with NITROS Bridge, see :doc:`here</concepts/nitros_bridge/unet_with_nitros_bridge>`.
+
+For an example to run Isaac Sim with NITROS Bridge, see :doc:`here</concepts/nitros_bridge/tutorial_isaac_sim>`.
+
+.. toctree::
+    :hidden:
+
+    /concepts/nitros_bridge/setup_ros1_docker.rst
+    /concepts/nitros_bridge/unet_with_nitros_bridge.rst
+    /concepts/nitros_bridge/tutorial_isaac_sim.rst
+
+
+
+Troubleshooting
+---------------
+
+Could not find a package configuration file provided by ``ament_cmake_auto``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptoms
+~~~~~~~~
+
+If you have both ROS 1 and ROS 2 installed in the Docker environment,
+you may see the following error message while building ROS 2 packages:
+
+ .. code:: bash
+
+  Could not find a package configuration file provided by "ament_cmake_auto"
+  with any of the following names:
+    ament_cmake_autoConfig.cmake
+    ament_cmake_auto-config.cmake
+
+Solution
+~~~~~~~~
+
+You must source ``setup.bash`` from the ROS 2 installation before building:
+
+ .. code:: bash
+
+   source /opt/ros/humble/setup.bash
+
+
+Updates
+-------
+.. include:: _snippets/updates.rst
+
+.. |repo_name| replace:: Isaac ROS NITROS Bridge

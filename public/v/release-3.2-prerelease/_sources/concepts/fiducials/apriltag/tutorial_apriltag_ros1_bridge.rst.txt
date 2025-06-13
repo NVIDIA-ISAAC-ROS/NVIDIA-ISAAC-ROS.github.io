@@ -1,0 +1,117 @@
+===========================================
+Isaac ROS AprilTag ``ros1_bridge`` Tutorial
+===========================================
+
+Overview
+---------
+
+This tutorial walks you through a graph to estimate the 6DOF pose of AprilTags
+using :ir_repo:`isaac_ros_apriltag <isaac_ros_apriltag>` running ROS 2 and a ROS 1 rosbag containing images.
+The image data will be published from the ROS 1 bag and sent to ROS 2
+for computation and the tag detections result will be visualized in ROS 1 using the command line
+``rostopic echo`` tool.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/fiducials/apriltag/ros1-bridge-flow-chart.png>`
+    :width: 800px
+    :align: center
+
+Tutorial Walkthrough
+--------------------
+
+1. Complete the quickstart :ref:`here <repositories_and_packages/isaac_ros_apriltag/isaac_ros_apriltag/index:quickstart>`.
+
+
+2. Complete the :doc:`Isaac ROS ros1_bridge Setup Guide </concepts/nitros_bridge/setup_ros1_docker>`.
+
+
+3.  Start the ``Noetic`` container:
+
+    .. code:: bash
+
+       docker run -it --cap-add=SYS_PTRACE --privileged --network host --pid host --runtime nvidia -e FASTRTPS_DEFAULT_PROFILES_FILE=/usr/local/share/middleware_profiles/rtps_udp_profile.xml --entrypoint /usr/local/bin/scripts/workspace-entrypoint.sh --name nitros_bridge --rm nitros_bridge:latest /bin/bash
+
+4.  Source ``ros1_noetic`` and run ``roscore``:
+
+    .. code:: bash
+
+       source /opt/ros/noetic/setup.bash && \
+        roscore
+
+5.  Attach the second terminal to the ``Noetic`` docker container:
+
+    .. code:: bash
+
+       docker exec -it nitros_bridge /bin/bash
+
+6.  Clone ``isaac_ros_apriltag`` into the ``Noetic`` container:
+
+    .. code:: bash
+
+       cd /tmp && \
+        git clone https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_apriltag.git
+
+7.  Pull down a ROS 1 rosbag of sample data:
+
+    .. code:: bash
+
+       cd /tmp/isaac_ros_apriltag/ && \
+        git lfs pull -X "" -I "resources/rosbags/ros1_bridge_apriltag.bag"
+
+
+8.  Inside the container, build and source the workspace:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev/ && \
+        source install/setup.bash && \
+        export ROS_MASTER_URI=http://localhost:11311 && \
+        ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
+
+9.  Attach the third terminal to the ``Noetic`` docker container:
+
+    .. code:: bash
+
+       docker exec -it nitros_bridge /bin/bash
+
+10. Play the AprilTag ROS1 rosbag in a loop:
+
+    .. code:: bash
+
+       source /opt/ros/noetic/setup.bash && \
+        cd /tmp/isaac_ros_apriltag/resources/rosbags && \
+        rosbag play -l ros1_bridge_apriltag.bag
+
+11.  Launch the ``Isaac ROS Dev`` Docker container using the ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh -d ${HOME}/workspaces -a --pid=host
+
+12. Run the ``isaac_ros_apriltag`` node:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros-dev && \
+        source install/setup.bash && \
+        ros2 launch isaac_ros_apriltag isaac_ros_apriltag.launch.py
+
+
+13. Attach the forth terminal to the ``Noetic`` docker container:
+
+    .. code:: bash
+
+       docker exec -it nitros_bridge /bin/bash
+
+
+14. Use ``rostopic echo`` to print the tag detections in the container:
+
+    .. code:: bash
+
+       cd /workspaces/isaac_ros_1-dev && \
+        source install_isolated/setup.bash && \
+        rostopic echo /tag_detections
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/fiducials/apriltag/ros1_tag_echo.png>`
+        :width: 800px
+        :align: center

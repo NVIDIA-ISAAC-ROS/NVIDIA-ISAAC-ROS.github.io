@@ -1,0 +1,229 @@
+..
+   Copyright (c) 2024, NVIDIA CORPORATION. All rights reserved.
+   NVIDIA CORPORATION and its licensors retain all intellectual property
+   and proprietary rights in and to this software, related documentation
+   and any modifications thereto. Any use, reproduction, disclosure or
+   distribution of this software and related documentation without an express
+   license agreement from NVIDIA CORPORATION is strictly prohibited.
+
+Sensors Architecture: Reach Forklift
+------------------------------------
+
+Introduction
+^^^^^^^^^^^^
+
+**Sensors Architecture Description**
+
+The sensor architecture adopts a modular approach to accommodate diverse
+use cases. In this configuration designed for forklifts, front stereo
+cameras primarily support robust VSLAM and 3D obstacle mapping, while
+mono cameras facilitate teleoperation and sensor-to-sensor calibration.
+
+This setup comprises of two stereo and three mono cameras. Rear mono
+cameras can potentially assist teleoperation at elevated heights
+alongside the fork-tines assembly. Additionally, the back stereo camera
+offers the option for the load dimension measurement.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensor_arch_1.png>`
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensor_arch_2.png>`
+
+======= ===========================
+Acronym Camera Designation
+======= ===========================
+FS      Front stereo
+FCS     Front ceiling-facing stereo
+FC      Front camera
+BS      Back stereo
+BRC     Back-right camera
+BLC     Back-left camera
+======= ===========================
+
+
+Stereo Cameras Coverage and Mounting Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Front Coverage Requirements
+***************************
+
+======== ===================================================================================================================================================================================================================
+Req ID:  Ground Visibility
+
+27366490 Stereo camera(s) arrangement shall be able to see ground plane from a distance of < 1m from the foremost forklift surface across the forklift width.
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/stereo_front_coverage_reqs_1.png>`
+======== ===================================================================================================================================================================================================================
+
+======== ===================================================================================================================================================================================================================
+Req ID:  Elevated Obstacles Visibility
+
+27366581 Stereo camera(s) arrangement shall be able to see an elevated obstacle at any height above the ground and below the forklift height at distance < 1m from the foremost forklift surface, across the forklift width.
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/stereo_front_coverage_reqs_2.png>`
+======== ===================================================================================================================================================================================================================
+
+======== ===================================================================================================================================================================================================================
+Req ID:  Horizontal Coverage Angle
+
+27366552 Stereo camera(s) arrangement shall see a horizontal angle of > 110\ :sup:`0` in any plane above the ground and below the forklift height.
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/stereo_front_coverage_reqs_3.png>`
+======== ===================================================================================================================================================================================================================
+
+Back Coverage Requirements
+**************************
+
+======== ============================================================================================================================================================================
+Req ID:  Ground Visibility
+
+27397857 Stereo camera(s) arrangement shall be able to see the ground plane from a distance < 1m from the back-most forklift surface (excluding the tines) across the forklift width.
+
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/stereo_back_coverage_reqs_1.png>`
+======== ============================================================================================================================================================================
+
+======== ============================================================================================================================================================================
+Req ID:  Payload Visibility
+
+27397862 The stereo cameras(s) arrangement shall provide full visibility of the payload footprint when the forklift tines are elevated to a height of Z~0.5m above the camera level.
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/stereo_back_coverage_reqs_2.png>`
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/stereo_back_coverage_reqs_3.png>`
+======== ============================================================================================================================================================================
+
+Mounting Requirements
+~~~~~~~~~~~~~~~~~~~~~
+
+======== ==============================================================================
+Req ID:  Pitch Range
+
+27386985 Any stereo camera pitch angle shall be in the range between -5 and 55 degrees.
+======== ==============================================================================
+
+======== ==============================================================================
+Req ID:  Z-range
+
+27386997 Any stereo camera vertex Z shall be < 0.5m in height.
+======== ==============================================================================
+
+Mono Cameras Coverage Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Front Coverage Requirement
+**************************
+
+======== ================================================================================================================================================
+Req ID:  Ground Visibility
+
+27430368 Camera(s) arrangement shall be able to see the ground plane from a distance < 0.2m from the foremost forklift surface across the forklift width.
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/mono_front_coverage_reqs_1.png>`
+======== ================================================================================================================================================
+
+======== ================================================================================================================================================
+Req ID:  Teleoperation Requirements
+
+27430377 Camera(s) arrangement shall be able to provide visual data sufficient for safe teleoperation of the AMR when driving forward.
+======== ================================================================================================================================================
+
+Back/Sides Coverage Requirements
+********************************
+
+======== ================================================================================================================================================================
+Req ID:  Tines Coverage Requirements
+
+27430404 Camera(s) arrangement shall provide coverage of the tines of the forklift at any supported loading height.
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/mono_tines_coverage_reqs_1.png>`
+======== ================================================================================================================================================================
+
+======== ================================================================================================================================================================
+Req ID:  Teleoperation Requirements
+
+27430405 Camera(s) arrangement shall provide visual data sufficient for safe teleoperation of the AMR when driving backwards, in loaded and unloaded conditions.
+
+         Camera(s) arrangement shall provide visual data sufficient for safe teleoperation of the AMR when loading and unloading payload.
+
+         Camera(s) arrangement shall provide visual data sufficient for safe teleoperation of the AMR when the loading/unloading procedure is handled at elevated height.
+======== ================================================================================================================================================================
+
+Mounting Requirements
+*********************
+
+======== ========================================================================================================================================================================================================================================
+Req ID:  Pitch Range
+
+27430410 Any camera pitch angle shall be in the range between -25 and 5 degrees.
+======== ========================================================================================================================================================================================================================================
+
+======== ========================================================================================================================================================================================================================================
+Req ID:  Z-range
+
+27430411 Any camera vertex Z shall be < 0.5m in height when the tines are lowered.
+======== ========================================================================================================================================================================================================================================
+
+======== =========================================================================================================================================================================================================================================
+Req ID:  Back Cameras Special Mounting Requirements
+
+27430423 To facilitate teleoperation at an elevated height, the back-facing cameras shall be rigidly connected to the lifting part of the forklift so that the coverage requirements are fulfilled when operating the load at the elevated height.
+======== =========================================================================================================================================================================================================================================
+
+**Sensors Mounting Example**
+
+Below is an implementation example for the camera belt.
+
+The stereo cameras' coverage is depicted in the image below:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensors_mounting_ex_1.png>`
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensors_mounting_ex_2.png>`
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensors_mounting_ex_3.png>`
+
+The sensors mounting locations and angles are summarized in the
+following table:
+
+.. table:: Stereo cameras' (Hawks) mounting locations and angles
+
+   +-----+-------+--------+-------+-------------+-----------+------------+
+   |     | X [m] | Y [m]  | Z [m] | Pitch [deg] | Yaw [deg] | Roll [deg] |
+   +-----+-------+--------+-------+-------------+-----------+------------+
+   | FS  | 0.05  | 0.075  | 0.32  | -5          | 0         | 0          |
+   +-----+-------+--------+-------+-------------+-----------+------------+
+   | FCS | 0.05  | 0.075  | 0.24  | -55         | 0         | 0          |
+   +-----+-------+--------+-------+-------------+-----------+------------+
+   | BS  | -1.2  | -0.075 | 0.1   | -30         | 180       | 0          |
+   +-----+-------+--------+-------+-------------+-----------+------------+
+
+.. Note:: Hawk vertex, aligned with the left lens center, was chosen
+   for representation of Hawk locations. Please refer to Hawk datasheet for
+   more information.
+
+
+The mono cameras' coverage is depicted in the image below:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensors_mounting_ex_4.png>`
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensors_mounting_ex_5.png>`
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensors_mounting_ex_6.png>`
+
+The sensors mounting locations and angles are summarized in the
+following table:
+
+.. table:: Mono cameras' (Owls) mounting locations and angles. 
+
+   +-----+-------+-------+-------+-------------+-----------+------------+
+   |     | X [m] | Y [m] | Z [m] | Pitch [deg] | Yaw [deg] | Roll [deg] |
+   +-----+-------+-------+-------+-------------+-----------+------------+
+   | FC  | 0.075 | 0     | 0.1   | -10         | 0         | 0          |
+   +-----+-------+-------+-------+-------------+-----------+------------+
+   | BLC | -1.81 | 0.55  | 0.4   | -20         | 135       | 0          |
+   +-----+-------+-------+-------+-------------+-----------+------------+
+   | BRC | -1.81 | -0.55 | 0.4   | -20         | -135      | 0          |
+   +-----+-------+-------+-------+-------------+-----------+------------+
+
+For reference, the AMR used in this example is shown on a 10cm x 10cm
+grid:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensors_mounting_ex_7.png>`
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/nova_sensor_mounting_guide/sensors_mounting_ex_8.png>`
+
+

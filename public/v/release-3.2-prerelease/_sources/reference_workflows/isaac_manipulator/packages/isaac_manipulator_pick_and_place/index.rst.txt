@@ -1,0 +1,253 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_manipulator> <isaac_manipulator_pick_and_place>`
+
+Overview
+--------
+
+|package_name| package contains the launch files for `Isaac Manipulator Pick and Place`. Specifically, this package contains
+an ``orchestrator`` that serves to connect the various components described in the 
+:doc:`Isaac Manipulator Reference Architecture </reference_workflows/isaac_manipulator/reference_architecture>`.
+This orchestrator is responsible for ensuring that components, such as planning and executing the pick, object attachment, planning
+and executing the place pose, pose estimation and handling user cancellation work together in a state machine fashion.
+In addition, this package contains utility files, such as launch files, URDFs and configurations for 
+controllers and grasps in order to perform pick and place.
+
+For an example of using this package, please consult the 
+:doc:`Isaac Manipulator Pick And Place Reference Workflow </reference_workflows/isaac_manipulator/tutorials/tutorial_pick_and_place>`.
+
+API
+---
+
+ur_pick_and_place.launch.py
+===========================
+
+Launch Arguments
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Arguments
+     - Default
+     - Choices
+     - Description
+
+   * - ``ur_type``
+     - ``''``
+     - [``ur3, ur3e, ur5, ur5e, ur10, ur10e, ur16e, ur20, ur30``]
+     - Type/series of used UR robot.
+
+   * - ``object_attachment_type``
+     - ``sphere``
+     - [``sphere, cuboid, custom_mesh``]
+     - Object attachment type.
+
+   * - ``object_attachment_scale``
+     - ``[0.09, 0.185, 0.035]``
+     - N/A
+     - Object attachment scale of object / cube
+
+   * - ``attach_object_mesh_file_path``
+     - ``''``
+     - N/A
+     - Object attachment mesh file path
+
+   * - ``gripper_type``
+     - ``''``
+     - [``robotiq_2f_85, robotiq_2f_140``]
+     - Type of gripper to use with UR robot.
+
+   * - ``robot_ip``
+     - N/A
+     - N/A
+     - IP address by which the robot can be reached and connected.
+
+   * - ``voxel_size``
+     - ``0.01``
+     - N/A
+     - Resolution of 3D voxels for nvblox and cuRobo in meters
+
+   * - ``enable_nvblox``
+     - ``True``
+     - [``True``, ``False``]
+     - Enable Nvblox for cuMotion
+
+   * - ``runtime_config_package``
+     - ``ur_robot_driver``
+     - N/A
+     - Package with the controller's configuration in the 'config' folder.
+
+   * - ``controller_spawner_timeout``
+     - ``10``
+     - N/A
+     - Timeout (in seconds) used when spawning controllers
+
+   * - ``initial_joint_controller``
+     - ``scaled_joint_trajectory_controller``
+     - N/A
+     - Initially loaded robot controller
+
+   * - ``camera_type``
+     - ``hawk``
+     - [``hawk, realsense``]
+     - Camera sensor to use.
+
+   * - ``hawk_depth_mode``
+     - ``ess_full``
+     - [``ess_full, ess_light``]
+     - Depth mode for Hawk camera.
+
+   * - ``num_cameras``
+     - ``1``
+     - [``1, 2``]
+     - Number of cameras to run for 3d reconstruction. Note for ``hawk``, only ``1`` camera is supported.
+
+   * - ``setup``
+     - ``hubble_test_bench``
+     - N/A
+     - The name of the setup you are running on (specifying calibration, workspace bounds and camera ids)
+
+   * - ``filter_depth_buffer_time``
+     - ``0.7``
+     - N/A
+     - Filter Depth buffers for object attachment. This informs how many seconds in the past object attachment looks at to get depth image input for object detection
+
+   * - ``time_sync_slop``
+     - ``0.5``
+     - N/A
+     - The time in seconds nodes keep as sync threshold to sync images and joint states. If one has a slower machine, tweaking this variable is useful to get syncs but at the cost of accuracy. If the slop parameter is too high, the robot will sync with older images or joint states leading to incorrect depth segmentation and object attachment
+
+   * - ``use_pose_from_rviz``
+     - ``False``
+     - [``True``, ``False``]
+     - When enabled, the end effector interactive marker is used to set the place pose through RViz
+
+
+PickAndPlaceOrchestrator
+========================
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``gripper_collision_links``
+     - ``list``
+     - ``['']``
+     - List of gripper links to disable collision with object during pick phase.
+
+   * - ``gripper_action_name``
+     - ``string``
+     - ``/robotiq_gripper_controller/gripper_cmd``
+     - Name of the gripper action to be used for controlling the gripper.
+
+   * - ``time_dilation_factor``
+     - ``double``
+     - ``0.2``
+     - Speed factor multiplier for the robot arm. This value is used when planning for a trajectory. A value of ``1`` means the output trajectories can be executed at full speed.
+
+   * - ``use_ground_truth_pose_from_sim``
+     - ``bool``
+     - ``False``
+     - When enabled, 3d pose of the object of interest is calculated by Isaac Sim and not by pose estimation server.
+
+   * - ``publish_grasp_frame``
+     - ``bool``
+     - ``False``
+     - When enabled, grasp frame is published and can be visualized in RViz.
+
+   * - ``sleep_time_before_planner_tries_sec``
+     - ``double``
+     - ``0.5``
+     - Wait time in seconds before planner retries.
+
+   * - ``object_frame_name``
+     - ``string``
+     - ``detected_object1``
+     - Name of the frame of the object that was detected by the object detection server.
+
+   * - ``num_planner_tries``
+     - ``int``
+     - ``5``
+     - Maximum number of retries for the planner per phase.
+
+   * - ``attach_object_fallback_radius``
+     - ``double``
+     - ``0.15``
+     - If object attachment fails to estimate the object's shape, a sphere of this radius will be used instead.
+
+   * - ``grasp_file_path``
+     - ``string``
+     - ``''``
+     - File path which contains the valid grasp poses for the object of interest.
+
+   * - ``grasp_approach_offset_distance``
+     - ``list double``
+     - ``[0.0, 0.0, -0.15]``
+     - Specifies the end effector approach offset distance along each of the axes (x, y and z) before grasping the object.
+
+   * - ``retract_offset_distance``
+     - ``list double``
+     - ``[0.0, 0.0, 0.15]``
+     - Specifies the end effector retract offset distance along each of the axes (x, y and z) after grasping the object.
+
+   * - ``attach_object_shape``
+     - ``string``
+     - ``sphere``
+     - Object attachment type. The valid choices are ``sphere``, ``cuboid``, or ``custom_mesh``.
+
+   * - ``attach_object_mesh_file_path``
+     - ``string``
+     - ``''``
+     - File path which contains the mesh data for the object of interest.
+
+   * - ``attach_object_scale``
+     - ``list double``
+     - ``[0.05, 0.05, 0.1]``
+     - Scale values for the object shape for each of the axes (x, y and z).
+
+   * - ``grasp_approach_in_world_frame``
+     - ``bool``
+     - ``False``
+     - Whether the grasp approach is in the world frame or the goal frame.
+
+   * - ``retract_in_world_frame``
+     - ``bool``
+     - ``True``
+     - Whether the retract is in the world frame or the goal frame.
+
+   * - ``use_pose_from_rviz``
+     - ``bool``
+     - ``False``
+     - When enabled, the pose from interactive marker is used to define the goal pose and pose value in the action request is ignored.
+
+   * - ``end_effector_mesh_resource_uri``
+     - ``string``
+     - ``package://isaac_manipulator_pick_and_place/meshes/robotiq_2f_85.obj``
+     - The mesh resource URI for the end effector marker.
+
+
+ROS Actions Advertised
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Action
+     - Interface
+     - Description
+
+   * - ``/pick_and_place``
+     - :ir_repo:`isaac_manipulator_interfaces::action::PickAndPlace <isaac_manipulator> <isaac_manipulator_interfaces\action\PickAndPlace.action>`  
+     - Entrypoint action to start the pick and place pipeline.
+
+.. |package_name| replace:: ``isaac_manipulator_pick_and_place``
