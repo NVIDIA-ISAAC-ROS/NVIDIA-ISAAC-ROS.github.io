@@ -1,0 +1,384 @@
+==========================================================
+Tutorial for Pick and Place using cuMotion with Perception
+==========================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_manipulator/isaac_manipulator_rviz_scene.png>`
+   :width: 100%
+   :alt: RViz visualization of Isaac Manipulator pick and place for a robot simulated in Isaac Sim
+
+Overview
+--------
+
+This tutorial walks through the process of picking and placing of an object using the following packages.
+
+- :doc:`Isaac ROS RT-DETR</repositories_and_packages/isaac_ros_object_detection/isaac_ros_rtdetr/index>` for object detection
+- :doc:`Isaac ROS FoundationPose</repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>` for object 3D pose estimation
+- :doc:`Isaac ROS Nvblox</repositories_and_packages/isaac_ros_nvblox/index>` for 3D scene reconstruction
+- :doc:`Isaac ROS cuMotion</repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index>` for motion planning with obstacle avoidance
+- :doc:`Isaac ROS Object Attachment</repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index>` for estimating the object collision spheres
+
+
+This tutorial assumes the following:
+
+- A `Universal Robots <https://www.universal-robots.com/>`__ manipulator (UR5e or UR10e) and a `Robotiq two-finger gripper <https://robotiq.com/products/adaptive-grippers#Two-Finger-Gripper>`__ (2F-85 or 2F-140).
+- A `RealSense cameras <https://www.intelrealsense.com/>`__ or a  `Hawk stereo camera <https://leopardimaging.com/leopard-imaging-hawk-stereo-camera/>`__.
+- The object is one supported by :ir_ngc:`sdetr_grasp <teams/isaac/models/synthetica_detr>`. In this tutorial, we use the "mac and cheese" box.
+- Tabletop scene is static when the object is being picked and placed.
+- Tabletop scene is static when the object detection and pose estimation are being performed.
+
+This tutorial uses the following action servers:
+
+- **Object detection server:** For detecting objects in the scene.
+- **Pose estimation server:** For estimating the pose of the object in the scene.
+- **Object info server:** For wrapping the object detection and pose estimation servers. This provides a common interface for getting the object information like the object pose or 2D bounding box.
+- **Pick and place action server:** For triggering pick and place pipeline.
+- **Planner server:** For planning with cuMotion.
+- **Object attachment server:** For object attachment and detachment during planning.
+- **Gripper server:** For controlling the gripper via ROS 2 actions.
+
+
+When the pipeline is triggered using the action call mentioned below, the following things happen:
+
+#. The objects in the scene are detected using the object info server and one object to pick is selected.
+#. Using the ``object_id`` of object of interest from the previous call, the pose of the object is estimated using the pose estimation server.
+#. After the pose of the object is determined, the pick phase planning using the planner server begins.
+#. Pick phase planning involves the following steps:
+
+   - Execute the first trajectory given by the planner server. This is the approach trajectory, which brings the gripper close to the object.
+   - Close the gripper.
+   - Execute the second trajectory given by the planner server. This is the retract trajectory which lifts the object.
+
+#. After the object is picked, the robot footprint is modified to include the object's collision spheres using the object attachment server.
+#. Planning for the place phase using the planner server with updated robot footprint begins.
+#. Place phase planning involves the following steps:
+
+   - Execute the trajectory given by the planner server to reach the place pose.
+   - Then we open the gripper to release the object.
+
+#. The object attachment server is called to detach the object from the robot footprint.
+
+
+.. warning::
+
+   The obstacle avoidance behavior demonstrated in this tutorial is not a safety function and does not
+   comply with any national or international functional safety standards. When testing obstacle avoidance
+   behavior, do not use human limbs or other living entities.
+
+The pick-and-place pipeline consists of a series of action servers for object detection, pose estimation, object attachment, and motion planning,
+along with a "pick-and-place orchestrator" for coordinating the overall pipeline. Expensive operations such as object detection and pose estimation
+are performed on demand through action calls in order to minimize system load. For the purpose of collision avoidance, nvblox constantly integrates depth input from one or two depth cameras, maintaining a surface reconstruction in the form of a truncated signed distance field (TSDF).
+A Euclidean signed distance field (ESDF) is computed only when needed for planning.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_manipulator/manipulator_pick_and_place_workflow.png>`
+   :width: 100%
+   :align: center
+
+   High-level architecture of the Isaac Manipulator pick-and-place reference workflow
+
+Supported Hardware
+------------------
+
+Compute:
+
+The pick-and-place reference workflow has been tested on Jetson AGX Orin (64 GB).
+
+Robots:
+
+- `UR5e or UR10e <https://www.universal-robots.com/>`__
+
+Grippers:
+
+- `Robotiq 2F-85 or 2F-140 <https://robotiq.com/products/adaptive-grippers#Two-Finger-Gripper>`__
+
+Cameras:
+
+Up to two RealSense cameras :doc:`supported by Isaac ROS </getting_started/hardware_setup/sensors/realsense_setup>` or one :doc:`Hawk stereo camera </getting_started/hardware_setup/sensors/hawk_setup>`.
+
+Multiple cameras can help reduce occlusion and noise in the scene and therefore increase the quality and completeness of the 3D reconstruction  used for collision avoidance.
+While the object following tutorial with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras, object detection and pose estimation are only enabled on the camera with the lowest index.
+
+Reflective or smooth, featureless surfaces in the environment may increase noise in the depth estimation.
+
+Use of multiple cameras is recommended.
+
+Mixing stereo camera types is untested but may work with modifications to the launch files.
+
+.. warning::
+
+   The obstacle avoidance behavior demonstrated in this tutorial is not a safety function and does not
+   comply with any national or international functional safety standards. When testing obstacle avoidance
+   behavior, do not use human limbs or other living entities.
+
+
+Requirements
+------------
+
+Ensure that you have one of the NGC catalog objects that can be grasped, for example :ir_ngc:`sdetr_grasp <teams/isaac/models/synthetica_detr>`. This tutorial uses the **Mac and Cheese Box**.
+
+If you are using FoundationPose, for the desired object, ensure that you have a mesh and a texture file available for it.
+   
+To prepare an object, review :doc:`FoundationPose's documentation </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`.
+
+Tutorial
+--------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Set up your development environment by following the instructions in :doc:`getting started </getting_started/dev_env_setup>`.
+
+#. Complete the camera setup:
+
+   - For a RealSense camera, using the steps in :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`.
+   - For a Hawk stereo camera, using the steps in :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`.
+
+#. Clone ``isaac_ros_common`` under ``${ISAAC_ROS_WS}/src``.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+        git clone :ir_clone:`<isaac_ros_common>`
+
+
+Set Up UR Robot
+~~~~~~~~~~~~~~~
+
+#. Refer to the :ref:`Set Up UR Robot section <set-up-ur-robot>`.
+
+Set Up Cameras for Robot
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Refer to the :ref:`Set Up Cameras for Robot section <set-up-cameras-for-robot>`.
+
+Build the Code
+~~~~~~~~~~~~~~
+
+#. Open a **new** terminal inside the Docker container or launch the container for the first time:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+#. Clone the Isaac ROS fork of ``ros2_robotiq_gripper`` and ``tylerjw/serial`` under ``${ISAAC_ROS_WS}/src``:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+        git clone --recursive https://github.com/NVIDIA-ISAAC-ROS/ros2_robotiq_gripper && \
+        git clone -b ros2 https://github.com/tylerjw/serial
+
+   .. note::
+
+      - The fork is used to fix `this bug <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/57>`__ in the original repository.
+
+      - The custom ``serial`` package build is required because of `Issue 21 <https://github.com/PickNikRobotics/ros2_robotiq_gripper/issues/21>`__
+
+#. Building dependencies:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}
+      colcon build --symlink-install --packages-select-regex robotiq* serial --cmake-args "-DBUILD_TESTING=OFF" && \
+      source install/setup.bash
+
+#. Install this tutorial using source or Debian.
+
+   .. tabs::
+
+      .. tab:: Installation from Source
+
+               #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+                  .. code:: bash
+
+                     cd ${ISAAC_ROS_WS}/src && git clone --recursive :ir_clone:`<isaac_manipulator>`
+
+               #. Use ``rosdep`` to install the package’s dependencies:
+
+                  :ir_apt:
+
+                  .. code:: bash
+
+                     rosdep update && rosdep install -i -r --from-paths \
+                        ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place \
+                        --ignore-src --rosdistro humble -y
+
+               #. Build and source the ROS workspace:
+
+                  .. code:: bash
+
+                     cd ${ISAAC_ROS_WS}
+                     colcon build --symlink-install --packages-up-to isaac_manipulator_pick_and_place && \
+                     source install/setup.bash
+
+      .. tab:: Installation from Debian
+
+               #. Get ``isaac_manipulator_bringup``, ``isaac_manipulator_pick_and_place`` and its dependencies.
+
+                  :ir_apt:
+
+                  .. code:: bash
+
+                     sudo apt-get install -y ros-humble-isaac-manipulator-bringup ros-humble-isaac-manipulator-pick-and-place
+
+Set Up Perception Deep Learning Models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Make sure to follow the FoundationPose tab of the tutorial.
+
+#. Refer to the :ref:`Set Up Perception Deep Learning Models section <set-up-perception-deep-learning-models>`.
+
+Run Launch Files and Deploy to Robot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
+new terminal where you run ROS commands, to avoid interference
+with other computers in the same network (`ROS Guide <https://docs.ros.org/en/humble/Concepts/Intermediate/About-Domain-ID.html>`__).
+
+We recommend using Cyclone DDS for this tutorial when trying on real robot for better performance.
+   
+#. To enable Cyclone DDS, run the following command in each terminal (once) before running any other command.
+
+   .. code:: bash
+
+      export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+#. On the UR teach pendant, ensure that the robot's **remote program** is loaded and that the robot is **paused** or **stopped** for safety purposes.
+
+#. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+#. Launch the `tool_communication.py` script to communicate with the gripper on the UR robot:
+
+   .. code:: bash
+
+     ros2 run ur_robot_driver tool_communication.py --ros-args -p robot_ip:=<ROBOT_IP_ADDRESS>
+   
+   This is an important step because it interacts with the Robotiq gripper and allows for programmatic control of the gripper.
+
+#. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+#. Launch perception nodes along with cuMotion for the UR robot:
+
+   This tutorial was validated using ``ur_type:=ur5e``, ``ur_type:=ur10e`` with gripper types of ``robotiq_2f_140`` and ``robotiq_2f_85``, respectively. The default launch arguments assume
+   that the model to be used is SyntheticaDETR v1.0.0 and that the object to be picked is the
+   Mac and Cheese box. To pick a different object, change the object class ID and optionally
+   the file path to the desired RT-DETR model file.
+
+   .. warning::
+
+      Add any obstacles that are not visible by the camera into the scene to prevent potential collisions.
+      Consult the documentation :doc:`here </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index>`.
+
+   .. tabs::
+
+      .. tab:: Hawk
+
+         #. Install the support package for the Hawk stereo camera:
+
+            .. code:: bash
+
+               sudo apt-get install -y ros-humble-isaac-ros-hawk
+
+         #. Launch the example:
+
+         .. code:: bash
+
+               ros2 launch isaac_manipulator_pick_and_place ur_pick_and_place.launch.py \
+                  ur_type:=<UR_TYPE> robot_ip:=<ROBOT_IP_ADDRESS> \
+                  gripper_type:=<GRIPPER_TYPE> camera_type:=hawk setup:=<SETUP_NAME> \
+                  use_pose_from_rviz:=True \
+                  ess_engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.1.0_onnx/ess.engine
+
+      .. tab:: RealSense
+
+         .. code:: bash
+
+               ros2 launch isaac_manipulator_pick_and_place ur_pick_and_place.launch.py \
+                  ur_type:=<UR_TYPE> robot_ip:=<ROBOT_IP_ADDRESS> \
+                  gripper_type:=<GRIPPER_TYPE> camera_type:=realsense setup:=<SETUP_NAME> \
+                  use_pose_from_rviz:=True num_cameras:=<NUM_CAMERAS>
+
+         For increased reliability, we recommend using the ``custom_mesh`` or ``cuboid`` approach:
+
+         * For ``custom_mesh``, this can be done by setting ``object_attachment_type:=custom_mesh``
+           and ``attach_object_mesh_file_path:=<PATH-TO-MESH>`` in the launch files above.
+
+         * For ``cuboid``, this can be done by setting ``object_attachment_type:=cuboid`` 
+           and setting ``object_attachment_scale:=<CHOSEN_SCALE>`` in the launch files above.
+           The ``CHOSEN_SCALE`` consists of 3 floating point values, representing the
+           dimensions of the cuboid.
+
+      .. warning::
+
+         If you see the log ``No depth images from X seconds``, consider changing the
+         ``filter_depth_buffer_time:=`` to a higher value (the unit is seconds). This will
+         allow object attachment to buffer more depth images from the past. The caveat
+         is that the software will operate on an older set of data that might lead to
+         creating object spheres that might not model the object position accurately. 
+         
+         The
+         other parameter of interest is the ``time_sync_slop`` parameter. It defines the
+         synchronization threshold for finding a matched pair of depth images, joint states
+         and transforms. For slower systems, slightly tweaking the value up will allow for
+         collision sphere and obstacle avoidance to work. Using a very large
+         value will synchronize older pieces of data together leading to unpredictable
+         downstream effects in planning, collision voxel cloud generation and obstacle
+         avoidance. 
+         
+         This only applies when ``SPHERE`` is used as the object attachment
+         type. The other modes do not use depth as input to create the object spheres.
+
+   
+
+#. Open **another** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+#. On the UR teach pendant, press  **play** to enable the robot.
+
+#. Trigger the object detection:
+
+   .. code:: bash
+
+      ros2 action send_goal /get_objects isaac_manipulator_interfaces/action/GetObjects {}
+
+   If the action call does not return in a few seconds, it is possible that the object detection did not return any objects. In this case, try again.
+
+#. Trigger the pick and place pipeline:
+
+   When launching the ROS graph earlier, ```use_pose_from_rviz``` is set to ```True``` which creates a interactive marker that can be used to set the place pose.
+   Use the marker controls to set the desired position and orientation. In this mode, the ```place_pose``` in the below command is ignored.
+
+   .. code:: bash
+
+      ros2 action send_goal /pick_and_place isaac_manipulator_interfaces/action/PickAndPlace "{object_id : 0}"
+
+
+   #. Wait for the terminal log to show ``cuMotion is ready for planning queries!``, before triggering the pick and place pipeline.
+
+   #. If the above action call does not return in a few seconds, it is possible that the pose estimation did not return any results. In this case, try again by calling the object detection action from previous step.
+
+#. To do another object pick and place, one would need to do a service call to clear all current
+   objects in the cache. One can do that via this service call. After this, one can run the entire
+   pipeline again to pick and place another object.
+
+   .. code:: bash
+
+      ros2 service call /clear_objects isaac_manipulator_interfaces/srv/ClearObjects
+
+   This will clear all objects from the cache, if you only want to clear a certain object then
+   you will need to specify the object id in the request.

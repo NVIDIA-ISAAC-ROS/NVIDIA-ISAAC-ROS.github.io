@@ -1,0 +1,174 @@
+Tutorial: Autonomous Navigation with Isaac Perceptor and Nav2 on the `Nova Carter`
+==================================================================================
+
+This tutorial enables you to run autonomous navigation with the Nova Carter robot.
+The tutorial uses the Isaac Perceptor stack for local camera-based 3D perception,
+AMCL for Lidar localization and Nav2 for navigation.
+
+For this tutorial, it is assumed that you have successfully completed the
+:doc:`perceptor tutorial</reference_workflows/isaac_perceptor/tutorials_on_carter/demo_perceptor>`.
+
+Running the Application
+------------------------
+
+1. SSH into the robot (:ref:`instructions<nova-carter-ssh-setup>`).
+2. Make sure you have successfully connected the PS5 joystick to the robot (:ref:`instructions<nova-carter-joystick-setup>`).
+3. Make sure you export the environment variable ``MAPS_FOLDER`` to the path where the maps are stored. e.g.
+
+    .. code-block:: bash
+
+        export MAPS_FOLDER=/path/to/maps
+
+4. Follow the instructions below to launch the app.
+
+Navigation with AMCL localization and wheel odometry
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you don't have an occupancy map of your environment, follow the :doc:`Tutorial: Generate an Occupancy Map for Navigation </robots/nova_carter/demo_lidar_mapping>`
+to create one.
+
+Build or install the required packages, and launch the app with the following command:
+
+.. run_ros_app::
+    :repo_setup: <nova-carter-dev-setup>
+    :repo: nova_carter
+    :image: isaac/nova_carter_bringup:release_3.2-aarch64
+    :package: nova_carter_bringup
+    :app: navigation.launch.py map_yaml_path:=<path_to_map_yaml>
+    :asset_packages: isaac_ros_ess_models_install:isaac_ros_peoplesemseg_models_install:isaac_ros_peoplesemseg_models_install
+    :asset_scripts: install_ess_models.sh:install_peoplesemsegnet_vanilla.sh:install_peoplesemsegnet_shuffleseg.sh
+    :additional_docker_options: -v $MAPS_FOLDER:$MAPS_FOLDER
+
+Replace ``<path_to_map_yaml>`` with the path of the map YAML file.
+
+Navigation with visual localization and odometry from `Isaac Perceptor`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can use the visual localization and odometry from `Isaac Perceptor` instead of the AMCL localization and wheel odometry.
+
+Follow the :doc:`Tutorial: Mapping and Localization with Isaac Perceptor </reference_workflows/isaac_perceptor/tutorial_mapping_and_localization>`
+to create necessary maps as in the :ref:`Map Types<reference_workflows/isaac_perceptor/tutorial_mapping_and_localization:Map Types>`.
+Once the maps are created, use them with the following command:
+
+.. run_ros_app::
+    :repo_setup: <nova-carter-dev-setup>
+    :repo: nova_carter
+    :image: isaac/nova_carter_bringup:release_3.2-aarch64
+    :package: nova_carter_bringup
+    :app: navigation.launch.py stereo_camera_configuration:=front_left_right_configuration map_yaml_path:=<PATH_TO_MAP_FOLDER>/occupancy_map.yaml enable_visual_localization:=True vslam_load_map_folder_path:=<PATH_TO_MAP_FOLDER>/cuvslam_map/ vgl_map_dir:=<PATH_TO_MAP_FOLDER>/cuvgl_map vslam_enable_slam:=True
+    :asset_packages: isaac_ros_ess_models_install:isaac_ros_peoplesemseg_models_install:isaac_ros_peoplesemseg_models_install
+    :asset_scripts: install_ess_models.sh:install_peoplesemsegnet_vanilla.sh:install_peoplesemsegnet_shuffleseg.sh
+    :additional_docker_options: -v $MAPS_FOLDER:$MAPS_FOLDER
+
+The ``PATH_TO_MAP_FOLDER`` specifies the path to the output map directory generated
+by the map creation step. In this setup, cuVSLAM first localizes within the
+existing map using the pose hint provided by cuVGL. Once localization is successful,
+the pose output from cuVSLAM can be used for navigation.
+
+.. note::
+   Some users have reported sporadic WiFi connection issues and the robot
+   sometimes not responding to goal poses when using the pre-built Docker
+   images. We are actively working on improving these issues.
+
+Configurations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can configure the following modules in the navigation app with these options:
+
+- Localization: by default, AMCL localization uses 3D Lidar.
+
+   * To use visual localization, set the option ``enable_visual_localization:=True`` and provide both the visual global localization map and the cuVSLAM map. Enabling visual localization will automatically enable visual odometry and disable wheel odometry.
+   * To use AMCL localization with 2D Lidar, set ``enable_3d_lidar_localization:=False``.
+
+- Odometry: wheel odometry is enabled by default.
+
+   * To use visual odometry, set ``enable_wheel_odometry:=False``.
+
+- Costmap layers: the default configuration includes a 2D Lidar costmap and `Nvblox` costmap.
+
+   * To add a 3D Lidar costmap layer, set ``enable_3d_lidar_costmap:=True``.
+
+For the stereo camera configurations, refer to the :doc:`Tutorial: Stereo Camera Configurations for Isaac Perceptor </reference_workflows/isaac_perceptor/tutorial_stereo_camera_configurations>`.
+
+.. note::
+   Navigation is only possible when `stereo_camera_configuration` is set to `front_configuration` or
+   `front_left_right_configuration` or `no_cameras` (for lidar only setup) options.
+
+
+Visualizing the Outputs and Sending Goals
+-----------------------------------------
+
+1. Complete the :ref:`Foxglove setup <foxglove-setup>` guide. Make sure to
+   follow the instructions of
+   :ref:`installing additional Nvblox Foxglove extension <nvblox-foxglove-ext>`.
+
+2. Download all Foxglove layout configurations available in
+   :ir_repo:`nova_carter repository <nova_carter> <nova_carter_bringup/foxglove_layouts>`.
+
+3. Open Foxglove Studio on your remote machine.
+   Open the ``nova_carter_navigation.json`` layout file downloaded in the previous step.
+
+4. Validate that you can see a visualization of the map, local costmap, and
+   footprint of the robot. Verify that you see a visualization similar to the
+   following:
+
+.. TODO(lgulich): Update image.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_nav2.png>`
+    :width: 800px
+    :alt: foxglove_nav2
+    :align: center
+
+.. note::
+
+    By default, the costmap layers are use the pessimistic nvblox costmap locally and
+    optimistic one globally. The pessimistic costmap marks all "unknown" cells as obstructed
+    so that the robot is locally more risk averse.
+
+4. You can send a goal pose setpoint to Nav2 using the
+   `pose publish button <https://docs.foxglove.dev/docs/visualization/panels/3d/#publish>`_
+   in Foxglove as shown below:
+
+.. note::
+
+    It is important to ensure that the Foxglove "Display frame" in the 
+    `3D panel <https://docs.foxglove.dev/docs/visualization/panels/3d/>`_ is set
+    to "map" before sending the goals. If goals are sent and the robot does not
+    move, it is best to check first that the correct "Display frame" has been
+    set.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_nav2_galileo.gif>`
+    :width: 800px
+    :alt: foxglove_nav2_galileo
+    :align: center
+
+.. note::
+
+    You can also use the joystick to override Nav2 autonomous control at any point.
+
+5. If you use visual localization for navigation, refer to the visualization section in this
+   :ref:`Quickstart<reference_workflows/isaac_perceptor/tutorial_mapping_and_localization:Quickstart with a Pre-recorded Rosbag>`
+   tutorial to view the localization result.
+
+   After the robot is successfully localized, you'll see a visualization similar to the following:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_perceptor/inca_nav2_integration.gif>`
+    :width: 800px
+    :alt: inca_nav2_integration
+    :align: center
+
+The video begins by displaying the local costmap, then transitions to the global costmap.
+
+Other Details
+------------------
+
+To learn about our parameters changes for improving AMCL localization performance, refer to the following document:
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   amcl_tuning.rst

@@ -1,0 +1,81 @@
+============================
+PREEMPT_RT Kernel for Jetson
+============================
+
+We provide a PREEMPT_RT kernel for ``Jetpack 6.1``. This kernel is recommended only for use with robot manipulators, as many manipulator manufacturers recommend a low-latency kernel for interfacing with their robots.
+
+Install PREEMPT_RT kernel from apt server
+-------------------------------------------
+
+1. Follow instructions from `Developer guide <https://docs.nvidia.com/jetson/archives/r36.4/DeveloperGuide/SD/Kernel/KernelCustomization.html?real-time-kernel-using-ota-update#real-time-kernel-using-ota-update>`__
+   to install PREEMPT_RT kernel on Jetson.
+2. Check if PREEMPT_RT kernel is active by running the below command which should return text that
+   contains ``PREEMPT RT``.
+
+    .. code:: bash
+
+        uname -a
+
+Reduce Ethernet Latency
+------------------------
+
+When connecting your robot through Ethernet, it's helpful to reduce the latency by running the
+following commands.
+
+1. Install Ethernet tools.
+
+    .. code:: bash
+
+        sudo apt-get install ethtool net-tools
+
+
+2. Bring down the Ethernet interface.
+
+    .. code:: bash
+
+        ifconfig eno1 down
+
+3. Tune the ``rx-usecs`` parameter using ``ethtool``.
+
+    .. code:: bash
+
+        sudo ethtool -C eno1 rx-usecs 64
+
+4. Bring up the interface.
+
+    .. code:: bash
+
+        ifconfig eno1 up
+
+5. Check if the new value is reflected as ``rx-usecs: 64`` in the output of ``ethtool``.
+
+    .. code:: bash
+
+        ethtool -c eno1 | grep rx-usecs
+
+6. Now ping your robot's IP address (``<ROBOT_IP_ADDRESS>``) to check the latency.
+
+    .. code:: bash
+
+        sudo ping <ROBOT_IP_ADDRESS> -i 0.001 -D -c 10000 -s 1200
+
+Uninstall PREEMPT_RT kernel
+----------------------------
+
+1. Remove kernel headers and modules
+
+    .. code:: bash
+
+        sudo apt remove nvidia-l4t-rt-kernel nvidia-l4t-rt-kernel-headers nvidia-l4t-rt-kernel-oot-modules nvidia-l4t-display-rt-kernel
+
+2. Reboot your machine
+
+    .. code:: bash
+
+        sudo reboot
+
+3. Verify the kernel version does not include ``PREEMPT RT``.
+
+    .. code:: bash
+
+        uname -a

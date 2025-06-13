@@ -1,0 +1,459 @@
+Extended Robot Description Format (XRDF)
+========================================
+
+In order to generate motion for a robot, the kinematics and collision geometry must be defined.
+
+The Universal Robot Description Format (URDF) is used to specify kinematics, but it does not
+include all the robot description required for motion generation via NVIDIA cuMotion.
+
+The Extended Robot Description Format (XRDF) is designed to supplement the URDF by adding specification for:
+
+* Semantic labeling of configuration space (i.e., c-space) and tool frame(s) to control the robot,
+* Acceleration and jerk limits required to generate smooth motion,
+* Collision spheres to efficiently represent robot geometry, and
+* Masking to regulate self-collision avoidance.
+
+XRDF also allows minor modifications to the kinematic structure (e.g., adding new frames).
+These modifications are designed to, in general, allow existing URDFs to be used with cuMotion without
+changing the URDF directly.
+
+For convenience, a visual
+`Robot Description Editor <https://docs.omniverse.nvidia.com/isaacsim/latest/advanced_tutorials/tutorial_motion_generation_robot_description_editor.html>`_
+with XRDF support is available in Isaac Sim 4.0 and later.
+
+XRDF Specification
+------------------
+
+XRDF is based on YAML 1.2 and includes the following sections.
+
+1. Format Version [REQUIRED]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each XRDF file must contain a format code indicating that it is an ``xrdf`` and a version number indicating the
+intended version. The Isaac 3.0 release is compatible with XRDF version 1.0.
+
+These fields are required and generally placed at top of the file. An example is included below:
+
+    .. code:: yaml
+
+        format: xrdf
+        format_version: 1.0
+
+2. URDF Modifiers [OPTIONAL]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Often the URDF for a robot is published by a manufacturer or some other canonical source and it is desired to not
+directly alter the URDF in order to make minor changes to the kinematic structure. For this reason, we offer the
+``modifiers`` section that provides a set of “commands” that can be used to alter the kinematics.
+
+When an XRDF file is parsed, the ``modifiers`` section is always applied first. This means that, e.g., any newly added
+frames are available for geometry attachment and any joints removed when a new base frame is set are *not* available
+to become part of the configuration space.
+
+The currently supported URDF modifiers are:
+
+* ``add_frame``
+* ``set_base_frame``
+
+A given modifier may appear multiple times with different parameters. The order in which the modifiers are specified
+in XRDF is arbitrary, but the modifiers must be able to be applied cohesively.
+
+The following sections describe each URDF modifier, detailing its input parameters and required format.
+
+**Frame addition**
+
+The ``add_frame`` modifier is used to add a new frame to the kinematic structure. This new frame must be connected
+via a fixed joint to a parent frame in the kinematic structure. This parent frame may be a link in the URDF or another
+frame added via the ``add_frame`` modifier. All frame names in the kinematic structure must be unique.
+
+The following attributes are used to configure the ``add_frame`` modifier:
+
++-----------------------+---------------+----------+---------------------------------+-----------------------------------------+
+| Name                  | Type          | Status   | Description                     | Constraints                             |
++=======================+===============+==========+=================================+=========================================+
+| ``frame_name``        | string        | required | Specifies name for new frame    | Must specify a unique name not          |
+|                       |               |          |                                 | already in use as a link name in        |
+|                       |               |          |                                 | the URDF or as a ``frame_name`` in      |
+|                       |               |          |                                 | another ``add_frame`` modifier.         |
++-----------------------+---------------+----------+---------------------------------+-----------------------------------------+
+| ``parent_frame_name`` | string        | required | Parent frame for new frame      | Must specify a name already             |
+|                       |               |          |                                 | in use as a link name in the URDF or    |
+|                       |               |          |                                 | as a ``frame_name`` in another          |
+|                       |               |          |                                 | ``add_frame`` modifier.                 |
++-----------------------+---------------+----------+---------------------------------+-----------------------------------------+
+| ``joint_name``        | string        | required | Joint name for connecting new   | Must specify a unique name not          |
+|                       |               |          | frame to parent frame.          | already in use as a joint name in       |
+|                       |               |          |                                 | the URDF or as a joint_name in          |
+|                       |               |          |                                 | another ``add_frame`` modifier.         |
++-----------------------+---------------+----------+---------------------------------+-----------------------------------------+
+| ``joint_type``        | string        | optional | Type of joint. Initially, only  | Must be equal to ``FIXED``. If not      |
+|                       |               |          | fixed joints are supported.     | specified, ``FIXED`` will be used as    |
+|                       |               |          |                                 | default value.                          |
++-----------------------+---------------+----------+---------------------------------+-----------------------------------------+
+| ``fixed_transform``   | (see example) | required | Relative pose of new frame      | Must contain ``position`` and           |
+|                       |               |          | w.r.t parent frame              | ``orientation`` keys. Position must     |
+|                       |               |          |                                 | contain a list of three floating        |
+|                       |               |          |                                 | point values. Orientation must          |
+|                       |               |          |                                 | have two keys: ``w`` and ``xyz``. ``w`` |
+|                       |               |          |                                 | must contain a single floating          |
+|                       |               |          |                                 | value and ``xyz`` must contain a list   |
+|                       |               |          |                                 | of three floating point values.         |
++-----------------------+---------------+----------+---------------------------------+-----------------------------------------+
+
+Example usage of the ``add_frame`` modifier is shown below.
+
+    .. code:: yaml
+
+        modifiers:
+          - add_frame:
+            frame_name: "my_new_end_effector"
+            parent_frame_name: "tool0"
+            joint_name: "my_new_joint"
+            joint_type: FIXED
+            fixed_transform:
+              position: [1.0, 2.0, 3.0]
+              orientation: {w: 0.5, xyz: [-0.5, 0.5, 0.5]}
+
+**Setting the base frame**
+
+The ``set_base_frame`` modifier is used to set a new root for the kinematic structure. All frame poses will be computed
+relative to the new base frame.
+
+Any joints upstream of the new base frame will be removed from the kinematic structure and can **not** be
+used in the rest of the XRDF (e.g., as components of c-space)
+
+Any frames upstream of the new base frame will be removed from the kinematic structure and **cannot** be
+used in the rest of the XRDF (e.g., as frames for attaching collision geometry).
+
+The specified frame must exist in the URDF. Example usage of the ``set_base_frame`` modifier is shown below.
+
+    .. code:: yaml
+
+        modifiers:
+          - set_base_frame: "my_new_base_frame"
+
+
+3. Geometry Groups [OPTIONAL]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The sphere is the underlying primitive used to represent the geometry of the robot in XRDF. These
+“collision spheres” are rigidly attached to a robot frame. Each sphere is represented by a ``radius`` and a ``center``
+position relative to the origin of its parent frame.
+
+A set of spheres is defined as a dictionary where keys correspond to frame names and the corresponding values are
+lists of spheres (i.e., ``center`` and ``radius``). Each frame name must exist as a link in the URDF (or have been
+added as a frame via ``add_frame`` in the ``modifiers`` section).
+
+These sets of spheres are used to build geometry groups. Each geometry group is a named group (e.g., ``my_spheres``)
+nested under the geometry tag at the top level of the XRDF file.
+nested under the geometry tag at the top-level of the XRDF.
+
+.. warning::
+
+    Specifying one or more ``geometry`` groups is **optional**, but if no collision spheres are specified
+    motion generation will not be able to avoid self-collision or collisions with obstacles in the environment.
+
+An example ``geometry`` group arbitrarily named ``my_spheres`` is shown below.
+
+    .. code:: yaml
+
+        geometry:
+          "my_spheres":
+            spheres:
+              "link0":
+                - center: [0, 0, 0]
+                  radius: 0.1
+                - center: [0.1, 0, 0]
+                  radius: 0.1
+              "link1":
+                - center: [0, 0, 0]
+                  radius: 0.1
+
+.. note::
+
+    Isaac 3.0 only supports usage of a single geometry group. In a future release of cuMotion, support may be
+    added for multiple geometry groups, including use of distinct groups for obstacle avoidance and self-collision
+    avoidance.  This would also entail tooling to allow combinations of spheres from multiple geometry groups.
+
+
+4. Collision Geometry [OPTIONAL]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``collision`` tag is used to specify which ``geometry`` group will be used for detecting collisions with
+obstacles in the environment.
+
+If included, ``collision`` must specify ``geometry`` using a string name that corresponds to a geometry group
+included in the ``geometry`` tag.
+
+An **optional** ``buffer_distance`` can be used to provide a per-frame buffer for environment collision detection.
+These buffer distances are input as a dictionary mapping from frame names to buffer distances.
+If no ``buffer_distances`` are specified, the buffer for each frame is assumed to be zero.
+
+In the example below, spheres attached to ``linkA`` will be considered in collision if they come within 0.05 m of an
+obstacle in the environment. The buffer distance can also be negative as shown for ``linkB``. In this case spheres
+attached to ``linkB`` are allowed to penetrate an obstacle in the environment by as much as 0.02 m before a collision
+is detected.
+
+    .. code:: yaml
+
+        collision:
+          geometry: "my_collision_spheres"
+          buffer_distance:
+            "linkA": 0.05
+            "linkB": -0.02
+
+.. warning::
+
+    Specifying ``collision`` is **optional**, but if no collision spheres are specified
+    motion generation will not be able to avoid collisions with obstacles in the environment.
+
+5. Self-collision Geometry [OPTIONAL]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``self_collision`` tag is used to specify which ``geometry`` group will be used for detecting self-collision.
+
+If included, ``self_collision`` must specify ``geometry`` using a string name that corresponds to a geometry group
+included in the ``geometry tag``.
+
+.. warning::
+
+    In Isaac 3.0, the ``geometry`` specified for ``self_collision`` **must** be the same as the geometry specified for
+    ``collision``. In a future release, this requirement may be lifted to allow the ``geometry`` used for detecting
+    self-collisions to differ from the ``geometry`` used for detecting collisions with the environment.
+
+An **optional** ``buffer_distance`` can be used to provide a per-frame buffer for self-collision detection.
+These buffer distances are input as a dictionary mapping from frame names to buffer distances.
+If no ``buffer_distances`` are specified, the buffer is assumed to be zero.
+
+Buffers applied to interacting links are additive. In the example below, spheres attached to ``linkA`` will be
+considered in collision if they come within 0.05 m (i.e., 0.03 m + 0.02 m) of spheres in ``linkD``.
+
+An **optional** ``ignore`` tag can (and generally *should*) be used to specify self-collision masking. For most robot
+geometries, it is desirable to disable collision checking between adjacent frames. This is because:
+
+    1. For most robots, joint limits are sufficient to ensure adjacent links cannot collide. In this case, expensive
+    geometric collision tests are unnecessary.
+
+    2. Even if the actual adjacent robot links cannot intersect, the generally more conservative collision spheres may.
+    In this case, the geometric collision tests are not only wasteful but might also produce “false positives” that
+    artificially restrict the collision-free configuration space of the robot.
+
+The ``ignore`` list for collision masking is specified using a frame name as a key followed by a list of frame names
+for which collisions will be masked.  Each frame name must exist as a link in the URDF (or have been added as a
+frame via ``add_frame`` in the ``modifiers`` section).
+
+As shown in the example below, redundant specification of collision masking is allowable and will not impact
+performance of self-collision detection.
+
+    .. code:: yaml
+
+        self_collision:
+          geometry: "my_self_collision_spheres"
+          buffer_distance:
+            "linkA": 0.03
+            "linkD": 0.02
+          ignore:
+            "linkB": ["linkA", "linkC"]
+            "linkC": ["linkD"]
+            "linkD": ["linkC"]  # redundant but allowed
+
+.. warning::
+
+    Specifying ``self_collision`` is **optional**, but if no collision spheres are specified
+    motion generation will not be able to avoid self-collision.
+
+6. Default Joint Positions [OPTIONAL]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The **optional** ``default_joint_positions`` tag may be used to specify the default position for any non-fixed joint
+(i.e., joints specified as ``REVOLUTE``, ``CONTINUOUS``, or ``PRISMATIC`` in the URDF).
+
+The use of these default joint positions is application-defined. The default position may be used, for example, as
+a bias posture for trajectory optimization or as a seed for inverse kinematics.
+
+It is not required that default joint positions be set for all non-fixed joints in the URDF. For any non-specified
+joint positions, the default joint position will be zero clamped to the corresponding position limits. For example, if
+a joint has the position limits [-3, 2], the default position will be 0. If the position limits are [1, 3], the
+default position would be clamped to 1.
+
+When manually specifying default joint positions, it is required that default values be within the corresponding
+joint limits. Additionally, if the ``self_collision`` tag is used to specify collision geometry, it is also required
+that these ``default_joint_positions`` result in a robot configuration that is free of self-collision.
+
+.. warning::
+
+    Default joint positions must **not** be specified for a joint that is set to mimic another joint (via
+    the ``mimic`` attribute in the URDF). The position of these mimic joints is implicitly set by the control joint.
+
+As shown below, the ``default_joint_positions`` are specified as a dictionary of joint names mapping to default
+positions. Thus, the order of specified joints does not matter and each joint name may only appear once.
+
+    .. code:: yaml
+
+        default_joint_positions:
+          "joint_3": 0.0
+          "joint_1": 2.2
+          "joint_4": 1.9
+
+7. C-space Definition [REQUIRED]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The **required** ``cspace`` tag specifies a subset of joints in the URDF as the configuration space (i.e., “c-space”)
+coordinates used for control.
+
+These joints are specified as a list of string names in the required ``joint_names`` tag. All joints specified as
+part of c-space must exist in the URDF and be non-fixed joints. Additionally, *mimic* joints (i.e., joints specified
+with the ``mimic`` attribute in the URDF) **cannot** be part of c-space since they are implicitly controlled by another
+joint.
+
+The order in which the c-space joints are specified determines the ordering of values for “c-space vectors”
+(e.g., position and velocity) input and output from Isaac motion generation libraries.
+
+Finally, acceleration and jerk limits are required to be specified for each c-space coordinate using the
+``acceleration_limits`` and ``jerk_limits`` tags respectively. These values represent maximum allowable magnitudes;
+it follows that the acceleration and jerk limits must be symmetric. The order of the acceleration and jerk limits must match
+the order used for ``joint_names``.
+
+An example ``cspace`` specification is shown below:
+
+    .. code:: yaml
+
+        cspace:
+          joint_names:
+            - "jointA"
+            - "jointB"
+            - "jointC"
+          acceleration_limits: [50.0, 40.0, 30.0]
+          jerk_limits: [5000.0, 5000.0, 5000.0]
+
+
+8. Tool Frame Definition [OPTIONAL]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``tool_frames`` tag is an **optional** tag used to specify one or more “frames of interest.”
+
+The use of these frames is application-dependent. For example, cuMotion requires at least one entry and uses the
+first entry as the “end effector frame” (i.e., the frame for which task space targets will be assigned for generating
+collision-free trajectories).
+
+The `tools_frames`` are specified as a list of frame names. Each specified frame must be a link in the URDF or another
+frame added via the ``add_frame`` modifier.
+
+An example ``tool_frame`` specification is shown below:
+
+    .. code:: yaml
+
+        tool_frames: ["link6", "tool0"]
+
+XRDF Example
+------------
+
+An example XRDF file is shown below for the Universal Robots UR10e:
+
+    .. code:: yaml
+
+        format: xrdf
+        format_version: 1.0
+
+        modifiers:
+          - set_base_frame: "base_link"
+
+        default_joint_positions:
+          shoulder_pan_joint: 0.0
+          shoulder_lift_joint: -2.2
+          elbow_joint: 1.9
+          wrist_1_joint: -1.383
+          wrist_2_joint: -1.57
+          wrist_3_joint: 0.0
+
+        cspace:
+          joint_names:
+            - "shoulder_pan_joint"
+            - "shoulder_lift_joint"
+            - "elbow_joint"
+            - "wrist_1_joint"
+            - "wrist_2_joint"
+            - "wrist_3_joint"
+          acceleration_limits: [12.0, 12.0, 12.0, 12.0, 12.0, 12.0]
+          jerk_limits: [500.0, 500.0, 500.0, 500.0, 500.0, 500.0]
+
+        tool_frames: ["tool0"]
+
+        collision:
+          geometry: "ur10e_collision_spheres"
+          buffer_distance:
+            shoulder_link: 0.01
+            upper_arm_link: 0.01
+            forearm_link: 0.01
+            wrist_1_link: 0.01
+            wrist_2_link: 0.01
+            wrist_3_link: 0.01
+            tool0: 0.01
+            camera_mount: 0.01
+
+        self_collision:
+          geometry: "ur10e_collision_spheres"
+          buffer_distance:
+            shoulder_link: 0.07
+            tool0: 0.05
+          ignore:
+            upper_arm_link: ["forearm_link", "shoulder_link"]
+            forearm_link: ["wrist_1_link"]
+            wrist_1_link: ["wrist_2_link","wrist_3_link"]
+            wrist_2_link: ["wrist_3_link", "tool0"]
+            wrist_3_link: ["tool0"]
+            camera_mount: ["tool0", "wrist_3_link"]
+
+        geometry:
+          ur10e_collision_spheres:
+            spheres:
+              shoulder_link:
+                - center: [0, 0, 0]
+                  radius: 0.05
+              upper_arm_link:
+                - center: [-0, -0, 0.18]
+                  radius: 0.09
+                - center: [-0.102167, 0,  0.18]
+                  radius: 0.05
+                - center: [-0.204333, 0, 0.18]
+                  radius: 0.05
+                - center: [-0.3065, 0, 0.18]
+                  radius: 0.05
+                - center: [-0.408667, 0, 0.18]
+                  radius: 0.05
+                - center: [-0.510833, 0, 0.18]
+                  radius: 0.05
+                - center: [-0.613, 0,0.18]
+                  radius: 0.07
+              forearm_link:
+                - center: [-0, 0, 0.03]
+                  radius: 0.05
+                - center: [-0.0951667, 0, 0.03]
+                  radius: 0.05
+                - center: [-0.190333, 0, 0.03]
+                  radius: 0.05
+                - center: [-0.2855, 0, 0.03]
+                  radius: 0.05
+                - center: [-0.380667, 0,0.03]
+                  radius: 0.05
+                - center: [-0.475833, 0,0.03]
+                  radius: 0.05
+                - center: [-0.571, -1.19904e-17, 0.03]
+                  radius: 0.05
+              wrist_1_link:
+                - center: [0, 0, 0]
+                  radius: 0.05
+              wrist_2_link:
+                - center: [0, 0, 0]
+                  radius: 0.05
+              wrist_3_link:
+                - center: [0, 0, 0]
+                  radius: 0.05
+                - center: [0, 0, 0.06]
+                  radius: 0.07
+              tool0:
+                - center: [0, 0, 0.12]
+                  radius: -0.01
+              camera_mount:
+                - center: [0, 0.11, -0.01]
+                  radius: 0.06

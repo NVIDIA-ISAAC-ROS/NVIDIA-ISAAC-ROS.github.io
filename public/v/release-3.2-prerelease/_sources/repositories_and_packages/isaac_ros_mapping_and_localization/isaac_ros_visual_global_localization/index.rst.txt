@@ -1,0 +1,243 @@
+==========================
+|package name|
+==========================
+
+:ir_github:`<isaac_ros_mapping_and_localization> <isaac_ros_visual_global_localization>`
+
+Overview
+--------
+
+This package includes the ROS node and launch files for :doc:`visual global localization </concepts/visual_global_localization/index>`.
+It takes the global localization map along with raw or rectified stereo images as inputs and outputs the global pose.
+The package supports both single and multiple stereo image inputs.
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /repositories_and_packages/isaac_ros_mapping_and_localization/_snippets/setup_dev_env_mapping.rst
+
+
+Install or Build |package name|
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Install Binary Package
+
+      1. Install the prebuilt Debian package in the container:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-visual-global-localization
+
+   .. tab:: Build from Source
+
+      1. Open a new terminal outside container and clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_mapping_and_localization>`
+
+      2. Launch container and use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization --ignore-src -y
+
+      3. Build the package from source:
+
+         .. code:: bash
+
+            colcon build --symlink-install --packages-up-to isaac_ros_visual_global_localization --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization
+
+      4.  Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Localization with Rosbag Replay
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We provide an end-to-end ROS launch file for replaying a rosbag and running global localization. It continuously
+run global localization on incoming frames, even after a localization pose has already been computed. It also
+activates the 3D Lidar to create a point cloud overlay on the occupancy map using the result poses.
+
+1. Create a map by following :doc:`Tutorial with Map Creation </concepts/visual_global_localization/tutorials/tutorial_map_creation>`.
+2. Record a localization rosbag with :ref:`isaac_ros_nova_recorder Quickstart<repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/index:Quickstart>`. Please keep the localization trajectory within 1m from the map trajectory's coverage.
+3. Launch container and run the following command to replay the localization rosbag and localize the robot:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_visual_global_localization run_cuvgl_rosbag_replay.launch.py \
+         rosbag_path:=$ROS_BAG_PATH \
+         camera_names:='front_back_left_right' \
+         vgl_map_dir:=${MAP_DIR}/cuvgl_map \
+         occupancy_map_yaml_file:=${MAP_DIR}/occupancy_map.yaml
+
+.. note::
+
+   For live testing, please see :ref:`ISAAC Perceptor Localization<reference_workflows/isaac_perceptor/tutorial_mapping_and_localization:Running Perceptor with Localization>`
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/visualize_vgl_pose.png>`
+    :align: center
+    :width: 800px
+
+Visualize the `/map`, `/front_3d_lidar/lidar_points_filtered`, and `/visual_localization/pose` topics in
+RViz or Foxglove. The alignment between the point cloud and the occupancy map indicates the accuracy of
+the result pose, which is used to transform the point cloud into the occupancy map frame. The axes shows
+the localization pose, with the red axes pointing in the the robot's forward direction.
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+
+   Tutorial with Map Creation </concepts/visual_global_localization/tutorials/tutorial_map_creation>
+
+   Tutorial with Visual Global Localization </concepts/visual_global_localization/tutorials/tutorial_localization>
+
+Coordinate Frames
+-----------------
+
+This section describes the coordinate frames that are involved in the
+``VisualGlobalLocalizationNode``. The frames discussed below are oriented as follows:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/Axes.png>`
+   :width: 300px
+   :align: center
+
+1. ``base_frame``: The base frame of the robot or camera rig. It is assumed that
+   all cameras are rigidly mounted to this frame, such that the transforms between
+   the ``base_frame`` and the ``camera_optical_frames`` can assumed to be static.
+   The estimated odometry and SLAM pose will represent the pose of this frame.
+
+2. ``map_frame``: The frame corresponding to the origin of the map that cuVGL
+   creates or localizes in. The SLAM pose reported by cuVGL corresponds with
+   the transform ``map_frame`` -> ``base_frame``.
+
+3. ``camera_optical_frames``: The frames corresponding to the optical center of
+   every camera. The frame is expected to lie at the center of the camera lens
+   and oriented with the z-axis pointing in the view direction and the y-axis
+   pointing to the floor.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Troubleshooting Suggestions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. If localization frequently fails to return a pose, consider relaxing the rejection criteria, allowing it to return less confident results, by setting: ``vgl_localization_precision_level:=0``.
+2. To print more debug messages from the localization node, use launch parameters: ``vgl_verbose_logging:=True vgl_init_glog:=True vgl_glog_v:=1``.
+
+API
+----
+
+Usage
+^^^^^
+.. code:: bash
+
+   ros2 launch isaac_ros_visual_global_localization isaac_ros_visual_global_localization_node.launch.py
+
+ROS Parameters
+^^^^^^^^^^^^^^
+======================================== ============================ ===================================== =====================================================================================================================================================================================================================
+ROS Parameter                            Type                         Default                               Description
+======================================== ============================ ===================================== =====================================================================================================================================================================================================================
+*Functional Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``num_cameras``                          ``int``                      ``2``                                 Number of cameras used. Set to 2 for single stereo camera.
+``stereo_localizer_cam_ids``             ``std::string``              ``0,1``                               Camera ids for stereo camera pairs, in the form of "stereo0_left_camera_id,stereo0_right_camera_id,stereo1_left_camera_id...".
+``image_sync_match_threshold_ms``        ``double``                   ``5.0``                               Maximum duration between image timestamps to still consider them synced.
+``enable_rectify_images``                ``bool``                     ``false``                             If enabled, will do rectification for the incoming images.
+``enable_continuous_localization``       ``bool``                     ``true``                              Whether or not to continue triggering localization after a localization pose is successfully computed.
+``use_initial_guess``                    ``bool``                     ``false``                             If use_initial_guess is true, the localizer will do cuSFM-based localization. If it is false, the localizer will do global localization.
+``map_dir``                              ``std::string``              ``""``                                Required, the directory of cuVGL map files.
+``config_dir``                           ``std::string``              ``""``                                Required, the directory of config files, which should include ``keypoint_creation_config.pb.txt`` and ``localizer_config.pb.txt``.
+``model_dir``                            ``std::string``              ``""``                                The directory of model file. This value can be set in config file.
+``input_image_topic_name``               ``std::string``              ``visual_localization/image``         The topic name of the input image.
+``input_camera_info_topic_name``         ``std::string``              ``visual_localization/camera_info``   The topic name of the input camera info.
+``localization_precision_level``         ``int``                      ``2``                                 The localization precision level: 0 for lowest precision, returning more poses; 1 for medium precision; 2 for highest precision, returning fewer poses.
+*Frame Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``map_frame``                            ``std::string``              ``vmap``                              The frame name associated with the map origin.
+``base_frame``                           ``std::string``              ``base_link``                         The frame name associated with the base of the robot or camera rig.
+``camera_optical_frames``                ``std::vector<std::string>`` ``[]``                                The frame names associated with the cameras' optical frames. Using ROS optical frame conventions, i.e. z-axis front, y-axis down. If not specified will use the frames from the camera info messages.
+*Message Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``image_buffer_size``                    ``int``                      ``100``                               Buffer size used by the image synchronizer.
+``image_qos_profile``                    ``std::string``              ``DEFAULT``                           QoS profile for the image subscribers.
+*Output Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``publish_map_to_base_tf``               ``bool``                     ``true``                              Enable ``tf`` broadcaster for ``map_frame`` -> ``base_frame`` transform.
+``invert_map_to_base_tf``                ``bool``                     ``false``                             Invert the ``map_frame`` -> ``base_frame`` transform before broadcasting to the ``tf`` tree.
+*Debug/Visualization Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``debug_dir``                            ``std::string``              ``""``                                If it is set, will generate debug images to this folder.
+``debug_map_raw_dir``                    ``std::string``              ``""``                                Optional, the directory that saves the raw images of the map frames.
+``publish_rectified_images``             ``bool``                     ``false``                             Optional, if to publish the rectified images. This flag is used only when ``enable_rectify_image`` is true.
+``verbose_logging``                      ``bool``                     ``false``                             Optional, if to print more verbose ROS logs.
+``init_glog``                            ``bool``                     ``false``                             Optional, if to initialize `glog <https://google.github.io/glog/stable/>`__. Note that glog can be initialized only once per process, otherwise it raises error.
+``glog_v``                               ``int``                      ``0``                                 Optional, the verbose level for glog.
+======================================== ============================ ===================================== =====================================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+==================================================== ==================================================================================================================================================== =============================================================================================================
+ROS Topic                                            Interface                                                                                                                                            Description
+==================================================== ==================================================================================================================================================== =============================================================================================================
+``visual_localization/image_{i}``                    `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                              Image from the :spelling:ignore:`i-th` camera in grayscale (i is in range [0, ``num_cameras``-1]).
+``visual_localization/camera_info_{i}``              `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                    Camera info from the :spelling:ignore:`i-th` camera (i is in range [0, ``num_cameras``-1]).
+``visual_localization/trigger_localization``         `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__  Pose used as tick for localizing in an existing map. Every received message will trigger a localization.
+==================================================== ==================================================================================================================================================== =============================================================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+=================================================== ======================================================================================================================================================= ============================================================================================================================================
+ROS Topic                                           Interface                                                                                                                                               Description
+=================================================== ======================================================================================================================================================= ============================================================================================================================================
+``visual_localization/pose``                        `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__     Current pose with covariance of the ``base_frame``.
+``visual_localization/debug_image``                 `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                                 Image for debugging.
+``visual_localization/camera_{i}/image_rect``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__                                                 Rectified images from visual localization node, published only when ``enable_rectify_images`` and ``publish_rectified_images`` are set true.
+``visual_localization/camera_{i}/camera_info_rect`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__                                       Camera info for the rectified images, published only when ``enable_rectify_images`` and ``publish_rectified_images`` are set true.
+``/diagnostics``                                    `diagnostic_msgs/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/humble/diagnostic_msgs/msg/DiagnosticArray.msg>`__                     Diagnostic message. Similar to ``status`` topic but in a different format.
+=================================================== ======================================================================================================================================================= ============================================================================================================================================
+
+ROS Services Advertised
+^^^^^^^^^^^^^^^^^^^^^^^
+
+================================================= ======================================================================================================================================================= ===============================================================
+ROS Service                                       Interface                                                                                                                                               Description
+================================================= ======================================================================================================================================================= ===============================================================
+``visual_localization/trigger_localization``      `std_srvs::srv::Trigger <https://github.com/ros2/common_interfaces/blob/humble/std_srvs/srv/Trigger.srv>`__                                             A service to trigger localization the node.
+================================================= ======================================================================================================================================================= ===============================================================
+
+
+.. |package name| replace:: Isaac ROS Visual Global Localization

@@ -1,0 +1,26 @@
+===================
+Performance Summary
+===================
+
+The performance results of benchmarking the Isaac ROS packages on both Jetson and x86_64 platforms are below:
+
+.. include:: tables/isaac_ros_nodes.rst
+
+.. include:: tables/isaac_ros_graphs.rst
+
+.. include:: tables/isaac_ros_live_graphs.rst
+
+Methodology
+-----------
+
+The performance numbers provided above are measured using 
+:doc:`Isaac ROS Benchmark </repositories_and_packages/isaac_ros_benchmark/index>`. 
+Configuration files for reproducing results are provided in the launch scripts for each benchmark 
+:ir_repo:`here <isaac_ros_benchmark> <benchmarks>`.
+
+Frames per second (fps) are measured using the maximum sustained framerate for the accelerated 
+computational pipeline on each listed platforms. Performance measured includes input node → graph
+of node(s) under performance test → output node where the publishing rate of the input node is
+auto-tuned to discover the peak throughput dropping <5% of the frames. Average fps computed over 5
+runs, discarding minimum and maximum runs; latency measured at 30hz publishing rate matching sensor
+capture rate.

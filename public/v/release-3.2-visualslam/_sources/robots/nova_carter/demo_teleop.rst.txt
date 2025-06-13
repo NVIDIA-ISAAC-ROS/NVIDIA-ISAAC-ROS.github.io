@@ -1,0 +1,113 @@
+Tutorial: Teleoperate the Robot with a Joystick
+===============================================
+
+This demo walks through remote controlling the robot with a joystick.
+Additionally, you visualize the outputs of the various sensors on
+the robot with Foxglove.
+
+For this tutorial, it is assumed that you have successfully setup your Nova Carter
+robot using the setup instructions :doc:`here </robots/nova_carter/getting_started>` and
+you are familiar with the Isaac ROS development environment.
+
+Instructions
+------------
+
+1. SSH into the robot (:ref:`instructions<nova-carter-ssh-setup>`).
+
+2. Make sure you have successfully connected the PS5 joystick to the robot
+   (:ref:`instructions<nova-carter-joystick-setup>`).
+
+3. Build and install the required packages:
+
+.. run_ros_app::
+    :repo_setup: <nova-carter-dev-setup>
+    :repo: nova_carter
+    :image: isaac/nova_carter_bringup:release_3.2-aarch64
+    :package: nova_carter_bringup
+    :app: teleop.launch.py
+    :skip_packages: isaac_ros_ess_models_install:isaac_ros_peoplesemseg_models_install
+
+4. You are now able to remote control the robot with the gamepad. You can use
+   the left joystick to control the linear velocity and the right joystick to
+   control the angular velocity of the robot. You must press
+   ``L1`` to enable the remote control. You can enable turbo mode by pressing
+   ``R1``.
+
+   Follow the next steps to additionally visualize the sensor outputs in Foxglove.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/joystick_controls.png>`
+    :width: 800px
+    :alt: Foxglove viz with joystick controls
+    :align: center
+
+
+Visualizing the Outputs
+-----------------------
+
+1. Make sure you complete :ref:`visualization-setup-carter`.
+
+2. Open the Foxglove studio on your remote machine. In Foxglove,
+   open the ``nova_carter_teleop.json`` layout file downloaded in the previous step.
+
+3. Validate that you can see a visualization of the `Nova Carter` robot, an
+   image of the front stereo camera and the scan lines of the front and back 2D
+   Lidar scanners. Verify a visualization similar to the following:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_carter/foxglove_teleop.png>`
+    :width: 800px
+    :alt: Foxglove visualization of the teleop outputs.
+    :align: center
+
+.. note::
+
+    The visualization of the `Nova Carter` robot mesh is only present when using robot nominals
+    (i.e., when the extrinsic calibration of the robot sensors has **not** been performed). If the
+    robot is calibrated, you are expected to see a similar view of sensor data and robot frames,
+    without the visualization of the `Nova Carter` robot mesh.
+
+You can also visualize different sensors by enabling them in the left-hand panel.
+
+.. note::
+
+    * This example streams the camera images in their full resolution to Foxglove. This requires a substantial amount of bandwidth and is only done here for exemplary purposes. Most likely the image stream is choppy due to the large bandwidth. For a better visualization experience, we recommend only visualizing resized images or h264 streams.
+    * Streaming higher bandwidth data to Foxglove causes higher latency. You can choose an appropriate value for the `send_buffer_limit <https://github.com/foxglove/ros-foxglove-bridge#configuration>`__ parameter in Foxglove bridge to control latency vs. high bandwidth data visualization.
+    * The fisheye cameras use the ``equidistant`` distortion model, which is not yet supported in Foxglove. For this reason, it is not possible to visualize a fisheye camera in the 3D panel in Foxglove. You can however add an additional `Image` panel and use this to visualize the fisheye camera. In the `Image` panel's settings set `Topic` to the fisheye camera's image topic and set `Calibration` to ``None``.
+
+
+Enabling Different Sensors
+--------------------------
+
+By default, the launch file ``teleop.launch.py`` enables the Segway
+base, the front, left, and right stereo cameras, the front and back 2D Lidars and
+the 3D Lidar. You can however pass additional launch arguments to enable
+different sensors.
+
+To see all available launch arguments run:
+
+.. code:: bash
+
+    ros2 launch nova_carter_bringup teleop.launch.py --show-args
+
+To enable all sensors use the following launch command:
+
+.. code:: bash
+
+    ros2 launch nova_carter_bringup teleop.launch.py \
+        enable_3d_lidar:=True \
+        enabled_2d_lidars:=front_2d_lidar,back_2d_lidar \
+        enabled_stereo_cameras:=front_stereo_camera,back_stereo_camera,left_stereo_camera,right_stereo_camera \
+        enabled_fisheye_cameras:=front_fisheye_camera,back_fisheye_camera,left_fisheye_camera,right_fisheye_camera
+
+To disable all sensors and only run the Segway base use the following launch command:
+
+.. code:: bash
+
+    ros2 launch nova_carter_bringup teleop.launch.py \
+        enable_3d_lidar:=False \
+        enabled_2d_lidars:=none \
+        enabled_stereo_cameras:=none \
+        enabled_fisheye_cameras:=none
+
+You may also change the launch arguments to selectively dis-/enable sensors.

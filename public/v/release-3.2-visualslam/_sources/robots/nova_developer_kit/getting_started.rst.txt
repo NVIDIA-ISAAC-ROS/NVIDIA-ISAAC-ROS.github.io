@@ -1,0 +1,119 @@
+Getting Started
+===============
+
+To guarantee optimal functionality of supported applications on `Nova Orin Developer Kit`,
+please follow all steps introduced below before installing it on your robot.
+
+.. include:: /../shared/_snippets/nova_devkit/getting_started.rst
+
+.. _nova-developer-kit-dev-setup:
+
+Prerequisites
+-------------
+
+If you consider using `Nova Orin Developer Kit` only through the pre-built Docker image,
+continue to Visualization Setup. Otherwise, you should complete Isaac ROS Development Environment,
+repositories, and visualization setup before proceeding to run the applications.
+
+Isaac ROS Development Environment Setup (Optional)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you consider using the `Nova Orin Developer Kit` only through the pre-built Docker image,
+you can proceed to :ref:`tutorials <robots/nova_developer_kit/getting_started:Tutorials>`.
+Otherwise,
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+.. note::
+
+    We recommend that you connect the `Nova Orin Developer Kit` through Ethernet in this step.
+    Building a Docker image for the development environment takes longer time in the first time
+    you run it. Expect faster spin-up of the development environment after the first cached build.
+
+Repositories Setup (Optional)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. conditional_render:: internal
+
+  .. note::
+
+    In order to clone private repositories from the dev container you will need a valid SSH key and
+    a running SSH agent. To enable the SSH agent run the following on your personal computer:
+
+    .. code:: bash
+
+      eval "$(ssh-agent -s)"
+      ssh-add ~/.ssh/id_ed25519
+
+    When SSHing to the robot make sure to forward your SSH Agent with the ``-A`` flag in ``ssh``,
+    i.e. ``ssh -A <robot_ip>``.
+
+    You can check that the SSH agent is running with your SSH key by running ``ssh-add -l`` (can be
+    run on the personal computer, on the robot and inside of the dev container).
+
+
+1. Clone ``nova_developer_kit`` repository under ``${ISAAC_ROS_WS}/src``:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+        git clone --recursive :ir_clone:`<nova_developer_kit>`
+
+2. Create a file called ``.isaac_ros_common-config`` with the following context:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts
+      echo -e "CONFIG_IMAGE_KEY=ros2_humble.nova_developer_kit\nCONFIG_DOCKER_SEARCH_DIRS=(../../nova_developer_kit/docker ../docker)" > .isaac_ros_common-config
+
+3. Create a file called ``.isaac_ros_dev-dockerargs`` with the following
+   context:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common/scripts
+      echo -e "-v /etc/nova/:/etc/nova/\n-v /opt/nvidia/nova/:/opt/nvidia/nova/\n-v /mnt/nova_ssd/recordings:/mnt/nova_ssd/recordings" > .isaac_ros_dev-dockerargs
+
+4. Launch the Docker container using the ``run_dev.sh`` script:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+        ./scripts/run_dev.sh
+
+5. Clone the dependency repositories using the ``vcstool`` file in the ``nova_developer_kit`` repository:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev
+      vcs import --recursive --workers 1 --delay 5.0 src < src/nova_developer_kit/nova_developer_kit.repos
+
+.. _visualization-setup-devkit:
+
+Visualization Setup
+~~~~~~~~~~~~~~~~~~~
+
+To visualize and evaluate outputs from camera-based perception applications, you should
+follow those steps on your remote machine.
+
+1. Complete the :ref:`Foxglove setup <foxglove-setup>` guide. Make sure to
+   :ref:`install additional Nvblox Foxglove extension<nvblox-foxglove-ext>`.
+
+2. Download all Foxglove layout configurations available in
+   :ir_repo:`nova_developer_kit repository <nova_developer_kit> <nova_developer_kit_bringup/foxglove_layouts>`.
+
+Tutorials
+---------
+
+You are recommended to go through following tutorials to visualize sensor outputs, and prepare
+running camera-based perception on your robot.
+
+Visualizing Sensors Outputs on the `Nova Orin Developer Kit`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the :doc:`Tutorial: Run all Sensors on the Nova Orin Developer Kit </reference_workflows/isaac_perceptor/tutorials_on_devkit/demo_sensors>`.
+
+Running Camera-based 3D Perception on a Robot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the :doc:`Tutorial: Camera-based 3D Perception with Isaac Perceptor with the Nova Orin Developer Kit</reference_workflows/isaac_perceptor/tutorials_on_devkit/demo_perceptor>`.

@@ -1,0 +1,593 @@
+=============
+Release Notes
+=============
+
+Isaac ROS 3.2 Update 8 May 14, 2025
+-----------------------------------
+
+Packages available as `3.2 Update 8` tagged `v3.2-8` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- ``isaac_perceptor``: Introduce new reference architecture documentation
+- ``isaac_ros_common``: Improve container security and image build robustness
+
+Isaac ROS 3.2 Update 7 May 8, 2025
+----------------------------------
+
+Packages available as `3.2 Update 7` tagged `v3.2-7` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- ``isaac_ros_cumotion``: Updated Isaac Manipulator pick and place reference workflow to take into account obstacles manually added to the MoveIt planning scene
+- ``isaac_ros_visual_global_localization``: Update API documentation
+- ``ros2_benchmark``: Update quickstart documentation
+
+Isaac ROS 3.2 Update 6 April 3, 2025
+------------------------------------
+
+Packages available as `3.2 Update 6` tagged `v3.2-6` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- ``isaac_ros_mission_client``, ``nova_carter``: Integrated the Nova Carter navigation stack with the Mega Omniverse Blueprint
+- ``isaac_manipulator``, ``isaac_ros_moveit_benchmark``: Improve documentation and configuration for Isaac Manipulator benchmarks
+- ``isaac_ros_visual_slam``: Improve visibility into cuVSLAM error conditions
+
+
+Isaac ROS 3.2 Update 5 February 27, 2025
+----------------------------------------
+
+Packages available as `3.2 Update 5` tagged `v3.2-5` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- Published missing asset needed for Isaac ROS cuMotion "Object Attachment" quickstart
+- Fixed an issue in Isaac ROS cuMotion and Isaac Manipulator that prevented cuMotion from being selected as a planner in recent versions of MoveIt (observed in MoveIt 2.5.8)
+- ``isaac_manipulator``: Improved pick-and-place reference workflow robustness with Isaac Sim. It was previously possible for robot joint state publishing to fail, causing planning failures
+- ``isaac_ros_cumotion``: Rebuilt Debian packages against MoveIt 2.5.8 to resolve ``dlopen`` errors ("cannot open shared object file")
+- ``ros2_benchmark``: Improved robustness of fps calculation
+ 
+
+Isaac ROS 3.2 Update 4 February 13, 2025
+----------------------------------------
+
+Packages available as `3.2 Update 4` tagged `v3.2-4` on GitHub.
+
+Feature Requests & Issues Addressed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This release contains fixes to address user feedback, including:
+
+- `isaac_ros_cumotion #27 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/issues/27>`__, `#28 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/issues/28>`__: Correct version incompatibility
+
+
+
+Isaac ROS 3.2 Update 3 February 6, 2025
+---------------------------------------
+
+Packages available as `3.2 Update 3` tagged `v3.2-3` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for Isaac Sim 4.5
+
+
+Isaac ROS 3.2 Update 2 January 30, 2025
+---------------------------------------
+
+Packages available as `3.2 Update 2` tagged `v3.2-2` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- ``isaac_ros_common``: Improve container security
+- ``isaac_ros_cumotion``: Improve input validation
+- ``isaac_ros_nitros``: Improve unit test robustness
+- ``isaac_ros_visual_slam``: Reduced image buffer size
+
+
+Isaac ROS 3.2 Update 1 January 16, 2025
+----------------------------------------
+
+Packages available as `3.2 Update 1` tagged `v3.2-1` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for JetPack 6.2 and Jetson Orin Nano Super
+- ``isaac_ros_benchmarks``: Update benchmarks for Jetson Orin Nano Super
+- ``isaac_ros_common``: Update build tools installation
+
+
+Isaac ROS 3.2 December 10, 2024
+-------------------------------
+
+Packages available as `3.2 Release` tagged `v3.2` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for JetPack 6.1 / Ubuntu 22.04 on CUDA 12.6 (only)
+- tested with Isaac Sim 4.2
+- Isaac Perceptor end-to-end workflow with vision-only mapping, localization, and obstacle perception for AMR navigation
+- Isaac Manipulator pick-and-place workflow with pose estimation, grasping, and trajectory generation
+- Isaac Manipulator workflows (pose-to-pose, object-following, and pick-and-place) available in Isaac Sim
+- PyNITROS: Python API for CUDA with NITROS support with PyTorch tensors and images
+- Nova Event Data Recorder for collecting data during live operation
+- Nova online sensor monitoring diagnostics and offline data validation
+- verified Isaac Perceptor with new multi-cam rigs including Orbbec
+- ``isaac_mapping_ros``: Add offline map creation
+- ``isaac_ros_pose_estimation``: Improve FoundationPose performance and accuracy with multiple refinement, particularly for symmetric objects
+- ``isaac_ros_nvblox``: Improve fine-grained ~1cm voxel resolution, bounded workspace support, and multi-cam for workcell applications, dynamic mode support for Nova Carter/Nova Developer Kit, improved people detection for RealSense
+- ``isaac_ros_visual_global_localization``: Add multi-cam visual global localization
+- ``isaac_ros_visual_slam``: Add multi-cam SLAM mode localization
+
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds available in the troubleshooting section:
+
+- :ir_ngc:`Nova Calibration Tool <teams/isaac/containers/nova_extrinsics_sensor_calibration_tool>` is deprecated.
+- The Debian package for ``isaac_ros_pynitros`` can only be installed inside the Isaac ROS Docker container.
+- Significant frame drops during data recording may occur in dark or occluded scenes due to excessive image noise exacerbating compression compute load.
+- Isaac Perceptor during startup may hang due to camera drop frames. Restart the launch file to recover.
+
+
+Isaac ROS 3.1 September 26, 2024
+--------------------------------
+
+Packages available as `3.1 Release` tagged `v3.1` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- restored ZED support
+- tested with Isaac Sim 4.1
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds available in the troubleshooting section:
+
+- Isaac Sim 4.2 not yet supported
+- Isaac Perceptor workflows only support Isaac Sim 4.0
+
+
+
+Isaac ROS 3.0.1 June 14, 2024
+-----------------------------
+
+Packages available as `3.0.1 Release` tagged `v3.0.1` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- tested with Isaac Sim 4.0
+- Isaac Sim NITROS Bridge support
+- Improved Isaac Perceptor low-lying obstacle detection through new camera/ground calibration for Nova Developer Kit
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds available in the troubleshooting section:
+
+- Latest RealSense firmware (5.16.0.1) and ``librealsense`` (2.55.1) introduced breaking changes. Reverted to building supported versions from source.
+
+
+
+Isaac ROS 3.0.0 May 30, 2024
+----------------------------
+
+Packages available as `3.0.0 Release` tagged `v3.0.0` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for JetPack 6.0 / Ubuntu 22.04 on CUDA 12.2 (only)
+- tested with Isaac Sim 2023.1.1
+- Introducing Isaac Manipulator reference workflows for perception-driven manipulation
+- Introducing Isaac Perceptor reference workflows for visual odometry and obstacle perception
+- Improved documentation with tabbed quickstarts for source/binary and image providers
+- ``isaac_ros_benchmark``: Add multi-cam benchmarks
+- ``isaac_ros_common``: Improvements to run_dev.sh, add Docker deployment scripts
+- ``isaac_ros_cumotion``: New cuMotion package and ``MoveIt!`` plugin
+- ``isaac_ros_dnn_inference``: Decomposed DNN image encoder nodes
+- ``isaac_ros_ess``: Update for ESS 4.0 improved for workcell manipulation use cases
+- ``isaac_ros_foundationpose``: Add NITROS FoundationPose decoder
+- ``isaac_ros_image_proc``: Add crop/resize nodes
+- ``isaac_ros_jetson_stats``: Add ``jtop`` package
+- ``isaac_ros_mission_client``: New Nav2 docking support
+- ``isaac_ros_nitros``: Add ``message_filter`` support for CUDA with NITROS
+- ``isaac_ros_nova``: New data recorder/replayer, rosbag validation tools
+- ``isaac_ros_nitros_bridge``: Add support for Jetson
+- ``isaac_ros_nvblox``: New multi-cam scene reconstruction, add NITROS support, Foxglove viz plugin
+- ``isaac_ros_rtdetr``: Add NITROS RT-DETR support for SyntheticaDETR models
+- ``isaac_ros_segformer``: Add NITROS Segformer decoder
+- ``isaac_ros_segment_anything``: Add NITROS Segment Anything (SAM) decoder
+- ``isaac_ros_visual_slam``: New multi-cam visual odometry, add NITROS support
+
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds available in the troubleshooting section:
+
+- Known stability issues and frame drops under high CPU load in multi-cam configurations
+- Known disconnect issues with Nova Carter WiFi + Bluetooth when switching access points during teleoperation
+- Known high latency issue of Isaac ROS FoundationPose pipeline with Hawk cameras
+- Removed support for JetPack 5.1.2, Ubuntu 20.04, and Jetson Xavier
+- Removed support for Stereolabs ZED cameras until ZED SDK support for JP6 is available
+- ROS 1 Noetic not supported on Ubuntu 22.04 for use with Isaac ROS NITROS Bridge
+- Known issue with setting ``use_intra_process_comms`` explicitly to ``True`` in ROS graphs with NITROS nodes. See workaround :ref:`here <troubleshooting/dev_env:Failed to load a NITROS enabled nodes with intraprocess communication enabled>`.
+
+Feature Requests & Issues Addressed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This release contains new features and fixes to address user feedback, including:
+
+- `isaac_ros_visual_slam #141 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_visual_slam/issues/141>`__: Removes TF static publisher preventing intra-process communication
+
+
+
+Isaac ROS 2.1.0 November 16, 2023
+---------------------------------
+
+Packages available as `2.1.0 Release` tagged `v2.1.0` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- Streamlined developer experience with prebuilt Debian packages for Isaac ROS on x86 and Jetson platforms
+- ``ros2_benchmark``: Add live mode benchmarking capability
+- ``isaac_ros_managed_nitros_examples``: Add CV-CUDA DNN Image Encoder example
+- ``isaac_ros_unet``: Improve segmentation accuracy by converting to BGR colorspace
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds available in the troubleshooting section:
+
+- CV-CUDA DNN Image Encoder example is limited to x86 platforms with discrete GPU
+- Isaac ROS Nvblox prebuilt Debian packages not yet available
+
+Feature Requests & Issues Addressed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This release contains new features and fixes to address user feedback, including:
+
+- `gxf #2 <https://github.com/NVIDIA-ISAAC-ROS/gxf/issues/2>`__: Added additional files
+
+Isaac ROS 2.0.0 October 18, 2023
+--------------------------------
+
+Packages available as `2.0.0 Release` tagged `v2.0.0` on GitHub.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for JetPack 5.1.2
+- support for Isaac Sim 2023.1.0
+- support for Nova Carter
+- support for Stereolabs ZED cameras
+- ``isaac_ros_apriltag``: Improve throughput performance, expose new tuning parameters
+- ``isaac_ros_centerpose``: Add NITROS CenterPose decoder
+- ``isaac_ros_ess``: Update for ESS 3.0 with confidence thresholding in multiple resolutions
+- ``isaac_ros_h264_decoder``: Add support on ``aarch64``
+- ``isaac_ros_h264_encoder``: Add support on x86_64
+- ``isaac_ros_managed_nitros``: Introduce CUDA with NITROS
+- ``isaac_ros_mission_client``: Add mission cancellation and improved stability
+- ``isaac_ros_nitros_bridge``: Introduce support for ROS 1 Noetic
+- ``isaac_ros_nova``: New support packages for Nova sensor suite
+- ``isaac_ros_nvblox``: New general dynamics detection, improve stability and performance
+- ``isaac_ros_stereo_image_proc``: Add confidence thresholding for SGM
+- ``isaac_ros_yolov8``: Add NITROS YOLOv8 decoder
+- ``isaac_ros_visual_slam``: Improve stability
+- Improved developer experience with unified documentation site
+- Streamlined development workflow with ROS 2 Humble Debian packages for JetPack 5
+- Renamed Isaac ROS DNN Stereo Disparity -> Isaac ROS DNN Stereo Depth
+- Renamed Isaac ROS Proximity Segmentation -> Isaac ROS Depth Segmentation
+- Deleted Isaac ROS IMU, moved ``isaac_ros_imu_bmi088`` to Isaac ROS Nova
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds available in the troubleshooting section:
+
+- Isaac ROS NITROS Bridge is limited to x86 platforms with discrete GPU
+- People in Isaac 2023.1.0 may not animate in Isaac ROS Nvblox examples
+- ``isaac_ros_triton`` can under certain conditions report errors of the form ``Incomplete inference; response appeared out of order``.
+- Inconsistencies and failures on multi-GPU systems
+- Instability when running >2 stereo cameras through Isaac ROS Argus Camera
+
+Feature Requests & Issues Addressed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This release contains new features and fixes to address user feedback, including:
+
+- `isaac_ros_argus_camera #21 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_argus_camera/issues/21>`__: Update camera distortion type mapping
+- `isaac_ros_common #62 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/issues/62>`__: Fixed handling of CONFIG_DOCKER_SEARCH_DIRS
+- `isaac_ros_common #63 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/issues/63>`__: Reduced required ``cmake`` to 3.22.1 available with Ubuntu 22.04
+- `isaac_ros_map_localization #6 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_map_localization/issues/6>`__: Update support for resolution parameter
+
+Isaac ROS 0.31.0 DP (developer preview) May 25, 2023
+----------------------------------------------------
+
+Packages available as ``DP 3.1 Release`` tagged ``v0.31.0-dp`` on
+`GitHub <https://github.com/NVIDIA-ISAAC-ROS/.github/releases/tag/v0.31.0-dp>`__.
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- ``isaac_ros_visual_slam``: Update with cuVSLAM 11 for improved performance, on-robot validation guide, and better HAWK support
+- optimizations for CPU overhead for all NITROS packages
+- ``isaac_ros_stereo_image_proc``: Improve stereo rectification
+- new package ``isaac_ros_imu_bmi088`` for interfacing with Bosch BMI088 IMU
+
+Isaac ROS 0.30.0 DP (developer preview) April 5, 2023
+-----------------------------------------------------
+
+Packages available as ``DP 3 Release`` tagged ``v0.30.0-dp`` on
+`GitHub <https://github.com/NVIDIA-ISAAC-ROS/.github/releases/tag/v0.30.0-dp>`__.
+
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for JetPack 5.1.1
+- support for Jetson Orin NX, and Jetson Orin Nano 8GB
+- support for RTX 4K series (Lovelace GPU) with CUDA 11.8 on x86_64
+- new package ``isaac_ros_map_localization`` using LIDAR to automatically find the pose of the robot for Nav2
+- ``isaac_ros_vslam``: Improvements for better covariance estimation and planar constraints for mobile robots
+- ``isaac_ros_nvblox``: Improvements for DNN-based person detection and removal from 3D scene reconstruction
+- ``isaac_ros_h264_encoder``: Improvement adding H.264 P-frame encode for higher performance and smaller rosbags
+- ``isaac_ros_h264_decoder``: Improvement adding H.264 decompression on Jetson (``aarch64``)
+- ``isaac_ros_dnn_stereo_depth``: Improvement of ESS DNN trained with real data and SDG (synthetic data generation)
+- new package ``ros2_benchmark`` for performance measurement of graphs of nodes in open source
+- new package ``isaac_ros_benchmark`` building upon ``ros2_benchmark`` to provide configurations to benchmark Isaac ROS graphs of nodes
+- open source release for multiple NITROS-enabled NVIDIA-accelerated packages
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds available in the troubleshooting section:
+
+- ``isaac_ros_triton`` can under certain conditions report errors of the form ``Incomplete inference; response appeared out of order``.
+- ``isaac_ros_h264_encoder`` can become unresponsive when starting a stream after stopping because of a known synchronization bug.
+
+Feature Requests & Issues Addressed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This release contains new features and fixes to address user feedback,
+including:
+
+- `isaac_ros_visual_slam #53 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_visual_slam/issues/53>`__: Add instructions to clone the dependency ``isaac_ros_nitros``
+- `isaac_ros_visual_slam #54 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_visual_slam/issues/54>`__: Update depth emitter parameters passed to RealSense node
+- `isaac_ros_nvblox #40 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/issues/40>`__: Update ``realsense-ros`` branch name due to upstream change (kudos to `@ripdk12 <https://github.com/ripdk12>`__)
+- `isaac_ros_mission_client #2 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_mission_client/issues/2>`__: Change parameter name to avoid namespace duplication (kudos to `@bobbleballs <https://github.com/bobbleballs>`__)
+
+Isaac ROS 0.20.0 DP (developer preview) October 19, 2022
+--------------------------------------------------------
+
+Packages available as ``DP 2 Release`` tagged ``v0.20.0-dp``.
+
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for `Jetson Orin Nano 8GB <https://developer.nvidia.com/blog/solving-entry-level-edge-ai-challenges-with-nvidia-jetson-orin-nano/>`__
+- `Apache-2.0 <https://www.apache.org/licenses/LICENSE-2.0>`__ licensing for Isaac ROS repositories
+- ``isaac_ros_compression``: NVIDIA-accelerated H.264 encoding/decoding
+- ``isaac_ros_depth_segmentation``: Freespace segmentation based on Bi3D, add Isaac Sim tutorials, add RealSense tutorial
+- ``isaac_ros_mission_client``: VDA5050-compatible Nav2 mission controller, add Isaac Sim tutorial
+- ``isaac_ros_dnn_stereo_depth``: Add Isaac Sim tutorial, add RealSense tutorial
+- ``isaac_ros_image_pipeline``: Add Isaac Sim tutorial, add RealSense tutorial
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds
+available in the troubleshooting section:
+
+- ``isaac_ros_h264_encoder`` can become unresponsive when starting a stream after stopping because of a known synchronization bug.
+
+Isaac ROS 0.11.0 DP (developer preview) September 1, 2022
+---------------------------------------------------------
+
+Packages available as ``DP 1.1 Release`` tagged ``v0.11.0-dp``.
+
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- support for JetPack 5.0.2
+- support for Isaac Sim 2022.1.1
+- ``isaac_ros_image_pipeline``: Add image flip node
+- ``isaac_ros_nvblox``: Add support for 3D LIDAR input and serialization of maps to file, improve performance
+- ``isaac_ros_object_detection``: Accelerate DetectNet inference with NITROS, add Isaac Sim tutorial, improve performance
+- ``isaac_ros_pose_estimation``: Accelerate DOPE inference with NITROS
+- ``isaac_ros_depth_segmentation``: Update Bi3D model, add dynamic disparity level support
+- ``isaac_ros_visual_slam``: Update launch files for RealSense package changes, remove stale dependency on ``isaac_ros_image_proc``
+
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations, with workarounds
+available in the troubleshooting section:
+
+- Intel RealSense drivers do not support Humble out-of-the-box (workaround :ref:`here <troubleshooting/hardware_setup:RealSense driver does not work with ROS 2 Humble>`)
+
+
+Feature Requests and Issues Addressed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This release contains new features and fixes to address feedback,
+including:
+
+- `isaac_ros_nvblox #13 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/issues/19>`__, `#19 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/issues/19>`__: Feature request: Map serialization/deserialization from file
+- `isaac_ros_nvblox #23 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/issues/23>`__: Feature request: Demo for using Intel RealSense Cameras with Nvblox
+- `isaac_ros_nvblox #24 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox/issues/24>`__: Feature request: Clear voxels beyond a radius
+- `isaac_ros_common #29 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/issues/29>`__: Torch unavailable inside container on AGX Orin (kudos to `@bblumberg <https://github.com/bblumberg>`__)
+- `isaac_ros_common #40 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/issues/40>`__: Docker support for JetPack 5.0.2
+- `isaac_ros_dnn_inference #5 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_inference/issues/5>`__: ROS Topics can't be viewed from outside container due to UID mismatch (kudos to `@GEngels <https://github.com/GEngels>`__, `@Doch88 <https://github.com/Doch88>`__)
+- `isaac_ros_object_detection #8 <https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_object_detection/issues/8>`__: Isaac ROS Object Detection does not install parameters file (kudos to `@Tristis116`)
+
+Isaac ROS 0.10.1 DP (Developer Preview) July 12, 2022
+-----------------------------------------------------
+
+Packages available as ``DP Release`` tagged ``v0.10.1-dp``.
+
+
+What's New
+~~~~~~~~~~
+
+Minor bug fixes and updates including:
+
+- ``isaac_ros_apriltag``: Update launch file 'max_tags' parameter to default 64
+- ``isaac_ros_argus_camera``: Tune queue sizes
+- ``isaac_ros_common``: Add missing dependency on ``isaac_ros_apriltag_interfaces``
+- ``isaac_ros_dnn_stereo_depth``: Tune QoS and queue sizes
+- ``isaac_ros_image_pipeline``: Improve frame synchronization
+- ``isaac_ros_nvblox``: Fix integration with Nav2 costmaps on Humble, updated topic names for test rosbag, fix rosdeps
+- ``isaac_ros_visual_slam``: Update launch files for RealSense package changes, remove stale dependency on ``isaac_ros_image_proc``
+
+Isaac ROS 0.10.0 DP (Developer Preview) June 30, 2022
+-----------------------------------------------------
+
+Packages available as ``DP Release`` tagged ``v0.10.0-dp``.
+
+
+What's New
+~~~~~~~~~~
+
+ROS 2 Humble release of Isaac ROS with performance boost and new stereo
+perception functions including:
+
+- packages for ROS 2 Humble (Foxy deprecated) on JetPack 5.0.1 DP
+- support for Jetson Orin
+- support for Isaac Sim 2022.1 *(Isaac SIM 2021.2 is deprecated)*
+- ``isaac_ros_nitros``: Implement type adaptation and type negotiation features new to Humble boosting performance
+- ``isaac_ros_depth_segmentation``: For stereo vision detection of obstacles during navigation
+- ``isaac_ros_dnn_stereo_depth``: For stereo vision AI prediction of depth
+
+
+Limitations
+~~~~~~~~~~~
+
+There are known limitations with this release, that
+might have additional details for workarounds in the troubleshooting
+section:
+
+- Isaac SIM 2022.1 released in June 2022 will add support for Humble in September. Incompatibilities exist when performing SIL (software in the loop) simulation with Isaac ROS.
+- RealSense drivers as-is do not support Humble, but can be modified to work.
+- ``isaac_ros_nvblox`` is untested with Nav2 on Humble.
+- Removed CenterPose support on Jetson.
+- ``isaac_ros_ess`` throws an error if using rosbag as input, and input topics are published after the node is started.
+
+Isaac ROS 0.9.3 EA3 (Early Access) March 23, 2022
+-------------------------------------------------
+
+Packages available as ``EA3 Release`` tagged ``v0.9.3-ea3``.
+
+
+What's New
+~~~~~~~~~~
+
+GTC 2022 release of Isaac ROS with new packages for vision based
+autonomous navigation including:
+
+- packages for ROS 2 Foxy on JetPack 4.6.1
+- ``isaac_ros_visual_slam``: Upgrade from SVIO as visual odometry source for Nav2 with save and load of feature maps
+- ``isaac_ros_nvblox``: For vision based temporary 3D obstacle map construction in real-time
+- ``isaac_ros_object_detection``: To detect and classify obstacles using DNN detection networks
+
+Isaac ROS 0.9.1 EA2.1 (Early Access) Nov 22, 2021
+-------------------------------------------------
+
+Packages available as ``EA2 Release`` tagged ``v0.9.1-ea2``.
+
+
+What's New
+~~~~~~~~~~
+
+Incremental update with fixes and new packages from previous ROSCon 2021
+release, including:
+
+- packages for ROS 2 Foxy on JetPack 4.6
+- support for Isaac Sim 2021.3
+- ``isaac_ros_pose_estimation``: Update adding CenterPose DNN for detection of pose
+- Isaac SIM <-> Isaac ROS tutorials with Jetson hardware in the loop
+- new software license with commercial use grant
+
+Isaac ROS EA2 (Early Access) Oct 20, 2021
+-----------------------------------------
+
+
+What's New
+~~~~~~~~~~
+
+ROSCon 2021 release of Isaac ROS providing NVIDIA acceleration for
+autonomous robots with new features including:
+
+- packages for ROS 2 Foxy on JetPack 4.6
+- ``isaac_ros_visual_odometry``: Provide stereo visual inertial odometry
+- ``isaac_ros_argus_camera``: For NVIDIA-accelerated ISP of CSI and GMSL cameras
+- ``isaac_ros_image_segmentation``: For DNN based image segmentation including people detection pre-trained model
+- ``isaac_ros_pose_estimation``: For detection of pose using DOPE DNN
+- ``isaac_ros_dnn_inference``: For TensorRT and Triton inferencing server for DNN processing
+
+Isaac ROS EA1 (Early Access) Aug 11, 2021
+-----------------------------------------
+
+
+What's New
+~~~~~~~~~~
+
+This is the first release of Isaac ROS providing NVIDIA acceleration for
+autonomous robots with new features including:
+
+- packages for ROS 2 Foxy on JetPack 4.5
+- ``isaac_apriltag``: Provide NVIDIA accelerated replacement for ``apriltag``
+- ``isaac_image_proc``: Provide NVIDIA accelerated replacement for ``image_proc``
+- ``isaac_stereo_image_proc``: Provide NVIDIA accelerated replacement for ``image_proc``

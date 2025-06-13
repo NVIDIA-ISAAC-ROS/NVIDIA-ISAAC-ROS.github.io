@@ -1,0 +1,73 @@
+ZED Camera Examples
+===================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/zed_example.gif>`
+    :width: 600px
+    :align: center
+
+This page contains tutorials for running nvblox on the `ZED <https://www.stereolabs.com/docs/get-started-with-zed>`__ camera.
+
+.. note::
+
+   This tutorial requires a compatible ZED camera from
+   the list available  :doc:`here </getting_started/hardware_setup/sensors/zed_setup>`.
+
+Prerequisites
+-------------
+
+These are the steps common to running all examples on the zed.
+
+1. Complete the :doc:`ZED setup tutorial </getting_started/hardware_setup/sensors/zed_setup>`.
+
+2. Complete the :doc:`/getting_started/dev_env_setup`.
+
+.. note::
+
+    For best results we suggest increase maximum Linux kernel receive buffer size as
+    detailed `here <https://docs.ros.org/en/rolling/How-To-Guides/DDS-tuning.html#cyclone-dds-tuning>`__.
+
+Install
+-------
+
+1. Complete the :ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`.
+
+
+ZED Example
+-----------
+
+This example runs nvblox-based reconstruction from a single zed camera,
+either from live data coming directly off a camera, or from recorded
+data coming from a ROSbag.
+
+
+1. Navigate (inside the docker) to the workspace folder
+
+    .. code:: bash
+
+        cd /workspaces/isaac_ros-dev
+
+2. Run the zed example, either live from a sensor or from a recorded ROSbag.
+
+    .. tabs::
+
+        .. tab:: On a ROSbag
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup zed_example.launch.py \
+                camera:=<ZED_CAMERA_MODEL> rosbag:=<YOUR_DATASET_PATH>
+        
+        .. tab:: Live from a sensor
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup zed_example.launch.py \
+                camera:=<ZED_CAMERA_MODEL>
+
+    where ``<ZED_CAMERA_MODEL>`` is either ``zed2`` or ``zedx`` depending 
+    on the ZED camera model you are using.
+
+.. note::
+
+    To record your own ZED ROSbag, please refer to the official
+    `ROSbag recording tutorial <https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Recording-And-Playing-Back-Data/Recording-And-Playing-Back-Data.html>`__.

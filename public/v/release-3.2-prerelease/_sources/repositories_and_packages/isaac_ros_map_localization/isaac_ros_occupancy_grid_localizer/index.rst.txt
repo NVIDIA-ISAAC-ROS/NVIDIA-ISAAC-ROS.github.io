@@ -1,0 +1,250 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_map_localization> <isaac_ros_occupancy_grid_localizer>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_occupancy_grid_localizer> <quickstart.tar.gz>`
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-occupancy-grid-localizer
+   
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_map_localization>`
+     
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_map_localization/isaac_ros_occupancy_grid_localizer --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_occupancy_grid_localizer --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_map_localization/isaac_ros_occupancy_grid_localizer
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+            
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+1.  Continuing inside the Docker container, ``rviz2``:
+
+    .. code:: bash
+
+       rviz2 -d  $(ros2 pkg prefix isaac_ros_occupancy_grid_localizer --share)/rviz/quickstart.rviz
+
+2.  Create another terminal in the Docker container using the
+    ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+3.  Run the launch file to spin up a demo of this package:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_occupancy_grid_localizer isaac_ros_occupancy_grid_localizer_quickstart.launch.py
+
+4.  Create another terminal in the Docker container using the
+    ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+5. Run the rosbag:
+
+    .. code:: bash
+
+       ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_occupancy_grid_localizer/rosbags/flatscan
+
+6. Create another terminal in the Docker container using the
+    ``run_dev.sh`` script:
+
+    .. code:: bash
+
+       cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+7. Trigger the localization using a command line service call:
+
+    .. code:: bash
+
+       ros2 service call trigger_grid_search_localization std_srvs/srv/Empty {}
+
+8. Verify that you see a frame being generated in the map showing the
+    position of the LIDAR.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_map_localization/quickstart.png>`
+    :width: 600px
+    :align: center
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+   
+   Tutorial with Isaac Sim </concepts/localization/lidar/tutorial_isaac_sim>
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, see :doc:`here </troubleshooting/index>`.
+
+API
+----
+
+Usage
+~~~~~
+
+.. code:: bash
+
+   ros2 launch isaac_ros_occupancy_grid_localizer isaac_ros_occupancy_grid_localizer.launch.py
+
+.. note::
+
+   Use the ``flatscan`` topic with the
+   ``trigger_grid_search_localization`` service to trigger localization
+   using a service.
+
+   **Or** publish directly to the ``flatscan_localization`` topic to
+   trigger localization every time a FlatScan message is received on
+   this topic.
+
+   **Do not** publish FlatScan messages to both ``flatscan`` and
+   ``flatscan_localization`` topics.
+
+
+OccupancyGridLocalizerNode
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. note::
+
+   The ROS parameter names are the same as the Nav2 
+   `map_server <https://github.com/ros-planning/navigation2/blob/main/nav2_map_server/src/map_io.cpp#L136>`__ 
+   YAML parameters. This allows to load and pass the same YAML file to both Nav2 and 
+   ``isaac_ros_occupancy_grid_localizer`` as shown in the 
+   :ir_repo:`Isaac Sim Launch File <isaac_ros_map_localization> <isaac_ros_occupancy_grid_localizer/launch/isaac_ros_occupancy_grid_localizer_nav2.launch.py>`
+
+=========================== ======================= =================== ==========================================================================================================================================================================================================================================================
+ROS Parameter               Type                    Default             Description
+=========================== ======================= =================== ==========================================================================================================================================================================================================================================================
+``loc_result_frame``        ``std::string``         ``map``             frame_id of localization result
+``resolution``              ``double``              ``0.05``            The meters per pixel of the ``.png`` map being loaded. This parameter is loaded from the the map YAML file.
+``origin``                  ``std::vector<double>`` ``[0.0, 0.0, 0.0]`` The origin of the map loaded. Used to transform the output to compensate for the same transform made to the PNG file loaded by the Nav2 `map_server <https://github.com/ros-planning/navigation2/blob/main/nav2_map_server/src/map_io.cpp#L136>`__.
+``occupied_thresh``         ``double``              ``0.65``            Pixels with occupancy probability greater than this threshold are considered completely occupied. This parameter is loaded from the the map YAML file. Supported values: ``[0,1)``
+``image``                   ``std::string``         ``""``              Name of the PNG file used to load map. This should be in the same directory as the map YAML file specified in ``map_yaml_path``. This parameter is loaded from the the map YAML file.
+``map_yaml_path``           ``std::string``         ``""``              Absolute path to the map YAML file. From which we load the ``resolution`` and ``occupied_thresh``
+``max_points``              ``int``                 ``20000``           Maximum number of points in FlatScan Message that can be received used to pre-allocate GPU memory.
+``robot_radius``            ``double``              ``0.25``            The radius of the robot. This parameter is used to exclude poses which are too close to an obstacle.memory.
+``min_output_error``        ``double``              ``0.22``            The minimal output error used to normalize and compute confidence, if output error from best sample smaller or equal to this, the confidence is 1
+``max_output_error``        ``double``              ``0.35``            The max output error from our best sample, if output error larger than this threshold, we conclude localization failed
+``max_beam_error``          ``double``              ``0.5``             The maximum beam error used when comparing range scans.
+``num_beams_gpu``           ``int``                 ``512``             The GPU accelerated scan-and-match function can only handle a certain number of beams per range scan. The allowed values are {32, 64, 128, 256, 512}. If the number of beams in the range scan does not match this number a subset of beams will be taken.
+``batch_size``              ``int``                 ``512``             This is the number of scans to collect into a batch for the GPU kernel. Choose a value which matches your GPU well.
+``sample_distance``         ``double``              ``0.1``             Distance between sample points in meters. The smaller this number, the more sample poses will be considered. This leads to a higher accuracy and lower performance.
+``out_of_range_threshold``  ``double``              ``100.0``           Points range larger than this threshold will be marked as out of range and not used.
+``invalid_range_threshold`` ``double``              ``0.0``             Points range smaller than this threshold will be marked as invalid and not used.
+``min_scan_fov_degrees``    ``double``              ``270.0``           Minimal required scan FoV to run the localizer.
+``use_closest_beam``        ``bool``                ``true``            Whether or not pick the closest angle beam in angle bucket, if not pick the average within an angular bucket
+=========================== ======================= =================== ==========================================================================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+========================= =============================================================================================================================== ==========================================================================================================================================================================
+ROS Topic                 Type                                                                                                                            Description
+========================= =============================================================================================================================== ==========================================================================================================================================================================
+``flatscan``              :ir_repo:`isaac_ros_pointcloud_interfaces::msg::FlatScan <isaac_ros_common> <isaac_ros_pointcloud_interfaces/msg/FlatScan.msg>` The input FlatScan messages buffer. The last message on this topic will be used as input for localization when the ``trigger_grid_search_localization`` service is called.
+``flatscan_localization`` :ir_repo:`isaac_ros_pointcloud_interfaces::msg::FlatScan <isaac_ros_common> <isaac_ros_pointcloud_interfaces/msg/FlatScan.msg>` The topic to trigger localization directly without a buffer. Localization will be triggered every time a FlatScan message is received on this topic.
+========================= =============================================================================================================================== ==========================================================================================================================================================================
+
+
+======================= ========================================================================================================================================================= ============================================================================================================================
+ROS Topic               Interface                                                                                                                                                 Description
+======================= ========================================================================================================================================================= ============================================================================================================================
+``localization_result`` `geometry_msgs::msg::PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__ Pose of the scan data with respect to the map origin, as specified in the first note in the `overview section <#overview>`__
+======================= ========================================================================================================================================================= ============================================================================================================================
+
+ROS Services Advertised
+^^^^^^^^^^^^^^^^^^^^^^^
+
+==================================== ======================================================================================================= ============================================================================================================
+ROS Service                          Interface                                                                                               Description
+==================================== ======================================================================================================= ============================================================================================================
+``trigger_grid_search_localization`` `std_srvs::srv::Empty <https://github.com/ros2/common_interfaces/blob/humble/std_srvs/srv/Empty.srv>`__ The service to trigger the global localization using the last scan received on the ``flatscan`` input topic.
+==================================== ======================================================================================================= ============================================================================================================
+
+.. |package_name| replace:: ``isaac_ros_occupancy_grid_localizer``

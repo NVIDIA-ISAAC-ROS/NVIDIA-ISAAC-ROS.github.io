@@ -1,0 +1,294 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_apriltag> <isaac_ros_apriltag>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_apriltag> <quickstart.tar.gz>`
+
+Setup Jetson device
+^^^^^^^^^^^^^^^^^^^
+   Setting up Jetson for using VPI. See :doc:`here </getting_started/hardware_setup/compute/jetson_vpi>`
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      1. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      2. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-apriltag
+
+   .. tab:: Build from Source
+
+      1. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_apriltag>`
+
+      2. Launch the Docker container using the ``run_dev.sh`` script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      3. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_apriltag/isaac_ros_apriltag --ignore-src -y
+
+      4. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_apriltag --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_apriltag/isaac_ros_apriltag
+
+      5. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Docker container.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=apriltag interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_apriltag/quickstart_interface_specs.json
+
+      #. Open a **second** terminal inside the Docker container:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+            ./scripts/run_dev.sh
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_apriltag/quickstart.bag --remap image:=image_rect camera_info:=camera_info_rect
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/hardware_setup/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,apriltag
+
+   .. tab:: Hawk Camera
+
+      #. Ensure that you have already set up your Hawk camera using the :doc:`Hawk setup tutorial </getting_started/hardware_setup/sensors/hawk_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-argus-camera
+
+      #. Run the following launch file to spin up a demo of this package using a Hawk camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=argus_mono,rectify_mono,apriltag
+
+   .. tab:: ZED Camera
+
+      #. Ensure that you have already set up your ZED camera using :doc:`ZED setup tutorial </getting_started/hardware_setup/sensors/zed_setup>`.
+
+      #. Continuing inside the Docker container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-humble-isaac-ros-examples ros-humble-isaac-ros-zed
+
+      #. Run the following launch file to spin up a demo of this package using a ZED camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=zed_mono_rect,apriltag \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_apriltag/zed2_quickstart_interface_specs.json
+
+         .. note::
+
+            If you are using the `ZED X` series, replace  `zed2_quickstart_interface_specs.json` with `zedx_quickstart_interface_specs.json` in the above command.
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+1. Open a **new** terminal inside the Docker container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
+         ./scripts/run_dev.sh
+
+2. Observe the AprilTag detection output ``/tag_detections`` on a separate terminal with the command:
+
+   .. code:: bash
+
+      ros2 topic echo /tag_detections
+
+.. note::
+
+   You must to calibrate the intrinsics of your camera if you want the node to determine 3D poses for tags instead of just detection and corners as 2D pixel coordinates.
+   See `calibration <https://docs.nav2.org/tutorials/docs/camera_calibration.html>`__ for more details.
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+
+   Tutorial with a USB camera </concepts/fiducials/apriltag/tutorial_usb_cam>
+
+   Tutorial with Isaac Sim </concepts/fiducials/apriltag/tutorial_isaac_sim>
+
+   Tutorial with NITROS ROS 1 Bridge </concepts/fiducials/apriltag/tutorial_apriltag_ros1_bridge>
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_apriltag isaac_ros_apriltag.launch.py
+
+Replacing ``apriltag_ros`` with ``isaac_ros_apriltag``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Add a dependency on ``isaac_ros_apriltag`` to
+   ``your_package/package.xml`` and ``your_package/CMakeLists.txt``. The
+   original ``apriltag_ros`` dependency may be removed entirely.
+2. Change the package and plugin names in any ``*.launch.py`` launch
+   files to use ``isaac_ros_apriltag`` and
+   ``nvidia::isaac_ros::apriltag::AprilTagNode``, respectively.
+
+Supported Packages
+~~~~~~~~~~~~~~~~~~
+
+The packages under the standard ``apriltag_ros`` have the
+following support:
+
+================== ================================
+Existing Package   Isaac ROS Alternative
+================== ================================
+``apriltag_ros``   See ``isaac_ros_apriltag``
+``image_pipeline`` See ``isaac_ros_image_pipeline``
+================== ================================
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+============== ========== ============ ======================================================================================================================================================================================================================================================
+ROS Parameter  Type       Default      Description
+============== ========== ============ ======================================================================================================================================================================================================================================================
+``size``       ``double`` ``0.22``     The tag edge size in meters, assuming square markers. More `details here <https://github.com/AprilRobotics/apriltag>`__. For example, ``0.22``
+``max_tags``   ``int``    ``64``       The maximum number of tags to be detected. For example, ``64``
+``tile_size``  ``uint``   ``4``        Tile/window size used for adaptive thresholding in pixels. For example, ``4``
+``tag_family`` ``string`` ``tag36h11`` Tag family to detect. CUDA backend only supports ``tag36h11``. CPU and PVA backends support ``tag36h11``, ``tag16h5``, ``tag25h9``, ``tag36h10``, ``tag36h11``, ``circle21h7``, ``circle49h12``, ``custom48h12``, ``standard41h12``, ``standard52h13``
+``backends``   ``string`` ``CUDA``     Backend to perform detection with. Options include ``CPU``, ``CUDA``, ``PVA``
+============== ========== ============ ======================================================================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+=============== ================================================================================================================= ===================================
+ROS Topic       Interface                                                                                                         Description
+=============== ================================================================================================================= ===================================
+``image``       `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg>`__           The input camera stream.
+``camera_info`` `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/CameraInfo.msg>`__ The input camera intrinsics stream.
+=============== ================================================================================================================= ===================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+================== ====================================================================================================================================================================================== =========================================================================================
+ROS Topic          Type                                                                                                                                                                                   Description
+================== ====================================================================================================================================================================================== =========================================================================================
+``tag_detections`` :ir_repo:`isaac_ros_apriltag_interfaces/AprilTagDetectionArray <isaac_ros_common> <isaac_ros_apriltag_interfaces/msg/AprilTagDetectionArray.msg>`                                      The detection message array.
+``tf``             `tf2_msgs/TFMessage <https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg>`__                                                                                        Pose of all detected AprilTags (``TagFamily:ID``) w.r.t to the camera topic ``frame_id``.
+================== ====================================================================================================================================================================================== =========================================================================================
+
+
+.. |package_name| replace:: ``isaac_ros_apriltag``
