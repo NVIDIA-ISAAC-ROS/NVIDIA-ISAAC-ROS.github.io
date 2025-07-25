@@ -45,15 +45,16 @@ The following steps configure the AprilTag for docking:
 
 3. Build and install the required packages:
 
-.. include:: _snippets/build_docking_sim.rst
+.. run_ros_app::
+    :repo_setup: <nova-carter-dev-setup>
+    :repo: nova_carter
+    :package: nova_carter_bringup
+    :app: docking_with_apriltag_sim.launch.py init_pose_x:=-2.0 init_pose_y:=14.0 init_pose_yaw:=3.14
+    :asset_packages: isaac_ros_ess_models_install
+    :asset_scripts: install_ess_models.sh
+    :skip_packages: isaac_ros_peoplesemseg_models_install
 
-4. Run the launch file:
-
-    .. code:: bash
-
-       ros2 launch nova_carter_docking docking_with_apriltag_sim.launch.py init_pose_x:=-2.0 init_pose_y:=14.0 init_pose_yaw:=3.14
-
-5. Send a docking action:
+4. Send a docking action:
 
     .. code:: bash
 
@@ -96,7 +97,15 @@ Docking with Nova Carter in Real Using AprilTag
 
 3. Build and install the required packages:
 
-.. include:: _snippets/build_docking_real.rst
+.. run_ros_app::
+    :repo_setup: <nova-carter-dev-setup>
+    :repo: nova_carter
+    :image: isaac/nova_carter_bringup:release_3.2-aarch64
+    :package: nova_carter_bringup
+    :asset_packages: isaac_ros_ess_models_install
+    :asset_scripts: install_ess_models.sh
+    :skip_packages: isaac_ros_peoplesemseg_models_install
+    :command: /bin/bash
 
 4. Run the launch file for your cloud services configuration:
 
