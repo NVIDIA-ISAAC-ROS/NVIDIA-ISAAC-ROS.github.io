@@ -18,7 +18,7 @@ cloud for depth perception.
 
 This package is accelerated using the GPU and specialized hardware
 engines for image computation, replacing the CPU-based
-[image_pipeline metapackage](http://wiki.ros.org/image_pipeline).
+[image_pipeline metapackage](https://docs.ros.org/en/rolling/p/image_pipeline).
 Considerable effort has been made to ensure that replacing
 `image_pipeline` with `isaac_ros_image_pipeline` on a Jetson or GPU
 is as painless a transition as possible.

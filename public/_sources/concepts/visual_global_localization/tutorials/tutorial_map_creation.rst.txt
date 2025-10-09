@@ -36,38 +36,66 @@ Map Creation From ROS Bags
 
 If you want to create the cuVGL map from rosbags, follow these steps:
 
-1. Collect a rosbag with  :ref:`isaac_ros_nova_recorder Quickstart<repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/index:Quickstart>`.
-2. Run your own SLAM algorithm to generate the poses. If you use cuVSLAM, see the :doc:`Tutorial: Mapping and Localization on the Nova Carter </reference_workflows/isaac_perceptor/tutorial_mapping_and_localization>` to create the map instead.
-3. Extract features from the rosbags. You can use the following command to extract features from rosbags. cuVGL only supports converting h264 compressed image in the rosbag.
+#. Collect a rosbag with  :ref:`isaac_ros_nova_recorder Quickstart<repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/index:Quickstart>`.
+#. Run your own SLAM algorithm to generate the poses. If you use cuVSLAM, see the :doc:`Tutorial: Mapping and Localization on the Nova Carter </reference_workflows/isaac_perceptor/tutorial_mapping_and_localization>` to create the map instead.
+#. Extract features from the rosbags. You can use the following command to extract features from rosbags. cuVGL only supports converting h264 compressed image in the rosbag.
 
-.. code-block:: bash
+    .. code-block:: bash
 
-  # Set following variables to your own paths
-  $SENSOR_DATA_BAG="path_to_sensor_data.bag"
-  $POSE_BAG="path_to_pose.bag"
-  $MAP_FOLDER="path_to_map_folder"
+      # Set following variables to your own paths
+      $SENSOR_DATA_BAG="path_to_sensor_data.bag"
+      $POSE_BAG="path_to_pose.bag"
+      $MAP_FOLDER="path_to_map_folder"
 
-  ros2 run isaac_mapping_ros run_rosbag_to_mapping_data.py \
-  --sensor_data_bag=$SENSOR_DATA_BAG --pose_bag=$POSE_BAG --output_folder="$MAP_FOLDER/keyframes" \
-  --extract_feature --rot_dist=5 --trans_dist=0.2 \
-  --pose_topic_name <POSE_TOPIC_NAME>
+      ros2 run isaac_mapping_ros rosbag_to_mapping_data \
+        --sensor_data_bag_file=$SENSOR_DATA_BAG \
+        --pose_bag_file=$POSE_BAG \
+        --output_folder_path="$MAP_FOLDER/keyframes" \
+        --extract_feature --min_inter_frame_rotation_degrees=5 --min_inter_frame_distance=0.2 \
+        --pose_topic_name=<POSE_TOPIC_NAME> \
+        --keypoint_creation_config=$(ros2 pkg prefix isaac_mapping_ros)/share/isaac_mapping_ros/configs/keypoint_creation_config.pb.txt
 
-.. note::
-  Only ``geometry_msgs/msg/PoseStamped``, ``geometry_msgs/msg/PoseWithCovarianceStamped``, ``nav_msgs/msg/Odometry``, and ``nav_msgs/msg/Path`` message types are supported for pose type in the pose rosbag.
+    .. note::
+      Only ``geometry_msgs/msg/PoseStamped``, ``geometry_msgs/msg/PoseWithCovarianceStamped``, ``nav_msgs/msg/Odometry``, and ``nav_msgs/msg/Path`` message types are supported for pose type in the pose rosbag.
 
-4. Create the global localization map using the following command:
+
+    To create map with a customized camera topic config, you can create a camera topic config yaml file and pass it to the command. For example:
+
+    .. code-block:: yaml
+
+      stereo_cameras:
+        - name: my_camera
+          left: /my_camera/left/image_raw
+          left_camera_info: /my_camera/left/camera_info
+          right: /my_camera/right/image_raw
+          right_camera_info: /my_camera/right/camera_info
+
+    Then pass the camera topic config file to the command:
+
+        .. code-block:: bash
+
+          ros2 run isaac_mapping_ros rosbag_to_mapping_data \
+          --sensor_data_bag_file=$SENSOR_DATA_BAG \
+          --pose_bag_file=$POSE_BAG \
+          --output_folder_path="$MAP_FOLDER/keyframes" \
+          --extract_feature --min_inter_frame_rotation_degrees=5 --min_inter_frame_distance=0.2 \
+          --pose_topic_name=<POSE_TOPIC_NAME> \
+          --keypoint_creation_config=$(ros2 pkg prefix isaac_mapping_ros)/share/isaac_mapping_ros/configs/keypoint_creation_config.pb.txt \
+          --camera_topic_config=path/to/camera_topic_config.yaml
+
+#. Create the global localization map using the following command:
 
     .. code-block:: bash
 
       # Create the global localization map, it will create bow index, bow vocabulary
       ros2 run isaac_mapping_ros create_cuvgl_map.py --map_folder=$MAP_FOLDER --no-extract_feature
 
-5. If you have a prebuilt vocabulary, copy the vocabulary folder or create symlink in the map folder, then pass ``--build_bow_voc=false`` when running ``create_cuvgl_map.py``. For example:
+#. If you have a prebuilt vocabulary, copy the vocabulary folder or create symlink in the map folder, then pass ``--build_bow_voc=false`` when running ``create_cuvgl_map.py``. For example:
 
-  .. code-block:: bash
+    .. code-block:: bash
 
-    ln -s /path/to/vocabulary $MAP_FOLDER/vocabulary
-    ros2 run isaac_mapping_ros create_cuvgl_map.py --map_folder=$MAP_FOLDER --no-extract_feature --no-build_bow_voc
+      ln -s /path/to/vocabulary $MAP_FOLDER/vocabulary
+      ros2 run isaac_mapping_ros create_cuvgl_map.py --map_folder=$MAP_FOLDER --no-extract_feature --no-build_bow_voc
 
 Map Creation From Raw Images
 ----------------------------
@@ -84,7 +112,7 @@ definition see the ``keyframe_metadata.pb.h`` file under the install folder of c
 
   cat $(ros2 pkg prefix isaac_mapping_ros)/include/isaac_mapping/protos/visual/general/keyframe_metadata.pb.h
 
-1. Prepare a text protobuf file of message ``KeyframesMetadataCollection`` and put it under: 
+#. Prepare a text protobuf file of message ``KeyframesMetadataCollection`` and put it under:
 
     .. code-block:: bash
 
@@ -94,11 +122,11 @@ definition see the ``keyframe_metadata.pb.h`` file under the install folder of c
         ...
         frames_meta.pb.txt
 
-2. Create the global localization map using the following command:
+#. Create the global localization map using the following command:
 
     .. code-block:: bash
 
       # Create the global localization map, it will create bow index, bow vocabulary
       ros2 run isaac_mapping_ros create_cuvgl_map.py --map_folder=$MAP_FOLDER --no-extract_feature
 
-3. Run create map script with ``--extract_feature``.
+#. Run create map script with ``--extract_feature``.

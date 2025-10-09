@@ -13,7 +13,7 @@ Overview
 --------
 
 This guide details the Isaac requirements for calibration files (that is,
-`URDF <https://wiki.ros.org/urdf>`_ files) encoding extrinsic calibration between sensors, as
+`URDF <https://docs.ros.org/en/rolling/p/urdf>`__ files) encoding extrinsic calibration between sensors, as
 well as requirements on sensors publishing transformations to the ``/tf_static`` tree.
 
 
@@ -63,7 +63,7 @@ Frame Requirements for Sensor Drivers
 The list of requirements regarding sensor frames published from drivers include:
 
 - All frames must follow the conventions defined `ROS REP-0103 <https://www.ros.org/reps/rep-0103.html>`_.
-- All calibration transforms must be published to ``/tf_static`` with a `tf2 <https://wiki.ros.org/tf2>`_ static transform broadcaster.
+- All calibration transforms must be published to ``/tf_static`` with a `tf2 <https://docs.ros.org/en/rolling/p/tf2/>`__ static transform broadcaster.
 
     - It is recommended that you publish only one (1) message per sensor during initialization or with the first published data message.
     - The ``/tf_static`` topic has *transient_local* durability, hence the publisher is responsible for persisting samples for "late-joining" subscriptions.
@@ -120,9 +120,9 @@ The list of requirements for the URDF calibration file encoding extrinsics trans
 
 - URDF-specific requirements:
 
-    - The calibration file must be parsable by the `xacro <http://wiki.ros.org/xacro>`_ command.
+    - The calibration file must be parsable by the `xacro <https://docs.ros.org/en/rolling/p/xacro>`__ command.
 
-        - The calibration file format may be either native `URDF <https://wiki.ros.org/urdf>`_ or using xacro templates.
+        - The calibration file format may be either native `URDF <https://docs.ros.org/en/rolling/p/urdf>`__ or using xacro templates.
         - The resulting calibration URDF (after running the xacro command) must be a valid URDF file.
 
     - Joint type must be ``fixed`` for all joints connecting sensors to ``base_link``.
