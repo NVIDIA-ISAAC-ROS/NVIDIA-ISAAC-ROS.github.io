@@ -3521,7 +3521,7 @@
 </ol>
 <p>This architecture is illustrated in the following diagram:</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_main.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_main.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_main.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_main.png/" />
 </figure>
 <p>The components in the reference architecture represent functional blocks that can have multiple implementations. The primary implementation for each component has undergone testing by NVIDIA. For certain components, we provide alternative implementations later in the document to demonstrate how the reference architecture can be tailored for specific downstream applications.</p>
 </section>
@@ -3531,7 +3531,7 @@
 <section id="visual-input">
 <h3>Visual Input<a class="headerlink" href="#visual-input" title="Link to this heading"></a></h3>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component1.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component1.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component1.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component1.png/" />
 </figure>
 <p>This component is responsible for supplying the RGB and depth images required by other components. Specifically, RGB images are utilized by the Visual Odometry (2), Voxel Grid Mapping (4), and Semantic Segmentation (3) components. Depth images are essential for the Voxel Grid Mapping (4) component.
 In the featured architecture, this component is implemented using three HAWK stereo cameras for capturing RGB images. This camera configuration is identical to that included in the Nova Orin Developer Kit. The RGB images provided by these cameras are processed by the ESS Depth Estimation model, which generates the depth images required for voxel grid mapping.</p>
@@ -3573,7 +3573,7 @@ Besides odometry, Nvblox additionally requires depth images as input. The refere
 <p>This variation corresponds to <strong>Visual Input</strong>.</p>
 <p>In the reference architecture, we use stereo RGB cameras and rely on neural networks (that is, ESS DNN) to estimate depth information. The alternative is to use RGBD cameras. Additionally, use of RGBD cameras can free up computational resources on hardware platforms like Jetson Orin.</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_variation2.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_variation2.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_variation2.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_variation2.png/" />
 </figure>
 <p>In this variation, we eliminate depth processing (on Jetson Orin) entirely by using RGBD cameras. This configuration still provides the required information for components such as cuVSLAM (that is, RGB image) and Nvblox (that is, depth image).
 Here is a list of RGBD cameras along with pointers on how to integrate them with Isaac Perceptor:</p>
@@ -3612,7 +3612,7 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 <section id="visual-odometry">
 <h3>Visual Odometry<a class="headerlink" href="#visual-odometry" title="Link to this heading"></a></h3>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component2.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component2.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component2.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component2.png/" />
 </figure>
 <p>This component processes the multi-camera RGB images to estimate the pose of the cameras as they move through the environment. These camera poses are essential for Voxel Grid Mapping (4) and Navigation (5).</p>
 <p>In the featured architecture, this component is implemented using cuVSLAM, NVIDIA’s accelerated VSLAM library. When provided with multiple time-synchronized RGB images, cuVSLAM accurately generates odometry.</p>
@@ -3626,14 +3626,14 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 <li><p>AMCL: When a static map of the robot’s environment is available, cuVSLAM can be replaced with AMCL, which uses the static map for localizing the robot. For detailed guidance, <a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_isaac_sim.html"><span class="doc">Run Isaac ROS NvBlox with Isaac Sim</span></a> <a class="reference internal" href="tutorials_on_carter/demo_navigation.html"><span class="doc">Autonomous Navigation with Isaac Perceptor and Nav2</span></a>. The tutorial includes steps on creating a map of your environment using lidar on the robot.</p>
 <blockquote>
 <div><figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_visual_odometry_AMCL.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_visual_odometry_AMCL.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_visual_odometry_AMCL.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_visual_odometry_AMCL.png/" />
 </figure>
 </div></blockquote>
 </li>
 <li><p>Wheel Odometry and IMU with AMCL: cuVSLAM for odometry can be substituted with wheel odometry and IMU data. Localization information would be derived from the sensors on the robot’s wheel motors and IMU. Initially, AMCL would be required to create a static map of the environment if one is not already available. Additionally, AMCL is essential for correcting odometry drift. This variation employs AMCL for global localization and wheel odometry for local positioning. For example, <a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_realsense.html"><span class="doc">Visual SLAM using a RealSense camera with integrated IMU</span></a>.</p>
 <blockquote>
 <div><figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_visual_odometry_wheelOdometry.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_visual_odometry_wheelOdometry.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_visual_odometry_wheelOdometry.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_visual_odometry_wheelOdometry.png/" />
 </figure>
 </div></blockquote>
 </li>
@@ -3645,7 +3645,7 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 <section id="semantic-segmentation">
 <h3>Semantic Segmentation<a class="headerlink" href="#semantic-segmentation" title="Link to this heading"></a></h3>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component3.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component3.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component3.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component3.png/" />
 </figure>
 <p>This component processes the RGB images provided by the Visual Input (1) and generates segmentation maps used by Voxel Grid Mapping (4). These segmentation masks add meaningful semantics to the voxel grid maps, allowing for improved handling of dynamic obstacles in the environment and enabling the robot to modify its behavior based on the identified semantics.</p>
 <p>In the featured architecture, this component is implemented using the PeopleSemSegNet segmentation model. The segmentation masks generated by this model create an additional layer in the voxel grid map specifically for identifying and tracking people. For more information, see <a class="reference external" href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplesemsegnet">PeopleSemSegNet</a>.</p>
@@ -3653,7 +3653,7 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 <section id="voxel-grid-mapping">
 <h3>Voxel Grid Mapping<a class="headerlink" href="#voxel-grid-mapping" title="Link to this heading"></a></h3>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component4.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component4.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component4.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component4.png/" />
 </figure>
 <p>This core component is responsible for integrating RGB, depth, pose, and more to build an occupancy map, which is essential for navigation.</p>
 <p>In the featured architecture, this component is implemented using Nvblox. Nvblox processes RGB images, depth images, segmentation masks, and camera poses produced by the other components to generate one or more occupancy masks, with optional colors for visualization. The costmap produced is utilized by the Navigation component (5) to identify safe areas for the robot to travel, while the RGB colors may be used for Visualization (6). For more information, see <a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/index.html"><span class="doc">Nvblox</span></a>.</p>
@@ -3666,7 +3666,7 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 <section id="visualization">
 <h3>Visualization<a class="headerlink" href="#visualization" title="Link to this heading"></a></h3>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component6.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component6.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component6.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component6.png/" />
 </figure>
 <p>This component is useful for debugging purposes, such as visualizing the environment for collision avoidance and motion planning. It also aids in capturing the environment in digital form for visualization and understanding by engineers and developers.</p>
 <p>For example, Nvblox generates a colorized 3D reconstruction of the environment for visualization. It also provides plugins to visualize this mesh in RViz and Foxglove, with real-time updates as the mesh is built.</p>
@@ -3686,9 +3686,9 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component7_nova_orin_devkit.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component7_nova_orin_devkit.png/" />
+<tr class="row-even"><td><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component7_nova_orin_devkit.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component7_nova_orin_devkit.png/" />
 </td>
-<td><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component7_nova_carter_devkit.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component7_nova_carter_devkit.png/" />
+<td><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component7_nova_carter_devkit.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_component7_nova_carter_devkit.png/" />
 </td>
 </tr>
 </tbody>
@@ -3713,7 +3713,7 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 <p>The perception-related tasks in the current reference architecture are executed entirely on a single NVIDIA Jetson AGX Orin. Given the numerous processing nodes involved, this architecture consumes substantial computing and memory resources.</p>
 <p>For navigation purposes, it is recommended to run a navigation stack like Nav2 on an additional Jetson AGX Orin or an x86 system to ensure optimal performance. For instance, if you have an existing Lidar-based SLAM navigation stack running on an x86 system, you can integrate this with Isaac Perceptor for perception capability.</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_hardware_platform.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_hardware_platform.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_hardware_platform.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_perceptor/perceptor_RA_hardware_platform.png/" />
 </figure>
 <p>In this variation, besides running a navigation stack, you can execute additional tasks such as Large Language Models (LLMs) or Vision-Language Models (VLMs) on the x86 system or on an additional Jetson AGX Orin.</p>
 <p>NVIDIA provides a sample config for the Carter robot using Cyclone DDS below. If you are using a Carter robot, add this profile to carter-dev/docker/middleware_profiles:</p>
@@ -3793,7 +3793,7 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2025, NVIDIA.
-      <span class="lastupdated">Last updated on Oct 08, 2025.
+      <span class="lastupdated">Last updated on Oct 24, 2025.
       </span></p>
   </div>
 
@@ -3830,10 +3830,11 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
-            <dd><a href="reference_architecture.html">release-3.2</a></dd>
-            <dd><a href="../../../../reference_workflows/isaac_perceptor/reference_architecture.html">latest</a></dd>
+            <dd><a href="../../../release-4.0/index.html">release-4.0</a></dd>
+            <dd><a href="../../../../index.html">latest</a></dd>
             <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
             <dd><a href="../../../release-3.1/index.html">release-3.1</a></dd>
+            <dd><a href="reference_architecture.html">release-3.2</a></dd>
         </dl>
     </div>
 </div><script>

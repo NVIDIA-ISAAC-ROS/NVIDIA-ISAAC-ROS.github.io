@@ -1,0 +1,1331 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_manipulator> <isaac_manipulator_bringup>`
+
+Overview
+--------
+
+|package_name| contains the launch files for `Isaac for Manipulation`.
+These launch files support multiple reference workflows:
+
+- **Pose-to-Pose**: Move the robot between predefined poses
+- **Object Following**: Track and follow detected object in real-time  
+- **Pick and Place**: Detect, grasp, and place objects
+- **Gear Assembly**: Perform precision assembly tasks using reinforcement learning policies
+
+The package provides a unified interface through configuration files to launch different workflows with various robot configurations (UR5e/UR10e with Robotiq grippers) and sensor setups (RealSense cameras or Isaac Sim).
+
+For step-by-step instructions on running these workflows, see the :doc:`Isaac for Manipulation tutorials </reference_workflows/isaac_for_manipulation/index>` section.
+
+Configuration
+~~~~~~~~~~~~~
+
+The manipulation workflows are configured through YAML files that specify camera types, perception models, and workflow-specific parameters. The :doc:`manipulation_workflow_config_guide` provides:
+
+- **Required parameters** for all workflows (``workflow_type``, ``camera_type``)
+- **Perception workflow options** including depth estimation methods (ESS, Foundation Stereo, etc.)
+- **Camera compatibility options** showing supported combinations
+- **Sample configuration files** for different robot setups
+- **Advanced parameters** for fine-tuning performance
+
+.. tip::
+   
+   **Quick Start**: Use the sample configuration files in the ``isaac_manipulator_bringup/params`` directory as starting points for your setup.
+
+Main Launch File Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``workflows.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This is the main meta launch file that launches manipulator-supported workflows including pose-to-pose, pick and place, object following, and gear assembly workflows.
+
+The launch file coordinates three main components:
+
+1. **Sensor launch file** (``sensors/cameras.launch.py``): Provides RGB camera streams, camera info, and depth estimation. Includes camera-to-robot calibration data. Supports ESS, FoundationStereo depth estimation for RealSense, or stereo depth from Isaac Sim.
+2. **Robot driver launch file** (``drivers/ur_robotiq_driver.launch.py``): Launches drivers for UR e-Series robots and Robotiq 2F grippers, exposing joint states and robot descriptions. For simulation, provides topic-based control through ``ros2_control``.
+3. **Core launch file** (``workflows/core.launch.py``): Launches cuMotion for GPU-accelerated motion planning, nvblox for 3D reconstruction, and perception pipelines (DOPE, RT-DETR + FoundationPose, or Grounding DINO + FoundationPose for object detection and pose estimation). Optionally includes Segment Anything/Segment Anything 2 for segmentation.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Description
+
+   * - ``manipulator_workflow_config``
+     - Path to the YAML configuration file that determines which Isaac for Manipulation workflow to run and its detailed configuration. Supported workflow types: ``POSE_TO_POSE``, ``PICK_AND_PLACE``, ``OBJECT_FOLLOWING``, ``GEAR_ASSEMBLY``.
+
+``record_realsense.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch files records a rosbag containing the RealSense's data,
+which can be useful for debugging purposes.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``run_realsense``
+     - ``True``
+     - ``True``, ``False``
+     - Whether to run the RealSense or not
+
+   * - ``num_cameras``
+     - ``1``
+     - ``1``, ``2``
+     - The number of cameras to run
+
+   * - ``run_rqt``
+     - ``True``
+     - ``True``, ``False``
+     - Whether or not to run RQT to visualize the image
+
+   * - ``output``
+     - ``'None'``
+     - N/A
+     - The file path to write the rosbag
+
+``camera_calibration.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file is used to perform camera calibration. Please
+consult the :doc:`Isaac for Manipulation Camera Calibration </getting_started/sensors/isaac_for_manipulation_camera_calibration>` page.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``camera_type``
+     - ``realsense``
+     - ``realsense``, ``isaac_sim``
+     - Camera sensor used for calibration
+
+Sub Launch File Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``cumotion.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches components related to cuMotion based on several interdependent parameters.
+
+**Parameter Dependencies and Launch Logic:**
+
+The launch behavior is controlled by three key boolean parameters with complex interactions:
+
+1. **Primary Launch Decision**: ``not from_bag and not no_robot_mode``
+
+   - **When true**: Launches cuMotion Planner and Static Planning Scene server to plan and execute robot motions
+   - **When false**: Launches ESDF Visualizer to display the 3D environment map without moving the robot
+
+2. **Robot Segmentation**: ``not no_robot_mode and read_esdf_world``
+
+   - Only launches when **both** robot mode is enabled **and** ESDF integration is enabled
+   - Required to filter robot from depth images before nvblox creates ESDF
+
+3. **Object Attachment**: ``not no_robot_mode and enable_object_attachment``
+
+   - Only available in robot mode (requires actual robot for attachment)
+   - **Additional constraint** (lines 201-210): When ``read_esdf_world=false``, object type cannot be ``SPHERE`` (must be ``CUSTOM_MESH`` or ``CUBOID``)
+
+**Key Terms:**
+
+- **ESDF Visualizer**: Displays the 3D environment reconstruction as colored voxels in RViz, showing obstacles and free space detected by cameras. Used to verify that nvblox is correctly mapping the environment and to debug perception issues (e.g., checking if objects are properly detected, if the workspace bounds are correct, or if camera calibration is accurate).
+- **Bag Playback Mode**: Processing pre-recorded sensor data from ROS bag files instead of live camera streams. Used for testing and development without hardware.
+- **Robot Segmentation**: Filters out the robot itself from depth camera images to prevent the robot from appearing as an obstacle in the environment map.
+
+**Common Configuration Scenarios:**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 15 15 15 40
+
+   * - ``no_robot_mode``
+     - ``from_bag``
+     - ``read_esdf_world``
+     - ``enable_object_attachment``
+     - **Launched Components**
+
+   * - ``false``
+     - ``false``
+     - ``true``
+     - ``false``
+     - **Live Robot Mode**: cuMotion Planner + Robot Segmentation + Static Planning Scene
+
+   * - ``false``
+     - ``false``
+     - ``false``
+     - ``false``
+     - **Live Robot (No ESDF)**: cuMotion Planner + Static Planning Scene
+
+   * - ``true``
+     - ``false``
+     - ``any``
+     - ``any``
+     - **Visualization Only**: ESDF Visualizer (view environment map in RViz, no robot movement)
+
+   * - ``false``
+     - ``true``
+     - ``any``
+     - ``any``
+     - **Bag Analysis**: ESDF Visualizer (analyze pre-recorded sensor data)
+
+   * - ``false``
+     - ``false``
+     - ``true``
+     - ``true``
+     - **Full System**: cuMotion + Robot Segmentation + Static Planning + Object Attachment
+
+   * - ``false``
+     - ``false``
+     - ``false``
+     - ``true``
+     - **Limited Attachment**: cuMotion + Static Planning + Object Attachment (CUSTOM_MESH/CUBOID only)
+
+For detailed component information, see :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>`.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``camera_type``
+     - N/A
+     - ``REALSENSE``, ``ISAAC_SIM``
+     - Type of camera system being used
+
+   * - ``no_robot_mode``
+     - ``False``
+     - ``True``, ``False``
+     - When true, disables robot mode and launches ESDF Visualizer instead of cuMotion Planner and Robot Segmentation nodes
+
+   * - ``enable_object_attachment``
+     - ``False``
+     - ``True``, ``False``
+     - When true, enables object attachment functionality (only available when robot mode is enabled)
+
+   * - ``enable_dnn_depth_in_realsense``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to enable DNN depth estimation in RealSense cameras
+
+   * - ``from_bag``
+     - ``False``
+     - ``True``, ``False``
+     - When true, indicates data is being played from a ROS bag file (pre-recorded sensor data) rather than live cameras. Forces visualization-only mode.
+
+   * - ``num_cameras``
+     - ``1``
+     - ``1``, ``2``
+     - Number of cameras to process
+
+   * - ``workspace_bounds_name``
+     - ``''``
+     - N/A
+     - Name of the workspace bounds configuration to use
+
+   * - ``use_sim_time``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to use simulation time
+
+   * - ``urdf_file_path``
+     - ``<isaac_ros_cumotion_robot_description>/urdf/ur5e_robotiq_2f_140.urdf``
+     - N/A
+     - The URDF for cuMotion to use for planning - used by sim
+
+   * - ``robot_file_name``
+     - ``<isaac_ros_cumotion_robot_description>/xrdf/ur5e_robotiq_2f_140.xrdf``
+     - N/A
+     - The file path that describes the robot. You must specify the full file path and the files can be found in the ``isaac_ros_cumotion_robot_description`` package
+
+   * - ``time_dilation_factor``
+     - ``0.25``
+     - N/A
+     - Speed scaling factor for the planner
+
+   * - ``distance_threshold``
+     - ``0.15``
+     - N/A
+     - Maximum distance from a given collision sphere (in meters) at which to mask points in the CumotionRobotSegmenter
+
+   * - ``time_sync_slop``
+     - ``0.1``
+     - N/A
+     - Maximum allowed delay (in seconds) for which depth image and joint state messages are considered synchronized in the CumotionRobotSegmenter
+
+   * - ``filter_depth_buffer_time``
+     - ``0.1``
+     - N/A
+     - Maximum allowed delayed between the buffer of depth images with respect to the current time
+
+   * - ``joint_states_topic``
+     - ``/joint_states``
+     - N/A
+     - The joint states topic that receives robot position
+
+   * - ``tool_frame``
+     - ``wrist_3_link``
+     - N/A
+     - The tool frame of the robot
+
+   * - ``read_esdf_world``
+     - ``True``
+     - ``True``, ``False``
+     - When true, indicates that cuMotion should read a Euclidean signed distance field (ESDF) as part of its world
+
+   * - ``object_link_name``
+     - ``attached_object``
+     - N/A
+     - Object link name for object attachment
+
+   * - ``search_radius``
+     - ``0.1``
+     - N/A
+     - Search radius for object attachment.
+
+   * - ``update_link_sphere_server_segmenter``
+     - ``planner_attach_object``
+     - N/A
+     - Update link sphere server for the Robot Segmentation node
+
+   * - ``update_link_sphere_server_planner``
+     - ``planner_attach_object``
+     - N/A
+     - Update link sphere server for cuMotion planner
+
+   * - ``clustering_bypass``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to bypass clustering
+
+   * - ``action_names``
+     - ``['segmenter_attach_object', 'planner_attach_object']``
+     - N/A
+     - List of action names for object attachment
+
+   * - ``clustering_hdbscan_min_samples``
+     - ``20``
+     - N/A
+     - HDBSCAN min samples for clustering
+
+   * - ``clustering_hdbscan_min_cluster_size``
+     - ``30``
+     - N/A
+     - HDBSCAN min cluster size for clustering
+
+   * - ``clustering_hdbscan_cluster_selection_epsilon``
+     - ``0.5``
+     - N/A
+     - HDBSCAN cluster selection epsilon
+
+   * - ``clustering_num_top_clusters_to_select``
+     - ``3``
+     - N/A
+     - Number of top clusters to select
+
+   * - ``clustering_group_clusters``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to group clusters
+
+   * - ``clustering_min_points``
+     - ``100``
+     - N/A
+     - Minimum points for clustering
+
+   * - ``publish_curobo_world_as_voxels``
+     - ``True``
+     - ``True``, ``False``
+     - When true, indicates that cuMotion should publish its world representation
+
+   * - ``qos_setting``
+     - ``SENSOR_DATA``
+     - N/A
+     - Indicates what QOS setting is used in the app
+
+   * - ``surface_sphere_radius``
+     - ``0.01``
+     - N/A
+     - Radius for object surface collision spheres
+
+   * - ``object_esdf_clearing_padding``
+     - ``[0.025, 0.025, 0.025]``
+     - N/A
+     - Amount by which to pad each dimension of the AABB enclosing the object, in meters, for the purpose of ESDF clearing
+
+   * - ``trigger_aabb_object_clearing``
+     - ``False``
+     - ``True``, ``False``
+     - When true, indicates that object attachment should instruct nvblox to clear an axis-aligned bounding box (AABB) encompassing the object
+
+   * - ``object_attachment_type``
+     - ``CUSTOM_MESH``
+     - ``CUSTOM_MESH``, ``CUBOID``, ``SPHERE``
+     - Object attachment type for object attachment functionality
+
+   * - ``enable_cuda_mps``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to enable CUDA Multi-Process Service (MPS) for GPU resource sharing
+
+   * - ``cuda_mps_pipe_directory``
+     - ``/workspaces/isaac_ros-dev/ros_ws/mps_pipe_dir``
+     - N/A
+     - The directory for the CUDA MPS pipe
+
+   * - ``cuda_mps_client_priority_robot_segmenter``
+     - ``1``
+     - N/A
+     - The client priority for the MPS for robot segmentation
+
+   * - ``cuda_mps_active_thread_percentage_robot_segmenter``
+     - ``100``
+     - N/A
+     - The active thread percentage for MPS for robot segmentation
+
+   * - ``cuda_mps_client_priority_planner``
+     - ``0``
+     - N/A
+     - The client priority for the MPS for cuMotion planner
+
+   * - ``cuda_mps_active_thread_percentage_planner``
+     - ``100``
+     - N/A
+     - The active thread percentage for MPS for cuMotion planner
+
+   * - ``moveit_collision_objects_scene_file``
+     - ``''``
+     - N/A
+     - Path to MoveIt .scene file with static collision objects to load at startup
+
+``dope.launch.py``
+^^^^^^^^^^^^^^^^^^
+
+This launch file launches the DOPE network, which performs pose estimation.
+This pose is used as the target to follow in object following.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``dope_model_file_path``
+     - ``''``
+     - N/A
+     - The absolute file path to the ONNX file
+
+   * - ``dope_engine_file_path``
+     - ``''``
+     - N/A
+     - The absolute file path to the TensorRT engine file
+
+   * - ``object_name``
+     - ``soup``
+     - N/A
+     - The object class that the DOPE network is detecting
+
+   * - ``dope_map_peak_threshold``
+     - ``0.1``
+     - N/A
+     - The minimum value of a peak in a DOPE belief map
+
+   * - ``dope_enable_tf_publishing``
+     - ``false``
+     - ``true``, ``false``
+     - Whether Dope Decoder will broadcast poses to the TF tree or not
+
+   * - ``stability_num_samples``
+     - ``2``
+     - N/A
+     - Number of samples to ensure pose stability
+
+   * - ``stability_distance_threshold``
+     - ``0.1``
+     - N/A
+     - Maximum distance in meters between poses for stability
+
+   * - ``stability_angle_threshold``
+     - ``5.0``
+     - N/A
+     - Maximum angle in degrees between poses for stability
+
+   * - ``rotation_y_axis``
+     - ``0.0``
+     - N/A
+     - Enable DOPE pose estimation to be rotated by X degrees along y axis
+
+   * - ``rotation_x_axis``
+     - ``0.0``
+     - N/A
+     - Enable DOPE pose estimation to be rotated by X degrees along x axis
+
+   * - ``rotation_z_axis``
+     - ``0.0``
+     - N/A
+     - Enable DOPE pose estimation to be rotated by X degrees along z axis
+
+   * - ``input_fps``
+     - ``30``
+     - N/A
+     - FPS for input messages to the drop node of DOPE
+
+   * - ``dropped_fps``
+     - ``28``
+     - N/A
+     - FPS that are dropped by the drop node of DOPE
+
+   * - ``dope_input_qos``
+     - ``'SENSOR_DATA'``
+     - N/A
+     - QOS setting used for DOPE input
+
+``ess.launch.py``
+^^^^^^^^^^^^^^^^^
+
+This launch file launches the ESS network to estimate depth images for stereo depth estimation.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``camera_type``
+     - ``REALSENSE``
+     - ``REALSENSE``
+     - Type of camera
+
+   * - ``ess_engine_file_path``
+     - ``''``
+     - N/A
+     - The absolute path to the ESS engine plan
+
+   * - ``ess_threshold``
+     - ``0.4``
+     - N/A
+     - Threshold value ranges between 0.0 and 1.0 for filtering disparity with confidence
+
+   * - ``depth_type``
+     - ``ESS_FULL``
+     - ``ESS_LIGHT``, ``ESS_FULL``, ``FOUNDATION_STEREO``
+     - Depth estimation type
+
+   * - ``left_image_raw_topic``
+     - ``left/image_raw_drop``
+     - N/A
+     - Input topic for left camera raw image
+
+   * - ``left_camera_info_topic``
+     - ``left/camera_info_drop``
+     - N/A
+     - Input topic for left camera info
+
+   * - ``right_image_raw_topic``
+     - ``right/image_raw_drop``
+     - N/A
+     - Input topic for right camera raw image
+
+   * - ``right_camera_info_topic``
+     - ``right/camera_info_drop``
+     - N/A
+     - Input topic for right camera info
+
+   * - ``depth_output_topic``
+     - ``depth_image``
+     - N/A
+     - Output topic for depth image
+
+   * - ``rgb_output_topic``
+     - ``rgb/image_rect_color``
+     - N/A
+     - Output topic for RGB image
+
+   * - ``rgb_camera_info_output_topic``
+     - ``rgb/camera_info``
+     - N/A
+     - Output topic for RGB camera info
+
+   * - ``camera_namespace``
+     - ``realsense_camera_1``
+     - N/A
+     - Namespace for the camera
+
+   * - ``input_image_height``
+     - ``720``
+     - ``720`` (REALSENSE)
+     - Input image height
+
+   * - ``input_image_width``
+     - ``1280``
+     - ``1280`` (REALSENSE)
+     - Input image width
+
+``foundationstereo.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the FoundationStereo network for stereo depth estimation, an alternative to ESS.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``camera_type``
+     - ``REALSENSE``
+     - ``REALSENSE``
+     - Type of camera
+
+   * - ``foundationstereo_engine_file_path``
+     - ``''``
+     - N/A
+     - The absolute path to the FoundationStereo engine plan
+
+   * - ``left_image_raw_topic``
+     - ``left/image_raw_drop``
+     - N/A
+     - Input topic for left camera raw image
+
+   * - ``left_camera_info_topic``
+     - ``left/camera_info_drop``
+     - N/A
+     - Input topic for left camera info
+
+   * - ``right_image_raw_topic``
+     - ``right/image_raw_drop``
+     - N/A
+     - Input topic for right camera raw image
+
+   * - ``right_camera_info_topic``
+     - ``right/camera_info_drop``
+     - N/A
+     - Input topic for right camera info
+
+   * - ``depth_output_topic``
+     - ``depth_image``
+     - N/A
+     - Output topic for depth image
+
+   * - ``rgb_output_topic``
+     - ``rgb/image_rect_color``
+     - N/A
+     - Output topic for RGB image
+
+   * - ``rgb_camera_info_output_topic``
+     - ``rgb/camera_info``
+     - N/A
+     - Output topic for RGB camera info
+
+   * - ``camera_namespace``
+     - ``realsense_camera_1``
+     - N/A
+     - Namespace for the camera
+
+   * - ``input_image_height``
+     - ``720``
+     - ``720`` (REALSENSE)
+     - Input image height
+
+   * - ``input_image_width``
+     - ``1280``
+     - ``1280`` (REALSENSE)
+     - Input image width
+
+``foundationpose.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch files launches the FoundationPose network to estimate the pose of
+an object detected by the object detection network (RT-DETR).
+This is used as the target for object following and as the object to
+grasp in Pick and Place.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``mesh_file_path``
+     - ``/tmp/textured_simple.obj``
+     - N/A
+     - The absolute file path to the mesh file
+
+   * - ``texture_path``
+     - ``/tmp/texture_map.png``
+     - N/A
+     - The absolute file path to the texture map
+
+   * - ``refine_model_file_path``
+     - ``/tmp/refine_model.onnx``
+     - N/A
+     - The absolute file path to the refine model
+
+   * - ``refine_engine_file_path``
+     - ``/tmp/refine_trt_engine.plan``
+     - N/A
+     - The absolute file path to the refine engine plan
+
+   * - ``score_model_file_path``
+     - ``/tmp/score_model.onnx``
+     - N/A
+     - The absolute file path to the score model
+
+   * - ``score_engine_file_path``
+     - ``/tmp/score_trt_engine.plan``
+     - N/A
+     - The absolute file path to the score engine plan
+
+   * - ``object_class_id``
+     - ``22``
+     - N/A
+     - The RT-DETR class ID of the object
+
+   * - ``tf_frame_name``
+     - ``detected_object1``
+     - N/A
+     - TF name for detected object
+
+   * - ``refine_iterations``
+     - ``3``
+     - N/A
+     - The number of pose refinement iterations to run
+
+   * - ``symmetry_axes``
+     - ``['x_180', 'y_180', 'z_180']``
+     - N/A
+     - The axes that the object is symmetric about
+
+   * - ``foundationpose_sensor_qos_config``
+     - ``SENSOR_DATA``
+     - N/A
+     - The sensor data quality of service for FoundationPose nodes
+
+   * - ``discard_old_messages``
+     - ``True``
+     - ``True``, ``False``
+     - Whether to discard old messages or not. This is only applicable with the real robot since GXF does not support ROS sim time clock
+
+   * - ``discard_msg_older_than_ms``
+     - ``1000``
+     - N/A
+     - The time in milliseconds to discard old messages
+
+   * - ``enable_dnn_depth_in_realsense``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to enable DNN depth in RealSense or not
+
+   * - ``segmentation_mask_camera_info_topic``
+     - ``/segment_anything/camera_info_dropped``
+     - N/A
+     - The topic name of the camera info for the segmentation mask
+
+   * - ``segmentation_mask_topic``
+     - ``/segment_anything/binary_segmentation_mask``
+     - N/A
+     - The topic name of the segmentation mask
+
+   * - ``output_pose_estimate_topic``
+     - ``pose_estimation/output``
+     - N/A
+     - The topic name of the output pose estimate
+
+   * - ``realsense_depth_camera_info_topic``
+     - N/A
+     - N/A
+     - The topic name of the depth camera info for the RealSense
+
+   * - ``rgb_image_width``
+     - N/A
+     - N/A
+     - The width of the RGB image
+
+   * - ``rgb_image_height``
+     - N/A
+     - N/A
+     - The height of the RGB image
+
+   * - ``depth_image_width``
+     - N/A
+     - N/A
+     - The width of the depth image
+
+   * - ``depth_image_height``
+     - N/A
+     - N/A
+     - The height of the depth image
+
+``goal.launch.py``
+^^^^^^^^^^^^^^^^^^
+
+This launch file launches the ``Goal Initializer`` node, which is used to
+set goals given the object pose in object following.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``world_frame``
+     - ``base_link``
+     - N/A
+     - The world frame of the robot
+
+   * - ``grasp_frame``
+     - ``grasp_frame``
+     - N/A
+     - The grasp frame (goal) that the robot should target
+
+   * - ``grasp_frame_stale_time_threshold``
+     - ``30.0``
+     - N/A
+     - The duration until a grasp frame (goal) not updating is considered stale
+
+   * - ``goal_change_position_threshold``
+     - ``0.1``
+     - N/A
+     - The minimum amount that the goal must move to be targeted
+
+   * - ``plan_timer_period``
+     - ``0.5``
+     - N/A
+     - The time in seconds for which the goal should request a plan
+
+   * - ``planner_group_name``
+     - ``ur_manipulator``
+     - N/A
+     - The MoveIt group name that the planner should plan for
+
+   * - ``pipeline_id``
+     - ``isaac_ros_cumotion``
+     - N/A
+     - The MoveIt pipeline ID to use
+
+   * - ``planner_id``
+     - ``cuMotion``
+     - N/A
+     - The MoveIt planner ID to use
+
+   * - ``end_effector_link``
+     - ``wrist_3_link``
+     - N/A
+     - The name of the end effector link for planning
+
+
+``nvblox.launch.py``
+^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches nvblox to provide a 3D voxel representation of the world as an Euclidean Signed Distance Function (ESDF).
+It's used to determine obstacles that the planner should avoid.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``camera_type``
+     - N/A
+     - ``REALSENSE``, ``ISAAC_SIM``
+     - Type of camera system being used
+
+   * - ``no_robot_mode``
+     - ``False``
+     - ``True``, ``False``
+     - When true, disables robot mode and uses direct depth images instead of robot-segmented depth
+
+   * - ``enable_dnn_depth_in_realsense``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to enable DNN depth estimation in RealSense cameras
+
+   * - ``num_cameras``
+     - ``1``
+     - ``1``, ``2``
+     - Number of cameras to process
+
+   * - ``workspace_bounds_name``
+     - ``''``
+     - N/A
+     - Name of the workspace bounds configuration to use
+
+   * - ``container_name``
+     - ``manipulator_container``
+     - N/A
+     - Name of the container to load nodes into
+
+For the base configuration of nvblox, refer to the configuration found :ir_repo:`here <isaac_ros_nvblox> <nvblox_examples/nvblox_examples_bringup/config/nvblox/nvblox_base.yaml>`
+and the documentation found :doc:`here </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/api/parameters>`.
+
+The modifications that are made from the base configuration can be found :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/config/nvblox/nvblox_manipulator_base.yaml>`.
+
+``pose_to_pose.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the pose-to-pose node, which is used to
+set goals between two different poses in the Pose to Pose example.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``world_frame``
+     - ``base_link``
+     - N/A
+     - The world frame of the robot
+
+   * - ``target_frames``
+     - ``["target1_frame", "target2_frame"]``
+     - N/A
+     - The list of target frames that the robot should plan towards
+
+   * - ``plan_timer_period``
+     - ``0.01``
+     - N/A
+     - The time in seconds for which the goal should request a plan
+
+   * - ``planner_group_name``
+     - ``ur_manipulator``
+     - N/A
+     - The MoveIt group name that the planner should plan for
+
+   * - ``pipeline_id``
+     - ``isaac_ros_cumotion``
+     - N/A
+     - The MoveIt pipeline ID to use
+
+   * - ``planner_id``
+     - ``cuMotion``
+     - N/A
+     - The MoveIt planner ID to use
+
+   * - ``end_effector_link``
+     - ``wrist_3_link``
+     - N/A
+     - The name of the end effector link for planning
+
+``realsense.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the RealSense camera drivers.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``num_cameras``
+     - ``1``
+     - ``1``, ``2``
+     - Number of cameras to launch
+
+   * - ``camera_ids_config_name``
+     - ``''``
+     - N/A
+     - Name of the camera ids/setup config to use
+
+   * - ``container_name``
+     - ``manipulator_container``
+     - N/A
+     - Name of the container to load nodes into
+
+   * - ``run_standalone``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to run in standalone mode with visualization
+
+   * - ``enable_dnn_depth_in_realsense``
+     - ``False``
+     - ``True``, ``False``
+     - Whether to enable DNN depth estimation in RealSense cameras
+
+   * - ``enable_depth``
+     - ``True``
+     - ``True``, ``False``
+     - Whether to enable depth processing
+
+   * - ``dropped_fps``
+     - ``10``
+     - N/A
+     - Target output frame rate (FPS) after frame dropping. The drop node reduces frame rate to balance processing load and latency.
+
+   * - ``input_fps``
+     - ``15``
+     - N/A
+     - Input frame rate (FPS) from the camera. Frames are dropped to achieve the target output rate.
+
+Refer to the configuration file that can be found :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/config/sensors/realsense.yaml>`.
+
+``rtdetr.launch.py``
+^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the RT-DETR pipeline for object detection in order
+to determine the object's location in the image.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``rtdetr_engine_file_path``
+     - ``/tmp/rtdetr.plan``
+     - N/A
+     - The absolute path to the RT-DETR engine plan
+
+   * - ``rt_detr_confidence_threshold``
+     - ``0.7``
+     - N/A
+     - The minimum score for a bounding box to be published
+
+   * - ``input_fps``
+     - ``30``
+     - N/A
+     - FPS for input message to the drop node of RT-DETR
+
+   * - ``dropped_fps``
+     - ``28``
+     - N/A
+     - FPS that are dropped by the drop node of RT-DETR
+
+   * - ``input_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for RT-DETR input
+
+   * - ``output_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for internal nodes of RT-DETR after going through drop node
+
+``grounding_dino.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the Grounding DINO pipeline for open-vocabulary object detection using text prompts.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``dropped_fps``
+     - ``28``
+     - N/A
+     - FPS that are dropped by the drop node
+
+   * - ``grounding_dino_model_file_path``
+     - ``''``
+     - N/A
+     - The absolute file path to the ONNX file
+
+   * - ``grounding_dino_encoder_image_mean``
+     - ``[0.485, 0.456, 0.406]``
+     - N/A
+     - The mean for image normalization
+
+   * - ``grounding_dino_encoder_image_stddev``
+     - ``[0.229, 0.224, 0.225]``
+     - N/A
+     - The standard deviation for image normalization
+
+   * - ``grounding_dino_engine_file_path``
+     - ``''``
+     - N/A
+     - The absolute path to the Grounding DINO engine plan
+
+   * - ``grounding_dino_confidence_threshold``
+     - ``0.5``
+     - N/A
+     - The minimum score for a bounding box to be published
+
+   * - ``grounding_dino_default_prompt``
+     - ``object``
+     - N/A
+     - The text prompt for Grounding DINO object detection
+
+   * - ``image_width``
+     - ``1920``
+     - N/A
+     - The input image width
+
+   * - ``image_height``
+     - ``1080``
+     - N/A
+     - The input image height
+
+   * - ``input_fps``
+     - ``30``
+     - N/A
+     - FPS for input message to the drop node
+
+   * - ``input_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for Grounding DINO input
+
+   * - ``network_image_width``
+     - ``960``
+     - N/A
+     - The network image width
+
+   * - ``network_image_height``
+     - ``544``
+     - N/A
+     - The network image height
+
+   * - ``output_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for Grounding DINO output
+
+``segment_anything.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the Segment Anything pipeline for generating segmentation masks from bounding boxes or points.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``image_input_topic``
+     - ``image``
+     - N/A
+     - The input topic name for the image
+
+   * - ``depth_topic_name``
+     - ``depth``
+     - N/A
+     - The input topic name for the depth
+
+   * - ``camera_info_input_topic``
+     - ``camera_info``
+     - N/A
+     - The input topic name for the camera info
+
+   * - ``image_width``
+     - ``640``
+     - N/A
+     - The width of the image
+
+   * - ``image_height``
+     - ``640``
+     - N/A
+     - The height of the image
+
+   * - ``depth_image_width``
+     - ``640``
+     - N/A
+     - The width of the depth image
+
+   * - ``depth_image_height``
+     - ``640``
+     - N/A
+     - The height of the depth image
+
+   * - ``sam_encoder_image_mean``
+     - ``[0.485, 0.456, 0.406]``
+     - N/A
+     - The mean for image normalization
+
+   * - ``sam_encoder_image_stddev``
+     - ``[0.229, 0.224, 0.225]``
+     - N/A
+     - The standard deviation for image normalization
+
+   * - ``sam_model_repository_paths``
+     - ``["/tmp/models"]``
+     - N/A
+     - The absolute path to the repository of models
+
+   * - ``sam_max_batch_size``
+     - ``20``
+     - N/A
+     - The maximum allowed batch size of the model
+
+   * - ``segment_anything_is_point_triggered``
+     - ``False``
+     - ``True``, ``False``
+     - Whether object following is enabled or not
+
+   * - ``segment_anything_enable_debug_output``
+     - ``False``
+     - ``True``, ``False``
+     - Enables visualizing of segmentation mask for debugging
+
+   * - ``input_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for input
+
+   * - ``output_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for output
+
+   * - ``segment_anything_input_points_topic``
+     - ``input_points``
+     - N/A
+     - The input topic name for the points
+
+   * - ``segment_anything_input_detections_topic``
+     - ``input_detections``
+     - N/A
+     - The input topic name for the detections
+
+   * - ``segment_anything_output_binary_mask_topic``
+     - ``binary_segmentation_mask``
+     - N/A
+     - The output topic name for the binary mask
+
+   * - ``segment_anything_output_detections_topic``
+     - ``output_detections``
+     - N/A
+     - The output topic name for the detections
+
+``segment_anything2.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This launch file launches the Segment Anything 2 pipeline, the next generation of Segment Anything for improved segmentation quality.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default Value
+     - Choices
+     - Description
+
+   * - ``image_input_topic``
+     - ``image``
+     - N/A
+     - The input topic name for the image
+
+   * - ``depth_topic_name``
+     - ``depth``
+     - N/A
+     - The input topic name for the depth
+
+   * - ``camera_info_input_topic``
+     - ``camera_info``
+     - N/A
+     - The input topic name for the camera info
+
+   * - ``image_width``
+     - ``640``
+     - N/A
+     - The width of the image
+
+   * - ``image_height``
+     - ``640``
+     - N/A
+     - The height of the image
+
+   * - ``sam2_encoder_image_mean``
+     - ``[0.485, 0.456, 0.406]``
+     - N/A
+     - The mean for image normalization
+
+   * - ``sam2_encoder_image_stddev``
+     - ``[0.229, 0.224, 0.225]``
+     - N/A
+     - The standard deviation for image normalization
+
+   * - ``sam_model_repository_paths``
+     - ``["/tmp/models"]``
+     - N/A
+     - The absolute path to the repository of models
+
+   * - ``sam2_max_batch_size``
+     - ``5``
+     - N/A
+     - The maximum allowed batch size of the model
+
+   * - ``segment_anything2_is_point_triggered``
+     - ``False``
+     - ``True``, ``False``
+     - Whether object following is enabled or not
+
+   * - ``input_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for input
+
+   * - ``output_qos``
+     - ``SENSOR_DATA``
+     - N/A
+     - QOS setting used for output
+
+   * - ``segment_anything_input_points_topic``
+     - ``input_points``
+     - N/A
+     - The input topic name for the points
+
+   * - ``segment_anything2_output_binary_mask_topic``
+     - ``binary_segmentation_mask``
+     - N/A
+     - The output topic name for the binary mask
+
+   * - ``segment_anything2_output_detections_topic``
+     - ``output_detections``
+     - N/A
+     - The output topic name for the detections
+
+``static_transforms.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This file contains the calibration data of various camera setups.
+It does not have any configurable parameters, however the tutorials
+expects one to create their own setup, with any required transforms.
+
+Additional Resources
+--------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   manipulation_workflow_config_guide
+
+.. |package_name| replace:: ``isaac_manipulator_bringup``

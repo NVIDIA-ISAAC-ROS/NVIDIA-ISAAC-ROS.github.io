@@ -1,0 +1,304 @@
+==========================================================
+Run Tests for various components of Isaac for Manipulation
+==========================================================
+
+Overview
+--------
+
+Testing a robotics system is generally complex, especially for a system like Isaac for Manipulation.
+While it is important to unit test individual components, it is also important to test the system as a whole.
+
+This guide will walk you through the various tests that are available in Isaac for Manipulation, their purposes,
+and how to run them individually.
+
+It is expected that the user has already built the Isaac for Manipulation packages and set up their Jetson unit.
+In addition it is expected that the user has connected cameras and robot to the Jetson unit.
+Some tests require a supported asset to be in the scene and visible to the camera.
+The configuration file should reflect the properties of that object (mesh files, the robot IP, setup and other properties).
+For more information on how to set up the manipulator configuration file, please refer to the 
+:ref:`Create Manipulator Configuration File section <create-manipulator-configuration-file>`.
+
+Environment Variables
+---------------------
+
+Before running any tests, you need to set the appropriate environment variables based on your testing scenario:
+
+Required Environment Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    export ENABLE_GLOBAL_NITROS_DIAGNOSTICS=1  # So that the user can see diagnostics using ros2 run isaac_ros_nitros diagnostic_viewer.py
+    export ENABLE_MANIPULATOR_TESTING=on_robot  # Options include isaac_sim, manual_isaac_sim on_robot or manual_on_robot
+    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp  # For real robot, use this. For Isaac Sim use rmw_fastrtps_cpp
+    export ISAAC_ROS_WS=<USER-ROS-WS>
+    export MANIPULATOR_INSTALL_ASSETS=1  # This is generally set so that the software can pick it up and install missing models/assets required.
+    export ISAAC_MANIPULATOR_TEST_CONFIG=$(ros2 pkg prefix --share isaac_manipulator_bringup)/params/ur10e_robotiq_2f_85_soup_can.yaml  # This is the configuration file for the robot. Your config file maybe different.
+    export ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR=$(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params
+
+Testing Mode Environment Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Set one of the following based on your testing scenario:
+
+**For Isaac Sim Testing:**
+
+.. code-block:: bash
+
+   export ENABLE_MANIPULATOR_TESTING=isaac_sim
+   export ISAAC_MANIPULATOR_TEST_CONFIG=$(ros2 pkg prefix --share isaac_manipulator_bringup)/params/sim_launch_params.yaml
+
+**For Physical Robot Testing:**
+
+.. code-block:: bash
+
+   export ENABLE_MANIPULATOR_TESTING=on_robot
+   export ISAAC_MANIPULATOR_TEST_CONFIG=/path/to/your/robot/config.yaml
+
+**For Manual Testing (Things that cant be tested quantitavely but need some sort of manual inspection):**
+
+.. code-block:: bash
+
+   export ENABLE_MANIPULATOR_TESTING=manual_on_robot
+
+Optional Environment Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   export ROS_DOMAIN_ID=37  # Recommended to avoid network interference
+   export ENABLE_GLOBAL_NITROS_DIAGNOSTICS=1  # For visualizing data flowing through the NITROS nodes
+   export MANIPULATOR_INSTALL_ASSETS=1  # Ensure assets are installed
+
+Running Tests
+-------------
+
+You can run tests in several ways:
+
+**Run All Tests:**
+
+.. code-block:: bash
+
+   python -m pytest $(ros2 pkg prefix --share isaac_manipulator_bringup)/test
+
+**Run Individual Test:**
+
+.. code-block:: bash
+
+   launch_test $(ros2 pkg prefix --share isaac_manipulator_bringup)/test/<test_name>.py
+
+**Run Tests via Colcon:**
+
+.. code-block:: bash
+
+   colcon test --packages-select isaac_manipulator_bringup
+
+.. note::
+
+   ``pytest`` provides better output and makes it easier to view test status and progress compared to ``colcon test``.
+
+Tests for Isaac for Manipulation
+----------------------------------
+
+The following tests are available in Isaac for Manipulation that test various components of the system.
+
+Perception and Object Detection Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For these tests, please place a supported object in the scene, such as a soup can or a mac and cheese box. If you are bringing your own objects, please make sure your manipulator workflow configuration file accurately reflects the object you are using.
+
+If the object is not visible by the camera, then the tests will fail.
+
+These tests will just run the camera through our perception components and observe if pose estimations, object detection or segmentation masks are coming through. It is a Proof Of Life test.
+
+**Object Detection Tests**
+
+- ``object_detection_pol_sim_test.py`` - Tests object detection pipeline in Isaac Sim using RT-DETR
+- ``object_detection_pol_realsense_test.py`` - Tests object detection with RealSense camera on physical robot using RT-DETR
+
+**Pose Estimation Tests**
+
+- ``pose_estimation_pol_sim_test.py`` - Tests 6DOF pose estimation using RT-DETR + FoundationPose in simulation
+- ``pose_estimation_pol_realsense_test.py`` - Tests pose estimation with RealSense camera on physical robot using RT-DETR + FoundationPose
+
+**Grounding DINO Tests**
+
+- ``grounding_dino_detection_pol_realsense_test.py`` - Tests Grounding DINO object detection with RealSense camera
+- ``grounding_dino_detector_servers_realsense_test.py`` - Tests Grounding DINO detector servers with RealSense camera
+
+**Segmentation Tests**
+
+- ``segment_anything_rtdetr_detector_servers_sim_test.py`` - Tests Segment Anything with RT-DETR in simulation
+- ``segment_anything_rtdetr_detector_servers_realsense_test.py`` - Tests Segment Anything with RT-DETR and RealSense
+- ``segment_anything2_rtdetr_detector_servers_realsense_test.py`` - Tests Segment Anything 2 with RT-DETR and RealSense
+
+**Combined Perception Pipeline Tests**
+
+- ``segment_anything_foundation_pose_servers_pol_sim_test.py`` - Tests complete Segment Anything + FoundationPose pipeline in simulation
+- ``segment_anything_foundation_pose_object_following_pol_test_sim.py`` - Tests object following with Segment Anything + FoundationPose in simulation
+- ``rtdetr_foundation_pose_servers_sim_test.py`` - Tests RT-DETR + FoundationPose pipeline in simulation
+
+Pick and Place Workflow Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is very similar to the above tests but these tests will run a perception request through the Isaac for Manipulation servers and do this perception cycle 10 times (this can be changed via a parameter). It will pass if all 10 perception requests were successful.
+We use these servers in our pick and place workflow since we do not want the system to do unnecessary work if perception is not required at some time (during planning, or gear insertion for example). On an edge system, we need to be careful about what work we schedule.
+
+**Core Pick and Place Tests**
+
+- ``pick_and_place_servers_sim_test.py`` - Tests complete pick and place workflow in Isaac Sim
+- ``pick_and_place_servers_realsense_pol_test.py`` - Tests pick and place with RealSense camera on physical robot
+- ``pick_and_place_servers_realsense_with_ess_test.py`` - Tests pick and place with RealSense using ESS depth estimation
+- ``pick_and_place_servers_realsense_with_foundationstereo_test.py`` - Tests pick and place with RealSense using FoundationStereo
+
+Robot Motion, Planning and System Load Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These tests are meant to test the robot segmentation, robot motion planning and system load and performance. We test various camera combinations and test the components with different depth estimation models.
+
+**Robot Segmentation Tests**
+
+- ``robot_segmentor_correctness_check_sim_test.py`` - Validates robot segmentation accuracy in simulation
+- ``robot_segmentor_correctness_check_realsense_test.py`` - Validates robot segmentation accuracy with RealSense
+- ``robot_segmentor_pol_realsense_test.py`` - Tests robot ``segmentor`` performance with RealSense
+- ``robot_segmentor_pol_realsense_2_test.py`` - Additional robot ``segmentor`` test with RealSense
+- ``robot_segmentor_pol_realsense_ess_test.py`` - Tests robot ``segmentor`` with RealSense using ESS depth
+- ``robot_segmentor_pol_realsense_foundationstereo_test.py`` - Tests robot ``segmentor`` with RealSense using FoundationStereo
+- ``robot_segmentor_pol_realsense_foundationstereo_2_test.py`` - Additional robot ``segmentor`` test with FoundationStereo
+
+**System Load and Performance Tests**
+
+- ``manipulator_cumotion_and_perception_load_test_sim_test.py`` - Tests system performance under maximum load in simulation
+- ``manipulator_cumotion_and_perception_load_test_realsense_test.py`` - Tests system performance with RealSense under load
+
+Advanced Manipulation Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These tests are meant to be run manually and do not do any sort of automatic verification.
+We recommend running these tests manually using ``launch_test`` and then manually inspecting the results.
+
+The user will have to export the ``ENABLE_MANIPULATOR_TESTING`` environment variable to ``manual_on_robot`` or ``manual_isaac_sim`` to run these tests.
+
+**Gear Assembly Tests**
+
+- ``gear_assembly_pol_sim_test.py`` - Tests complete gear assembly workflow in Isaac Sim using SAM for object detection
+- ``gear_assembly_pol_realsense_test.py`` - Tests gear assembly workflow with RealSense camera on the physical robot
+
+**Gear Insertion Tests**
+
+- ``gear_insertion_pol_test_sim.py`` - Tests the precision gear insertion task in Isaac Sim.
+- ``gear_assembly_pol_sim_test.py`` - Tests gear assembly workflow with ground truth pose estimation.
+
+**Pose Estimation Error Analysis**
+
+- ``test_pose_estimation_error_test.py`` - Analyzes pose estimation accuracy by moving robot to known poses for visual inspection. One can change the depth backend by changing the test configuration file.
+
+System Integration and QoS Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**QoS (Quality of Service) Tests**
+
+- ``core_nodes_qos_sim_test.py`` - Tests QoS settings for core nodes in simulation
+- ``core_nodes_qos_realsense_test.py`` - Tests QoS settings for core nodes with RealSense
+- ``foundationpose_qos_servers_pick_and_place_sim_test.py`` - Tests FoundationPose QoS in pick and place workflow (simulation)
+- ``foundationpose_qos_servers_pick_and_place_realsense_test.py`` - Tests FoundationPose QoS with RealSense
+- ``foundationpose_qos_object_following_sim_test.py`` - Tests FoundationPose QoS in object following workflow (simulation)
+- ``foundationpose_qos_object_following_realsense_test.py`` - Tests FoundationPose QoS in object following with RealSense
+
+**Topic Connection Tests**
+
+- ``core_nodes_topic_connections_test.py`` - Validates topic connections between core nodes
+- ``foundationpose_topic_connections_pick_and_place_test.py`` - Tests topic graph structure for FoundationPose pick and place workflow
+- ``foundationpose_topic_connections_object_following_test.py`` - Tests topic graph structure for FoundationPose object following workflow
+
+.. _driver_and_hardware_tests:
+
+Driver and Hardware Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Robot Driver Tests**
+
+- ``drivers_pick_and_place_on_robot_test.py`` - Tests robot drivers in pick and place scenario on the real robot.
+- ``drivers_object_following_on_robot_test.py`` - Tests robot drivers in object following scenario on the real robot.
+
+**Feature Toggle Tests**
+
+- ``disable_nvblox_sim_test.py`` - Tests system functionality with nvblox disabled in Isaac Sim.
+- ``disable_nvblox_realsense_test.py`` - Tests system functionality with nvblox disabled using RealSense on the physical robot.
+
+Calibration and Data Collection Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Calibration Tests**
+
+- ``collect_target_less_calibration_data_test.py`` - Collects calibration data for robot-camera calibration without calibration targets
+- ``validate_calibration_accuracy_test.py`` - Validates calibration accuracy by running a test that will record a calibration dataset and then validate the accuracy of the calibration.
+- ``run_calibration_validation.sh`` - Runs the calibration validation test. Please take a look at the bash script to know more about this test. This test can be run just as a ``bash`` script using ``bash run_calibration_validation.sh`` command.
+
+**Pose Estimation Repeatability Tests**
+
+- ``compare_pose_estimation_results.sh`` - Compares pose estimation results from different depth backends. This can be run just as a ``bash`` script using ``bash compare_pose_estimation_results.sh`` command.
+
+Running Individual Tests
+-------------------------
+
+To run a specific test, use the following command format:
+
+.. code-block:: bash
+
+   # Set environment variables first
+   export ENABLE_MANIPULATOR_TESTING=isaac_sim  # or on_robot
+   export ISAAC_ROS_WS=/path/to/your/workspace
+
+   # For Isaac Sim tests
+   export ENABLE_MANIPULATOR_TESTING=isaac_sim
+   launch_test $(ros2 pkg prefix --share isaac_manipulator_bringup)/test/pick_and_place_servers_sim_test.py
+
+   # For physical robot tests
+   export ENABLE_MANIPULATOR_TESTING=on_robot
+   export ISAAC_MANIPULATOR_TEST_CONFIG=/path/to/robot/config.yaml
+   launch_test $(ros2 pkg prefix --share isaac_manipulator_bringup)/test/pick_and_place_servers_realsense_pol_test.py
+
+Test Categories by Platform
+----------------------------
+
+**Isaac Sim Tests** (``ENABLE_MANIPULATOR_TESTING=isaac_sim``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- All tests ending with ``_sim_test.py``
+- Tests that use simulation parameters and Isaac Sim scenes
+- Do not require physical hardware
+
+**Physical Robot Tests** (``ENABLE_MANIPULATOR_TESTING=on_robot``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Tests ending with ``_realsense_test.py`` or ``_pol_test.py``
+- Require physical robot hardware and cameras
+- Need ``ISAAC_MANIPULATOR_TEST_CONFIG`` pointing to robot configuration file
+
+**Manual/CI Tests** (``ENABLE_MANIPULATOR_TESTING=manual_on_robot``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Tests run minimal functionality for CI/development purposes
+- Do not launch full Isaac for Manipulation stack
+
+Troubleshooting
+---------------
+
+**Common Issues:**
+
+1. **Tests fail to start:** Ensure all environment variables are set correctly
+2. **Isaac Sim tests timeout:** Make sure Isaac Sim is running and the scene is loaded
+3. **Physical robot tests fail:** Verify robot configuration file path and robot connectivity
+4. **Permission errors:** Ensure proper file permissions for test output directories
+5. **Test runs ok but it did not test anything:** Ensure that the ``RUN_TEST`` parameter is set to ``True`` in the test file. If not, then it is probably due to a bad configuration of the environment variables.
+
+**Debug Tips:**
+
+#. Enable NITROS diagnostics with ``export ENABLE_GLOBAL_NITROS_DIAGNOSTICS=1`` before launching the tests and in a separate terminal run the following command:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_nitros diagnostic_viewer.py
+
+#. You will be able to see the data flowing through the NITROS nodes.

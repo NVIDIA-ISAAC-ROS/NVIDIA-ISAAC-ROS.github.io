@@ -1,0 +1,114 @@
+Extrinsic Calibration for Mobile Robots
+=======================================
+
+You can use these instructions to calibrate the positions and orientations of sensors on a
+mobile robot. This process is known as **Extrinsic Calibration** and it enables robotics functions
+that combine information from multiple sensor modalities.
+
+The extrinsic calibration results are encoded in a `URDF <https://docs.ros.org/en/rolling/p/urdf>`_
+calibration file, which contains the relative position of different sensors on the robot.
+
+Instructions
+------------
+
+We suggest evaluating existing calibration solutions from companies such as
+`Main Street Autonomy (MSA) <https://mainstreetautonomy.com/>`_
+or `Tangram Vision <https://www.tangramvision.com/>`_ for your particular needs.
+
+.. note::
+
+    Make sure that the calibration solution supports the `Extrinsic Calibration Requirements`_
+    and that the resulting URDF calibration file follows the
+    :doc:`Isaac Requirements for URDF files</robots/isaac_urdf_requirements/index>`.
+
+The usual process for most calibration solutions include:
+
+#. Define a nominals URDF file and publish its transformations to the ``/tf_static`` topic, so that they can be recorded in the rosbag in the next step.
+#. Recording a rosbag with your robot. This step may include driving the robot in a particular motion or placing a calibration target around the robot.
+#. Processing the rosbag with a calibration tool or sharing it with the calibration provider. The calibration tool or service will generate a URDF calibration file.
+#. If the chosen calibration solution does not support camera - ground calibration, you may need to use additional calibration tools to complement the extrinsics calibration URDF.
+#. Placement of the URDF calibration file in the robot.
+
+See the sections below for additional details.
+
+**URDF nominals file:**
+
+This step may be optional depending on the calibration solution and sensors that you are
+calibrating. For example, camera-camera calibration with overlapping Field of View (FoV) may not
+require nominals. On the other hand, IMU, 2D LIDAR, or robot odometry may not be fully observable
+or reliable during calibration. In those cases, nominals allow to constrain the calibrated URDF
+file to the best known measurements from a CAD model. Make sure to follow the requirements and
+understand the limitations of the chosen calibration solution.
+
+Unless nominals are provided for the robot that you are calibrating (see the `Using Nominals`_
+section), in the general case it is **strongly** recommended that you define a nominals URDF file
+for your robot and publish its transformations to the ``/tf_static`` topic, so that they can be
+recorded in the rosbag that will be used for calibration.
+
+**Rosbag recordings used for calibration:**
+
+Most calibration solutions expect a rosbag as input data. You may need to use appropriate rosbag conversion tools to uncompress the messages in the rosbag to the types expected by most calibration solutions:
+
+    - Camera streams: Uncompressed `sensor_msgs/msg/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__ messages.
+    - 3D LIDAR data: `sensor_msgs/msg/PointCloud2 <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/PointCloud2.msg>`__ messages (with fields ``x, y, z, intensity, ring, timestamp``).
+
+Extrinsic Calibration Requirements
+----------------------------------
+
+.. note::
+
+    Recommended prior reading:
+    :doc:`Isaac Requirements for URDF files</robots/isaac_urdf_requirements/index>`
+
+In order to be compatible with Isaac applications, extrinsic calibration tools must:
+
+- Generate a URDF calibration file complying with the :doc:`Isaac Requirements for URDF files</robots/isaac_urdf_requirements/index>`.
+
+- Perform extrinsic calibration for all sensors **without** optimizing intrinsic calibration or stereo calibration of any of the sensors (that is, by fixing the calibration from the sensor drivers).
+
+    - In the event that it is necessary to re-calibrate intrinsics or stereo calibration, make sure that all the following are true:
+
+        - The re-calibrated sensors have a native a mechanism to overwrite their intrinsic calibration and/or stereo calibration (e.g., the calibration stored in the EEPROM).
+
+        - The overwrite process is performed before using the extrinsic URDF calibration file with Isaac applications.
+
+        - The resulting URDF still complies with the :doc:`Isaac Requirements for URDF files</robots/isaac_urdf_requirements/index>` (stereo calibration is not included in the robot URDF).
+
+    - Calibration transformations for all sensors must include 6 Degrees of Freedom (DoF), unless certain DoF are not observable during the data recording (see following points).
+
+- Perform 6-DoF sensor-to-robot calibration and encode the result in the transformation to ``base_link``, unless certain DoF are not observable during the data recording (see following points).
+
+- Fix nominal transformations (from ``/tf_static``) for the DoF that are not observable (or unreliable) during the data recording.
+
+    - Unobservable DoF depend on the calibration process, robot motion (if any), and calibration target design and motion (if any), among others.
+
+    - Some specific examples for wheeled robots include :
+
+        - *IMU*: Axes that are not excited during data recording.
+
+        - ``base_link``: X and Y-translation and yaw rotation for robots with unreliable odometry.
+
+- Perform sensor-to-ground calibration. See clarifications below:
+
+    - Ground calibration refers to the 3-DoF transformation between a sensor and the ground plane: Z-translation, and pitch and yaw rotations.
+
+    - The ground plane should be computed from sensor data.
+
+    - The transformations between ``base_link`` and the robot sensors must be modified so that ``base_link`` is on the ground, with its X-Y axes representing the ground plane.
+
+    - Ground calibration must not modify the transformation between individual sensors. It must only modify the transformation between all sensors (as a rigid body) and ``base_link``, such that ground points perceived by sensors lie on the X-Y plane of the ``base_link`` frame.
+
+
+Using Nominals
+--------------
+
+It is recommended that you always use the ``isaac_calibration.urdf`` file generated in the calibration
+instructions above, because it accurately reflects the true extrinsics of your physical robot.
+However, as a backup option, nominal `xacro <https://index.ros.org/p/xacro/>`_ files may also be available for some platforms.
+
+By default, these nominal values are used by Isaac applications, if a calibrated URDF file is not
+present in the system.
+
+.. note::
+   If using nominal values with sensors mounted on a robot,
+   it is still necessary to provide a URDF encoding their position on the robot.

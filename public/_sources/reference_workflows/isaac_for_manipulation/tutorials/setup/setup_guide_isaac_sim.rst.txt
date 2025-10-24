@@ -1,0 +1,32 @@
+======================================
+Setup for Simulated Robot in Isaac Sim
+======================================
+
+Overview
+--------
+
+This guide walks through the process of setting up the software for a simulated robot with Isaac for Manipulation in Isaac Sim.
+
+
+.. include:: ../isaac_sim/_snippets/isaac_sim_requirements_and_setup.rst
+
+.. include:: ../_snippets/isaac_manipulator_robotiq_gripper.rst
+
+Install Python Dependencies (only required for workflows that run ``RL`` policies)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Install RSL-RL:
+
+.. code:: bash
+
+   sudo apt-get install -y python3-git \
+      && pip install --break-system-packages tensordict \
+      && pip install --break-system-packages --no-deps rsl-rl-lib==3.1.1
+
+.. include:: ../isaac_sim/_snippets/isaac_sim_configure_workflow_file.rst
+
+.. include:: ../isaac_sim/_snippets/isaac_sim_launch.rst
+
+.. include:: ../isaac_sim/_snippets/isaac_sim_pfc_tests.rst
+
+.. include:: ../isaac_sim/_snippets/isaac_sim_scene_speed_up.rst

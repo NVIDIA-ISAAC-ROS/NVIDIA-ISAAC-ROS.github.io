@@ -1,0 +1,398 @@
+===================
+Configuration Guide
+===================
+
+This guide provides step-by-step configuration instructions for setting up the multi-object Pick and Place system. It covers essential setup requirements, hardware-specific configurations, and troubleshooting.
+
+.. note::
+
+   For complete parameter reference and default values, refer to the :doc:`API Reference and Configuration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference>`.
+
+.. important::
+
+   **Configuration File Locations:**
+   
+   - **Binary (Debian) Installation**: Configuration files are read-only. Copy reference files before editing.
+   - **Source Installation**: Configuration files can be edited in place or copied to a separate location.
+   
+   Reference configuration files:
+   
+   - :ir_repo:`multi_object_pick_and_place_behavior_tree_params.yaml <isaac_manipulator> <isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml>`
+   - :ir_repo:`multi_object_pick_and_place_blackboard_params.yaml <isaac_manipulator> <isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml>`
+   
+   For complete setup instructions including copying and editing these files, see :ref:`Configure Your Workflow <configure-workflow>` in the :doc:`Pick and Place Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place>`.
+
+First Run Essentials
+--------------------
+
+.. important::
+   
+   **Before running the multi-object Pick and Place system, you MUST configure the essential parameters below.** The system has many parameters, but most can remain as defaults for your first run. Focus on these critical configurations first.
+
+These parameters **MUST be configured** for your specific setup before running:
+
+.. list-table:: Essential Configuration Checklist
+   :header-rows: 1
+
+   * - Configuration Area
+     - File
+     - Required Parameters
+     - Description
+     - Critical Notes
+
+   * - Object Definitions
+     - ``multi_object_pick_and_place_blackboard_params.yaml``
+     - ``supported_objects.<name>.class_id``, ``supported_objects.<name>.grasp_file_path``, ``supported_objects.<name>.mesh_file_path``
+     - Define which objects can be manipulated
+     - Class IDs MUST match detection model; file paths MUST exist
+
+   * - Drop Locations & Mode
+     - ``multi_object_pick_and_place_blackboard_params.yaml``
+     - ``mode``, ``target_poses``, ``class_ids``
+     - Set execution mode and target locations
+     - Can be pre-configured or provided via action goals
+
+   * - Server Names
+     - ``multi_object_pick_and_place_behavior_tree_params.yaml``
+     - All ``action_server_name``, ``service_name``, and ``gripper_action_name`` parameters
+     - Connect to your system's action/service servers
+     - Must match your actual server names - see complete list in behavior tree config file
+
+   * - Startup Timeout
+     - ``multi_object_pick_and_place_behavior_tree_params.yaml``
+     - ``server_timeout_config.startup_server_timeout_sec``
+     - Control launch sequence timing
+     - Set to ``None`` if orchestration starts before servers
+
+**Object Configuration Example:**
+
+.. code-block:: yaml
+
+   supported_objects:
+     your_object_name:
+       class_id: 'your_detection_class_id'           # MUST match your detection model
+       grasp_file_path: /path/to/your/grasp/file.yaml   # MUST exist
+       mesh_file_path: /path/to/your/object/mesh.obj    # MUST exist for collision planning
+
+Drop Pose Configuration
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The system supports flexible drop pose configuration through three approaches:
+
+.. list-table:: Drop Pose Configuration Methods
+   :header-rows: 1
+
+   * - Method
+     - Priority
+     - Use Case
+     - Configuration
+     - Notes
+
+   * - **Action Goal Parameters**
+     - Highest (overrides all)
+     - Dynamic operation, external control
+     - Provided via ROS 2 action calls
+     - Default behavior - system waits for these
+
+   * - **YAML Pre-configuration**
+     - Medium (used if no action goal)
+     - Autonomous operation, fixed workflows
+     - Set in ``multi_object_pick_and_place_blackboard_params.yaml``
+     - Optional - enables autonomous startup
+
+   * - **Interactive RViz Marker**
+     - Real-time adjustment
+     - Fine-tuning, debugging, correction
+     - Enable ``use_drop_pose_from_rviz: true``
+     - **Correction only** - requires initial poses from other methods
+
+.. important::
+   
+   **Interactive markers are for correction only.** You must start with drop poses from either YAML 
+   config or action goal. The interactive marker then allows real-time adjustments.
+
+Action Goal Parameters (Default Method)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, the system waits for action goals to specify drop poses, class IDs, and execution mode. This provides maximum flexibility for dynamic operation.
+
+.. note::
+
+   For complete action interface documentation including parameter validation rules and examples, refer to the :doc:`API Reference and Configuration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference>`.
+
+YAML Pre-configuration (Optional Autonomous Operation)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For autonomous operation without requiring action goals, you can pre-configure drop poses in the blackboard YAML file. When values are pre-configured, the system starts automatically with these settings:
+
+.. code-block:: yaml
+
+   mode: 1                           # `mode=0` for single bin, `mode=1` for multi-bin
+   target_poses:                     # Safe positions in your workspace [x, y, z, qx, qy, qz, qw]
+     - [-0.25, 0.50, 0.70, -0.677772, 0.734752, 0.020993, 0.017994]  # Class 22
+     - [-0.25, 0.40, 0.40, -0.677772, 0.734752, 0.020993, 0.017994]  # Class 3
+   class_ids: ['22', '3']            # Detection model class IDs (empty if `mode=0`)
+   home_pose: [-0.25, 0.45, 0.50, -0.677772, 0.734752, 0.020993, 0.017994]  # Safe fallback position
+
+**For default behavior (waiting for action goals), leave these fields empty or null:**
+
+.. code-block:: yaml
+
+   mode: null                        # System waits for action goal
+   target_poses: []                  # Empty - system waits for action goal  
+   class_ids: []                     # Empty - system waits for action goal
+   home_pose: [-0.25, 0.45, 0.50, -0.677772, 0.734752, 0.020993, 0.017994]  # Always required
+
+Override Behavior
+^^^^^^^^^^^^^^^^^^
+
+Action goals always take precedence over YAML configuration. Even when YAML values are pre-configured, sending an action goal will override those values for the current execution.
+
+#. Verify Server Names (Behavior Tree Config)
+
+   The behavior tree connects to various action servers and services in your system. In ``multi_object_pick_and_place_behavior_tree_params.yaml``, you need to verify that all server names match your actual system configuration.
+
+   **Key server types to verify:**
+   
+   - **Object detection**: ``detect_object.action_server_name`` (default: ``'/get_objects'``)
+   - **Pose estimation**: ``pose_estimation.action_server_name`` (default: ``'/get_object_pose'``)
+   - **Motion planning**: ``plan_to_grasp.action_server_name`` and ``plan_to_pose.action_server_name`` (default: ``'cumotion/motion_plan'``)
+   - **Gripper control**: ``close_gripper.gripper_action_name`` and ``open_gripper.gripper_action_name`` (default: ``'/robotiq_gripper_controller/gripper_cmd'``)
+   - **Trajectory execution**: ``execute_trajectory.action_server_name`` (default: ``'execute_trajectory'``)
+
+   .. note::
+
+      For the complete list of all server names and configurable parameters, refer to the :doc:`API Reference and Configuration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference>`.
+
+#. Set Startup Timeout (Critical for Launch Sequence)
+
+   .. code-block:: yaml
+
+      server_timeout_config:
+        startup_server_timeout_sec: None    # Set to None if you start orchestration BEFORE servers
+        # OR set to a number (e.g., 120.0) if servers are already running
+
+.. note::
+
+   For additional timeout configuration options including runtime retry timeouts and server check intervals, refer to the :doc:`API Reference and Configuration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference>`.
+
+Hardware-Specific Configuration
+-------------------------------
+
+After configuring the essential parameters, adjust the following settings for your specific robot hardware:
+
+* **Gripper Settings**
+
+  Configure gripper positions and force limits based on your gripper specifications and the objects you're manipulating.
+
+  .. code-block:: yaml
+
+     # Gripper Configuration
+     close_gripper:
+       close_position: 0.55    # Adjust for your gripper's closed position
+       max_effort: 10.0        # Adjust for your gripper's effort limits
+     open_gripper:
+       open_position: 0.0      # Adjust for your gripper's open position
+
+* **Controller Names**
+
+  Ensure the controller names match your robot's ROS 2 controller configuration. The system needs to activate the correct controllers for arm and gripper operations.
+
+  .. code-block:: yaml
+
+     # Controller Names
+     switch_controllers:
+       arm:
+         controllers_to_activate: ['your_arm_controller']        # Your arm controller name
+         controllers_to_deactivate: ['conflicting_controller']   # Controllers to deactivate
+         strictness: 4  # FORCE_AUTO (default)
+       tool:
+         controllers_to_activate: ['your_gripper_controller']    # Your gripper controller name
+         strictness: 4  # FORCE_AUTO (default)
+
+  .. tip::
+
+     Controller switching ``strictness`` defaults to **4 (FORCE_AUTO)** on ROS 2 Jazzy and later. This automatically deactivates conflicting controllers when switching. If you experience unexpected de-activations or are on an earlier ROS 2 distribution, set ``strictness`` to ``2`` (``STRICT``) explicitly in your YAML.
+
+* **Frame Names**
+
+  Verify that reference frames and end effector frames match your robot's TF tree structure.
+
+  .. code-block:: yaml
+
+     # Frame Names
+     interactive_marker:
+       reference_frame: 'base_link'      # Your robot's base frame
+       end_effector_frame: 'gripper_frame'  # Your end effector frame
+
+Advanced Customization
+----------------------
+
+Once your system is running, you may want to fine-tune the following performance parameters:
+
+* **Workspace Bounds**
+
+  Configure 3D cuboid workspace bounds to automatically filter objects outside the robot's reachable area during pose estimation. Default is disabled (``diagonal: []``), so you can run the workflow without modifying these values. When enabled, the cuboid is defined by two diagonal corner points.
+
+  .. code-block:: yaml
+
+     pose_estimation:
+       workspace_bounds:
+         diagonal:
+           - [0.3, -0.4, 0.0]   # corner 1 (x, y, z) in base_link frame
+           - [-0.3, 0.4, 0.8]   # corner 2 (x, y, z) in base_link frame
+
+  .. warning::
+     
+     **If you enable workspace bounds, customize these coordinates for your specific robot and workspace setup.** The example values above are for illustration only. Measure your robot's actual reachable workspace and set appropriate bounds to prevent the robot from attempting to reach objects outside its safe operating area.
+
+  Set ``diagonal: []`` to disable workspace bounds filtering. Objects outside the defined cuboid are automatically removed from the object cache during pose estimation.
+
+* **Pose Estimation Frame IDs**
+
+  Configure frames used by pose estimation in the behavior tree parameters:
+
+  .. code-block:: yaml
+
+     pose_estimation:
+       base_frame_id: 'base_link'             # Robot base frame
+       camera_frame_id: ''                     # Camera optical frame
+
+  Guidance:
+
+  - On real robots, set ``camera_frame_id`` to the RGB optical frame for the camera feeding detection (e.g., ``camera_1_color_optical_frame`` for RealSense).
+  - In Isaac Sim, use ``front_stereo_camera_left`` for the default scene.
+
+* **Detection Confidence**
+
+  Increase ``detection_confidence_threshold`` if your detection model is very reliable.
+
+  .. code-block:: yaml
+
+     detection_confidence_threshold: 0.9  # Increase for more reliable detection models
+
+* **Retry Limits**
+
+  Increase retry values if your system components are unreliable.
+
+  .. code-block:: yaml
+
+     max_planning_retries: 5           # Default: 3
+     max_detection_retries: 5          # Default: 3
+     max_pose_estimation_retries: 5    # Default: 3
+
+* **Workflow Timing**
+
+  Adjust ``timeout_duration`` based on your expected workflow completion time.
+
+  .. code-block:: yaml
+
+     timeout_duration: 300.0           # Seconds until workflow timeout (default: 180.0)
+
+* **Interactive Features**
+
+  Enable ``use_drop_pose_from_rviz`` for real-time drop pose adjustment in RViz.
+
+  .. code-block:: yaml
+
+     use_drop_pose_from_rviz: true     # Enable interactive marker control
+
+* **Object Attachment Configuration**
+
+  Object attachment adds grasped objects to the robot's collision geometry for safe motion planning.
+
+  .. tabs::
+
+     .. tab:: CUBOID (Recommended)
+
+        Reliable geometric approximation using a box shape.
+
+        .. code-block:: yaml
+
+           attach_object:
+             shape: 'CUBOID'                    # Reliable geometric approximation
+             scale: [0.1, 0.1, 0.2]             # [width, depth, height] in meters
+
+     .. tab:: CUSTOM_MESH
+
+        Most accurate but requires mesh files for each object.
+
+        .. code-block:: yaml
+
+           attach_object:
+             shape: 'CUSTOM_MESH'
+             # Uses mesh_file_path from supported_objects configuration
+
+     .. tab:: SPHERE
+
+        Depth-based dynamic generation.
+
+        .. code-block:: yaml
+
+           attach_object:
+             shape: 'SPHERE'
+             # Automatically generates sphere from depth data
+
+.. note::
+
+   For complete parameter specifications and default values, refer to the :doc:`API Reference and Configuration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference>`.
+
+Configuration File Locations
+----------------------------
+
+Configuration files are located at:
+
+- Behavior tree config: ``$(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params/multi_object_pick_and_place_behavior_tree_params.yaml``
+- Blackboard config: ``$(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params/multi_object_pick_and_place_blackboard_params.yaml``
+
+
+Configuration Templates
+-----------------------
+
+.. tabs::
+
+   .. tab:: Single Bin Mode
+
+      Example configuration for simple Pick and Place to a single location:
+
+      **Blackboard Config:**
+
+      .. code-block:: yaml
+
+         # Single bin mode - all objects go to one location
+         mode: 0
+         target_poses: []  # Will be provided via action goal
+         class_ids: []     # Empty for single bin
+         home_pose: [-0.25, 0.45, 0.50, -0.677772, 0.734752, 0.020993, 0.017994]
+         
+         supported_objects:
+           generic_object:
+             class_id: '1'
+             grasp_file_path: '/path/to/generic_grasps.yaml'
+             mesh_file_path: '/path/to/generic_mesh.obj'
+
+   .. tab:: Multi-Bin Mode
+
+      Example configuration for sorting different object types to different locations:
+
+      **Blackboard Config:**
+
+      .. code-block:: yaml
+
+         # Multi-bin mode - sort objects by type
+         mode: 1
+         target_poses:
+           - [-0.25, 0.50, 0.70, -0.677772, 0.734752, 0.020993, 0.017994]  # Location for class '22'
+           - [-0.25, 0.40, 0.40, -0.677772, 0.734752, 0.020993, 0.017994]  # Location for class '3'
+         class_ids: ['22', '3']
+         home_pose: [-0.25, 0.45, 0.50, -0.677772, 0.734752, 0.020993, 0.017994]
+         
+         supported_objects:
+           object_type_a:
+             class_id: '22'
+             grasp_file_path: '/path/to/object_a_grasps.yaml'
+             mesh_file_path: '/path/to/object_a.obj'
+           object_type_b:
+             class_id: '3'
+             grasp_file_path: '/path/to/object_b_grasps.yaml'
+             mesh_file_path: '/path/to/object_b.obj'

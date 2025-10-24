@@ -3503,7 +3503,7 @@ somewhat less accurate than those returned by FoundationPose, but DOPE incurs lo
 On Jetson AGX Orin, DOPE runs at up to 5 FPS, while the combination of RT-DETR and FoundationPose
 more typically runs at approximately 1 FPS.</p>
 <figure class="align-center" id="id5">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/manipulator_object_following_workflow.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/manipulator_object_following_workflow.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/manipulator_object_following_workflow.png/" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/manipulator_object_following_workflow.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/manipulator_object_following_workflow.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/manipulator_object_following_workflow.png/" style="width: 100%;" /></a>
 <figcaption>
 <p><span class="caption-text">High-level architecture of the Isaac Manipulator “object following” reference workflow</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
 </figcaption>
@@ -3511,18 +3511,18 @@ more typically runs at approximately 1 FPS.</p>
 <p>The pose-to-pose tutorial uses:</p>
 <ul class="simple">
 <li><p>Stereo cameras for perception</p></li>
-<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_stereo_depth/blob/main/isaac_ros_ess">Isaac ROS ESS</a> for depth estimation</p></li>
+<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_dnn_stereo_depth/blob/release-3.2/isaac_ros_ess">Isaac ROS ESS</a> for depth estimation</p></li>
 <li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nvblox">Isaac ROS Nvblox</a> to produce a voxelized representation of the scene</p></li>
 </ul>
 <p>The object-following tutorial uses the above and adds:</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">FoundationPose</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">DOPE</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><ul class="simple">
-<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_object_detection/blob/main/isaac_ros_rtdetr">Isaac ROS RT-DETR</a> to detect an object of interest</p></li>
-<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_pose_estimation/blob/main/isaac_ros_foundationpose">Isaac ROS FoundationPose</a> to estimate the 6 DoF pose of the desired object to approach</p></li>
+<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_object_detection/blob/release-3.2/isaac_ros_rtdetr">Isaac ROS RT-DETR</a> to detect an object of interest</p></li>
+<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_pose_estimation/blob/release-3.2/isaac_ros_foundationpose">Isaac ROS FoundationPose</a> to estimate the 6 DoF pose of the desired object to approach</p></li>
 <li><p><a class="reference external" href="https://github.com/ros-tooling/topic_tools/tree/humble?tab=readme-ov-file#drop">Drop</a> nodes to reduce the input frame rate for RT-DETR, in order to more closely match the achievable frame rate for FoundationPose and thus limit unnecessary system load.</p></li>
 </ul>
 </div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><ul class="simple">
-<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_pose_estimation/blob/main/isaac_ros_dope">Isaac ROS DOPE</a> to detect an object of interest and estimate its 6 DoF pose</p></li>
+<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_pose_estimation/blob/release-3.2/isaac_ros_dope">Isaac ROS DOPE</a> to detect an object of interest and estimate its 6 DoF pose</p></li>
 <li><p><a class="reference external" href="https://github.com/ros-tooling/topic_tools/tree/humble?tab=readme-ov-file#drop">Drop</a> nodes to reduce the input frame rate for DOPE, in order to limit GPU utilization and avoid starvation of cuMotion and nvblox.</p></li>
 </ul>
 </div></div>
@@ -3572,10 +3572,10 @@ Foxglove is recommended when visualizing a reconstruction streamed from a remote
 <li><p>One of the objects that <a class="reference external" href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/synthetica_detr">sdetr_grasp</a> or <a class="reference external" href="https://github.com/NVlabs/Deep_Object_Pose">DOPE</a> was trained on. In this tutorial, we are going to use the Mac and Cheese Box for FoundationPose and the Tomato Soup Can for DOPE.</p></li>
 </ul>
 <figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/soup_can.png/"><img alt="Soup Can object" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/soup_can.png/" style="width: 234px;" /></a>
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/soup_can.png/"><img alt="Soup Can object" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/soup_can.png/" style="width: 234px;" /></a>
 </figure>
 <figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/mac_and_cheese.png/"><img alt="Mac and Cheese object" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/mac_and_cheese.png/" style="width: 286px;" /></a>
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/mac_and_cheese.png/"><img alt="Mac and Cheese object" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/mac_and_cheese.png/" style="width: 286px;" /></a>
 </figure>
 <p>If you are using FoundationPose for an object, ensure that you have a mesh and a texture file available for it. To prepare an object, consult the FoundationPose documentation:</p>
 <blockquote>
@@ -3716,7 +3716,7 @@ the quality and completeness of the 3D reconstruction being used for collision a
 </li>
 <li><p>Decide on a name for your setup and substitute it for <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> in the instructions below.</p></li>
 <li><p>If your test setup includes multiple RealSense cameras <a class="reference external" href="https://dev.intelrealsense.com/docs/ros2-multiple-cameras">identify their serial numbers</a>.
-Copy the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/config/sensors/realsense_camera_ids/unspecified.yaml">unspecified.yaml</a> file
+Copy the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/config/sensors/realsense_camera_ids/unspecified.yaml">unspecified.yaml</a> file
 to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in the same folder and fill in the camera serial numbers.</p></li>
 <li><p>Follow <a class="reference internal" href="../../../getting_started/hardware_setup/sensors/manipulator_camera_calibration.html"><span class="doc">Manipulator Camera Calibration</span></a>
 instructions to calibrate the cameras with respect to the robot. The <code class="docutils literal notranslate"><span class="pre">calibration.launch.py</span></code>
@@ -3768,7 +3768,7 @@ def<span class="w"> </span>generate_launch_description<span class="o">()</span><
 </div>
 </div></blockquote>
 </li>
-<li><p>In the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>
+<li><p>In the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>
 file, duplicate the <code class="docutils literal notranslate"><span class="pre">hubble_test_bench</span></code> item in the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code> dictionary and rename its key to <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code>.</p></li>
 <li><p>Update the transforms in the new <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item with the calibrated pose values found in the calibration step above.</p>
 <div class="admonition note">
@@ -3804,17 +3804,17 @@ only) from the previous point would look as follows:</p>
 <li><p>Modify other appropriate values based on the tutorial:</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-2-2-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-2-2-0" name="2-0" role="tab" tabindex="0">Object Following</button><button aria-controls="panel-2-2-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-2-2-1" name="2-1" role="tab" tabindex="-1">Pose to Pose</button></div><div aria-labelledby="tab-2-2-0" class="sphinx-tabs-panel" id="panel-2-2-0" name="2-0" role="tabpanel" tabindex="0"><p>Modify the <code class="docutils literal notranslate"><span class="pre">object_to_grasp_frame</span></code> transform in the <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item of the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code>
-dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>,
+dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>,
 to a desired grasp pose relative to the detected object. Feel free to leave this as the default for simplicity.</p>
 </div><div aria-labelledby="tab-2-2-1" class="sphinx-tabs-panel" hidden="true" id="panel-2-2-1" name="2-1" role="tabpanel" tabindex="0"><p>Update the <code class="docutils literal notranslate"><span class="pre">world_to_target_frame_1</span></code> and <code class="docutils literal notranslate"><span class="pre">world_to_target_frame_2</span></code> transforms in the <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item of the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code>
-dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>,
+dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>,
 to be two distinct poses that are reachable by the robot.</p>
 </div></div>
 </li>
 <li><p>Set the workspace bounds for nvblox:</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-3-3-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-3-3-0" name="3-0" role="tab" tabindex="0">Installation from Source</button><button aria-controls="panel-3-3-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-3-3-1" name="3-1" role="tab" tabindex="-1">Installation from Debian</button></div><div aria-labelledby="tab-3-3-0" class="sphinx-tabs-panel" id="panel-3-3-0" name="3-0" role="tabpanel" tabindex="0"><ol class="arabic">
-<li><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_test_bench.yaml">hubble_test_bench.yaml</a>
+<li><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_test_bench.yaml">hubble_test_bench.yaml</a>
 to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in the same folder and update the workspace bound corners.</p></li>
 <li><p>Rebuild and source the <code class="docutils literal notranslate"><span class="pre">isaac_manipulator_bringup</span></code> package inside the Docker container:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
@@ -3824,13 +3824,13 @@ to a new file named <code class="docutils literal notranslate"><span class="pre"
 </div>
 </li>
 </ol>
-</div><div aria-labelledby="tab-3-3-1" class="sphinx-tabs-panel" hidden="true" id="panel-3-3-1" name="3-1" role="tabpanel" tabindex="0"><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_test_bench.yaml">hubble_test_bench.yaml</a>
+</div><div aria-labelledby="tab-3-3-1" class="sphinx-tabs-panel" hidden="true" id="panel-3-3-1" name="3-1" role="tabpanel" tabindex="0"><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_test_bench.yaml">hubble_test_bench.yaml</a>
 to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in
 <code class="docutils literal notranslate"><span class="pre">/opt/ros/humble/share/isaac_manipulator_bringup/config/nvblox/workspace_bounds/</span></code>.</p>
 </div><p><strong>How to choose the workspace bounds:</strong></p>
 <ul class="simple">
 <li><p>The workspace bounds define the space that is mapped for obstacle-aware planning and must cover the full space that the robot arm will be operating in.</p></li>
-<li><p>The workspace min and max corners are defined in the nvblox <code class="docutils literal notranslate"><span class="pre">global_frame</span></code> set <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/config/nvblox/nvblox_manipulator_base.yaml">here</a>.</p></li>
+<li><p>The workspace min and max corners are defined in the nvblox <code class="docutils literal notranslate"><span class="pre">global_frame</span></code> set <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/config/nvblox/nvblox_manipulator_base.yaml">here</a>.</p></li>
 <li><p>The workspace bounds will be visualized when running the launch files (as a red bounding box). You can return to this step to adjust them after the system is running and producing visualizations.</p></li>
 <li><p>A larger workspace will result in increased computational demands, which scale with the total number of voxels. The Isaac Manipulator reference workflows have been tested on Jetson AGX Orin with workspace volumes of up to 8 m<sup>3</sup> with 1 cm<sup>3</sup> voxels.  If a larger workspace is desired, the voxel size may be increased proportionally while keeping the total number of voxels fixed.  The trade-off is that larger voxels may increase the likelihood of planning failures or increase motion time in scenarios that require the robot to move in tight proximity to obstacles.</p></li>
 </ul>
@@ -4149,7 +4149,7 @@ in the <code class="docutils literal notranslate"><span class="pre">isaac_ros_cu
 <li><p>On the UR teach pendant, press <strong>play</strong> to enable the robot.</p></li>
 </ol>
 <figure class="align-center" id="id6">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif/" style="width: 576px;" /></a>
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/reference_workflows/isaac_manipulator/ur5e_pose_to_pose.gif/" style="width: 576px;" /></a>
 <figcaption>
 <p><span class="caption-text">“Pose-to-pose” example with obstacle avoidance via cuMotion and nvblox on a UR5e robot.</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
 </figcaption>
@@ -4172,9 +4172,9 @@ for the <code class="docutils literal notranslate"><span class="pre">isaac_manip
 <ol class="arabic simple">
 <li><p>Complete the <a class="reference internal" href="../../../concepts/visualization/foxglove.html#foxglove-setup"><span class="std std-ref">Foxglove setup</span></a> guide.</p></li>
 <li><p>For the RealSense pose-to-pose tutorial, see the
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/config/visualization/realsense_foxglove.json">realsense_foxglove.json</a>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/config/visualization/realsense_foxglove.json">realsense_foxglove.json</a>
 Foxglove layout configuration as an example. When running with a Hawk camera, use the
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/main/isaac_manipulator_bringup/config/visualization/hawk_foxglove.json">hawk_foxglove.json</a> configuration.</p></li>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-3.2/isaac_manipulator_bringup/config/visualization/hawk_foxglove.json">hawk_foxglove.json</a> configuration.</p></li>
 <li><p>Launch any Isaac Manipulator tutorial with the commands shown <a class="reference internal" href="#run-launch-files"><span class="std std-ref">here</span></a>
 and append the <code class="docutils literal notranslate"><span class="pre">run_foxglove:=True</span></code> flag.</p></li>
 </ol>
@@ -4194,7 +4194,7 @@ and append the <code class="docutils literal notranslate"><span class="pre">run_
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2025, NVIDIA.
-      <span class="lastupdated">Last updated on Oct 08, 2025.
+      <span class="lastupdated">Last updated on Oct 24, 2025.
       </span></p>
   </div>
 
@@ -4231,10 +4231,11 @@ and append the <code class="docutils literal notranslate"><span class="pre">run_
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
-            <dd><a href="tutorial_e2e.html">release-3.2</a></dd>
-            <dd><a href="../../../../../reference_workflows/isaac_manipulator/tutorials/tutorial_e2e.html">latest</a></dd>
+            <dd><a href="../../../../release-4.0/index.html">release-4.0</a></dd>
+            <dd><a href="../../../../../index.html">latest</a></dd>
             <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
             <dd><a href="../../../../release-3.1/reference_workflows/isaac_manipulator/tutorials/tutorial_e2e.html">release-3.1</a></dd>
+            <dd><a href="tutorial_e2e.html">release-3.2</a></dd>
         </dl>
     </div>
 </div><script>

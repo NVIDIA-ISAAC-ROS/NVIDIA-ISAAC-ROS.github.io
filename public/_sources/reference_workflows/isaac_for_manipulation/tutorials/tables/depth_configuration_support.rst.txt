@@ -1,0 +1,54 @@
+**RealSense Cameras**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 25 45
+
+   * - Depth Type
+     - ``enable_dnn_depth_in_realsense``
+     - Actual Depth Source
+
+   * - Any depth type
+     - ``false``
+     - Native RealSense depth (overrides ``depth_type``)
+
+   * - ``ESS_FULL``
+     - ``true``
+     - ESS Full DNN depth
+
+   * - ``ESS_LIGHT``
+     - ``true``
+     - ESS Light DNN depth
+
+   * - ``FOUNDATION_STEREO``
+     - ``true``
+     - Foundation Stereo DNN depth
+
+   * - ``ISAAC_SIM``
+     - Any value
+     - Simulation depth
+
+**Isaac Sim Cameras**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 50 50
+
+   * - Supported Depth Type
+     - Actual Depth Source
+
+   * - ``ISAAC_SIM``
+     - Simulation depth
+
+.. note::
+
+   **Key Configuration Rules:**
+   
+   - **RealSense cameras** have native depth capability. Set ``enable_dnn_depth_in_realsense: false`` to use native depth, or ``true`` to use DNN-based depth estimation.
+   - **Isaac Sim cameras** provide simulation depth directly and only support ``ISAAC_SIM`` depth type. The ``enable_dnn_depth_in_realsense`` parameter is ignored.
+   - When using RealSense with ``enable_dnn_depth_in_realsense: false``, the ``depth_type`` setting is overridden and native RealSense depth is used regardless.
+   - DNN-based depth methods (``ESS_FULL``, ``ESS_LIGHT``, ``FOUNDATION_STEREO``) provide better quality but require additional computational resources.
+   
+   **Unsupported Combinations:**
+   
+   - Isaac Sim cameras cannot use ``ESS_FULL``, ``ESS_LIGHT``, ``FOUNDATION_STEREO``, or ``REALSENSE`` depth types

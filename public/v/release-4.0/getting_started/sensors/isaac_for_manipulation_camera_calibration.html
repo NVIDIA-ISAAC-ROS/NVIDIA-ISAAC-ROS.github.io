@@ -1,0 +1,1495 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Isaac for Manipulation Camera Calibration &#8212; Isaac ROS</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=a5c4661c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/isaac.css?v=177ef1d8" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=01823362"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script src="../../_static/tabs.js?v=3030b3cb"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started/sensors/isaac_for_manipulation_camera_calibration';</script>
+    <script>mermaid.initialize({"startOnLoad": true})</script>
+    <link rel="icon" href="../../_static/isaac_ros_logo.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Extrinsic Calibration for Mobile Robots" href="amr_extrinsic_calibration.html" />
+    <link rel="prev" title="Monocular Camera Calibration" href="camera_calibration.html" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Oct 24, 2025"/>
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Getting Started</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../compute/index.html">Compute Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../compute/jetson_storage.html">Jetson Storage Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/preempt_setup.html">PREEMPT_RT Kernel for Jetson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/jetson_vpi.html">Jetson Setup for VPI</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Sensors Setup</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="realsense_setup.html">Isaac ROS RealSense Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zed_setup.html">Isaac ROS ZED Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="camera_calibration.html">Monocular Camera Calibration</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Isaac for Manipulation Camera Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="amr_extrinsic_calibration.html">Extrinsic Calibration for Mobile Robots</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_workflows/index.html">Reference Workflows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/index.html">Isaac for Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/reference_architecture.html">Isaac for Manipulation Reference Architecture</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper.html">Set Up Hardware and Software for Real Robot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim.html">Setup for Simulated Robot in Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html">Run Tests for various components of Isaac for Manipulation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorials.html">Isaac for Manipulation Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_e2e.html">Tutorial for Obstacle Avoidance and Object Following Using cuMotion with Perception</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place.html">Multi-Object Pick and Place Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">Tutorial for Multi-Object Pick and Place using cuMotion with Perception</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place_from_cloud_service.html">Tutorial for Multi-Object Pick and Place from Isaac Cloud Service</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_gear_assembly.html">Tutorial for Gear Assembly with Contact Rich Insertion Policy and cuMotion</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim.html">Isaac for Manipulation Tutorials with Isaac Sim</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pose_to_pose.html">Pose to Pose Planning</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_object_following.html">Object Following</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pick_and_place.html">Pick and Place</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_grasp_authoring.html">Grasp Authoring</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_gear_insertion_policy.html">Gear Insertion Policy</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_gear_assembly.html">Gear Assembly Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_asset_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_asset_bringup</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_bringup</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/manipulation_workflow_config_guide.html">Manipulation Workflow Configuration Guide</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_gear_assembly/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_gear_assembly</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_orchestration</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/behavior_reference.html">Behavior Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/blackboard_reference.html">Blackboard Reference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_pick_and_place</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference.html">API Reference and Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide.html">Configuration Guide</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_ros_python_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ros_python_utils</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_servers/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_servers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_ur_dnn_policy/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ur_dnn_policy</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_workflows/isaac_for_mobility/index.html">Isaac for Mobility</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../performance/index.html">Performance Summary</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../concepts/index.html">Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/benchmarking/index.html">Benchmarking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/dev_env/index.html">Isaac ROS Development Environment</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/dnn_inference/index.html">DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/dnn_inference/model_preparation.html">Preparing Deep Learning Models for Isaac ROS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/dnn_inference/tensorrt_and_triton_info.html">Isaac ROS Triton and TensorRT Nodes for DNN Inference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/jetson_stats/index.html">Jetson Stats</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/manipulation/index.html">Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/orchestration.html">Manipulation Orchestration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/pick_and_place.html">Multi-Object Pick and Place</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/xrdf.html">Extended Robot Description Format (XRDF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/isaac_grasp.html">Isaac Grasp File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">Tutorial for integrating custom manipulators with cuMotion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/cumotion_moveit/tutorial_isaac_sim.html">Tutorial for cuMotion MoveIt plugin with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/missions/index.html">Missions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/nitros/index.html">NITROS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/nitros/cuda_with_nitros.html">CUDA with NITROS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/nitros/pynitros/index.html">PyNITROS</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/object_detection/index.html">Object Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/object_detection/detectnet/index.html">DetectNet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/object_detection/grounding_dino/index.html">Grounding DINO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/object_detection/rtdetr/index.html">RT-DETR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/object_detection/yolov8/index.html">YOLOv8</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/pose_estimation/index.html">Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/pose_estimation/centerpose/index.html">CenterPose</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/pose_estimation/dope/index.html">DOPE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/index.html">FoundationPose</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/scene_reconstruction/index.html">Scene Reconstruction</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/index.html">Nvblox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/technical_details.html">Technical Details</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_isaac_sim.html">Isaac Sim Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense.html">RealSense Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_multi_realsense.html">Multi-RealSense Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_zed.html">ZED Camera Examples</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segformer/index.html">Segformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segformer/tutorial_isaac_sim.html">Tutorial for People Segmentation with Segformer and Isaac Sim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segformer/tutorial_tensorrt.html">Tutorial for People Segmentation with Segformer and TensorRT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segment_anything/index.html">Segment Anything</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segment_anything/tutorial_isaac_sim.html">Tutorial for Segment Anything with Isaac Sim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/unet/tutorial_isaac_sim.html">Tutorial for DNN Image Segmentation with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/stereo_depth/index.html">Stereo Depth</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/stereo_depth/foundationstereo/index.html">FoundationStereo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/stereo_depth/ess/index.html">ESS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/stereo_depth/sgm/index.html">SGM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/stereo_dnn/index.html">Stereo DNN</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial for cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial for cuVGL Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/index.html">cuVSLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_isaac_sim.html">Tutorial for Visual SLAM with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_realsense.html">Tutorial for Visual SLAM Using a RealSense Camera with Integrated IMU</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_cuvslam_mask.html">Tutorial for Isaac ROS Visual SLAM with Segmentation Masks</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/visualization/index.html">Visualization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/visualization/foxglove.html">Foxglove Visualization</a></li>
+
+
+
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../repositories_and_packages/index.html">Repositories and Packages</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_apriltag/index.html">Isaac ROS AprilTag</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_apriltag/isaac_ros_apriltag/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_apriltag</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/fiducials/apriltag/tutorial_usb_cam.html">Tutorial with a USB camera</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/fiducials/apriltag/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_benchmark/index.html">Isaac ROS Benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_benchmark/isaac_ros_benchmark/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_benchmark</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_benchmark/benchmarks/isaac_ros_moveit_benchmark/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_moveit_benchmark</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cloud_control/index.html">Isaac ROS Cloud Control</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cloud_control/isaac_ros_mission_client/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_mission_client</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/missions/isaac_ros_mission_client.html">Isaac ROS Mission Client Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cloud_control/isaac_ros_scene_recorder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_scene_recorder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cloud_control/vda5050_action_handler/index.html"><code class="docutils literal notranslate"><span class="pre">vda5050_action_handler</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_common/index.html">Isaac ROS Common</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_compression/index.html">Isaac ROS Compression</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_decoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_encoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/index.html">Isaac ROS cuMotion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_moveit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_esdf_visualizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_esdf_visualizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_moveit_goal_setter/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_moveit_goal_setter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_goal_setter_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_goal_setter_interfaces</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_object_attachment</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/index.html">Isaac ROS DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dnn_image_encoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_tensor_proc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_tensor_rt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_triton</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_stereo_depth/index.html">Isaac ROS DNN Stereo Depth</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_ess</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/ess/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/ess/visualize_image.html">Visualize ESS Disparity Output</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationstereo</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/foundationstereo/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/foundationstereo/visualize_image.html">Visualize FoundationStereo Disparity Output</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/index.html">Isaac ROS Image Pipeline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_depth_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_depth_image_proc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_pipeline/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_pipeline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_proc</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_stereo_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_stereo_image_proc</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/sgm/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/index.html">Isaac ROS Image Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segformer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/segmentation/segformer/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/segmentation/segformer/tutorial_tensorrt.html">Tutorial with TensorRT</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/segmentation/segment_anything/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything2_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything2_interfaces</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unet</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/segmentation/unet/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_jetson/index.html">Isaac ROS Jetson</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_jetson/isaac_ros_jetson_stats/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_jetson_stats</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_jetson/isaac_ros_jetson_stats_services/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_jetson_stats_services</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: Create Maps for Visual Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_pointcloud_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pointcloud_utils</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_global_localization</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial with Map Creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial with Visual Global Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_mapping/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_mapping</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/index.html">Isaac ROS NITROS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_gxf/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_gxf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_managed_nitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_managed_nitros</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_bridge/index.html">Isaac ROS NITROS Bridge</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/nitros_bridge/tutorial_isaac_sim.html">Tutorial for NITROS Bridge with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_topic_tools/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_topic_tools</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_type/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_type</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_pynitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/nitros/pynitros/tutorial_pynitros.html">Tutorial to use PyNITROS with NITROS</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/index.html">Isaac ROS Nvblox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nvblox</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/api/parameters.html">ROS Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/api/topics_and_services.html">ROS Topics and Services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_isaac_sim.html">Isaac Sim Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense.html">RealSense Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_ros_communication.html">ROS Communication Issues</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_examples_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_examples_bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_image_padding/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_image_padding</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_msgs/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_msgs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_nav2/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_nav2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_ros/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_ros</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_ros_common/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_ros_common</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_rviz_plugin/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_rviz_plugin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/realsense_splitter/index.html"><code class="docutils literal notranslate"><span class="pre">realsense_splitter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/semantic_label_conversion/index.html"><code class="docutils literal notranslate"><span class="pre">semantic_label_conversion</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/index.html">Isaac ROS Object Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_detectnet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_detectnet</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/object_detection/detectnet/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/object_detection/detectnet/tutorial_custom_model.html">Tutorial with Custom Model</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_grounding_dino/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_grounding_dino</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_rtdetr/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_rtdetr</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/object_detection/rtdetr/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_yolov8</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/index.html">Isaac ROS Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dope</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/dope/tutorial_triton.html">Tutorial with Triton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/dope/tutorial_custom_model.html">Tutorial with Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/dope/tutorial_custom_size.html">Tutorial with Custom Size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/dope/dope_verification.html">Verifying DOPE Accuracy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationpose</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_tracking.html">Tutorial to launch FoundationPose Tracking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_create_your_own_mesh.html">Tutorial to create your own 3D object mesh in .obj</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_shift_mesh_center.html">Tutorial to shift the Mesh origin frame to the center of the Mesh using Meshlab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_usd_to_obj.html">Tutorial to convert a 3D mesh from .usd to .obj using Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_simplify_mesh.html">Tutorial to simplify a 3D mesh using Meshlab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_switch_mesh_runtime.html">Tutorial to switch the mesh during runtime</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_visual_slam/index.html">Isaac ROS Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/validating_cuvslam_setup.html">Validating cuVSLAM Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_realsense.html">Tutorial with RealSense</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam_interfaces</span></code></a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../robots/index.html">Robots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../robots/isaac_urdf_requirements/index.html">Calibration File Requirements for Isaac</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../robots/universal_robots/index.html">Universal Robots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../troubleshooting/index.html">Troubleshooting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../troubleshooting/dev_env.html">Developer Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../troubleshooting/hardware_setup.html">Hardware Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../troubleshooting/deep_learning.html">Deep Learning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog/index.html">Blogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../releases/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../about/index.html">About</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../about/license.html">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../about/contact.html">Contact</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a></div>
+      <div class="sidebar-primary-item"><div class="version-switcher__container dropdown">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    release-4.0
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <dl>
+        <dd><a href="isaac_for_manipulation_camera_calibration.html">release-4.0</a></dd>
+        <dd><a href="../../../../getting_started/sensors/isaac_for_manipulation_camera_calibration.html">latest</a></dd>
+        <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
+        <dd><a href="../../../release-3.1/index.html">release-3.1</a></dd>
+        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
+    </dl>
+  </div>
+</div></div>
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Getting Started</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Sensors Setup</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Isaac for Manipulation Camera Calibration</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="isaac-for-manipulation-camera-calibration">
+<h1>Isaac for Manipulation Camera Calibration<a class="headerlink" href="#isaac-for-manipulation-camera-calibration" title="Link to this heading">#</a></h1>
+<p>These instructions are for extrinsics calibration of a RealSense camera with a UR e-Series robot (tested with UR5e and UR10e).
+For dual-camera setups, please follow the <a class="reference internal" href="#calibration-procedure"><span class="std std-ref">Calibration Procedure</span></a> twice (once for each camera),
+with only one camera plugged into the system each time.</p>
+<section id="calibration-target">
+<h2>Calibration Target<a class="headerlink" href="#calibration-target" title="Link to this heading">#</a></h2>
+<section id="supported-patterns">
+<h3>Supported Patterns<a class="headerlink" href="#supported-patterns" title="Link to this heading">#</a></h3>
+<p>Both ArUco and ChArUco calibration targets are supported with this tutorial. For best results, we recommend a ChArUco
+pattern with an odd number of rows and a high number of markers, printed on the largest sized board that is suitable for the robot being calibrated.</p>
+<p>The following ArUco pattern dictionaries are supported.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>DICT_4X4_250</p></td>
+</tr>
+<tr class="row-even"><td><p>DICT_5X5_250</p></td>
+</tr>
+<tr class="row-odd"><td><p>DICT_6X6_250</p></td>
+</tr>
+<tr class="row-even"><td><p>DICT_7X7_250</p></td>
+</tr>
+<tr class="row-odd"><td><p>DICT_ARUCO_ORIGINAL</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="target-printing">
+<h3>Target Printing<a class="headerlink" href="#target-printing" title="Link to this heading">#</a></h3>
+<p>The calibration targets must be rigid without any noticeable bending when flat and during operation.
+We recommend using aluminum/LDPE composite for the required flatness and stiffness.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We recommend using <a class="reference external" href="https://calib.io/">calib.io</a> to obtain high quality calibration targets. The targets used in this tutorial
+were purchased from calib.io.</p>
+</div>
+<p>If printing from a different source, ensure that the printed targets are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Non-glossy to minimize light reflections and glare.</p></li>
+<li><p>Black and white in color.</p></li>
+</ul>
+</div></blockquote>
+<p>The calibration targets used in this tutorial are from <a class="reference external" href="https://calib.io/">calib.io</a> and shown below: left - UR5e target, right - UR10e target.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_targets.jpg/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_targets.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_targets.jpg/" style="width: 79%;" /></a>
+</figure>
+<p>The specifications for the calibration targets used in this tutorial are as follows:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Robot type</p></th>
+<th class="head"><p>Board dimension</p></th>
+<th class="head"><p>ChArUco resolution</p></th>
+<th class="head"><p>ArUco dictionary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>UR5e</p></td>
+<td><p>200x300 (mm)</p></td>
+<td><p>14x9</p></td>
+<td><p>DICT_5X5_250</p></td>
+</tr>
+<tr class="row-odd"><td><p>UR10e</p></td>
+<td><p>300x400 (mm)</p></td>
+<td><p>12x9</p></td>
+<td><p>DICT_5X5_250</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="physical-setup">
+<h2>Physical Setup<a class="headerlink" href="#physical-setup" title="Link to this heading">#</a></h2>
+<p>The calibration board should be mounted firmly to the end of the manipulator arm such that the board
+does not shift its position when the arm is moved. Any relative movement between the board and arm during
+calibration will result in inaccurate results. We recommend using a mount such as the one shown
+<a class="reference external" href="https://calib.io/products/robot-flange-mount">here</a>.</p>
+<p>A calibration target attached to a UR10e robot using the mount is shown below.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/ur10_w_calibration_target.jpg/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/ur10_w_calibration_target.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/ur10_w_calibration_target.jpg/" style="width: 79%;" /></a>
+</figure>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_mount_rear.jpg/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_mount_rear.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_mount_rear.jpg/" style="width: 79%;" /></a>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The calibration board can also be held by the robot using a gripper. If using this method to hold the target and a portion of the
+ChAuCo pattern is obstructed, ensure that the calibration tool is able to successfully detect the target. Refer to <strong>Step 11</strong> of
+<a class="reference internal" href="#calibration-procedure"><span class="std std-ref">Calibration Procedure</span></a> for instructions
+on how to visualize the detection of the calibration target.</p>
+</div>
+</section>
+<section id="software-setup">
+<h2>Software Setup<a class="headerlink" href="#software-setup" title="Link to this heading">#</a></h2>
+<ol class="arabic">
+<li><p>Set up your development environment by following the instructions
+in: <a class="reference internal" href="../index.html"><span class="doc">Developer Environment Setup</span></a>.</p></li>
+<li><p>Set up the UR Robot by following the instructions
+in: <a class="reference internal" href="../../robots/universal_robots/index.html"><span class="doc">Universal Robots Robot</span></a>.</p></li>
+<li><p>Complete the <a class="reference internal" href="realsense_setup.html"><span class="doc">RealSense setup tutorial</span></a>
+if using a RealSense camera.</p></li>
+<li><p>Clone <code class="docutils literal notranslate"><span class="pre">isaac_manipulator</span></code> under <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/src</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>-b<span class="w"> </span>release-4.0<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator.git<span class="w"> </span>isaac_manipulator
+</pre></div>
+</div>
+</li>
+<li><p>Activate the Isaac ROS environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Build from source and install the <a class="reference external" href="https://github.com/illumo-robotics/moveit_calibration">moveit_calibration package</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>
+git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>ros2-jazzy-updates<span class="w"> </span>https://github.com/iconner22/moveit_calibration.git<span class="w"> </span>src/third_party/moveit_calibration
+rosdep<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rosdep<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>--from-paths<span class="w"> </span>src/third_party/moveit_calibration<span class="w"> </span>--ignore-src<span class="w"> </span>--rosdistro<span class="w"> </span><span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span><span class="w"> </span>-y
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-up-to-regex<span class="w"> </span>moveit_calibration*<span class="w"> </span>--cmake-args<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">moveit_calibration</span></code> package that we use has been updated to support ROS 2 Jazzy.</p>
+</div>
+</li>
+<li><p>Install the Isaac for Manipulation packages. There are two options:</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Installation from Source</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Installation from Debian</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> to install the package’s dependencies:</p>
+<blockquote>
+<div><blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>rosdep<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>-r<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--from-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_manipulator/isaac_manipulator_bringup/<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--rosdistro<span class="w"> </span>jazzy<span class="w"> </span>-y
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Build and source the ROS workspace:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>
+colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-up-to<span class="w"> </span>isaac_manipulator_bringup
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Get <code class="docutils literal notranslate"><span class="pre">isaac_manipulator_bringup</span></code> and its dependencies.</p>
+<blockquote>
+<div><blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-isaac-manipulator-bringup
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</div></div>
+</li>
+</ol>
+</section>
+<section id="calibration-procedure">
+<h2>Calibration Procedure<a class="headerlink" href="#calibration-procedure" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Before proceeding, complete the steps in <a class="reference internal" href="#software-setup"><span class="std std-ref">Software Setup</span></a>.</p>
+</div>
+<ol class="arabic">
+<li><p>Open a new terminal window and activate the Isaac ROS environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We recommend setting a <code class="docutils literal notranslate"><span class="pre">ROS_DOMAIN_ID</span></code> via <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ROS_DOMAIN_ID=&lt;ID_NUMBER&gt;</span></code> for every
+new terminal you run ROS commands to avoid interference
+with other computers in the same network (<a class="reference external" href="https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Domain-ID.html">ROS Guide</a>).</p>
+</div>
+</li>
+<li><p>Inside the container, source the workspace.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</li>
+<li><p>Launch the UR robot driver:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>ur_robot_driver<span class="w"> </span>ur_control.launch.py<span class="w"> </span>ur_type:<span class="o">=</span>&lt;ROBOT_TYPE&gt;<span class="w"> </span>robot_ip:<span class="o">=</span>&lt;ROBOT_IP_ADDRESS&gt;<span class="w"> </span>launch_rviz:<span class="o">=</span><span class="nb">false</span>
+</pre></div>
+</div>
+<p>The supported robot types are: [<code class="docutils literal notranslate"><span class="pre">ur3e</span></code>, <code class="docutils literal notranslate"><span class="pre">ur5e</span></code>, <code class="docutils literal notranslate"><span class="pre">ur10e</span></code>, <code class="docutils literal notranslate"><span class="pre">ur16e</span></code>]</p>
+</li>
+<li><p>Open a second terminal window and activate the Isaac ROS environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Inside the container, source the workspace and launch the camera feed.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">RealSense</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Launch the camera feed.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>install/setup.bash
+ros2<span class="w"> </span>launch<span class="w"> </span>isaac_manipulator_bringup<span class="w"> </span>camera_calibration.launch.py<span class="w"> </span>camera_type:<span class="o">=</span>REALSENSE
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic simple" start="3">
+<li><p>This launch file launches the camera pipeline for RealSense. After launch you can verify that camera topics are publishing data, e.g., <code class="docutils literal notranslate"><span class="pre">/camera_1/color/image_raw</span></code>.</p></li>
+</ol>
+</div></div>
+</li>
+<li><p>Open a third terminal window and activate the Isaac ROS environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the RViz window with the <strong>HandEyeCalibration</strong> crashes, restart the window by rerunning the commands below.</p>
+</div>
+</li>
+<li><p>Inside the container, source the workspace and launch the robot with RViz.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>install/setup.bash
+ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_cumotion_examples<span class="w"> </span>ur.launch.py<span class="w"> </span>ur_type:<span class="o">=</span>&lt;ROBOT_TYPE&gt;<span class="w"> </span>robot_ip:<span class="o">=</span>&lt;ROBOT_IP_ADDRESS&gt;<span class="w"> </span>launch_rviz:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>The supported robot types are: [<code class="docutils literal notranslate"><span class="pre">ur3e</span></code>, <code class="docutils literal notranslate"><span class="pre">ur5e</span></code>, <code class="docutils literal notranslate"><span class="pre">ur10e</span></code>, <code class="docutils literal notranslate"><span class="pre">ur16e</span></code>]</p>
+</li>
+<li><p>Close the <code class="docutils literal notranslate"><span class="pre">MotionPlanning</span></code> panel on the left side of the window. This must be done to allow for image panels to be added to RViz in a later step. <strong>If this step is not done, the application may crash</strong>.</p></li>
+<li><p>In the RViz window that opens, click on <strong>Add</strong> &gt; <strong>By display type</strong> &gt; <strong>moveit_calibration_gui</strong> &gt; <strong>HandEyeCalibration</strong>.
+Click on <strong>OK</strong> to add the calibration panel to the window. Verify that you have a new panel added to the left side of the RViz
+window titled <strong>HandEye Calibration</strong>.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_add.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_add.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_add.png/" style="width: 59%;" /></a>
+</figure>
+</li>
+<li><p>In the <strong>HandEye Calibration</strong> panel, click on the <strong>Target</strong> tab and set the following parameters.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>Target Type</p></td>
+<td><p>HandEyeTarget/Charuco</p></td>
+</tr>
+<tr class="row-even"><td><p>squares, X</p></td>
+<td><p><em>Number of squares in calibration target along X direction</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>squares, Y</p></td>
+<td><p><em>Number of squares in calibration target along Y direction</em></p></td>
+</tr>
+<tr class="row-even"><td><p>marker size (px)</p></td>
+<td><p>1500</p></td>
+</tr>
+<tr class="row-odd"><td><p>square size (px)</p></td>
+<td><p>2400</p></td>
+</tr>
+<tr class="row-even"><td><p>margin size (px)</p></td>
+<td><p>60</p></td>
+</tr>
+<tr class="row-odd"><td><p>marker border (bits)</p></td>
+<td><p><em>Number of bits around marker border</em></p></td>
+</tr>
+<tr class="row-even"><td><p>ArUco dictionary</p></td>
+<td><p>DICT_5X5_250</p></td>
+</tr>
+<tr class="row-odd"><td><p>longest board side (m)</p></td>
+<td><p><em>Measured length of longest side of the board pattern in meters</em></p></td>
+</tr>
+<tr class="row-even"><td><p>measured marker size (m)</p></td>
+<td><p><em>Measured length of marker in meters</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The following values may be used directly if using the <a class="reference external" href="https://calib.io/">calib.io</a> calibration targets that were recommended in the
+<a class="reference internal" href="#calibration-target"><span class="std std-ref">Calibration Target</span></a> section above.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>Target Type</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">HandEyeTarget/Charuco</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>squares, X</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">12</span></code> (for UR10e target), <code class="docutils literal notranslate"><span class="pre">14</span></code> (for UR5e target)</p></td>
+</tr>
+<tr class="row-odd"><td><p>squares, Y</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">9</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>marker size (px)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1500</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>square size (px)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2400</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>margin size (px)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">60</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>marker border (bits)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>ArUco dictionary</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DICT_5X5_250</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>longest board side (m)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.36</span></code> (for UR10e target), <code class="docutils literal notranslate"><span class="pre">0.28</span></code> (for UR5e target)</p></td>
+</tr>
+<tr class="row-even"><td><p>measured marker size (m)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.022</span></code> (for UR10e target), <code class="docutils literal notranslate"><span class="pre">0.015</span></code> (for UR5e target)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>After the above values have been set, click on <strong>Create Target</strong>.</p>
+<p>Lastly, click on the <strong>Camera Image Topic</strong> drop down menu and select the appropriate image topic.
+For RealSense the topic is <code class="docutils literal notranslate"><span class="pre">/camera_1/color/image_raw</span></code>.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_target_small.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_target_small.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_target_small.png/" style="width: 79%;" /></a>
+</figure>
+</li>
+<li><p>In the <strong>HandEye Calibration</strong> panel, click on the <strong>Context</strong> tab and set the following parameters.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>Sensor Configuration</p></td>
+<td><p>Eye-to-hand</p></td>
+</tr>
+<tr class="row-even"><td><p>Sensor frame</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">camera_1_link</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Object frame</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">handeye_target</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>End-effector frame</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wrist_3_link</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Robot base frame</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">world</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After setting the <code class="docutils literal notranslate"><span class="pre">Sensor</span> <span class="pre">frame</span></code>, the UI may freeze for a few seconds before becoming responsive again.</p>
+</div>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_context_small.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_context_small.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_context_small.png/" style="width: 59%;" /></a>
+</figure>
+</li>
+<li><p>Add a panel to visualize the calibration target detection by clicking
+<strong>Add</strong> &gt; <strong>By topic</strong> &gt; <strong>/handeye_calibration</strong> &gt; <strong>/target_detection</strong> &gt; <strong>Image</strong>. Click on <strong>OK</strong> to add.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_vis_rviz_add.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_vis_rviz_add.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_vis_rviz_add.png/" style="width: 59%;" /></a>
+</figure>
+<p>Verify that you have a new panel added to the left side of the RViz
+window titled <strong>Image</strong> which shows the detected pose of the calibration target.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_detection.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_detection.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/calibration_target_detection.png/" style="width: 79%;" /></a>
+</figure>
+</li>
+<li><p>Add TF visualizations for the camera and target. In the RViz window, click on <strong>Add</strong> &gt; <strong>By display type</strong> &gt; <strong>rviz_default_plugins</strong> &gt; <strong>TF</strong>.
+Click on <strong>OK</strong> to add the visualization to the window.
+Verify that you have an entry titled <strong>TF</strong> in the <strong>Displays</strong> panel on the left side of the window. Expand
+the <strong>TF</strong> entry and then click on <strong>Frames</strong> and deselect the option titled <strong>All Enabled</strong>. Scroll through the
+list of frames and re-enable <code class="docutils literal notranslate"><span class="pre">camera_1_link</span></code> and <code class="docutils literal notranslate"><span class="pre">handeye_target</span></code>.
+These are the camera frame and target frame, respectively.</p></li>
+<li><p>In the <strong>HandEye Calibration</strong> panel, click on the <strong>Context</strong> tab and use the sliders under <strong>Camera Pose Initial Guess</strong>
+to provide an initial pose estimation. Adjust the translation and rotation values until the TF visualizations on the
+right side of the window roughly correspond with the position of the camera and target board in real life with respect
+to the manipulator arm.</p></li>
+<li><p>In the <strong>HandEye Calibration</strong> panel, click on the <strong>Calibrate</strong> tab. Make sure the calibration board is visible in the camera
+image. Move the manipulator arm to a desired pose and click <strong>Take sample</strong>. If the sample is successfully taken, it will
+it appear in the box titled <strong>Pose samples</strong>. After a minimum of 5 samples are taken, the tool will compute a camera pose
+together with a corresponding reprojection error (it appears at the bottom-left of the <strong>HandEyeCalibration</strong> window). Continue to move the manipulator arm and collect samples until the desired number
+of samples is achieved.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Adding more diverse samples will typically lead to a more robust calibration. It is recommended that a minimum of <strong>2</strong> translational poses are used with approximately <strong>10</strong> rotations for each translation.</dt><dd><p>The rotations should be made by moving the board along all three axes (roll, pitch, yaw) at the same time to ensure each rotation
+is sufficiently different from the prior. Additional rotations can be added to improve the accuracy of the calibration.
+The translational poses should be positioned within the workspace of the manipulator arm.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Verify that reprojection error is low enough for your application, and that the camera</dt><dd><p>position in RViz looks reasonable and aligns with the simulated robot.
+The procedure described in these instructions have been tested to provide reprojection error
+under 0.002 m and 0.002 rad.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<p>After the desired number of samples are taken, save the calibration results by clicking <strong>Save camera pose</strong>.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_calibrate_small.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_calibrate_small.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/hawk_calibrate_small.png/" style="width: 79%;" /></a>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Different solvers yield different calibration results, we recommend experimenting with different solvers to see which yields the
+best results for your use case. To select a different solver, click on the drop down menu next to <strong>AX=XB Solver</strong> and click
+on the desired solver. Then click on the <strong>Solve</strong> button to recompute the calibration results with the selected solver.</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">calibration.launch.py</span></code> output from the calibration tool will include a code snippet similar to the following example (values included for illustration only as they will differ for different setups):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;&quot;&quot; Static transform publisher acquired via MoveIt 2 hand-eye calibration &quot;&quot;&quot;</span>
+<span class="s2">&quot;&quot;&quot; EYE-TO-HAND: world -&gt; camera &quot;&quot;&quot;</span>
+from<span class="w"> </span>launch<span class="w"> </span>import<span class="w"> </span>LaunchDescription
+from<span class="w"> </span>launch_ros.actions<span class="w"> </span>import<span class="w"> </span>Node
+
+def<span class="w"> </span>generate_launch_description<span class="o">()</span><span class="w"> </span>-&gt;<span class="w"> </span>LaunchDescription:
+<span class="w">    </span><span class="nv">nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>
+<span class="w">        </span>Node<span class="o">(</span>
+<span class="w">            </span><span class="nv">package</span><span class="o">=</span><span class="s2">&quot;tf2_ros&quot;</span>,
+<span class="w">            </span><span class="nv">executable</span><span class="o">=</span><span class="s2">&quot;static_transform_publisher&quot;</span>,
+<span class="w">            </span><span class="nv">output</span><span class="o">=</span><span class="s2">&quot;log&quot;</span>,
+<span class="w">            </span><span class="nv">arguments</span><span class="o">=[</span>
+<span class="w">                </span><span class="s2">&quot;--frame-id&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;world&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--child-frame-id&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;camera&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--x&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;1.77278&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--y&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;0.939827&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--z&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;-0.0753478&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--qx&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;-0.128117&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--qy&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;-0.0317539&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--qz&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;0.955077&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--qw&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;-0.265339&quot;</span>,
+<span class="w">                </span><span class="c1"># &quot;--roll&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;0.132507&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;--pitch&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;-0.229891&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;--yaw&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;-2.5843&quot;,</span>
+<span class="w">            </span><span class="o">]</span>,
+<span class="w">        </span><span class="o">)</span>,
+<span class="w">    </span><span class="o">]</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span>LaunchDescription<span class="o">(</span>nodes<span class="o">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>The calibrated pose values can now be used with the rest of the <a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/index.html"><span class="doc">Isaac for Manipulation</span></a> suite
+by updating the values in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>
+as described <a class="reference internal" href="../../robots/universal_robots/index.html#set-up-cameras-for-robot"><span class="std std-ref">here</span></a>, and specifying the frame name defined
+during <a class="reference internal" href="../../robots/universal_robots/index.html#set-up-cameras-for-robot"><span class="std std-ref">Camera Setup</span></a> in the  <code class="docutils literal notranslate"><span class="pre">--child-frame-id</span></code>  field.
+For dual-camera setups, make sure to use a different frame name for each calibrated camera.</p></li>
+</ol>
+</section>
+<section id="validating-calibration">
+<h2>Validating Calibration<a class="headerlink" href="#validating-calibration" title="Link to this heading">#</a></h2>
+<p>To validate the calibration, run the following procedure.</p>
+<ol class="arabic">
+<li><p>First perform 2 calibrations for the same camera. Take the transforms you get and create a json file with schema given here:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;parent_frame&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;world&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;child_frame&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;camera_1_link&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;translation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.412198</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.238021</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;z&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.138175</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;rotation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.0527208</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.00452152</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;z&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.998266</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;w&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.0257981</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;imager_used&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rgb_realsense&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;parent_frame&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;world&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;child_frame&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;camera_1_link&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;translation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.413251</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.235007</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;z&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.132836</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;rotation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.0524579</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.00387522</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;z&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.998361</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;w&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.0225519</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;imager_used&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;realsense_infra2&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;parent_frame&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;world&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;child_frame&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;camera_1_link&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;translation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.413318</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.234351</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;z&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.132421</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;rotation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.0525905</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.00255462</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;z&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.99835</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;w&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.0229073</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;imager_used&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;realsense_infra1&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Store this file somewhere and reference it in an environment variable.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">CALIBRATION_TRANSFORMS_FILE</span><span class="o">=</span>/path/to/your/calibration_transforms.json
+<span class="nb">export</span><span class="w"> </span><span class="nv">ENABLE_MANIPULATOR_TESTING</span><span class="o">=</span>manual_on_robot
+</pre></div>
+</div>
+</li>
+<li><p>First we record a calibration dataset that stores RGB and infrared camera streams, TFs
+(to store extrinsic calibration from robot to the camera, and inter-camera transforms between RGB and infrared streams)
+and camera information (to record camera intrinsics).</p></li>
+<li><p>Then we perform a test that visualizes errors in the following</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Target pose estimation using OpenCV’s Perspective in Pose solver.</p></li>
+<li><p>The factory calibrated intrinsic transforms between RGB and infrared streams.</p></li>
+<li><p>Using 2 extrinsic calibrations to get error bounds of the calibration process.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Before running the calibration data recording script, make sure to have the following:
+- The calibration target seen by the camera and is static.
+- The target should be placed such that it takes over as much of the image / field of view as possible.</p></li>
+<li><p>Run this command that will record the data (this will take 60 seconds) and then will run the test.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ENABLE_MANIPULATOR_TESTING</span><span class="o">=</span>manual_on_robot
+<span class="nb">export</span><span class="w"> </span><span class="nv">NUM_SQUARE_HEIGHT</span><span class="o">=</span><span class="m">9</span><span class="w">  </span><span class="c1"># This is for the UR5e target, UR10e target is 12</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">NUM_SQUARE_WIDTH</span><span class="o">=</span><span class="m">14</span><span class="w">  </span><span class="c1"># This is for the UR5e target, UR10e target is 14</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">LONGER_SIDE_M</span><span class="o">=</span><span class="m">0</span>.28<span class="w">  </span><span class="c1"># This is for the UR5e target, UR10e target is 0.36</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MARKER_SIZE_M</span><span class="o">=</span><span class="m">0</span>.015<span class="w">  </span><span class="c1"># This is for the UR5e target, UR10e target is 0.022</span>
+bash<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_manipulator_bringup<span class="k">)</span>/test/run_calibration_validation.sh
+</pre></div>
+</div>
+</li>
+<li><p>You will see the following output in json files and images visualizing the error. This folder will be the ones indicated as the output folder in the above bash script.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;extrinsics_error&quot;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="s2">&quot;error_mean_x_cm&quot;</span>:<span class="w"> </span>-0.8119825981623039,
+<span class="w">    </span><span class="s2">&quot;error_std_x_cm&quot;</span>:<span class="w"> </span><span class="m">0</span>.004882939882471144,
+<span class="w">    </span><span class="s2">&quot;error_mean_y_cm&quot;</span>:<span class="w"> </span>-0.558025644231066,
+<span class="w">    </span><span class="s2">&quot;error_std_y_cm&quot;</span>:<span class="w"> </span><span class="m">0</span>.004597599422036537,
+<span class="w">    </span><span class="s2">&quot;error_mean_z_cm&quot;</span>:<span class="w"> </span><span class="m">0</span>.3173449385777736,
+<span class="w">    </span><span class="s2">&quot;error_std_z_cm&quot;</span>:<span class="w"> </span><span class="m">0</span>.04592212495318613,
+<span class="w">    </span><span class="s2">&quot;projected_frame&quot;</span>:<span class="w"> </span><span class="s2">&quot;camera_1_infra2_optical_frame&quot;</span>,
+<span class="w">    </span><span class="s2">&quot;home_frame&quot;</span>:<span class="w"> </span><span class="s2">&quot;camera_1_infra1_optical_frame&quot;</span>,
+<span class="w">    </span><span class="s2">&quot;notes&quot;</span>:<span class="w"> </span><span class="s2">&quot;This error is the same as above dict</span>
+<span class="s2">              however we now use the extrinsics transform</span>
+<span class="s2">              1 calibration point to world and another one</span>
+<span class="s2">              used for world back to camera_1_link instead of</span>
+<span class="s2">              using the target pose estimation error&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Perhaps the most important thing is to look at the images and observe how the error increases once you add more computations in the pose estimation process from OpenCV’s solver, to using intrinsics and then to using 2 extrinsic calibrations.</p></li>
+<li><p>As an example, this is what the OpenCV pose error visualized looks like. Here, you just see red dots, since the blue dots that are projected match the pixel value exactly.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/pnp_target_test.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/pnp_target_test.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/pnp_target_test.png/" style="width: 100%;" /></a>
+</figure>
+</li>
+<li><p>This is what the error looks like once you add the intrinsics calibration. You start to see a small error.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/intrinsics_error_test.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/intrinsics_error_test.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/intrinsics_error_test.png/" style="width: 100%;" /></a>
+</figure>
+</li>
+<li><p>This is what the error looks like once you add the 2 extrinsic calibrations. You start to see a bigger error that can be around 1 cm at the worst case scenario. You will notice that the error is around half the size of the corner squares and each corner is 2 cm which puts our camera to target distance at around 1.5 cm. This number is inflated as the error in the 2 calibration compounds on each other, so the actual error might be closer to 5 mm.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/extrinsics_error_test.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/extrinsics_error_test.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/getting_started/manipulator_camera_calibration/extrinsics_error_test.png/" style="width: 100%;" /></a>
+</figure>
+</li>
+<li><p>Careful calibrations with a wide coverage can help drive down this error.</p></li>
+<li><p>This also motivates the need for data driven robotics algorithms that are robust to such errors in calibration.</p></li>
+</ol>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="camera_calibration.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Monocular Camera Calibration</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="amr_extrinsic_calibration.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Extrinsic Calibration for Mobile Robots</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibration-target">Calibration Target</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-patterns">Supported Patterns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#target-printing">Target Printing</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#physical-setup">Physical Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#software-setup">Software Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibration-procedure">Calibration Procedure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#validating-calibration">Validating Calibration</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Manage My Privacy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/preferences/start/">Do Not Sell or Share My Data</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2023-2025 NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on Oct 24, 2025.
+  <br/>
+</p></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
+  </body>
+</html>

@@ -3541,7 +3541,7 @@ skipped, since preconfigured XRDF files for those robots are included with Isaac
 <p>cuMotion requires a URDF as well as an <a class="reference internal" href="../xrdf.html#extended-robot-description-format-xrdf"><span class="std std-ref">XRDF</span></a>
 file for the robot.  URDFs are available for most common robot arms, but it may be necessary to create an XRDF file.
 This can be done by hand (e.g., using an
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_robot_description/xrdf/ur10e.xrdf">existing XRDF file</a>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_robot_description/xrdf/ur10e.xrdf">existing XRDF file</a>
 as a reference) or by using the
 <a class="reference external" href="https://docs.isaacsim.omniverse.nvidia.com/4.5.0/manipulators/manipulators_robot_description_editor.html">Robot Description Editor</a>
 in Isaac Sim 4.0 or later, as follows.</p>
@@ -3559,8 +3559,8 @@ Franka or UR.</p>
 files (often found in a <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT&gt;_moveit_config</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT&gt;_description</span></code> package).  Create a <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT&gt;_config</span></code>
 directory in your ROS workspace to store the files created below.</p>
 <p>When creating the files below, the
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_examples/ur_config">configuration files</a> and
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_examples/launch/ur_isaac_sim.launch.py">launch file</a>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_examples/ur_config">configuration files</a> and
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_examples/launch/ur_isaac_sim.launch.py">launch file</a>
 for the UR10e robot may be used as a reference.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -3573,7 +3573,7 @@ controllers for your robot (e.g., for the combination of the arm and gripper, th
 <ol class="arabic simple">
 <li><p>Create a copy of the <code class="docutils literal notranslate"><span class="pre">controllers.yaml</span></code> file from your robot’s MoveIt configuration package.</p></li>
 <li><p>Make minor modifications so that it looks like the provided
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_examples/ur_config/ros2_controllers.yaml">sample file</a>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_examples/ur_config/ros2_controllers.yaml">sample file</a>
 for the UR10e robot.</p></li>
 </ol>
 </section>
@@ -3586,7 +3586,7 @@ doesn’t exist, create one by copying the contents of the <code class="docutils
 <li><p>Remove the <code class="docutils literal notranslate"><span class="pre">&lt;ros2_control&gt;</span></code> section from your URDF file, if present.</p></li>
 <li><p>Replace the <code class="docutils literal notranslate"><span class="pre">&lt;hardware&gt;</span></code> subsection with the code below to properly set up topic-based ROS 2 control; the
 ROS topics are those expected by the provided Isaac Sim USD scene.  The
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_examples/ur_config/ur.ros2_control.xacro">sample file</a>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_examples/ur_config/ur.ros2_control.xacro">sample file</a>
 for the UR10e robot may be used as a reference.</p></li>
 </ol>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;hardware&gt;</span>
@@ -3604,11 +3604,11 @@ both the xacro required to generate the robot URDF and the robot’s <code class
 <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT&gt;.ros2_control.xacro</span></code>). If a <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT&gt;.urdf.xacro</span></code> file was provided with your robot description or MoveIt
 configuration package, it may contain only the former.  In this case, a wrapper <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT&gt;.urdf.xacro</span></code> file should be
 created.  In the following, the
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_examples/ur_config/ur.urdf.xacro">sample file</a>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_examples/ur_config/ur.urdf.xacro">sample file</a>
 for the UR10e robot is used as a reference.</p>
 <ol class="arabic">
 <li><p>Create a copy of the provided
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_examples/ur_config/ur.urdf.xacro">sample xacro file</a>.</p></li>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_examples/ur_config/ur.urdf.xacro">sample xacro file</a>.</p></li>
 <li><p>Replace <code class="docutils literal notranslate"><span class="pre">$(arg</span> <span class="pre">ur_type)</span></code> in the following line with your robot name:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;robot</span><span class="w"> </span><span class="na">xmlns:xacro=</span><span class="s">&quot;http://www.ros.org/wiki/xacro&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;$(arg ur_type)&quot;</span><span class="nt">&gt;</span>
 </pre></div>
@@ -3648,7 +3648,7 @@ might already come with such a file. There is no need to follow these instructio
 intended.</p>
 <ol class="arabic simple">
 <li><p>Create a copy of the provided
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_examples/rviz/ur_moveit_config.rviz">sample RViz file</a>.</p></li>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_examples/rviz/ur_moveit_config.rviz">sample RViz file</a>.</p></li>
 <li><p>There are six occurrences of each robot link name. You can find them by searching for <code class="docutils literal notranslate"><span class="pre">base_link</span></code>. Replace them
 with lists of links specific to your robot.</p></li>
 </ol>
@@ -3660,7 +3660,7 @@ The following instructions will result in a launch file that is also suitable fo
 Isaac Sim.</p>
 <ol class="arabic">
 <li><p>Create a copy of the provided
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/main/isaac_ros_cumotion_examples/launch/ur_isaac_sim.launch.py">sample launch file</a>.</p></li>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-3.2/isaac_ros_cumotion_examples/launch/ur_isaac_sim.launch.py">sample launch file</a>.</p></li>
 <li><p>Update <code class="docutils literal notranslate"><span class="pre">generate_launch_description()</span></code> to declare any required launch arguments, removing the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DeclareLaunchArgument</span><span class="p">(</span>
     <span class="s1">&#39;ur_type&#39;</span><span class="p">,</span>
@@ -3820,7 +3820,7 @@ file:</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2025, NVIDIA.
-      <span class="lastupdated">Last updated on Oct 08, 2025.
+      <span class="lastupdated">Last updated on Oct 24, 2025.
       </span></p>
   </div>
 
@@ -3857,10 +3857,11 @@ file:</p>
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
-            <dd><a href="tutorial_custom_manipulator.html">release-3.2</a></dd>
+            <dd><a href="../../../../release-4.0/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-4.0</a></dd>
             <dd><a href="../../../../../concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">latest</a></dd>
             <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
             <dd><a href="../../../../release-3.1/index.html">release-3.1</a></dd>
+            <dd><a href="tutorial_custom_manipulator.html">release-3.2</a></dd>
         </dl>
     </div>
 </div><script>
