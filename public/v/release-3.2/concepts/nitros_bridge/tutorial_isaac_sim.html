@@ -3485,7 +3485,7 @@
 <h1>Tutorial for NITROS Bridge with Isaac Sim<a class="headerlink" href="#tutorial-for-nitros-bridge-with-isaac-sim" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>This tutorial will walk you through how to use <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros/blob/main/isaac_ros_nitros_bridge">isaac_ros_nitros_bridge</a> to move images on the GPU while avoiding CPU memory copies from Isaac Sim.</p>
+<p>This tutorial will walk you through how to use <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros/blob/release-3.2/isaac_ros_nitros_bridge">isaac_ros_nitros_bridge</a> to move images on the GPU while avoiding CPU memory copies from Isaac Sim.</p>
 </section>
 <section id="tutorial-walkthrough">
 <h2>Tutorial Walkthrough<a class="headerlink" href="#tutorial-walkthrough" title="Link to this heading"></a></h2>
@@ -3506,7 +3506,7 @@ git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </spa
 <blockquote>
 <div><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You should be able to see, using the command <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">topic</span> <span class="pre">list</span></code>, two topics under the same main name, one for the standard ROS 2 <a class="reference external" href="https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg">sensor_msgs/Image</a> (e.g.: <code class="docutils literal notranslate"><span class="pre">/front_stereo_camera/left/image_rect_color</span></code>) and another for <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/main/isaac_ros_nitros_bridge_interfaces/msg/NitrosBridgeImage.msg">isaac_ros_nitros_bridge_interfaces/NitrosBridgeImage</a> (e.g.: <code class="docutils literal notranslate"><span class="pre">/front_stereo_camera/left/image_rect_color/nitros_bridge</span></code>).</p>
+<p>You should be able to see, using the command <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">topic</span> <span class="pre">list</span></code>, two topics under the same main name, one for the standard ROS 2 <a class="reference external" href="https://github.com/ros2/common_interfaces/blob/humble/sensor_msgs/msg/Image.msg">sensor_msgs/Image</a> (e.g.: <code class="docutils literal notranslate"><span class="pre">/front_stereo_camera/left/image_rect_color</span></code>) and another for <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/release-3.2/isaac_ros_nitros_bridge_interfaces/msg/NitrosBridgeImage.msg">isaac_ros_nitros_bridge_interfaces/NitrosBridgeImage</a> (e.g.: <code class="docutils literal notranslate"><span class="pre">/front_stereo_camera/left/image_rect_color/nitros_bridge</span></code>).</p>
 </div>
 </div></blockquote>
 <ol class="arabic simple" start="4">
@@ -3519,7 +3519,7 @@ git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </spa
 </div>
 </div></blockquote>
 <ol class="arabic simple" start="6">
-<li><p>Inside the container, edit the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros/blob/main/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/launch/isaac_ros_nitros_bridge_image_converter.launch.py?ref_type=heads#L39">isaac_ros_nitros_bridge_image_converter.launch.py</a> ROS 2 launch file to remap the <code class="docutils literal notranslate"><span class="pre">ros2_input_bridge_image</span></code> to the Isaac Sim’s NITROS Bridge topic name (e.g.: <code class="docutils literal notranslate"><span class="pre">/front_stereo_camera/left/image_rect_color/nitros_bridge</span></code>). Then, run the following command to start the NITROS Bridge.</p></li>
+<li><p>Inside the container, edit the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros/blob/release-3.2/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/launch/isaac_ros_nitros_bridge_image_converter.launch.py?ref_type=heads#L39">isaac_ros_nitros_bridge_image_converter.launch.py</a> ROS 2 launch file to remap the <code class="docutils literal notranslate"><span class="pre">ros2_input_bridge_image</span></code> to the Isaac Sim’s NITROS Bridge topic name (e.g.: <code class="docutils literal notranslate"><span class="pre">/front_stereo_camera/left/image_rect_color/nitros_bridge</span></code>). Then, run the following command to start the NITROS Bridge.</p></li>
 </ol>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/workspaces/isaac_ros-dev<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
@@ -3546,7 +3546,7 @@ git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </spa
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2025, NVIDIA.
-      <span class="lastupdated">Last updated on Oct 08, 2025.
+      <span class="lastupdated">Last updated on Oct 24, 2025.
       </span></p>
   </div>
 
@@ -3583,10 +3583,11 @@ git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </spa
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
-            <dd><a href="tutorial_isaac_sim.html">release-3.2</a></dd>
+            <dd><a href="../../../release-4.0/concepts/nitros_bridge/tutorial_isaac_sim.html">release-4.0</a></dd>
             <dd><a href="../../../../concepts/nitros_bridge/tutorial_isaac_sim.html">latest</a></dd>
             <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
             <dd><a href="../../../release-3.1/concepts/nitros_bridge/tutorial_isaac_sim.html">release-3.1</a></dd>
+            <dd><a href="tutorial_isaac_sim.html">release-3.2</a></dd>
         </dl>
     </div>
 </div><script>

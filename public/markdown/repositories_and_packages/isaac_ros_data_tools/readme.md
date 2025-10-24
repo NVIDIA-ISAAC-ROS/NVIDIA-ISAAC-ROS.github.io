@@ -6,4 +6,4 @@ Tools for inspecting and validating data sent through graphs containing Isaac RO
 
 ## Latest
 
-Update 2024-12-10: Initial release
+Update 2025-10-24: Support for ROS 2 Jazzy

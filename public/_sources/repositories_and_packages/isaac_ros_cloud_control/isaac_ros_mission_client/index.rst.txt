@@ -1,0 +1,161 @@
+===============================
+|package name|
+===============================
+
+:ir_github:`<isaac_ros_cloud_control> <>`
+
+Overview
+--------
+
+The package includes the MQTT bridge nodes, the VDA5050 Client node and launch scripts to bringup these nodes, both
+with and without navigation2.
+
+.. toctree::
+
+    /concepts/missions/isaac_ros_mission_client.rst
+
+Quickstart
+----------
+.. _mission_client_set_up_env:
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+.. _mission_client_build:
+
+Build |package name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-mission-client
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_cloud_control>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_cloud_control/isaac_ros_mission_client --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_mission_client --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_cloud_control
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+API
+----
+Usage
+^^^^^
+Launch mission client
+~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: bash
+
+    ros2 launch isaac_ros_vda5050_client_bringup isaac_ros_vda5050_client.launch.py
+
+
+Launch mission client and navigation2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: bash
+
+    ros2 launch isaac_ros_vda5050_client_bringup isaac_ros_vda5050_client_nav2.launch.py
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+- Parameters for `isaac_ros_vda5050_client.launch.py`
+
+======================== =========== ============================== ==============================================================================================================================================================
+ROS Parameter            Type        Default                        Description
+======================== =========== ============================== ==============================================================================================================================================================
+``namespace``            ``string``  ``(Empty string)``             The ROS namespace used for the ROS graph. e.g. `carter`
+``mqtt_host_name``       ``string``  ``localhost``                  The MQTT broker IP to connect to. e.g. `192.168.25.32`
+``mqtt_port``            ``string``  ``1883``                       The MQTT broker port
+``mqtt_transport``       ``string``  ``tcp``                        The protocol to use for sending MQTT messages (either `tcp` or `websockets`)
+``mqtt_ws_path``         ``string``  ``''``                         The path for the WebSocket if the protocol set in `mqtt_transport` is `websockets`
+``interface_name``       ``string``  ``uagv``                       Name of the used interface. It constitutes a segment of the MQTT topic name.
+                                                                    The format for MQTT topic names is constructed as ``<interface_name>/<major_version>/<manufacturer>/<serial_number>/[order|state|instantActions]``
+``major_version``        ``string``  ``v2``                         VDA5050 major version number. It constitutes a segment of the MQTT topic name.
+``manufacturer``         ``string``  ``RobotCompany``               Manufacturer of the AGV. It constitutes a segment of the MQTT topic name.
+``serial_number``        ``string``  ``carter01``                   Unique AGV Serial Number. It constitutes a segment of the MQTT topic name.
+``robot_type``           ``string``  ``amr``                        Set the robot type (either `amr` or `arm`).
+``ros_publisher_type``   ``string``  ``vda5050_msgs/Order``         The ROS message type to convert incoming MQTT messages to
+``ros_subscriber_type``  ``string``  ``vda5050_msgs/AGVState``      The ROS message type that outgoing MQTT message are converted from
+``ros_to_mqtt_name``     ``string``  ``Carter01_RosToMqttBridge``   The MQTT client name for the RosToMqtt Node
+``mqtt_to_ros_name``     ``string``  ``Carter01_MqttToRosBridge``   The MQTT client name for the MqttToRos Node
+``retry_forever``        ``bool``    ``true``                       Retry connecting forever if connection to MQTT message broker is not established
+``reconnect_period``     ``int``     ``5``                          The period of time to wait before retrying to connect to MQTT message broker (in seconds)
+``num_retries``          ``int``     ``10``                         The number of reconnection retries to connect to the MQTT message broker before giving up. This setting is only valid if ``retry_forever`` is set to ``false``
+``ros_recorder``         ``bool``    ``false``                      Launches ``isaac_ros_scene_recorder``_ if set to ``true``
+``config_file``          ``string``  ``vda5050_client_params.yaml`` The full path to the VDA5050 client parameter file to load
+======================== =========== ============================== ==============================================================================================================================================================
+
+- Additional parameters for `isaac_ros_vda5050_client.launch.py`
+
+============================== ========== ================================================================================================================================================== ===============================================================
+ROS Parameter                  Type       Default                                                                                                                                            Description
+============================== ========== ================================================================================================================================================== ===============================================================
+``use_namespace``              ``bool``   ``false``                                                                                                                                          Whether to apply a namespace to the navigation stack
+``use_composition``            ``bool``   ``false``                                                                                                                                          Whether to use composed Nav2 bringup
+``use_sim_time``               ``bool``   ``false``                                                                                                                                          Whether to use simulation (Omniverse Isaac Sim) clock
+``init_pose_x``                ``float``  ``0.0``                                                                                                                                            The initial position X coordinate
+``init_pose_y``                ``float``  ``0.0``                                                                                                                                            The initial position Y coordinate
+``init_pose_yaw``              ``float``  ``0.0``                                                                                                                                            The initial yaw orientation
+``map``                        ``string`` ``/home/$USER/workspaces/isaac_ros-dev/src/isaac_ros_cloud_control/isaac_ros_vda5050_client_bringup/maps/carter_warehouse_navigation.yaml``        The full path to the occupancy map file to load
+``nav_params_file``            ``string`` ``/home/$USER/workspaces/isaac_ros-dev/src/isaac_ros_cloud_control/isaac_ros_vda5050_client_bringup/config/carter_navigation_params.yaml``         The full path to the navigation parameter file to load
+``info_generator_params_file`` ``string`` ``/home/$USER/workspaces/isaac_ros-dev/src/isaac_ros_cloud_control/isaac_ros_vda5050_client_bringup/config/json_info_generator_params.yaml``       The full path to the JSON Info Generator parameter file to load
+``launch_rviz``                ``bool``   ``false``                                                                                                                                          Launches RViz if ``true``
+============================== ========== ================================================================================================================================================== ===============================================================
+
+.. |package name| replace:: ``isaac_ros_mission_client``

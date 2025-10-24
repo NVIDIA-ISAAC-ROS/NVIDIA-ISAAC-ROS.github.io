@@ -1,0 +1,216 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_manipulator> <isaac_manipulator_pick_and_place>`
+
+Overview
+--------
+
+|package_name| is the ROS 2 package implementation of the multi-object Pick and Place workflow, built on top of the :doc:`isaac_manipulator_orchestration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index>` behavior tree framework. This package provides the executable nodes, launch files, and configuration templates needed to run the system on your robot hardware.
+
+**Package Contents:**
+
+* **ROS 2 Action Server**: ``/multi_object_pick_and_place`` for workflow execution
+* **Launch Files**: Complete system orchestration with configurable parameters  
+* **Configuration Templates**: YAML files for behavior tree and blackboard setup
+* **Behavior Tree Nodes**: Custom nodes for manipulation-specific operations
+* **Integration Layer**: Interfaces with Isaac ROS perception and motion packages
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tab-set::
+   :sync-group: installation
+
+   .. tab-item:: Binary Package
+      :sync: binary
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-manipulator-pick-and-place
+
+   .. tab-item:: Build from Source
+      :sync: source
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone --recursive :ir_clone:`<isaac_manipulator>`
+     
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_manipulator_pick_and_place
+
+         .. note::
+
+            The ``--symlink-install`` flag allows you to edit configuration files in place without rebuilding. Changes to Python scripts and config files will be immediately available after sourcing.
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+            
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+#. This quickstart focuses on running the orchestration system standalone for development and testing.
+
+#. **Prepare configuration files:**
+
+   Set up configuration files and environment variables based on your installation method:
+
+   .. tab-set::
+      :sync-group: installation
+
+      .. tab-item:: Binary Package
+         :sync: binary
+
+         Binary installations have read-only configuration files, so you must copy them to edit:
+
+         .. code:: bash
+
+            # Set up configuration directory and copy files
+            mkdir -p ${ISAAC_ROS_WS}/isaac_manipulator_config
+            cp $(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params/multi_object_pick_and_place_behavior_tree_params.yaml \
+               ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_behavior_tree_params.yaml
+            cp $(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params/multi_object_pick_and_place_blackboard_params.yaml \
+               ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_blackboard_params.yaml
+
+         **Files you'll edit:**
+
+         * **Behavior tree parameters**: ``${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_behavior_tree_params.yaml``
+         * **Blackboard parameters**: ``${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_blackboard_params.yaml``
+
+         .. code:: bash
+
+            # Point to the directory containing your configuration files
+            export ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR="${ISAAC_ROS_WS}/isaac_manipulator_config"
+
+      .. tab-item:: Build from Source
+         :sync: source
+
+         When building from source with ``--symlink-install``, you can edit configuration files directly in the source directory. Changes take effect immediately after sourcing your workspace (no rebuild needed).
+
+         **Files you'll edit:**
+
+         * **Behavior tree parameters**: ``${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml``
+         * **Blackboard parameters**: ``${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml``
+         
+         .. code:: bash
+
+            # Point to the source directory containing the configuration files
+            export ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR="${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params"
+
+   For detailed configuration instructions, see the :doc:`Configuration Guide <configuration_guide>`.
+
+#. Start the mock action servers and services for testing the orchestration logic:
+
+   .. code:: bash
+
+      ros2 launch isaac_manipulator_orchestration mock_servers.launch.py
+
+   .. note::
+
+      These are **dummy/mock servers** that provide the expected action and service interfaces but do not perform actual object detection, pose estimation, motion planning, or gripper control. They are only for testing the behavior tree orchestration logic.
+
+#. (Optional) For interactive debugging and visualization:
+
+   .. code:: bash
+
+      py-trees-tree-viewer
+
+   .. note::
+
+      The ``py-trees-tree-viewer`` is a Qt-based graphical tool that provides real-time tree visualization, timeline replay, and blackboard inspection.
+
+#. Launch the orchestration system:
+
+   .. code:: bash
+
+      ros2 launch isaac_manipulator_pick_and_place orchestration.launch.py \
+         behavior_tree_config_file:=${ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR}/multi_object_pick_and_place_behavior_tree_params.yaml \
+         blackboard_config_file:=${ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR}/multi_object_pick_and_place_blackboard_params.yaml \
+         print_ascii_tree:=false
+
+
+#. Send an action goal to test the behavior tree execution:
+
+   .. code:: bash
+
+      # Test with single bin mode
+      ros2 action send_goal --feedback /multi_object_pick_and_place isaac_manipulator_interfaces/action/MultiObjectPickAndPlace \
+        '{target_poses: {header: {frame_id: "base_link"}, poses: [{position: {x: -0.25, y: 0.45, z: 0.50}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: [], mode: 0}'
+
+   The behavior tree will execute with mock responses, allowing you to observe the orchestration logic and debug your configuration.
+
+API and Configuration
+---------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   api_reference
+   configuration_guide
+
+**Related Resources:**
+
+* :doc:`Multi-Object Pick and Place Concepts </concepts/manipulation/pick_and_place>` - Architecture and workflow design
+* :doc:`isaac_manipulator_orchestration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index>` - Behavior tree framework and orchestration details
+* :doc:`Isaac for Manipulation Pick And Place Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place>` - Hardware workflow  
+* :doc:`Isaac Sim Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim>` - Simulation workflow
+
+Integration
+-----------
+
+This package integrates with the broader Isaac for Manipulation ecosystem and requires the following dependencies:
+
+* ``isaac_manipulator_orchestration``: Behavior tree framework and shared behaviors
+* ``isaac_manipulator_servers``: Action servers for perception and motion
+* ``isaac_manipulator_bringup``: Complete system launch files
+
+.. |package_name| replace:: ``isaac_manipulator_pick_and_place``

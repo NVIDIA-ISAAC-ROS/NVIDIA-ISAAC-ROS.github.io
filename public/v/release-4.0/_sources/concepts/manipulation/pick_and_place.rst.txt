@@ -1,0 +1,106 @@
+===========================
+Multi-Object Pick and Place
+===========================
+
+Overview
+--------
+
+The Multi-Object Pick and Place workflow demonstrates how to build complex manipulation tasks using the :doc:`manipulation orchestration </concepts/manipulation/orchestration>` framework. This reference implementation handles multiple objects in both single-bin and multi-bin sorting scenarios.
+
+Key Features
+^^^^^^^^^^^^
+
+* **Multi-Object Processing**: Handles multiple objects with parallel perception and sequential motion
+* **Flexible Sorting Modes**: Single-bin collection or multi-bin class-based sorting
+* **Real-time Status Reporting**: Progress tracking in real-time with individual object feedback
+* **Configuration-Driven**: YAML-based parameters for easy customization
+* **Real-time Visualization**: RViz integration with interactive pose adjustment
+* **Robust Error Recovery**: Configurable retry policies and fallback behaviors
+
+Workflow Architecture
+^^^^^^^^^^^^^^^^^^^^^
+
+The workflow uses a behavior tree with two parallel branches that coordinate through a shared blackboard.
+
+Workflow Components
+~~~~~~~~~~~~~~~~~~~
+
+**Perception Branch** (Continuous)
+
+* Detects objects using RT-DETR or GroundingDINO with confidence filtering
+* Estimates 6DOF poses with FoundationPose
+* Computes drop poses based on object class and execution mode
+* Updates planning scene with dynamic obstacles
+* Maintains object queue for motion coordination
+
+**Motion Branch** (Sequential)
+
+* Processes objects from perception queue one at a time
+* Executes complete pick sequences: approach → grasp → retract
+* Manages object attachment for collision-aware transport
+* Executes place sequences: approach → release → retract  
+* Handles fallback to home position on failures
+
+Execution Modes
+~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 40 40
+
+   * - Mode
+     - Single Bin (``mode=0``)
+     - Multi-Bin (``mode=1``)
+
+   * - **Object Routing**
+     - All objects into a single target location
+     - Objects sorted by class to class-specific locations
+
+   * - **Target Poses Required**
+     - One target pose in action goal
+     - Target poses for all the different object classes
+
+   * - **Use Case**
+     - Clearing a bin or cleaning out a table
+     - Enables automated sorting workflows
+
+Configuration and Customization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The workflow is highly configurable through YAML parameters:
+
+* **Object Classes**: Specify which objects to detect and handle
+* **Confidence Thresholds**: Filter detection results by confidence scores
+* **Workspace Bounds**: Define 3D boundaries to filter objects outside reachable areas
+* **Retry Policies**: Configure retry counts for different operation types
+* **Motion Parameters**: Adjust approach distances, speeds, and safety margins
+* **Drop Strategies**: Define how objects are placed in target locations
+
+Required Isaac ROS Packages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This workflow integrates multiple Isaac ROS packages to deliver a complete manipulation solution:
+
+**Perception**
+
+* :doc:`Isaac ROS RT-DETR </repositories_and_packages/isaac_ros_object_detection/isaac_ros_rtdetr/index>` or :doc:`Isaac ROS Grounding DINO </repositories_and_packages/isaac_ros_object_detection/isaac_ros_grounding_dino/index>` - Object detection
+* :doc:`Isaac ROS Segment Anything </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index>` or :doc:`Isaac ROS Segment Anything 2 </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything2/index>` - Image segmentation for object boundaries
+* :doc:`Isaac ROS FoundationPose </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>` - 6DOF pose estimation
+
+**Motion Planning**
+
+* :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index>` - Collision-aware motion planning with obstacle avoidance
+* :doc:`Isaac ROS Object Attachment </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index>` - Updating robot collision geometry with object shape
+
+**Scene Understanding**
+
+* :doc:`Isaac ROS Nvblox </repositories_and_packages/isaac_ros_nvblox/index>` - 3D scene reconstruction and obstacle detection
+  
+  For collision avoidance, Nvblox continuously integrates depth input from cameras, maintaining a surface reconstruction in the form of a truncated signed distance field (TSDF). A Euclidean signed distance field (ESDF) is computed on-demand for motion planning.
+
+Getting Started
+^^^^^^^^^^^^^^^
+
+* **Package Documentation**: :doc:`isaac_manipulator_pick_and_place </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/index>`
+* **Step-by-Step Tutorial**: :doc:`Isaac for Manipulation Pick And Place Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place>`
+* **Behavior Tree Framework**: :doc:`manipulation orchestration </concepts/manipulation/orchestration>`

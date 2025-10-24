@@ -1,0 +1,200 @@
+Tutorial: Create Maps for Visual Localization
+==============================================
+
+This tutorial describes how to create maps for visual localization including
+visual global (cuVGL) localization map creation, cuVSLAM map creation, and
+occupancy grid map creation.
+
+Map Types
+---------
+The following list is a few different types of maps that are generated with
+rosbags when running the :code:`create_map_offline.py` script.
+
+**cuVSLAM Map**
+
+cuVSLAM is able to create a map and load a saved map of an environment and use that map to
+improve localization performance and maintain a consistent global frame of reference.
+
+
+**Visual Global Localization Map**
+
+During startup or after losing localization, visual global localization can be
+used to globally localize on a previously created map and operate in a shared
+global frame.
+
+For more info about visual global localization, see: :doc:`Concepts: Visual Global Localization </concepts/visual_global_localization/index>`
+
+**Occupancy Grid Map**
+
+Navigation packages such as `nav2 <https://docs.nav2.org/>`_ use an occupancy
+grid map in order represent the obstacles in a map. `isaac_mapping_ros` uses :doc:`cuVSLAM </concepts/visual_slam/cuvslam/index>`
+and :doc:`Nvblox </concepts/scene_reconstruction/nvblox/index>` to build an occupancy grid map from images.
+
+.. note::
+
+    - The generated occupancy map is only intended to be used for global path planning. Specifically it is not intended to be used for 2d Lidar localization. The generated map may contain slight artifacts and imprecisions and therefore is expected to be used with a planner that inflates obstacles.
+
+    - Because the ROS2 rosbag replay is nondeterministic, each run of the occupancy map creation may produce a slightly different map.
+
+Data Collection
+---------------
+
+#. Collect a rosbag using appropriate data recording tools. ``isaac_mapping_ros`` currently
+   supports H264 compressed images in the rosbag.
+#. Drive the robot around the environment and capture as much of the environment as
+   possible. We recommend moving the robot for at least 1 minute within a 5x5m area
+   where it can observe various objects like chairs, tables, shelves, and other office
+   furniture. Featureless environments or those with predominantly repetitive structures
+   can result in failed localization.
+
+    For example, a blank wall with low feature is hard to localize against:
+
+    .. figure::
+        :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/driving_towards_wall.jpg>`
+        :width: 800px
+        :alt: Driving towards a wall
+        :align: center
+
+#. To generate a more accurate map, follow the guidelines for the robot's trajectories during data collection:
+
+   #. **Closed Loop Segments:** Build mapping trajectories in loops or segments of
+      around 5-10 meters. This ensures the same area is captured from different angles, which
+      improves map detail and reduces drift.
+
+   #. **Avoid Long Straight Paths:** Long drives in unexplored areas accumulate drift
+      risk. Use short, closed loops instead.
+
+   #. **Vary Camera Angles:** Capturing locations from multiple angles makes the visual
+      map more reliable for future localization.
+
+    Schematic examples of efficient mapping paths in both narrow corridors and open
+    spaces, demonstrating optimal patterns for capturing comprehensive visual data
+    and reducing tracking drift.
+
+    .. note::
+
+        For optimal pose correction and map accuracy, Loop Closing must
+        be effectively exploited. This mechanism corrects the robot's pose when
+        the robot revisits a previously mapped location.
+
+    .. figure::
+        :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Mapping_thincorridor.gif>`
+        :width: 800px
+        :alt: Visualization of the mapping trajectory in corridor
+        :align: center
+
+    .. figure::
+        :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Mapping_openspace.gif>`
+        :width: 800px
+        :alt: Visualization of the mapping trajectory in open space
+        :align: center
+
+#. For localization rosbag collection, make sure to record at least 10s stationary
+   data at the beginning of the rosbag to allow the global localization to initialize correctly.
+   The localization trajectory should be in the mapping area and not deviate too much from
+   the mapping trajectory.
+
+Map Creation
+------------
+
+.. warning::
+
+    - Map Creation will use all the CPU and GPU resources, make sure you do not have anything important running at the same time.
+
+    - Glass and very thin structures such as wires and cable railings cannot be detected by the current stereo networks used for depth estimation. If you have such structures in your environment, you might need to modify the environment so that there are larger visible features so that unnavigable areas are correctly estimated.
+
+    - The quality of the occupancy map is dependent on the disparity data provided to nvblox. Degraded results may occur in wall corners. Improved results may be achieved with alternative stereo modalities, such as a different stereo camera or other AI/DNNs for stereo disparity estimation.
+
+
+Make sure the rosbag and output map folder path are mounted to the Isaac ROS environment. You can
+add them in ``~/.isaac_ros_dev-dockerargs`` then restart
+the Isaac ROS environment.
+
+You can download the ``r2b_galileo`` dataset from the `r2b 2024 dataset on NGC <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/resources/r2bdataset2024>`__ for this tutorial.
+It is a 20-second bag containing synchronized images from four stereo camera pairs.
+
+Install `isaac_mapping_ros` and create the maps mentioned above using the following commands:
+
+    .. run_ros_app_binary::
+        :packages_up_to: isaac_mapping_ros
+        :package: isaac_mapping_ros
+        :asset_packages: isaac_ros_foundationstereo_models_install
+        :asset_scripts: install_foundationstereo_models.sh
+        :extra_packages:
+        :launch_args:
+        :app: create_map_offline.py --sensor_data_bag=<PATH_TO_BAG> --base_output_folder=<PATH_TO_OUTPUT_FOLDER>
+        :command: run
+
+
+Verify that you see logs similar to this:
+
+.. code:: bash
+
+    Storing all maps and logs in /workspaces/isaac_ros-dev/ros_ws/data/maps/2025-10-16_13-03-15_r2b_galileo.
+    Bag Duration: 21 seconds, Map Creation Starts: 13:03:15, Estimated Completion: 13:10:35
+    Extract edex: Success ✅️ [19.57s]
+    Create cuVSLAM map: Success ✅️ [34.66s]
+    Optimize odometry pose with keyframe pose: Success ✅️ [0.47s]
+    Update frame metadata pose: Success ✅️ [0.45s]
+    Select map frames: Success ✅️ [0.55s]
+    Copy map frames: Success ✅️ [0.48s]
+    Run Foundation Stereo inference: Success ✅️ [76.57s]
+    Run Nvblox: Success ✅️ [9.54s]
+    Extract features: Success ✅️ [90.48s]
+    Build vocabulary: Success ✅️ [12.40s]
+    Build BoW index: Success ✅️ [7.26s]
+    2025-10-16 13:07:28,368 - INFO - Finished creating cuVGL map. Resulting map is in /workspaces/isaac_ros-dev/ros_ws/data/maps/2025-10-16_13-03-15_r2b_galileo/cuvgl_map.
+    All maps can be found in /workspaces/isaac_ros-dev/ros_ws/data/maps/2025-10-16_13-03-15_r2b_galileo, Completed at: 13:07:28, Total Time: 252 seconds
+
+Upon successful completion, verify that you see a message confirming that maps have
+been created. The full logs for each step are stored in the outputs. All steps include:
+
+- `Extract edex` step extracts RGB images and metadata from rosbag.
+- `Create cuVSLAM map` step computes the cuVSLAM pose and map.
+- `Optimize odometry pose with keyframe pose` step processes the odometry pose and loop closures computed by cuVSLAM and outputs more accurate odometry poses.
+- `Update frame metadata pose` step updates the image metadata with the computed poses.
+- `Select map frames` step samples key frames using a translation and rotation distance from all images.
+- `Copy map frames` step copies the sampled keyframes to a keyframe folder.
+- `Run Foundation Stereo inference` step runs Foundation Stereo inference on keyframes and outputs depth images.
+- `Run Nvblox` step creates a 2d occupancy map from keyframes using RGB+depth images and poses.
+- `Extract features` step extracts ``ALIKED`` image features for keyframes.
+- `Build vocabulary` step builds a visual vocabulary from extracted features.
+- `Build BoW index` step builds a bag-of-words image retrieval database from extracted features, which together with vocabulary form the global localization map. 
+
+The occupancy map for ``r2b_galileo`` dataset looks like this:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/r2b_galileo_omap.png>`
+    :width: 800px
+    :alt: r2b_galileo_omap
+    :align: center
+
+A good occupancy map features well-aligned objects such as walls and overlapping
+occupancy when the robot revisits the same locations. Misalignment in the map
+is typically caused by pose errors. For example, this map with misaligned wall:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/omap_poor_quality1.png>`
+    :width: 800px
+    :alt: OMap poor quality
+    :align: center
+
+In this map, the wall marked is misplaced and should be more on the left:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/omap_poor_quality2.png>`
+    :width: 800px
+    :alt: OMap poor quality
+    :align: center
+
+To get a better map, try collecting a rosbag with more small loops in an
+environment rich with visual features. A good map looks like this:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/good_omap.png>`
+    :width: 800px
+    :alt: Good OMap
+    :align: center
+
+Ensure one map creation job runs at a time within a :code:`ROS_DOMAIN_ID`. You can run
+simultaneous jobs within different :code:`ROS_DOMAIN_ID`.

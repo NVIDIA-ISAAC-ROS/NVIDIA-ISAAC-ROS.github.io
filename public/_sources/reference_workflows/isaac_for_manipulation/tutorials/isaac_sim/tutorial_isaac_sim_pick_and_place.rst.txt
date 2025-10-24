@@ -1,0 +1,343 @@
+==============
+Pick and Place
+==============
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place.gif>`
+   :width: 600px
+   :align: center
+   :alt: Demonstration of Isaac for Manipulation pick and place for a robot simulated in Isaac Sim
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place_in_rviz.gif>`
+   :width: 750px
+   :align: center
+   :alt: RViz visualization of Isaac for Manipulation pick and place for a robot simulated in Isaac Sim
+
+Overview
+--------
+
+This tutorial demonstrates a complete pick and place workflow using Isaac for Manipulation in Isaac Sim. 
+The workflow combines obstacle-aware planning, object perception, and grasping to enable the robot 
+to pick up objects and place them at desired locations.
+
+This tutorial leverages the cuMotion planner node provided by :ir_repo:`Isaac ROS cuMotion <isaac_ros_cumotion>` 
+
+We use rectified image streams from simulation and do not need to perform lens distortion and rectification 
+that would need to be performed on a real robot.
+
+We use perfect ground truth depth from the simulation which drives up accuracy and allows one to focus on 
+the software stack in a perfect albeit unrealistic environment.
+
+.. warning::
+
+   The obstacle avoidance behavior demonstrated in this tutorial is not a safety function and does not
+   comply with any national or international functional safety standards. When testing obstacle avoidance
+   behavior, do not use human limbs or other living entities.
+
+The example uses `RViz <https://github.com/ros2/rviz>`__ for visualization.
+RViz is the default visualization tool when Isaac for Manipulation is running on the same computer
+that is displaying the visualization.
+`Foxglove <https://foxglove.dev/>`__ is recommended when visualizing a reconstruction streamed from 
+a remote machine. However, that is not officially supported for the sim workflows.
+
+Prerequisites
+-------------
+
+- Follow the setup instructions in :doc:`Setup for Simulated Robot with Isaac for Manipulation in Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim>`.
+
+- For improved performance in the scene execution, follow the instructions in :ref:`Optimization for Physics Scene in Isaac for Manipulation <isaac_sim_scene_speed_up>`.
+
+Tutorial
+--------
+
+Prepare Configuration Files and Environment Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before editing any configuration files, copy them to the appropriate location and set up environment variables based on your installation method. This section handles **all configuration file preparation** (workflow config, behavior tree parameters, and blackboard parameters) and sets up environment variables for simplified command usage.
+
+.. tab-set::
+   :sync-group: installation
+
+   .. tab-item:: Binary Package
+      :sync: binary
+
+      Binary installations have read-only configuration files in system directories. Copy all necessary files to a writable location:
+
+      .. code:: bash
+
+         # Create a directory for your custom configuration
+         mkdir -p ${ISAAC_ROS_WS}/isaac_manipulator_config
+
+      Copy the workflow configuration file:
+
+         .. code:: bash
+
+            cp $(ros2 pkg prefix --share isaac_manipulator_bringup)/params/sim_launch_params.yaml \
+               ${ISAAC_ROS_WS}/isaac_manipulator_config/sim_launch_params.yaml
+
+      Copy behavior tree and blackboard parameter files:
+
+      .. code:: bash
+
+         cp $(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params/multi_object_pick_and_place_behavior_tree_params.yaml \
+            ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_behavior_tree_params.yaml
+
+         cp $(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params/multi_object_pick_and_place_blackboard_params.yaml \
+            ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_blackboard_params.yaml
+
+      **Files you'll edit:**
+
+      * **Workflow configuration**: 
+      
+        .. code:: bash
+
+            ${ISAAC_ROS_WS}/isaac_manipulator_config/sim_launch_params.yaml
+
+      * **Behavior tree parameters**: 
+      
+        .. code:: bash
+
+            ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_behavior_tree_params.yaml
+
+      * **Blackboard parameters**: 
+      
+        .. code:: bash
+
+            ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_blackboard_params.yaml
+
+      Set up environment variables:
+
+      .. code:: bash
+
+         # Point to the directory containing your configuration files
+         export ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR="${ISAAC_ROS_WS}/isaac_manipulator_config"
+         export ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR="${ISAAC_ROS_WS}/isaac_manipulator_config"
+
+
+   .. tab-item:: Build from Source
+      :sync: source
+
+      When building from source with ``--symlink-install``, you can edit configuration files directly in the source directories.
+
+      **Files you'll edit:**
+
+      * **Workflow configuration**:
+
+        .. code:: bash
+
+            ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params/sim_launch_params.yaml
+
+      * **Behavior tree parameters**: 
+      
+        .. code:: bash
+
+            ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml
+
+      * **Blackboard parameters**: 
+      
+        .. code:: bash
+
+            ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml
+
+      Set up environment variables:
+
+      .. code:: bash
+
+         # Point to the source directories containing the configuration files
+         export ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR="${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params"
+         export ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR="${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params"
+
+
+Edit Workflow Configuration File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Edit the workflow configuration file to work with Isaac Sim.
+
+**Reference Configuration File:**
+
+- :ir_repo:`sim_launch_params.yaml <isaac_manipulator> <isaac_manipulator_bringup/params/sim_launch_params.yaml>`
+
+#. Open the ``sim_launch_params.yaml`` file and set the following parameters:
+
+   .. code:: yaml
+
+      workflow_type: PICK_AND_PLACE
+      segmentation_type: NONE
+      object_detection_type: RTDETR
+      enable_nvblox: 'false'
+      use_ground_truth_pose_in_sim: 'false'
+      #
+      # Other parameters...
+      #
+      moveit_collision_objects_scene_file: '$(ros2 pkg prefix --share isaac_manipulator_bringup)/config/scene_objects/sim_test_bench/sim_test_scene_objects.scene'
+
+.. note::
+
+   For parameter details and model combinations, refer to the :doc:`Manipulation Workflow Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/manipulation_workflow_config_guide>`.
+
+Configure Objects and Workspace
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Edit the behavior tree and blackboard parameter files (prepared in `Prepare Configuration Files and Environment Variables`_) to configure the objects your robot will manipulate and define workspace parameters.
+
+**Reference Configuration Files:**
+
+- :ir_repo:`Behavior Tree Parameters <isaac_manipulator> <isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml>`
+- :ir_repo:`Blackboard Parameters <isaac_manipulator> <isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml>`
+
+#. Modify the following parameters in the behavior tree parameter file:
+
+   .. code-block:: yaml
+
+      interactive_marker:
+         mesh_resource_uri: 'package://isaac_manipulator_robot_description/meshes/robotiq_2f_140.obj'
+         reference_frame: 'base_link'
+         end_effector_frame: 'gripper_frame'
+         user_confirmation_timeout: 60.0  # seconds to wait for user to adjust drop pose
+
+      pose_estimation:
+         action_server_name: '/get_object_pose'
+         base_frame_id: 'base_link'
+         camera_frame_id: 'front_stereo_camera_left' # for Isaac Sim
+         workspace_bounds:
+            diagonal: []
+
+      switch_controllers:
+         arm: 
+            controllers_to_activate: ['scaled_joint_trajectory_controller']
+            controllers_to_deactivate: []
+            strictness: 4  # FORCE_AUTO
+         tool:
+            controllers_to_activate: []
+            controllers_to_deactivate: []
+            strictness: 4  # FORCE_AUTO
+
+#. Modify the blackboard parameter file to update the grasp files for the objects in the simulation.
+
+   .. code-block:: yaml
+
+      supported_objects:
+         mac_and_cheese:
+            class_id: '22'
+            grasp_file_path: $(ros2 pkg prefix --share isaac_manipulator_robot_description)/config/robotiq_2f_140_grasps_mac_and_cheese.yaml
+            mesh_file_path: ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/Mac_and_cheese_0_1.obj
+
+         soup_can:
+            class_id: '3'
+            grasp_file_path: $(ros2 pkg prefix --share isaac_manipulator_robot_description)/config/robotiq_2f_140_grasps_soup_can.yaml
+            mesh_file_path: ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/soup_can/soup_can.obj
+
+.. note::
+
+   The example configurations are pre-configured for SyntheticaDETR v1.0.0 with specific class IDs: Mac and Cheese box (``'22'``) and Soup can (``'3'``). If you're using a different detection model or objects, you'll need to update these class IDs to match your model's output.
+
+For detailed configuration instructions covering object setup, workspace locations, and system parameters, refer to the :doc:`Pick and Place Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide>`.
+
+**Configuration Checklist**
+
+Verify these settings in your behavior tree and blackboard parameter files before launching:
+
+* **Objects:** ``supported_objects`` match scene objects with correct ``class_ids`` and valid grasp/mesh file paths
+* **Workspace:** ``target_poses`` and ``home_pose`` are safe and reachable
+* **Mode:** ``0`` = single bin, ``1`` = multi-bin sorting
+* **Drop method:** YAML defaults, action goal, or RViz marker correction
+* **System:** Action server names and ``startup_server_timeout_sec`` match your setup
+
+.. important::
+
+   Configuration changes require restarting the orchestration system. The behavior tree loads these parameters at startup and does not dynamically reload configuration files during execution.
+
+.. tip::
+
+   **Testing Configuration Without Hardware**: If you want to verify your configuration setup before proceeding to hardware, refer to the standalone quickstart in :doc:`isaac_manipulator_pick_and_place </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/index>`. This uses dummy servers to test that your behavior tree logic and configuration files work correctly.
+
+.. tip::
+
+   Configure ``pose_estimation.base_frame_id`` and ``pose_estimation.camera_frame_id`` in the behavior tree parameters. For Isaac Sim, use ``front_stereo_camera_left`` by default; see the :doc:`Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide>` for details and alternatives.
+
+
+.. include:: _snippets/isaac_sim_launch.rst
+
+
+Run Pick and Place
+~~~~~~~~~~~~~~~~~~~
+
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Launch the pick and place example:
+
+   .. code:: bash
+
+      ros2 launch isaac_manipulator_bringup workflows.launch.py \
+         manipulator_workflow_config:=${ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR}/sim_launch_params.yaml
+
+   The launch command uses environment variables set in the `Prepare Configuration Files and Environment Variables`_ section to point to your configuration files.
+
+Execute Pick and Place
+^^^^^^^^^^^^^^^^^^^^^^^
+
+#. After you run the launch file, in a new terminal trigger the workflow with an action goal:
+
+   .. tabs::
+
+      .. tab:: Single Bin Mode
+
+         All objects to one location:
+
+         .. code:: bash
+
+            ros2 action send_goal --feedback /multi_object_pick_and_place isaac_manipulator_interfaces/action/MultiObjectPickAndPlace \
+              '{target_poses: {header: {frame_id: "base_link"}, poses: [{position: {x: -0.25, y: -0.35, z: 0.50}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: [], mode: 0}'
+
+      .. tab:: Multi-Bin Mode
+
+         Objects sorted by class:
+
+         .. code:: bash
+
+            ros2 action send_goal --feedback /multi_object_pick_and_place isaac_manipulator_interfaces/action/MultiObjectPickAndPlace \
+              '{target_poses: {header: {frame_id: "base_link"}, poses: [{position: {x: -0.25, y: -0.35, z: 0.50}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}, {position: {x: -0.25, y: 0.40, z: 0.40}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: ["22", "3"], mode: 1}'
+
+   .. warning::
+
+      Update these example poses with positions safe and reachable in your robot's workspace.
+
+   Refer to :doc:`API Reference </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference>` for complete action interface documentation.
+
+
+Use Custom Grasps (Optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To test pick and place with custom grasps optimized for your objects and gripper, refer to the 
+:doc:`Grasp Authoring tutorial <tutorial_isaac_sim_grasp_authoring>`. This tutorial shows you how to 
+use Isaac Sim's Grasp Editor to create and configure custom grasp poses.
+
+
+
+Troubleshooting
+---------------
+
+Gripper State Issues
+~~~~~~~~~~~~~~~~~~~~
+
+Isaac Sim caches the last known joint state in its action graphs and pushes that in when **Play** is pressed.
+If the gripper is in a bad state (for example, if it is in self-collision), open the gripper.
+To later close the gripper, set the position to ``0.623``. You must have a launch file running to run the
+following command:
+
+.. code:: bash
+
+   ros2 action send_goal /robotiq_gripper_controller/gripper_cmd \
+      control_msgs/action/GripperCommand "{command: {position: 0.0, max_effort: 0.0}}"
+
+
+Next Steps
+----------
+
+- Try the :doc:`Object Following tutorial <tutorial_isaac_sim_object_following>` to track moving objects
+- Try the :doc:`Gear Assembly tutorial <tutorial_isaac_sim_gear_assembly>` for complex assembly tasks
+- Learn more about :doc:`Isaac for Manipulation Reference Architecture </reference_workflows/isaac_for_manipulation/reference_architecture>`

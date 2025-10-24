@@ -1,0 +1,389 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_dnn_stereo_depth> <isaac_ros_foundationstereo>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_foundationstereo> <quickstart.tar.gz>`
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-foundationstereo && \
+               sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-foundationstereo-models-install
+
+      #. Download and install the pre-trained FoundationStereo model files:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_foundationstereo_models_install install_foundationstereo_models.sh --eula \
+               --model_res high_res
+
+         .. note::
+
+            FoundationStereo supports two fixed resolution configurations:
+
+            - ``high_res``: 576x960 resolution (default)
+            - ``low_res``: 320x736 resolution (original training resolution)
+            
+            You can set the default model resolution using the ``FOUNDATIONSTEREO_MODEL_RES`` 
+            environment variable. Use the ``--model_res`` argument to override the default or 
+            to explicitly select between these options.
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_dnn_stereo_depth>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo --ignore-src -y
+
+      #. Download and install the pre-trained FoundationStereo model files:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-foundationstereo-models-install && \
+               ros2 run isaac_ros_foundationstereo_models_install install_foundationstereo_models.sh --eula \
+               --model_res high_res
+
+         .. note::
+
+            FoundationStereo supports two fixed resolution configurations:
+
+            - ``high_res``: 576x960 resolution (default)
+            - ``low_res``: 320x736 resolution (original training resolution)
+            
+            You can set the default model resolution using the ``FOUNDATIONSTEREO_MODEL_RES`` 
+            environment variable. Use the ``--model_res`` argument to override the default or 
+            to explicitly select between these options.
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --packages-up-to isaac_ros_foundationstereo --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for
+            ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+  .. tab:: Rosbag
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo using the quickstart rosbag:
+
+         .. tabs::
+
+            .. tab:: High Resolution (high_res)
+
+               .. code:: bash
+
+                  ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=foundationstereo \
+                     engine_file_path:=${ISAAC_ROS_WS:?}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_576x960.engine
+
+            .. tab:: Low Resolution (low_res)
+
+               .. code:: bash
+
+                  ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=foundationstereo \
+                     engine_file_path:=${ISAAC_ROS_WS:?}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_320x736.engine \
+                     model_input_width:=736 model_input_height:=320
+
+      #.  Open a **second terminal** and attach to the container:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #.  In the **second terminal**, play the FoundationStereo sample rosbag downloaded in the quickstart assets:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationstereo/rosbags/foundationstereo_rosbag \
+               --remap /left/camera_info:=/left/camera_info_rect /right/camera_info:=/right/camera_info_rect
+
+  .. tab:: RealSense Camera
+
+      .. note::
+
+         This tutorial requires a compatible RealSense camera from
+         the list of available
+         :doc:`cameras </getting_started/sensors/realsense_setup>`.
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`. If you have not, set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-realsense
+
+      #. Complete steps to set up the FoundationStereo model as described in the
+         :ref:`quickstart <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index:quickstart>`.
+
+      #. Continuing inside the Isaac ROS environment, run the following launch file to spin up a demo using a RealSense stereo camera:
+
+         .. tabs::
+
+            .. tab:: High Resolution (high_res)
+
+               .. code:: bash
+
+                  ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_stereo_rect,foundationstereo \
+                     engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_576x960.engine
+
+            .. tab:: Low Resolution (low_res)
+
+               .. code:: bash
+
+                  ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_stereo_rect,foundationstereo \
+                     engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_320x736.engine \
+                     model_input_width:=736 model_input_height:=320
+
+  .. tab:: ZED Camera
+
+      #. Ensure that you have already set up your ZED camera using :doc:`ZED setup tutorial </getting_started/sensors/zed_setup>`.
+
+      #. Continuing inside the Isaac ROS environment, install dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-depth-image-proc ros-:ir_ros_distro:-isaac-ros-stereo-image-proc ros-:ir_ros_distro:-isaac-ros-zed
+
+         .. tabs::
+
+            .. tab:: High Resolution (high_res)
+
+               .. code:: bash
+
+                  ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=zed_stereo_rect,foundationstereo \
+                     engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_576x960.engine \
+                     interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationstereo/zed2_quickstart_interface_specs.json
+
+            .. tab:: Low Resolution (low_res)
+
+               .. code:: bash
+
+                  ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=zed_stereo_rect,foundationstereo \
+                     engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_320x736.engine \
+                     interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationstereo/zed2_quickstart_interface_specs.json \
+                     model_input_width:=736 model_input_height:=320
+
+         .. note::
+            
+            If you are using the `ZED X` series, replace  `zed2_quickstart_interface_specs.json` with `zedx_quickstart_interface_specs.json` in the above commands.
+
+Visualize Output
+^^^^^^^^^^^^^^^^
+
+.. tabs::
+   .. tab:: Visualizer Script
+
+      #.  Open a **terminal** and attach to the container:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #.  In the **terminal**, visualize and validate the disparity output using the visualizer script:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_foundationstereo isaac_ros_foundationstereo_visualizer.py
+
+         The example result is:
+
+         .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/warehouse.png>`
+            :align: center
+
+   .. tab:: Foxglove
+
+      Connect Foxglove Studio and setup an `Image` panel to visualize depth image using topic `/depth`.
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+
+   Tutorial with Isaac Sim </concepts/stereo_depth/foundationstereo/tutorial_isaac_sim>
+
+   Visualize FoundationStereo Disparity Output </concepts/stereo_depth/foundationstereo/visualize_image>
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, refer to :doc:`Troubleshooting </troubleshooting/index>`.
+
+
+API
+---
+
+Overview
+^^^^^^^^
+
+The ``isaac_ros_foundationstereo`` package offers functionality to generate a stereo
+disparity map from stereo images using a trained FoundationStereo model. Given a pair
+of stereo input images, the package generates a continuous disparity
+image for the left input image. The package consists of the following node:
+
+``FoundationStereoDecoderNode``: Processes the model output and generates the disparity map
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_foundationstereo isaac_ros_foundationstereo.launch.py engine_file_path:=<your FoundationStereo engine plan absolute path>
+
+FoundationStereoDecoderNode
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Parameters
+~~~~~~~~~~~~~~
+
+========================== ========== ============== ==========================================================================================================
+ROS Parameter              Type       Default        Description
+========================== ========== ============== ==========================================================================================================
+``disparity_tensor_name``  string     "disparity"    Name of the disparity tensor in the input message.
+``min_disparity``          double     0.0            Minimum disparity value for filtering.
+``max_disparity``          double     10000.0        Maximum disparity value for filtering.
+========================== ========== ============== ==========================================================================================================
+
+ROS Topics Subscribed
+~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``tensor_sub``
+     - :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`
+     - Input tensor containing the disparity data.
+
+   * - ``right/camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`
+     - The right camera model.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``disparity``
+     - :ir_repo:`NitrosDisparityImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_disparity_image_type/include/isaac_ros_nitros_disparity_image_type/nitros_disparity_image.hpp>`
+     - The processed disparity image.
+
+Input Restrictions
+~~~~~~~~~~~~~~~~~~
+
+#. The input left and right images must have the **same dimension and
+   resolution**, and the resolution must be **divisible by 32**.
+
+Output Interpretations
+~~~~~~~~~~~~~~~~~~~~~~
+
+#. The ``isaac_ros_foundationstereo`` package outputs a disparity image with dimension same as the FoundationStereo model output dimension.
+
+   The input images are rescaled and padded to the FoundationStereo model input dimension
+   before inferencing. The disparity output is published as a continuous disparity map.
+
+#. The disparity output is filtered to remove invalid values:
+   - Values below ``min_disparity`` (default: 0.0)
+   - Values above ``max_disparity`` (default: 10000.0)
+   - Invalid regions (inf, Nan) are set to 0.0
+
+#. The right ``CameraInfo`` is used to composite a
+   ``NitrosDisparityImage``. If you only care about the disparity
+   image, and don't need the baseline and focal length information, you
+   can pass dummy camera messages.
+
+.. |package_name| replace:: ``isaac_ros_foundationstereo``
