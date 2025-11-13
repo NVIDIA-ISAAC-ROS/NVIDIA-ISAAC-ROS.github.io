@@ -1,0 +1,389 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_segmentation> <isaac_ros_segment_anything2>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_segment_anything2> <quickstart.tar.gz>`
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-segment-anything2
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_image_segmentation>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_segmentation/isaac_ros_segment_anything2 --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_segment_anything2 --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_segmentation/isaac_ros_segment_anything2
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+            
+            Since this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Prepare Segment Anything2 ONNX Model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#.  Make a directory to place models (inside the Isaac ROS environment):
+
+    .. code:: bash
+
+       mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/segment_anything2/1/
+
+#.  Generate the ONNX file for SAM2:
+   
+   .. note::
+      The official video predictor pipeline for SAM2 is not ONNX exportable. To address this limitation, 
+      we have developed a custom wrapper for SAM2 that replicates the behavior of the official video predictor pipeline using ONNX-exportable operations. 
+      The key difference is that our implementation uses memories only from the conditioned frame and the last frame where the object was detected. 
+      This wrapper is ONNX exportable and can be found here: :ir_repo:`sam2_wrapper.py <isaac_ros_image_segmentation> <isaac_ros_segment_anything2/scripts/sam2_wrapper.py>`
+
+   .. note::
+      SAM2 is only supported with Triton using the ONNX backend. The following step is to be performed only on x86_64. You must copy the generated ONNX file to a Jetson, in case you want to run the package on the device.
+
+   To create ONNX file for SAM2. Download the PyTorch weights from official SAM2 `repo <https://github.com/facebookresearch/sam2/tree/main?tab=readme-ov-file#getting-started>`__.
+   Then, copy the downloaded model weights into the container.
+   The model is expected to be downloaded to ``~/Downloads`` outside the
+   Isaac ROS environment.
+
+   This example uses ``sam2.1_hiera_tiny.pt``, which must be copied
+   into ``${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything2`` inside the Isaac ROS environment:
+
+   On ``x86_64``:
+
+   .. code:: bash
+
+      # Outside container
+      mv ~/Downloads/sam2.1_hiera_tiny.pt ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything2/sam2.1_hiera_tiny.pt
+   
+   .. code:: bash
+
+      # Inside container, install sam2
+      cd ${ISAAC_ROS_WS} && pip install --break-system-packages git+https://github.com/facebookresearch/sam2.git -v
+
+   .. note::
+      Run below command if you want to convert the model to ONNX using fp16 precision. The fp16 precision can be used to reduce the memory footprint of the model and improve the inference speed with some degradation in accuracy.
+      
+      .. code:: bash
+
+         cd ${ISAAC_ROS_WS} && pip install --break-system-packages onnxconverter-common==1.14.0
+   
+   The below command will convert the model to ONNX using fp16 precision. Remove --fp16 flag at the end if you want to convert the model to ONNX using fp32 precision.
+   
+   .. code:: bash
+
+      # Inside container
+      ros2 run isaac_ros_segment_anything2 sam2_onnx_exporter.py \
+      --checkpoint ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything2/sam2.1_hiera_tiny.pt \
+      --output ${ISAAC_ROS_WS}/isaac_ros_assets/models/segment_anything2/1/model.onnx --fp16
+
+#.  Copy the config file:
+
+      .. code:: bash
+
+         cp ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything2/sam2_config.pbtxt ${ISAAC_ROS_WS}/isaac_ros_assets/models/segment_anything2/config.pbtxt
+      
+Run Launch File
+~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package:
+
+         .. code:: bash
+            
+            cd ${ISAAC_ROS_WS} && \
+               ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=segment_anything2 interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything2/quickstart_interface_specs.json sam2_model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+      
+      #. Open a **second** terminal and activate the Isaac ROS environment: 
+      
+         .. code:: bash
+
+            isaac-ros activate
+      
+      #. Add the object for tracking using the utility script:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+            ros2 run isaac_ros_segment_anything2 add_object.py --object-id "bottle" bbox --x-center 140.5 --y-center 306 --width 83 --height 86
+      
+      #. Open **another** terminal and activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Play the rosbag:
+
+         .. code:: bash
+
+            ros2 bag play ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything2/quickstart.bag/
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+      
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+            
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,segment_anything2 sam2_model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+
+      #. Open a **second** terminal and activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Add the object for tracking by using the utility script (or any other method):
+      
+         To add an object using bbox prompt:
+
+         .. code:: bash
+      
+            cd ${ISAAC_ROS_WS} && ros2 run isaac_ros_segment_anything2 add_object.py --object-id "<object-id>" bbox --x-center <x-center> --y-center <y-center> --width <width> --height <height>
+
+         To add an object using point prompt:
+         
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && ros2 run isaac_ros_segment_anything2 add_object.py --object-id "<object-id>" point --x <x> --y <y>
+
+   .. tab:: ZED Camera
+
+      #. Ensure that you have already set up your ZED camera using :doc:`ZED setup tutorial </getting_started/sensors/zed_setup>`.
+      
+      #. Continuing inside the Isaac ROS environment, install dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+            
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-image-proc ros-:ir_ros_distro:-isaac-ros-zed
+      
+      #. Run the following launch file to spin up a demo of this package using a ZED Camera:
+
+         .. code:: bash
+            
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=zed_mono_rect,segment_anything2 sam2_model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+
+         .. note::
+            
+            If you are using the `ZED X` series, replace  `zed2_quickstart_interface_specs.json` with `zedx_quickstart_interface_specs.json` in the above command.
+
+      #. Open a **second** terminal and activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Add the object for tracking by using the utility script (or any other method):
+      
+         To add an object using bbox prompt:
+
+         .. code:: bash
+      
+            cd ${ISAAC_ROS_WS} && ros2 run isaac_ros_segment_anything2 add_object.py --object-id "<object-id>" bbox --x-center <x-center> --y-center <y-center> --width <width> --height <height>
+
+         To add an object using point prompt:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && ros2 run isaac_ros_segment_anything2 add_object.py --object-id "<object-id>" point --x <x> --y <y>
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+#. Open a **new** terminal inside the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Run the Python script to generate the colored segmentation mask from raw mask.
+
+   .. code:: bash
+      
+      ros2 run isaac_ros_segment_anything visualize_mask.py  --remap /segment_anything/raw_segmentation_mask:=/segment_anything2/raw_segmentation_mask /yolov8_encoder/resize/image:=/image_rect
+
+#. Open **another** terminal and activate the Isaac ROS environment:
+   
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Launch ``rqt_image_view``:
+
+   .. code:: bash
+
+      ros2 run rqt_image_view rqt_image_view /segment_anything/colored_segmentation_mask
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything2/output_rqt.png>`
+      :width: 320px
+      :align: center
+
+   .. note::
+
+      The raw segmentation mask is also published to ``/segment_anything2/raw_segmentation_mask``. However, the raw pixels correspond to the class labels and so the output is unsuitable for human visual inspection.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, see :doc:`here </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, see :doc:`here </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~
+
+A single launch file is provided for this package. The launch file launches ``isaac_ros_triton`` with ONNX backend.
+Only the ONNX backend with Triton is supported for this model.
+
+.. note::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+=============================================== ====================
+Launch File                                     Components Used
+=============================================== ====================
+``isaac_ros_segment_anything2_core.launch.py``  :doc:`ResizeNode, PadNode, ImageFormatConverterNode </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>`, :doc:`ImageToTensorNode, ImageTensorNormalizeNode, InterleavedToPlanarNode, ReshapeNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_proc/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`SegmentAnythingDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index>`, :doc:`SegmentAnything2DataEncoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything2/index>`
+=============================================== ====================
+
+SegmentAnything2DataEncoderNode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+==================================== ================ =============== ===================================================================================================================================================================================================
+ROS Parameter                        Type             Default         Description
+==================================== ================ =============== ===================================================================================================================================================================================================
+   ``max_num_objects``                ``int32_t``       ``10``        Max Number of Objects that can be tracked.
+    ``orig_img_dims``                ``double list``  ``[480,640]``   Dimensions of the Original Image in ``[H,W]`` format. Please note, expectation is each bbox/point is in the coordinate system of given dimension image.
+==================================== ================ =============== ===================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+=============== ==================================================================================================================================================================== ==================================================================================
+ROS Topic       Interface                                                                                                                                                            Description
+=============== ==================================================================================================================================================================== ==================================================================================
+``/memory``      :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      Memory data from the SAM2 model that helps track objects between video frames.
+``/image``       :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                                      Input image tensor.
+=============== ==================================================================================================================================================================== ==================================================================================
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+============================================ =============================================================================================================================================== ======================================================================================================
+ROS Topic                                     Interface                                                                                                                                      Description
+============================================ =============================================================================================================================================== ======================================================================================================
+``/encoded_data``                             :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`                Tensor List which has all the required tensors for SAM2 inference.
+============================================ =============================================================================================================================================== ======================================================================================================
+
+ROS Services Advertised
+^^^^^^^^^^^^^^^^^^^^^^^
+
+================================= ================================================================================================================================================================================ ===============================================================
+ROS Service                       Interface                                                                                                                                                                        Description
+================================= ================================================================================================================================================================================ ===============================================================
+``add_objects``                   :ir_repo:`isaac_ros_segment_anything2_interfaces/AddObjects <isaac_ros_image_segmentation> <isaac_ros_segment_anything2_interfaces/srv/AddObjects.srv>`                                                       A service to add objects to the segmentation model.
+``remove_object``                 :ir_repo:`isaac_ros_segment_anything2_interfaces/RemoveObject <isaac_ros_image_segmentation> <isaac_ros_segment_anything2_interfaces/srv/RemoveObject.srv>`                                           A service to remove objects from the segmentation model.
+================================= ================================================================================================================================================================================ ===============================================================
+
+.. |package_name| replace:: ``isaac_ros_segment_anything2``

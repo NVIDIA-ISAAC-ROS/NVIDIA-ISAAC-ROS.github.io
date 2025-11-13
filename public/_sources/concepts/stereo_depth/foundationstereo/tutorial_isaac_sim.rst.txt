@@ -1,0 +1,55 @@
+Tutorial for FoundationStereo with Isaac Sim
+=======================================================
+
+
+This tutorial walks you through a graph to :ir_repo:`estimate depth <isaac_ros_dnn_stereo_depth>`
+with stereo images from Isaac Sim using FoundationStereo.
+
+Tutorial Walkthrough
+--------------------
+
+1. Install and launch Isaac Sim following the steps in the :ref:`Isaac ROS Isaac Sim Setup Guide <gs_isaac_sim>`.
+
+2. Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 800px
+
+3. Complete the ``isaac_ros_foundationstereo`` 
+   :ref:`quickstart <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index:Quickstart>`.
+
+.. note::
+
+    Use the ``FoundationStereo model`` for the quickstart.
+
+4. Open a second terminal and attach to the container:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+5. In the second terminal, start the ``isaac_ros_foundationstereo`` node using the launch files:
+
+   .. tabs::
+
+      .. tab:: High Resolution (high_res)
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_foundationstereo isaac_ros_foundationstereo_isaac_sim.launch.py \
+               engine_file_path:=${ISAAC_ROS_WS:?}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_576x960.engine
+
+      .. tab:: Low Resolution (low_res)
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_foundationstereo isaac_ros_foundationstereo_isaac_sim.launch.py \
+               engine_file_path:=${ISAAC_ROS_WS:?}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_320x736.engine \
+               model_input_width:=736 model_input_height:=320
+
+6. Optionally, you can run the visualizer script to visualize the disparity image:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_foundationstereo isaac_ros_foundationstereo_visualizer.py

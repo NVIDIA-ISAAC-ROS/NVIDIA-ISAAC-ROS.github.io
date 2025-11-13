@@ -1,0 +1,112 @@
+Tutorial for Isaac ROS Visual SLAM with Segmentation Masks
+==========================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/vslam_segformer_mask.gif>`
+   :align: center
+   :width: 600px
+
+Overview
+--------
+
+This tutorial walks you through setting up
+:ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>` for stereo camera pose tracking
+and :ir_repo:`Image Segmentation <isaac_ros_image_segmentation>`
+for segmenting people in an image using TensorRT
+
+.. note::
+
+    :ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>` supports segmentation masks
+    corresponding to the primary camera (typically the left camera in a stereo setup) as input.
+    These masks allow to exclude visual features from consideration when tracking the pose of a stereo camera.
+    This functionality is particularly useful for disregarding people using Segformer
+    :ir_github:`<isaac_ros_image_segmentation> <isaac_ros_segformer>` or other dynamic objects
+    using SAM :ir_github:`<isaac_ros_image_segmentation> <isaac_ros_segment_anything>`.
+
+
+Tutorial Walkthrough - Stereo Visual SLAM Execution with People Segmentation
+----------------------------------------------------------------------------
+
+.. tabs::
+
+    .. tab:: Live on Realsense Camera
+
+        1. Complete the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`.
+
+        2. Complete the :ref:`Isaac ROS Visual Slam quickstart <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`.
+        
+        3. Complete the :ref:`Image Segmentation quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index:quickstart>`
+           up until  running launch file step 3 for RealSense Camera tab.
+
+        4. [Terminal 1] Open a new terminal and activate the Isaac ROS environment:
+
+        .. code:: bash
+
+            isaac-ros activate
+
+        5. [Terminal 1] Inside the running container, build and source the workspace:
+
+        .. code:: bash
+
+            cd ${ISAAC_ROS_WS}
+            ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam_realsense_mask.launch.py engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegformer/1/model.plan
+
+Tutorial Walkthrough - Visualizing the Outputs
+----------------------------------------------
+
+.. note::
+
+    Images and landmarks visualization may impact the performance of Visual Odometry. Please use visualization
+    for debugging and demonstration purposes only. To enable landmark visualization, set the following parameters
+    to ``True`` in the launch file: ``enable_slam_visualization``, ``enable_landmarks_view``, ``enable_observations_view``
+
+
+Visualization with Foxglove Studio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    These examples will stream the camera images in their full resolution to
+    Foxglove Studio. This requires a substantial amount of bandwidth and is only done
+    here for exemplary purposes. Most likely the image stream will be fairly
+    choppy due to the large bandwidth.
+
+1. Complete the :ref:`foxglove setup <foxglove-setup>` guide.
+
+2. In Foxglove Studio open the ``foxglove_layout_realsense_mask.json`` layout file, which can be
+   found in the
+   :ir_repo:`isaac_ros_visual_slam repository <isaac_ros_visual_slam> <isaac_ros_visual_slam/foxglove_layouts/foxglove_layout_realsense_mask.json>`.
+
+3. Validate that you can see a visualization of the images of the front left
+   stereo camera and Segformer mask, image landmarks, camera transform tree and odometry path.
+   You should expect a visualization similar to the following:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Foxglove_vslam_mask.png>`
+    :width: 600px
+    :alt: Foxglove visualization of the teleop outputs.
+    :align: center
+
+
+Visualization with RViz2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. [Terminal 3] Open another terminal and activate the Isaac ROS environment to execute RViz2:
+
+.. code:: bash
+
+    isaac-ros activate
+
+2. [Terminal 3] Open RViz2 from the new terminal:
+
+.. code:: bash
+
+    source ${ISAAC_ROS_WS}/install/setup.bash
+    rviz2 -d ${ISAAC_ROS_WS}/src/isaac_ros_visual_slam/isaac_ros_visual_slam/rviz/vslam_segformer.rviz
+
+3. Validate that you can see a visualization of the images of the front left
+   stereo camera and Segformer mask, image landmarks, camera transform tree and odometry path.
+   You should expect a visualization similar to the following:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Rviz_vslam_mask.png>`
+      :align: center
+      :width: 600px

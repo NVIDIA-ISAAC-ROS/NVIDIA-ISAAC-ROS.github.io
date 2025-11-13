@@ -1,0 +1,550 @@
+=======================================================================
+Tutorial for Multi-Object Pick and Place using cuMotion with Perception
+=======================================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/pick_and_place_sped_up.gif>`
+   :width: 100%
+   :alt: Multi object pick and place example.
+
+Overview
+--------
+
+This tutorial walks through running the multi-object Pick and Place workflow on your robot.
+The Pick and Place reference workflow has been tested on NVIDIA® Jetson Thor™ (128 GB).
+
+**What You'll Be Doing:**
+
+- Configure the orchestration system for your objects and workspace
+- Launch perception and motion planning nodes
+- Execute autonomous Pick and Place operations
+- Monitor workflow execution with behavior tree visualization
+
+.. note::
+
+   For conceptual understanding and more details, refer to:
+
+   - :doc:`Multi-Object Pick and Place </concepts/manipulation/pick_and_place>` - Workflow concepts
+   - :doc:`isaac_manipulator_pick_and_place </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/index>` - Package details and quickstart
+   - :doc:`Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide>` - Detailed configuration
+
+Tutorial Steps
+--------------
+
+#. Follow the setup instructions in :doc:`Setup Hardware and Software for Real Robot </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper>`.
+
+Object Requirements
+^^^^^^^^^^^^^^^^^^^
+
+Ensure that you have one of the NGC catalog objects that can be grasped, for example :ir_ngc:`sdetr_grasp <teams/isaac/models/synthetica_detr>`. This tutorial uses the **Mac and Cheese Box** and the **Soup Can**.
+
+If you are using ``FoundationPose``, for the desired object, ensure that you have a mesh and a texture file available for it.
+
+To prepare an object, review :doc:`FoundationPose documentation </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`.
+
+.. _configure-workflow:
+
+Configure Your Workflow
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Prepare Configuration Files and Environment Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before editing any configuration files, copy them to the appropriate location and set up environment variables based on your installation method. This section handles **all configuration file preparation** (workflow config, behavior tree parameters, and blackboard parameters) and sets up environment variables for simplified command usage.
+
+.. tab-set::
+   :sync-group: installation
+
+   .. tab-item:: Binary Package
+      :sync: binary
+
+      Binary installations have read-only configuration files in system directories. Copy all necessary files to a writable location:
+
+      .. code:: bash
+
+         # Create a directory for your custom configuration
+         mkdir -p ${ISAAC_ROS_WS}/isaac_manipulator_config
+
+      Copy the workflow configuration file for your robot:
+
+      .. tab-set::
+         :sync-group: robot
+
+         .. tab-item:: UR5e with Robotiq 2F-85
+            :sync: ur5e
+
+            .. code:: bash
+
+               cp $(ros2 pkg prefix --share isaac_manipulator_bringup)/params/ur5e_robotiq_85_mac_and_cheese.yaml \
+                  ${ISAAC_ROS_WS}/isaac_manipulator_config/my_robot_config.yaml
+
+         .. tab-item:: UR10e with Robotiq 2F-140
+            :sync: ur10e
+
+            .. code:: bash
+
+               cp $(ros2 pkg prefix --share isaac_manipulator_bringup)/params/ur10e_robotiq_2f_140_mac_and_cheese.yaml \
+                  ${ISAAC_ROS_WS}/isaac_manipulator_config/my_robot_config.yaml
+
+      Copy behavior tree and blackboard parameter files:
+
+      .. code:: bash
+
+         cp $(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params/multi_object_pick_and_place_behavior_tree_params.yaml \
+            ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_behavior_tree_params.yaml
+
+         cp $(ros2 pkg prefix --share isaac_manipulator_pick_and_place)/params/multi_object_pick_and_place_blackboard_params.yaml \
+            ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_blackboard_params.yaml
+
+      **Files you'll edit:**
+
+      * **Workflow configuration**: 
+      
+      .. code:: bash
+
+         ${ISAAC_ROS_WS}/isaac_manipulator_config/my_robot_config.yaml
+
+      * **Behavior tree parameters**: 
+      
+      .. code:: bash
+
+         ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_behavior_tree_params.yaml
+
+      * **Blackboard parameters**: 
+      
+      .. code:: bash
+
+         ${ISAAC_ROS_WS}/isaac_manipulator_config/multi_object_pick_and_place_blackboard_params.yaml
+
+      Set up environment variables:
+
+      .. code:: bash
+
+         # Point to the directory containing your configuration files
+         export ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR="${ISAAC_ROS_WS}/isaac_manipulator_config"
+         export ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR="${ISAAC_ROS_WS}/isaac_manipulator_config"
+
+
+   .. tab-item:: Build from Source
+      :sync: source
+
+      When building from source with ``--symlink-install``, you can edit configuration files directly in the source directories.
+
+      **Files you'll edit:**
+
+      * **Workflow configuration**:
+
+        .. tab-set::
+           :sync-group: robot
+
+           .. tab-item:: UR5e with Robotiq 2F-85
+              :sync: ur5e
+
+              .. code:: bash
+
+                 ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params/ur5e_robotiq_85_mac_and_cheese.yaml
+
+           .. tab-item:: UR10e with Robotiq 2F-140
+              :sync: ur10e
+
+              .. code:: bash
+
+                 ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params/ur10e_robotiq_2f_140_mac_and_cheese.yaml
+
+      * **Behavior tree parameters**: 
+      
+      .. code:: bash
+
+         ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml
+
+      * **Blackboard parameters**: 
+      
+      .. code:: bash
+
+         ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml
+
+      Set up environment variables:
+
+      .. code:: bash
+
+         # Point to the source directories containing the configuration files
+         export ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR="${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params"
+         export ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR="${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_pick_and_place/params"
+
+
+Edit Workflow Configuration File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Edit the workflow configuration file to set your robot and camera configuration.
+
+**Reference documentation:**
+
+.. tab-set::
+   :sync-group: robot
+
+   .. tab-item:: UR5e with Robotiq 2F-85
+      :sync: ur5e
+
+      :ir_repo:`ur5e_robotiq_85_mac_and_cheese.yaml <isaac_manipulator> <isaac_manipulator_bringup/params/ur5e_robotiq_85_mac_and_cheese.yaml>`
+
+   .. tab-item:: UR10e with Robotiq 2F-140
+      :sync: ur10e
+
+      :ir_repo:`ur10e_robotiq_2f_140_mac_and_cheese.yaml <isaac_manipulator> <isaac_manipulator_bringup/params/ur10e_robotiq_2f_140_mac_and_cheese.yaml>`
+
+#. Set ``workflow_type: PICK_AND_PLACE`` and configure your ``camera_type``:
+
+   .. tabs::
+
+      .. tab:: RealSense
+
+         Set ``camera_type`` to ``REALSENSE`` in your configuration file.
+
+   .. note::
+
+      For parameter details and model combinations, refer to the :doc:`Manipulation Workflow Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/manipulation_workflow_config_guide>`.
+
+Configure Objects and Workspace
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Edit the behavior tree and blackboard parameter files (prepared in `Prepare Configuration Files and Environment Variables`_) to configure the objects your robot will manipulate and define workspace parameters.
+
+**Reference documentation:**
+
+- :ir_repo:`Behavior Tree Parameters <isaac_manipulator> <isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml>`
+- :ir_repo:`Blackboard Parameters <isaac_manipulator> <isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml>`
+
+.. note::
+
+   The example configurations are pre-configured for SyntheticaDETR v1.0.0 with specific class IDs: Mac and Cheese box (``'22'``) and Soup can (``'3'``). If you're using a different detection model or objects, you'll need to update these class IDs to match your model's output.
+
+For detailed configuration instructions covering object setup, workspace locations, and system parameters, refer to the :doc:`Pick and Place Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide>`.
+
+**Configuration Checklist**
+
+Verify these settings in your behavior tree and blackboard parameter files before launching:
+
+* **Objects:** ``supported_objects`` match scene objects with correct ``class_ids`` and valid grasp/mesh file paths
+* **Workspace:** ``target_poses`` and ``home_pose`` are safe and reachable
+* **Mode:** ``0`` = single bin, ``1`` = multi-bin sorting
+* **Drop method:** YAML defaults, action goal, or RViz marker correction
+* **System:** Action server names and ``startup_server_timeout_sec`` match your setup
+
+.. important::
+
+   Configuration changes require restarting the orchestration system. The behavior tree loads these parameters at startup and does not dynamically reload configuration files during execution.
+
+.. tip::
+
+   **Testing Configuration Without Hardware**: If you want to verify your configuration setup before proceeding to hardware, refer to the standalone quickstart in :doc:`isaac_manipulator_pick_and_place </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/index>`. This uses dummy servers to test that your behavior tree logic and configuration files work correctly.
+
+.. tip::
+
+   Set ``pose_estimation.base_frame_id`` (usually ``base_link``) and ``pose_estimation.camera_frame_id`` in the behavior tree parameters. For recommended values and examples (RealSense and Isaac Sim), see the :doc:`Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide>`.
+
+
+.. note::
+   Please run the :ref:`Driver and Hardware Tests <driver_and_hardware_tests>` to make sure your robot drivers are in a good state.
+
+Run Pre-Flight Tests (Optional but highly recommended)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. To verify that you have setup Isaac for Manipulation correctly, run the following command:
+
+   .. code:: bash
+
+      export ENABLE_MANIPULATOR_TESTING=on_robot
+
+   Point to your configuration file:
+
+   .. tab-set::
+      :sync-group: installation
+
+      .. tab-item:: Binary Package
+         :sync: binary
+
+         .. code:: bash
+
+            export ISAAC_MANIPULATOR_TEST_CONFIG=${ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR}/my_robot_config.yaml
+
+      .. tab-item:: Build from Source
+         :sync: source
+
+         .. tab-set::
+            :sync-group: robot
+
+            .. tab-item:: UR5e with Robotiq 2F-85
+               :sync: ur5e
+
+               .. code:: bash
+
+                  export ISAAC_MANIPULATOR_TEST_CONFIG=${ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR}/ur5e_robotiq_85_mac_and_cheese.yaml
+
+            .. tab-item:: UR10e with Robotiq 2F-140
+               :sync: ur10e
+
+               .. code:: bash
+
+                  export ISAAC_MANIPULATOR_TEST_CONFIG=${ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR}/ur10e_robotiq_2f_140_mac_and_cheese.yaml
+
+
+   Run the tests:
+
+   .. code:: bash
+
+      python -m pytest ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/test
+
+   .. note::
+
+      One can also use ``colcon test --packages-select isaac_manipulator_bringup`` to run the tests.
+      However, ``pytest`` has a better output and makes it easier to view status and progress of the tests.
+      If these tests fail, please look at :doc:`Isaac for Manipulation Testing Guide </reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator>` for more information.
+      It is recommended to run the tests manually using ``launch_test`` and then manually inspecting the results.
+
+   This will run a series of tests to verify that Isaac for Manipulation is working correctly.
+
+Launch the System
+^^^^^^^^^^^^^^^^^
+
+#. Set up networking (in each terminal):
+
+   .. code:: bash
+
+      export ROS_DOMAIN_ID=<ID_NUMBER>  # Avoid network interference
+      export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp  # Better performance
+
+#. On the UR teach pendant: Load the **remote program** and ensure that robot is **paused** or **stopped** for safety purposes.
+
+#. (Optional) Open **another** terminal and launch the behavior tree viewer:
+
+   .. code:: bash
+
+      isaac-ros activate
+      py-trees-tree-viewer
+
+   .. note::
+
+      The behavior tree viewer provides real-time visualization of tree structure, node states (``SUCCESS``/green, ``FAILURE``/red, ``RUNNING``/blue), blackboard variables (object queue, active object ID, drop poses), and timeline replay for debugging workflow execution.
+
+   .. warning::
+
+      Running the ``py-trees-tree-viewer`` GUI on Jetson Thor may impact workflow performance due to shared compute and GPU resources. Consider using it for debugging only when needed.
+
+#. Open **another** terminal and launch the main workflow with your configuration:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Source the workspace (required if at least one package was built from source in previous steps):
+
+   .. code:: bash
+
+      source install/setup.bash
+
+#. Launch the workflow using the environment variable set earlier:
+
+   .. tab-set::
+      :sync-group: installation
+
+      .. tab-item:: Binary Package
+         :sync: binary
+
+         .. code:: bash
+
+            ros2 launch isaac_manipulator_bringup workflows.launch.py \
+               manipulator_workflow_config:=${ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR}/my_robot_config.yaml
+
+      .. tab-item:: Build from Source
+         :sync: source
+
+         .. tab-set::
+            :sync-group: robot
+
+            .. tab-item:: UR5e with Robotiq 2F-85
+               :sync: ur5e
+
+               .. code:: bash
+
+                  ros2 launch isaac_manipulator_bringup workflows.launch.py \
+                     manipulator_workflow_config:=${ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR}/ur5e_robotiq_85_mac_and_cheese.yaml
+
+            .. tab-item:: UR10e with Robotiq 2F-140
+               :sync: ur10e
+
+               .. code:: bash
+
+                  ros2 launch isaac_manipulator_bringup workflows.launch.py \
+                     manipulator_workflow_config:=${ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR}/ur10e_robotiq_2f_140_mac_and_cheese.yaml
+
+
+Execute Pick and Place
+^^^^^^^^^^^^^^^^^^^^^^
+
+#. On the UR teach pendant: Press **play** to enable the robot.
+
+#. Trigger the workflow with an action goal:
+
+   .. tabs::
+
+      .. tab:: Single Bin Mode
+
+         All objects to one location:
+
+         .. code:: bash
+
+            ros2 action send_goal --feedback /multi_object_pick_and_place isaac_manipulator_interfaces/action/MultiObjectPickAndPlace \
+              '{target_poses: {header: {frame_id: "base_link"}, poses: [{position: {x: -0.25, y: 0.45, z: 0.50}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: [], mode: 0}'
+
+      .. tab:: Multi-Bin Mode
+
+         Objects sorted by class:
+
+         .. code:: bash
+
+            ros2 action send_goal --feedback /multi_object_pick_and_place isaac_manipulator_interfaces/action/MultiObjectPickAndPlace \
+              '{target_poses: {header: {frame_id: "base_link"}, poses: [{position: {x: -0.25, y: 0.50, z: 0.70}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}, {position: {x: -0.25, y: 0.40, z: 0.40}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: ["22", "3"], mode: 1}'
+
+   .. warning::
+
+      Update these example poses with positions safe and reachable in your robot's workspace.
+
+   Refer to :doc:`API Reference </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference>` for complete action interface documentation.
+
+Pick and Place with Foundation Stereo and Static Planning Scene
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This section demonstrates how to run a pick and place workflow using Foundation Stereo for depth estimation, with nvblox disabled (recommended) and a static planning scene loaded from a MoveIt scene file. This configuration is ideal for scenarios where:
+
+- High-quality depth estimation is required but real-time performance is not critical
+- The environment is static and well-known (e.g., a fixed workspace)
+- You want to reduce computational overhead by using pre-defined collision objects
+- You need more accurate depth estimation for precise manipulation tasks
+
+The section uses the following components:
+
+- :doc:`Isaac ROS Foundation Stereo</repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index>` for high-quality depth estimation
+- :doc:`Isaac ROS FoundationPose</repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>` for object 3D pose estimation
+- :doc:`Isaac ROS cuMotion</repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index>` for motion planning with static collision avoidance
+- :doc:`Isaac ROS Object Attachment</repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index>` for estimating object collision spheres
+
+Key Differences from Standard Pick and Place
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This tutorial differs from the standard pick and place workflow in several important ways:
+
+1. **Foundation Stereo Depth Estimation**: Uses the more accurate but computationally intensive Foundation Stereo model instead of ESS
+2. **Disabled nvblox**: No dynamic 3D scene reconstruction, relying instead on static collision objects (though this is not a hard requirement - users can also enable nvblox to see it work with Foundation Stereo)
+3. **Static Planning Scene**: Uses a MoveIt scene file to define static obstacles and workspace boundaries
+4. **Reduced Real-time Requirements**: Foundation Stereo runs at lower frame rates but provides higher quality depth
+
+Create Static Planning Scene
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Create a MoveIt scene file for your workspace. This file defines static collision objects:
+
+   In the RViz window that opens, click on Displays > MoveIt > Motion Planning. You should see a new panel added to the left side of the RViz window titled Motion Planning.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_rviz_display_motion_planning.png>`
+        :width: 100%
+   
+   In MoveIt's RViz interface, obstacles may be added in the "Scene Objects" tab.
+   Supported geometric primitives are: 'box', 'sphere', and 'cylinder'. 
+
+   Scene file can be exported from MoveIt's RViz interface using 'Export' button, and the path to the scene file can be set in the configuration file in the ``moveit_collision_objects_scene_file`` parameter.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_scene_objects.png>`
+        :width: 100%
+
+   Once the scene file is exported and set in the ``moveit_collision_objects_scene_file`` parameter, the static planning scene will be loaded at launch once cuMotion is ready for planning queries.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_static_planning_scene.png>`
+        :width: 100%
+
+Configure the Workflow
+^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Edit the configuration file to enable Foundation Stereo and disable nvblox, and set the path to the scene file:
+
+   .. code:: yaml
+
+      # $(ros2 pkg prefix --share isaac_manipulator_bringup)/params/ur10e_robotiq_2f_140_mac_and_cheese_foundation_stereo.yaml
+
+      # Depth estimation configuration
+      depth_type: 'FOUNDATION_STEREO'  # Use Foundation Stereo instead of ESS
+      enable_nvblox: false  # Disable nvblox for static planning scene
+      # The user can run nvblox with FoundationStereo by enabling nvblox but the environment representation can be old (since the FoundationStereo model can take over 1-2 seconds to generate a depth image)
+
+      # Foundation Stereo configuration
+      foundation_stereo_engine_file_path: '${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_320x736.engine'
+
+      # Static planning scene configuration
+      moveit_collision_objects_scene_file: '<path_to_your_scene_file>'
+
+Launch the Pick and Place Workflow with Foundation Stereo
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every
+new terminal where you run ROS commands, to avoid interference
+with other computers in the same network (`ROS Guide <https://docs.ros.org/en/:ir_ros_distro:/Concepts/Intermediate/About-Domain-ID.html>`__).
+
+We recommend using Cyclone DDS for this tutorial when trying on real robot for better performance.
+
+#. To enable Cyclone DDS, run the following command in each terminal (once) before running any other command.
+
+   .. code:: bash
+
+      export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+#. Launch the Foundation Stereo pick and place workflow:
+
+   .. code:: bash
+
+      ros2 launch isaac_manipulator_bringup workflows.launch.py \
+        manipulator_workflow_config:=$(ros2 pkg prefix --share isaac_manipulator_bringup)/params/ur10e_robotiq_2f_140_mac_and_cheese_foundation_stereo.yaml
+
+#. Wait for the terminal log to show ``cuMotion is ready for planning queries!``
+
+#. Open **another** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. To enable Cyclone DDS, run the following command in each terminal.
+
+   .. code:: bash
+
+      export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+#. On the UR teach pendant, press  **play** to enable the robot.
+
+#. Set the drop pose:
+
+   When launching the ROS graph earlier, ``use_pose_from_rviz`` is set to ``True`` which creates an interactive marker that can be used to set the drop pose.
+   Use the marker controls to set the desired position and orientation. In this mode, the drop pose in the below command is ignored. The below command can be otherwise used to set the drop pose to a desired pose; the example below is for a drop pose at x=-0.25, y=0.45, z=0.50, and orientation w=0.018, x=-0.678, y=0.735, z=0.021. Note that the pose must be specified with respect to the base link frame.
+
+   .. code:: bash
+
+      ros2 topic pub /target_pose geometry_msgs/msg/PoseStamped '{header: {frame_id: "base_link"}, pose: {position: {x: -0.25, y: 0.45, z: 0.50}, orientation: {w: 0.018, x: -0.678, y: 0.735, z: 0.021}}}' --once
+
+Why does my robot fail to move ?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This issue can occur due to a variety of reasons, but we detail the most common reasons here in order of priority.
+
+1. **Ghost Voxels due to poor depth estimation**: If the user has enabled NvBlox, the depth estimation can have some false positives and can add ghost voxels to the environment. The user can visualize the depth voxel cloud from NvBlox on ``Rviz`` or Foxglove and verify that this is the case.
+   The user can experiment with better depth estimation by using the ``ESS_FULL`` or ``FOUNDATION_STEREO`` models by changing the ``depth_type`` and ``enable_dnn_depth_in_realsense`` parameters in the manipulator configuration file. You can also turn off NvBlox and generate a static planning scene from a MoveIt scene file.
+
+2. **Ghost Voxels due to poor calibration**: If the user has performed a poor calibration, then the robot can potentially think it is in self collision with the environment - leading to planning failures.
+
+3. **Pose Estimation**: If the object is not being detected or in a position that is not accessible to the robot- planning failures can occur. The user should take a look at the pose estimation that is output and verify that it is correct. Quite often the mesh files and segmentation mask being generated might not be accurate and so the user is expected to take care that they are referencing the correct mesh files in their manipulator workflow configuration file.
+
+4. **System Load**: If the user is running a heavy system load, then the system can fail in non obvious ways. An example is when the user is running with 2 cameras with ``FOUNDATION_STEREO`` depth estimation and ``NvBlox`` enabled, this can lead to slowdowns and in some cases cameras shutting down. Please verify that the system is not overloaded by looking at the NITROS diagnostics and verifying all topics are being published and received by the system. One might need to over throttle the system or reduce the frame rate of the cameras.
+
+Next Steps
+----------
+
+- :doc:`isaac_manipulator_pick_and_place </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/index>` - Package documentation and standalone testing
+- :doc:`Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide>` - Advanced configuration and troubleshooting
+- :doc:`API Reference </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference>` - Complete API documentation
+- :doc:`isaac_manipulator_orchestration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index>` - Behavior tree framework details

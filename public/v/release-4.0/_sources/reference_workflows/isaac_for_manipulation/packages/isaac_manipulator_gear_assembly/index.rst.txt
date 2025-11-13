@@ -1,0 +1,411 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_manipulator> <isaac_manipulator_gear_assembly>`
+
+Overview
+--------
+
+The ``isaac_manipulator_gear_assembly`` package provides high-level orchestration nodes for complex manipulation tasks in Isaac for Manipulation, specifically designed for gear assembly operations. This package serves as a reference example for creating sophisticated manipulation workflows that combine perception, motion planning, and task execution.
+
+The package contains orchestrator nodes that coordinate multiple Isaac for Manipulation action servers to perform end-to-end gear assembly task. These orchestrators are integrated into the Isaac for Manipulation system through the ``gear_assembly.py`` utility module in ``isaac_manipulator_ros_python_utils``.
+
+Key Features
+------------
+
+- **Gear Assembly Orchestration**: Complete workflow for picking gears and inserting them into gear stands with precision
+- **Pick and Place Orchestration**: Flexible Pick and Place operations with configurable grasp strategies
+- **Multi-modal Perception Integration**: Support for both ground-truth poses (simulation) and vision-based perception
+- **RL Policy Integration**: Integration with reinforcement learning policies for precision insertion tasks
+- **Comprehensive Testing**: Unit tests with mock servers for development and validation
+
+Package Components
+------------------
+
+Scripts
+~~~~~~~
+
+The package provides two main orchestrator scripts located in the ``scripts/`` directory:
+
+**Gear Assembly Orchestrator** (``gear_assembly_orchestrator.py``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The primary orchestration node for gear assembly tasks. This node coordinates the complete workflow:
+
+- **Object Detection and Segmentation**: Uses Segment Anything (SAM) with user-provided point triggers for object segmentation
+- **Pose Estimation**: Integrates with FoundationPose for 6DOF object pose estimation, with optional ground-truth fallback for simulation
+- **Pick and Place Execution**: Coordinates with Pick and Place action servers for gear manipulation
+- **RL Insertion**: Integrates with reinforcement learning policies for precision gear insertion
+- **Multi-gear Support**: Handles insertion of different gear sizes (small, medium, large) with appropriate mesh files
+
+Key capabilities:
+
+- Supports both Isaac Sim (with ground-truth poses) and physical robot deployment
+- Configurable gripper positions for different gear sizes
+- Pose estimation accuracy verification for development
+- Output directory configuration for logging and data collection
+- Integration with ``isaac_manipulator_ur_dnn_policy`` for Reinforcement Learning based contact rich insertion
+
+**Pick and Place Orchestrator** (``pick_and_place_orchestrator.py``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A flexible Pick and Place orchestration node that provides:
+
+- **Grasp Planning**: Configurable grasp strategies with approach and retract motions
+- **Object Attachment**: Integration with cuMotion object attachment for collision-aware planning
+- **Joint Space Planning**: Support for both Cartesian and joint space motion planning
+- **Interactive Markers**: RViz integration for interactive pose specification
+- **Home Pose Management**: Optional return-to-home functionality after task completion
+
+Key capabilities:
+
+- Allows for a configurable grasp approach and retract distances.
+- Support for custom object attachment shapes (cuboid, mesh-based)
+- Ability to plan to grasp the object and place it at an appropriate pose.
+- Usage of the joint space planner to plan to an ``IK`` solution that is in distribution with the trained insertion policy.
+- Intermediate output saving for debugging and analysis of the ``IK`` solutions generated for place pose.
+
+Integration with Isaac for Manipulation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Both orchestrator nodes are launched and configured through the ``gear_assembly.py`` module in ``isaac_manipulator_ros_python_utils``. This integration provides:
+
+**Gear Assembly Integration**
+
+The ``get_gear_assembly_orchestrator()`` function in ``gear_assembly.py`` creates and configures the gear assembly orchestrator with:
+
+- Mesh file paths for different gear types and peg stands
+- Camera frame configuration (simulation vs. real robot)
+- Target joint states for place poses
+- Ground-truth pose estimation settings
+- Pose estimation accuracy verification
+- Reinforcement learning inference configuration
+- Output directory setup
+
+**Node Launching**
+
+The ``get_gear_assembly_nodes()`` function launches supporting nodes:
+
+- **Insertion Policy Action Server**: RL policy execution for gear insertion
+- **Goal Pose Publisher**: Publishes target poses for RL inference
+- **Insertion Status Checker**: Monitors insertion completion and timeout
+- **Inference Launch**: Coordinates RL model inference pipeline
+
+Testing and Validation
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The package includes comprehensive test suites in the ``test/`` directory:
+
+**Unit Tests**
+
+- ``test_gear_assembly_orchestrator.py``: Tests gear assembly orchestrator with mock action servers
+- ``test_pick_and_place_orchestrator.py``: Tests Pick and Place orchestrator functionality
+
+**Test Infrastructure**
+
+- Mock action servers for isolated testing
+- Configurable test scenarios
+- Integration with Isaac ROS test framework
+- Support for both simulation and hardware testing modes
+
+Configuration and Parameters
+----------------------------
+
+Gear Assembly Orchestrator Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Description
+     - Default
+
+   * - ``use_sim_time``
+     - bool
+     - Use simulation time
+     - False
+
+   * - ``wait_for_point_topic``
+     - bool
+     - Wait for user point input to trigger perception
+     - True
+
+   * - ``point_topic_name_as_trigger``
+     - string
+     - Topic name for point-based perception triggering
+     - ``input_points_debug``
+
+   * - ``use_ground_truth_pose_estimation``
+     - bool
+     - Use ground-truth poses from simulation
+     - False
+
+   * - ``verify_pose_estimation_accuracy``
+     - bool
+     - Enable pose estimation accuracy verification
+     - False
+
+   * - ``run_rl_inference``
+     - bool
+     - Enable RL policy inference for insertion
+     - False
+
+   * - ``use_joint_space_planner``
+     - bool
+     - Use joint space planning for place poses
+     - False
+
+   * - ``mesh_file_paths``
+     - string[]
+     - Paths to gear mesh files
+     - []
+
+   * - ``mesh_file_path_for_peg_stand_estimation``
+     - string
+     - Path to peg stand mesh file
+     - ""
+
+   * - ``offset_for_place_pose``
+     - double
+     - Offset distance for place pose (meters)
+     - 0.28
+
+   * - ``offset_for_insertion_pose``
+     - double
+     - Offset distance for insertion pose (meters)
+     - 0.02
+
+Pick and Place Orchestrator Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Description
+     - Default
+
+   * - ``gripper_action_name``
+     - string
+     - Gripper action server name
+     - ``/robotiq_gripper_controller/gripper_cmd``
+
+   * - ``gripper_collision_links``
+     - string[]
+     - List of gripper links for collision checking
+     - ['']
+
+   * - ``time_dilation_factor``
+     - double
+     - Time scaling factor for simulation environments
+     - 0.2
+
+   * - ``use_ground_truth_pose_from_sim``
+     - bool
+     - Use ground-truth object poses from simulation
+     - False
+
+   * - ``publish_grasp_frame``
+     - bool
+     - Publish grasp frame for visualization
+     - False
+
+   * - ``sleep_time_before_planner_tries_sec``
+     - double
+     - Wait time before retrying planner (seconds)
+     - 0.5
+
+   * - ``object_frame_name``
+     - string
+     - Name of the object frame for pose estimation
+     - ``detected_object1``
+
+   * - ``num_planner_tries``
+     - int
+     - Number of planner retry attempts
+     - 5
+
+   * - ``attach_object_fallback_radius``
+     - double
+     - Fallback radius for object attachment (meters)
+     - 0.15
+
+   * - ``grasp_file_path``
+     - string
+     - Path to grasp configuration file
+     - ""
+
+   * - ``grasp_approach_offset_distance``
+     - double[]
+     - Approach offset [x, y, z] in meters
+     - [0.0, 0.0, -0.15]
+
+   * - ``retract_offset_distance``
+     - double[]
+     - Retract offset [x, y, z] in meters
+     - [0.0, 0.0, 0.10]
+
+   * - ``grasp_approach_in_world_frame``
+     - bool
+     - Whether grasp approach is in world frame
+     - False
+
+   * - ``retract_in_world_frame``
+     - bool
+     - Whether retract motion is in world frame
+     - True
+
+   * - ``attach_object_shape``
+     - string
+     - Object attachment shape (CUBOID/MESH)
+     - "CUBOID"
+
+   * - ``attach_object_mesh_file_path``
+     - string
+     - Path to object mesh file for attachment
+     - ""
+
+   * - ``attach_object_scale``
+     - double[]
+     - Object attachment scale [x, y, z]
+     - [0.05, 0.05, 0.1]
+
+   * - ``save_intermediate_outputs``
+     - bool
+     - Save intermediate planning outputs for debugging
+     - False
+
+   * - ``save_intermediate_outputs_dir``
+     - string
+     - Directory for saving intermediate outputs
+     - ``${ISAAC_ROS_WS}``
+
+   * - ``joint_limits_file_path``
+     - string
+     - Path to joint limits configuration file
+     - ``isaac_manipulator_robot_description/config/joint_limits.yaml``
+
+   * - ``move_to_home_pose_after_place``
+     - bool
+     - Return to home pose after completion
+     - False
+
+   * - ``home_pose``
+     - double[]
+     - Home pose [``x``, ``y``, ``z``, ``qx``, ``qy``, ``qz``, ``qw``]
+     - [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+
+   * - ``seed_state_for_ik_solver_for_joint_space_planner``
+     - double[]
+     - Seed joint state for IK solver
+     - [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+   * - ``use_pose_from_rviz``
+     - bool
+     - Use interactive marker poses from RViz
+     - False
+
+   * - ``end_effector_mesh_resource_uri``
+     - string
+     - URI for end effector mesh resource
+     - ``package://isaac_manipulator_robot_description/meshes/robotiq_2f_85.obj``
+
+   * - ``joint_states_topic``
+     - string
+     - Joint states topic name
+     - ``/joint_states`` (``/isaac_joint_states`` in sim)
+
+   * - ``isaac_sim``
+     - bool
+     - Whether running in Isaac Sim
+     - False
+
+Usage Examples
+---------------
+
+Gear Assembly Workflow
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The gear assembly orchestrator is typically launched through Isaac for Manipulation's gear assembly configuration:
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils.gear_assembly import get_gear_assembly_orchestrator
+   from isaac_manipulator_ros_python_utils.config import GearAssemblyConfig
+
+   # Configure gear assembly
+   config = GearAssemblyConfig()
+   config.use_sim_time = True
+   config.run_rl_inference = True
+   config.mesh_file_paths = [
+       "/path/to/gear_large.obj",
+       "/path/to/gear_small.obj", 
+       "/path/to/gear_medium.obj"
+   ]
+
+   # Get orchestrator nodes
+   orchestrator_nodes = get_gear_assembly_orchestrator(config)
+
+Pick and Place Workflow
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Pick and Place orchestrator can be launched independently or as part of gear assembly:
+
+.. code:: bash
+
+   ros2 run isaac_manipulator_gear_assembly pick_and_place_orchestrator.py \
+       --ros-args \
+       -p grasp_file_path:=/path/to/grasp_config.yaml \
+       -p use_ground_truth_pose_from_sim:=false \
+       -p move_to_home_pose_after_place:=true
+
+Action Interfaces
+-----------------
+
+The orchestrators provide the following ROS 2 action interfaces:
+
+**Gear Assembly Action**
+
+- **Action Type**: ``isaac_manipulator_interfaces/action/GearAssembly``
+- **Server**: ``/gear_assembly_action_server``
+- **Description**: Executes complete gear assembly workflow
+
+**Pick and Place Action**
+
+- **Action Type**: ``isaac_manipulator_interfaces/action/PickAndPlace``
+- **Server**: ``/pick_and_place``
+- **Description**: Executes Pick and Place operations with configurable parameters
+
+Dependencies
+------------
+
+The package depends on several Isaac ROS and Isaac for Manipulation components:
+
+**Core Dependencies**
+
+- ``isaac_manipulator_interfaces``: Action and service definitions
+- ``isaac_manipulator_ros_python_utils``: Utility functions and configurations
+- ``isaac_manipulator_servers``: Perception and manipulation action servers
+- ``isaac_manipulator_ur_dnn_policy``: RL policy integration
+- ``isaac_ros_cumotion_interfaces``: Motion planning interfaces
+- ``isaac_ros_cumotion_object_attachment``: Object attachment for collision avoidance
+
+**Hardware Dependencies**
+
+- ``ur_robot_driver``: Universal Robots driver
+- ``robotiq_controllers``: Robotiq gripper control
+- ``robotiq_description``: Robotiq gripper description
+
+See Also
+--------
+
+- :doc:`Isaac for Manipulation Gear Assembly Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_gear_assembly>`
+- :doc:`Isaac for Manipulation Pick and Place Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place>`
+- :doc:`Isaac for Manipulation UR DNN Policy </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_ur_dnn_policy/index>`
+- :doc:`Isaac for Manipulation Testing Guide </reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator>`
+
+.. |package_name| replace:: ``isaac_manipulator_gear_assembly``

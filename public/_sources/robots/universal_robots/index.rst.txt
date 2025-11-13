@@ -1,0 +1,415 @@
+
+.. _universal_robots:
+
+================
+Universal Robots
+================
+
+Set Up UR Robot
+~~~~~~~~~~~~~~~
+
+#. Set up the UR robot by following `Setting up a UR robot <https://docs.ros.org/en/:ir_ros_distro:/p/ur_robot_driver/doc/installation/robot_setup.html>`__.
+
+.. TODO(jaiveers): Update this with a Jazzy link instead
+
+#. Create a program for external control by following `Installing a URCap <https://docs.ros.org/en/humble/p/ur_robot_driver/doc/installation/install_urcap_e_series.html>`__.
+
+   .. warning::
+
+      `Extraction of calibration information <https://docs.ros.org/en/:ir_ros_distro:/p/ur_robot_driver/doc/installation/robot_setup.html#extract-calibration-information>`__
+      from the UR robot is required to ensure that the ROS ``ur_robot_driver`` is able to accurately compute the TCP pose
+      for a given joint configuration.
+
+#. Save the IP address of the robot and substitute it for ``<ROBOT_IP_ADDRESS>`` in the instructions below.
+
+.. note::
+
+   PolyScope >=5.23 is required for the ``isaac_manipulator_ur_dnn_policy`` package. This is available for download on UR's `website <https://www.universal-robots.com/download>`__. Instructions on how to update PolyScope can be found `here <https://www.universal-robots.com/manuals/EN/HTML/SW5_20/Content/prod-serv-man/E-series/serv-man-update.htm>`__.
+
+.. _set-up-cameras-for-robot:
+
+Set Up Cameras for Robot
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Connect your cameras:
+
+   - If you are using **RealSense** cameras, connect them via USB 3. See available USB ports of the Jetson AGX Thor `here <https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-thor/>`__. When connecting your RealSense cameras via USB, make sure to use a USB 3 port and cable.
+
+   It is recommended to use cables shorter than 3 m to guarantee stable transmission.
+
+#. Place your stereo cameras such that their field of view fully covers the workspace that the robot arm will be operating in.
+
+      **Camera Placement Guide:** Object detection networks, as well as ``nvblox``, which is used for collision avoidance, are affected
+      by the placement of cameras with respect to the workspace. Here we provide guidelines for placing cameras to
+      achieve the best results. *Deviation from these guidelines will degrade the quality of object detection and
+      3D reconstruction for obstacle avoidance.* We recommend the following:
+
+      * **Distance:** Place cameras approximately 1 m from the bounds of the workspace.
+
+      * **Pitch:** Locate cameras above the workspace surface such that they pitch down. We recommend 20 degrees,
+        however pitches within the range of [10-30] are acceptable.
+
+      * **Multiple Cameras:** For multiple cameras (currently a maximum of two are supported) we recommend that they view
+        the workspace from significantly different viewing directions. In particular, we recommend that the yaw difference
+        between the two cameras' viewing angles around the world z-axis is greater than 90 degrees. Greater yaw and
+        increased viewpoint differences between the cameras reduce occlusion in the scene. They also increase
+        the quality and completeness of the 3D reconstruction being used for collision avoidance.
+
+#. Decide on a name for your setup and substitute it for ``<SETUP_NAME>`` in the instructions below.
+
+#. If your test setup includes multiple RealSense cameras `identify their serial numbers <https://dev.realsenseai.com/docs/ros2-multiple-cameras>`__.
+   Copy the :ir_repo:`unspecified.yaml <isaac_manipulator> <isaac_manipulator_bringup/config/sensors/realsense_camera_ids/unspecified.yaml>` file
+   to a new file named ``<SETUP_NAME>.yaml`` in the same folder and fill in the camera serial numbers.
+
+#. Follow :doc:`Isaac for Manipulation Camera Calibration </getting_started/sensors/isaac_for_manipulation_camera_calibration>`
+   instructions to calibrate the cameras with respect to the robot. The ``calibration.launch.py``
+   output from each calibration process will include a code snippet similar to the following
+   example (values included for illustration only as they will differ for different setups):
+
+    .. code:: bash
+
+        """ Static transform publisher acquired via MoveIt 2 hand-eye calibration """
+        """ EYE-TO-HAND: world -> camera """
+        from launch import LaunchDescription
+        from launch_ros.actions import Node
+
+
+        def generate_launch_description() -> LaunchDescription:
+            nodes = [
+                Node(
+                    package="tf2_ros",
+                    executable="static_transform_publisher",
+                    output="log",
+                    arguments=[
+                        "--frame-id",
+                        "world",
+                        "--child-frame-id",
+                        "camera",
+                        "--x",
+                        "1.77278",
+                        "--y",
+                        "0.939827",
+                        "--z",
+                        "-0.0753478",
+                        "--qx",
+                        "-0.128117",
+                        "--qy",
+                        "-0.0317539",
+                        "--qz",
+                        "0.955077",
+                        "--qw",
+                        "-0.265339",
+                        # "--roll",
+                        # "0.132507",
+                        # "--pitch",
+                        # "-0.229891",
+                        # "--yaw",
+                        # "-2.5843",
+                    ],
+                ),
+            ]
+            return LaunchDescription(nodes)
+
+#. In the :ir_repo:`static_transforms.launch.py <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`
+   file, duplicate the ``hubble_test_bench`` item in the ``calibrations_dict`` dictionary and rename its key to ``<SETUP_NAME>``.
+
+#. Update the transforms in the new ``<SETUP_NAME>`` item with the calibrated pose values found in the calibration step above.
+
+   .. note::
+
+      If installing from Debian, modify the ``static_transforms.launch.py`` file found in ``/opt/ros/:ir_ros_distro:/share/isaac_manipulator_bringup/launch/include/``.
+
+   Specifically, copy the calibrated values ``--x tx``, ``--y ty``, and ``--z tz`` to the
+   ``"translation": [tx, ty, tz]`` field, and the calibrated values ``--qx qx``, ``qy qy``,
+   ``--qz qz``, and ``--qw qw`` to the ``"rotation": [qx, qy, qz, qw]`` field.
+
+   For example, adding a setup named ``hawk_example`` with the calibrated values (for illustration
+   only) from the previous point would look as follows:
+
+    .. code:: bash
+
+        calibrations_dict = {
+            'hubble_test_bench': {
+                'world_to_hawk': {
+                    'parent_frame': 'world',
+                    'child_frame': 'hawk',
+                    'translation': [-1.75433, -0.0887958, 0.419998],
+                    'rotation': [-0.00447052, 0.138631, -0.0101076, 0.990282],  # [qx, qy ,qz, qw]
+                },
+            'hawk_example': {
+                'world_to_hawk': {
+                    'parent_frame': 'world',
+                    'child_frame': 'hawk',
+                    'translation': [1.77278, 0.939827, -0.0753478],
+                    'rotation': [-0.128117 -0.0317539, 0.955077, -0.265339],  # [qx, qy ,qz, qw]
+                },
+        ...
+
+
+#. Modify other appropriate values based on the tutorial:
+
+   .. tabs::
+      .. tab:: Object Following
+
+         Modify the ``object_to_grasp_frame`` transform in the ``<SETUP_NAME>`` item of the ``calibrations_dict``
+         dictionary in :ir_repo:`static_transforms.launch.py <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`,
+         to a desired grasp pose relative to the detected object. Feel free to leave this as the default for simplicity.
+
+      .. tab:: Pose to Pose
+
+         Update the ``world_to_target_frame_1`` and ``world_to_target_frame_2`` transforms in the ``<SETUP_NAME>`` item of the ``calibrations_dict``
+         dictionary in :ir_repo:`static_transforms.launch.py <isaac_manipulator> <isaac_manipulator_bringup/launch/include/static_transforms.launch.py>`,
+         to be two distinct poses that are reachable by the robot.
+
+#. Set the workspace bounds for nvblox:
+
+   .. tabs::
+
+      .. tab:: Installation from Source
+
+         #. Copy :ir_repo:`hubble_ur5e_test_bench.yaml <isaac_manipulator> <isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_ur5e_test_bench.yaml>`
+            to a new file named ``<SETUP_NAME>.yaml`` in the same folder and update the workspace bound corners.
+
+         #. Rebuild and source the ``isaac_manipulator_bringup`` package inside the Isaac ROS environment:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS} && \
+                  colcon build --symlink-install --packages-select isaac_manipulator_bringup && \
+                  source install/setup.bash
+
+      .. tab:: Installation from Debian
+
+         Copy :ir_repo:`hubble_ur5e_test_bench.yaml <isaac_manipulator> <isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_ur5e_test_bench.yaml>`
+         to a new file named ``<SETUP_NAME>.yaml`` in
+         ``/opt/ros/:ir_ros_distro:/share/isaac_manipulator_bringup/config/nvblox/workspace_bounds/``.
+
+
+
+      **How to choose the workspace bounds:**
+
+      * The workspace bounds define the space that is mapped for obstacle-aware planning and must cover the full space that the robot arm will be operating in.
+      * The workspace min and max corners are defined in the nvblox ``global_frame`` set :ir_repo:`here <isaac_manipulator> <isaac_manipulator_bringup/config/nvblox/nvblox_manipulator_base.yaml>`.
+      * The workspace bounds will be visualized when running the launch files (as a red bounding box). You can return to this step to adjust them after the system is running and producing visualizations.
+      * A larger workspace will result in increased computational demands, which scale with the total number of voxels. The Isaac for Manipulation reference workflows have been tested on Jetson AGX Thor with workspace volumes of up to 8 m\ :sup:`3` with 1 cm\ :sup:`3` voxels.  If a larger workspace is desired, the voxel size may be increased proportionally while keeping the total number of voxels fixed.  The trade-off is that larger voxels may increase the likelihood of planning failures or increase motion time in scenarios that require the robot to move in tight proximity to obstacles.
+
+.. _create-manipulator-configuration-file:
+
+Create a Manipulator Configuration File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The manipulator configuration file defines the settings for both simulation and real-hardware operation in the Isaac ROS environment. One can use this file to change the camera type, workflow type and other parameters to suit different use cases.
+
+The configuration file uses YAML format and can be created manually or generated using included configuration tools. Below are the key parameter groups and their descriptions:
+
+#. **Global Settings**
+
+   * ``camera_type``: Type of camera being used (e.g., ``REALSENSE`` or ``ISAAC_SIM``)
+   * ``num_cameras``: Number of cameras to run for 3d reconstruction.
+   * ``workflow_type``: Type of workflow to run (e.g., ``PICK_AND_PLACE``, ``POSE_TO_POSE``, ``OBJECT_FOLLOWING``)
+
+#. **Robot Hardware Settings**
+
+   * ``ur_type``: Type of UR manipulator (e.g., ``ur5e`` or ``ur10e``)
+   * ``gripper_type``: Type of gripper attached (e.g., ``robotiq_2f_85`` or ``robotiq_2f_140``)
+   * ``use_sim_time``: Whether to use simulation time ( ``true`` or ``false`` )
+   * ``setup``: The name of the setup you are running on (specifying calibration, workspace bounds and camera ids)
+   * ``robot_ip``: Robot controller IP address
+   * ``log_level``: Logging verbosity level
+   * ``moveit_collision_objects_scene_file``: Path to a MoveIt scene file that defines static collision objects in the robot's environment. These objects can represent tables, walls, or other static obstacles in the workspace that the robot needs to avoid during motion planning. The scene file can be created and exported from RViz's MoveIt Motion Planning panel using the Scene Objects tab. Supported geometric primitives are boxes, spheres, and cylinders. The scene file is loaded at startup and the objects are added to the planning scene for collision avoidance.
+
+#. **Robot Description Parameters**
+
+   * ``urdf_path``: Path to robot/gripper URDF file
+   * ``srdf_path``: Path to semantic robot description file
+   * ``joint_limits_file_path``: Joint limits configuration file
+   * ``kinematics_file_path``: Robot kinematics configuration
+   * ``moveit_controllers_file_path``: MoveIt controllers configuration
+   * ``ros2_controllers_file_path``: ROS 2 controllers configuration
+   * ``controller_spawner_timeout``: Controller initialization timeout (seconds)
+   * ``tf_prefix``: Prefix for TF frames
+   * ``runtime_config_package``: Package with runtime configurations
+   * ``initial_joint_controller``: Primary joint controller name
+   * ``ur_calibration_file_path``: Path to the UR calibration file. Generate the calibration file for your robot using `this process <https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver/blob/main/ur_calibration/doc/usage.rst>`__.
+
+#. **cuMotion specific Parameters**
+
+   * ``cumotion_urdf_file_path``: Path to the cuMotion-specific URDF file
+   * ``cumotion_xrdf_file_path``: Path to the cuMotion-specific XRDF file
+   * ``distance_threshold``: Proximity threshold (in meters) for collision checks
+   * ``enable_nvblox``: Enable/disable nvblox for 3D scene reconstruction and dynamic collision avoidance ( ``true`` or ``false`` )
+
+#. **Time Synchronization Parameters**
+
+   * ``time_sync_slop``: The time in seconds nodes keep as sync threshold to sync images and joint states. If one has a slower machine, tweaking this variable is useful to get syncs but at the cost of accuracy. If the slop parameter is too high, the robot will sync with older images or joint states leading to incorrect depth segmentation and object attachment
+   * ``filter_depth_buffer_time``: Filters Depth buffers for object attachment. This informs how many seconds in the past object attachment looks at to get depth image input for object detection.
+
+#. **Perception Parameters**
+
+   * ``depth_type``: Stereo disparity engine mode (choices include ``ESS_FULL``, ``ESS_LIGHT``, ``FOUNDATIONSTEREO``, ``ISAAC_SIM``, ``REALSENSE``)
+   * ``ess_engine_file_path``: Path to ESS engine binary
+   * ``enable_dnn_depth_in_realsense``: Enable/disable DNN stereo depth estimation for RealSense cameras (``true`` or ``false``)
+   * ``pose_estimation_type``: Method for pose estimation (choices include ``FOUNDATION_POSE`` or ``DOPE``)
+   * ``pose_estimation_input_qos``: Quality of Service for pose estimation input
+   * ``pose_estimation_input_fps``: Input frame rate for pose estimation
+   * ``pose_estimation_dropped_fps``: Expected frame rate after message drops
+   * ``dope_engine_file_path``: Path to DOPE engine file
+   * ``dope_model_file_path``: Path to DOPE model (ONNX format)
+   * ``foundation_pose_mesh_file_path``: Mesh file for pose estimation via FoundationPose
+   * ``foundation_pose_refine_engine_file_path``: Engine file for refining pose estimation
+   * ``foundation_pose_texture_path``: Texture file for pose estimation via FoundationPose
+   * ``foundation_pose_score_engine_file_path``: Engine file for scoring pose quality
+   * ``object_detection_type``: Type of object detection method (choices include ``GROUNDING_DINO``, ``RTDETR``, ``SEGMENT_ANYTHING``, or ``SEGMENT_ANYTHING2``)
+   * ``grounding_dino_confidence_threshold``: Confidence threshold for Grounding DINO detections
+   * ``grounding_dino_default_prompt``: Default text prompt for Grounding DINO object detection
+   * ``grounding_dino_engine_file_path``: Path to Grounding DINO engine file
+   * ``grounding_dino_model_file_path``: Path to Grounding DINO model (ONNX format)
+   * ``grounding_dino_network_image_height``: Network input image height for Grounding DINO
+   * ``grounding_dino_network_image_width``: Network input image width for Grounding DINO
+   * ``rtdetr_engine_file_path``: Engine file for RT-DETR object detection
+   * ``object_class_id``: Class ID of the object to be detected. The default corresponds to the Mac and Cheese box if the SyntheticaDETR v1.0.0 model file is used. Refer to the SyntheticaDETR model documentation for additional supported objects and their class IDs.
+   * ``rt_detr_confidence_threshold``: Confidence threshold for RT-DETR detections
+   * ``sam_model_repository_paths``: list of paths to segment anything model repositories
+   * ``sam2_model_repository_paths``: list of paths to segment anything 2 model repositories
+   * ``segment_anything_input_detections_topic``: topic name for segment anything input detections
+   * ``segment_anything_input_points_topic``: topic name for segment anything input points
+   * ``segment_anything2_input_points_topic``: topic name for segment anything 2 input points
+   * ``segmentation_type``: type of segmentation method (choices include ``NONE``, ``SEGMENT_ANYTHING``, or ``SEGMENT_ANYTHING2``)
+
+#. **Pick and Place Parameters**
+
+   * ``use_ground_truth_pose_in_sim``: Whether to use ground truth pose in simulation ( ``true`` or ``false`` )
+   * ``pick_and_place_planner_retries``: Number of retries for the planning algorithm
+   * ``pick_and_place_retry_wait_time``: Wait time (in seconds) between planning retries
+   * ``sim_gt_asset_frame_id``: Ground truth asset frame identifier in simulation
+   * ``grasps_file_path``: Path to the file containing predefined grasp configurations
+   * ``trigger_aabb_object_clearing``: Flag to trigger bounding box (AABB) object clearing (``true`` or ``false``)
+   * ``time_dilation_factor``: Factor to control the simulation speed of the robot
+   * ``move_to_home_pose_after_place``: Flag to move the robot to the home pose after placing the object (``true`` or ``false``). This can be used for automated testing.
+   * ``home_pose``: List of joint values for the home pose
+   * ``use_pose_from_rviz``: When enabled, the end effector interactive marker is used to set the place pose through RViz (``true`` or ``false``).
+   * ``selection_policy``: Object selection policy to filter the output poses from the pose estimation backend (choices include ``HIGHEST_SCORE``, ``FIRST``, or ``RANDOM``)
+
+#. **Object Attachment Parameters**
+
+   * ``object_attachment_type``: Shape of the attachment geometry (``SPHERE``, ``CUBOID``, or ``CUSTOM_MESH``)
+   * ``object_attachment_scale``: Dimensions of the attachment geometry (list of floats)
+   * ``attach_object_mesh_file_path``: Path to the object visualization mesh
+   * ``end_effector_mesh_resource_uri``: URI for the end effector mesh resource
+
+#. **Visualization Options**
+
+   * ``enable_rviz_visualization``: Enable or disable RViz visualization (``true`` or ``false``)
+   * ``enable_foxglove_visualization``: Enable or disable Foxglove Studio visualization (``true`` or ``false``)
+   * ``rviz_config_file``: Path to the RViz configuration file
+
+#. **Performance and Profiling Settings**
+
+   * ``enable_cuda_mps``: Enable CUDA Multi-Process Service (``true`` or ``false``)
+   * ``cuda_mps_pipe_directory``: Directory for CUDA MPS pipes
+   * ``enable_nsight_profiling``: Enable Nsight profiling (``true`` or ``false``)
+   * ``nsight_profile_duration``: Duration of Nsight profiling session (in seconds)
+   * ``delay_to_start_nsight``: Delay (in seconds) before beginning Nsight profiling. This provides time for systems to stabilize prior to profiling.
+   * ``nsight_profile_output_file_path``: File path where the Nsight profiling results will be saved.
+   * ``enable_system_wide_profiling``: Enable system-wide profiling (``true`` or ``false``)
+
+#. **Gear Assembly Parameters**
+
+   * ``gear_assembly_model_path``: Path to the gear assembly model
+   * ``gear_assembly_model_file_name``: Name of the gear assembly model file
+   * ``gear_assembly_policy_alpha``: Alpha value for the gear assembly policy
+   * ``gear_assembly_observation_topic``: Topic name for the gear assembly observation
+   * ``gear_assembly_joint_state_topic``: Topic name for the gear assembly joint states
+   * ``gear_assembly_target_joint_state_topic``: Topic name for the gear assembly target joint states
+   * ``gear_assembly_target_tcp_state_topic``: Topic name for the gear assembly target TCP states
+   * ``gear_assembly_gear_insertion_request_topic``: Topic name for the gear assembly gear insertion request
+   * ``gear_assembly_goal_pose_topic``: Topic name for the gear assembly goal pose
+   * ``gear_assembly_gear_insertion_status_topic``: Topic name for the gear assembly gear insertion status
+   * ``gear_assembly_ros_bag_folder_path``: Path to the gear assembly ROS bag folder
+   * ``gear_assembly_enable_recording``: Enable recording of the gear assembly ROS bag
+
+   * ``gear_assembly_use_joint_state_planner``: Use joint state planner for gear assembly (``true`` or ``false``)
+   * ``gear_assembly_peg_stand_mesh_file_path``: Path to the peg stand mesh file
+   * ``gear_assembly_gear_large_mesh_file_path``: Path to the gear large mesh file
+   * ``gear_assembly_gear_small_mesh_file_path``: Path to the gear small mesh file
+   * ``gear_assembly_gear_medium_mesh_file_path``: Path to the gear medium mesh file
+
+   * ``gear_assembly_use_ground_truth_pose_in_sim``: Use ground truth pose in simulation (``true`` or ``false``)
+   * ``gear_assembly_verify_pose_estimation_accuracy``: Verify pose estimation accuracy (``true`` or ``false``)
+   * ``gear_assembly_run_rl_inference``: Run RL inference (``true`` or ``false``)
+   * ``gear_assembly_output_dir``: Output directory for the gear assembly
+
+#. **Additional MPS Parameters**
+
+   * ``cuda_mps_client_priority_container``: Client priority for container tasks in MPS
+   * ``cuda_mps_client_priority_robot_segmenter``: Client priority for robot segmentation tasks in MPS
+   * ``cuda_mps_active_thread_percentage_robot_segmenter``: Active thread percentage for robot segmentation in MPS
+   * ``cuda_mps_client_priority_planner``: Client priority for the cuMotion planner in MPS
+   * ``cuda_mps_active_thread_percentage_planner``: Active thread percentage for the cuMotion planner in MPS
+   * ``cuda_mps_active_thread_percentage_container``: Percentage of active threads reserved for container tasks when CUDA Multi-Process Service (MPS) is enabled
+
+For a complete example configuration, see the sample files in the :ir_repo:`params <isaac_manipulator> <isaac_manipulator_bringup/params>` directory.
+
+.. _run-pre-flight-test-manipulator-on-robot-e2e:
+
+To verify that you have setup Isaac for Manipulation correctly, run the following command:
+
+.. code:: bash
+
+   export ENABLE_MANIPULATOR_TESTING=on_robot
+   export ISAAC_MANIPULATOR_TEST_CONFIG=<config_file_path_for_your_robot>
+   python -m pytest ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/test
+
+.. note::
+
+   One can also use ``colcon test --packages-select isaac_manipulator_bringup`` to run the tests.
+   However, ``pytest`` has a better output and makes it easier to view status and progress of the tests.
+   If these tests fail, please look at :doc:`Isaac for Manipulation Testing Guide </reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator>` for more information.
+   It is recommended to run the tests manually using ``launch_test`` and then manually inspecting the results.
+
+This will run a series of tests to verify that Isaac for Manipulation is working correctly.
+
+.. _why-does-my-robot-driver-not-launch-correctly:
+
+Why does my robot driver not launch correctly ?
+-----------------------------------------------
+
+There can be several reasons but a lot of them can pertain to poor networking setup.
+
+#. Make sure ``192.56.1.2`` and ``192.56.1.1`` are ping-able from your Jetson machine.
+#. Make sure the Ethernet connection is set up correctly.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_1.jpg>`
+   :align: center
+
+#. Make sure you have setup External control correctly as shown in the figure below.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_4.jpg>`
+   :align: center
+
+#. Make sure you have setup the Robotiq Gripper up correctly and pointed it to ``User`` mode.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_2.jpg>`
+   :align: center
+
+#. Make sure after setting up URCaps and doing the above step you can control the gripper using the open and close buttons as shown below.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_5.jpg>`
+   :align: center
+
+#. Make sure you have setup the program correctly to External control as shown below.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_6.jpg>`
+   :align: center
+
+#. Make sure you have given all the permissions required for the Jetson compute box to communicate with the robot.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_8.jpg>`
+   :align: center
+
+#. Before running the drivers, make sure your ``Run`` screen looks like this.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_7.jpg>`
+   :align: center
+
+#. If you are still facing issues, please refer to the :doc:`Isaac for Manipulation Testing Guide </reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator>` for more information.

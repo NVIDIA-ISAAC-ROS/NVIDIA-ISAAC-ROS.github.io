@@ -2,7 +2,7 @@
 
 VDA5050-compatible mission controller
 
-<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mission_client/MD.png/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mission_client/MD.png/" width="800px"/></a></div>
+<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mission_client/MD.png/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mission_client/MD.png/" width="800px"/></a></div>
 
 ---
 

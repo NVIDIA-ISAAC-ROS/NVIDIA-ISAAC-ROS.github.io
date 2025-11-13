@@ -1,0 +1,208 @@
+====================
+Blackboard Reference
+====================
+
+The blackboard system provides shared memory for inter-behavior communication, storing workflow state and object information that behaviors can read from and write to during execution.
+
+For architecture concepts and usage examples, refer to the main :doc:`isaac_manipulator_orchestration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index>` documentation.
+
+Object Management
+-----------------
+
+The system tracks objects through their life cycle from detection to placement using several interconnected blackboard variables.
+
+Object Info Cache
+~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Variable
+     - Data Type
+     - Description
+
+   * - ``object_info_cache``
+     - Dictionary
+     - Maps object IDs to detected object information, updated throughout the workflow as objects progress through manipulation stages
+
+**Stored Information per Object:**
+
+.. list-table::
+   :header-rows: 1
+
+   * - Property
+     - Description
+     - Values/Format
+
+   * - Object Properties
+     - Physical attributes and identifiers
+     - Bounding boxes, estimated poses, class IDs, frame names
+
+   * - Object Status
+     - Current state in manipulation pipeline
+     - ``NOT_READY``, ``SELECTED``, ``READY_FOR_MOTION``, ``IN_MOTION``, ``DONE``, ``FAILED``
+
+   * - Drop Poses
+     - Target placement locations
+     - Pose data for where object should be placed
+
+Object ID Tracking Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Pipeline variables that manage object progression:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Variable
+     - Purpose
+     - Set By
+     - Used By
+     - Data Type
+
+   * - ``selected_object_id``
+     - Currently selected object for pose estimation
+     - ``ObjectSelector`` behavior
+     - ``PoseEstimation`` behavior
+     - ``int``
+
+   * - ``next_object_id``
+     - Queue of objects ready for motion planning
+     - ``PoseEstimation`` (after successful pose estimation)
+     - ``MarkObjectAsActive`` (to transition objects to motion)
+     - ``deque`` (queue) containing object IDs
+
+   * - ``active_obj_id``
+     - Object currently undergoing motion execution
+     - ``MarkObjectAsActive`` (when popping from ``next_object_id`` queue)
+     - ``MarkObjectAsDone`` or ``MarkObjectAsFailed`` (for clearing)
+     - ``int``
+
+Pose Management
+---------------
+
+Home Pose
+~~~~~~~~~
+
+Default robot arm position for recovery and initialization:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Variable
+     - Data Type
+     - Frame
+     - Used By
+     - Description
+
+   * - ``home_pose``
+     - 7-element array [``x``, ``y``, ``z``, ``qx``, ``qy``, ``qz``, ``qw``]
+     - Robot base frame
+     - ``UpdateDropPoseToHome``
+     - Default robot arm position for recovery and fallback scenarios
+
+Drop Pose Variables
+~~~~~~~~~~~~~~~~~~~
+
+Target placement location management:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Variable
+     - Data Type
+     - Source
+     - Set By
+     - Used By
+     - Description
+
+   * - ``rviz_drop_pose``
+     - ``geometry_msgs/PoseStamped``
+     - Interactive RViz marker with 3D gripper manipulation
+     - ``InteractiveMarker`` behavior
+     - ``UpdateDropPoseFromRViz``
+     - Interactive RViz-specified drop pose, updated in real-time as users manipulate markers
+
+   * - ``goal_drop_pose``
+     - ``geometry_msgs/Pose``
+     - Active object's drop pose from ``object_info_cache``; can originate from RViz interactions, action parameters, or home pose fallback
+     - ``ReadDropPose`` behavior
+     - Motion planning behaviors (``PlanToPose``)
+     - Current motion planning target pose
+
+Object Configuration
+--------------------
+
+Status Reporting Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The system maintains comprehensive status tracking through dedicated blackboard variables that provide real-time workflow monitoring and completion reporting:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Variable
+     - Purpose
+     - Data Type
+     - Set By
+     - Used By
+     - Description
+
+   * - ``workflow_status``
+     - Overall workflow completion status
+     - ``int`` (MultiObjectPickAndPlace.Result enum)
+     - ``UpdateWorkflowStatus`` behavior
+     - Action server result determination
+     - Tracks overall workflow outcome: ``SUCCESS`` (all objects completed), ``FAILED`` (all objects failed), ``PARTIAL_SUCCESS`` (mixed outcomes), ``INCOMPLETE`` (interrupted), or ``UNKNOWN`` (processing ongoing)
+
+   * - ``workflow_summary``
+     - Human-readable progress report
+     - ``string``
+     - ``ReportGeneration`` behavior
+     - Action server feedback and logging
+     - Contains detailed status summary counting completed, failed, in-progress, and pending objects with descriptive messages
+
+   * - ``workflow_feedback_queue``
+     - Real-time individual object status updates
+     - ``collections.deque``
+     - ``MarkObjectAsDone``, ``MarkObjectAsFailed`` behaviors
+     - Action server feedback loop
+     - Queue of individual object completion/failure messages for immediate user feedback as objects are processed
+
+Supported Objects System
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The system maintains a configuration dictionary that defines which objects can be manipulated and links detection classes to manipulation resources:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Variable
+     - Purpose
+     - Data Structure
+     - Used By
+     - Description
+
+   * - ``supported_objects_config``
+     - Main configuration dictionary
+     - Dictionary indexed by Class ID
+     - System initialization
+     - Contains ``class_id``, ``grasp_file_path``, ``mesh_file_path``, ``object_name`` - links detection classes to manipulation resources
+
+   * - ``supported_class_ids``
+     - Set of valid class IDs
+     - Set derived from ``supported_objects_config``
+     - ``FilterDetections``
+     - Removes unsupported objects from detection results
+
+   * - ``mesh_file_paths``
+     - Class ID to mesh file mapping
+     - Dictionary created from ``supported_objects_config``
+     - ``MeshAssigner``, Motion planning (``PlanToPose``, ``PlanToGrasp``), ``AttachObject``
+     - Used for ``FoundationPose`` estimation, collision detection, and ``CUSTOM_MESH`` object attachment
+
+   * - ``grasp_reader_manager``
+     - Grasp pose data manager
+     - Manager object with YAML file access
+     - ``ReadGraspPoses``
+     - Loads pre-computed grasp poses from YAML files, provides object-specific grasp poses

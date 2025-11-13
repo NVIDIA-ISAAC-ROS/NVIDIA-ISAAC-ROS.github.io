@@ -1,0 +1,1301 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Universal Robots &#8212; Isaac ROS</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=a5c4661c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/isaac.css?v=177ef1d8" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=01823362"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script src="../../_static/tabs.js?v=3030b3cb"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'robots/universal_robots/index';</script>
+    <script>mermaid.initialize({"startOnLoad": true})</script>
+    <link rel="icon" href="../../_static/isaac_ros_logo.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Troubleshooting" href="../../troubleshooting/index.html" />
+    <link rel="prev" title="Calibration File Requirements for Isaac" href="../isaac_urdf_requirements/index.html" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Nov 13, 2025"/>
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../getting_started/index.html">Getting Started</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../getting_started/compute/index.html">Compute Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/compute/jetson_storage.html">Jetson Storage Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/compute/preempt_setup.html">PREEMPT_RT Kernel for Jetson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/compute/jetson_vpi.html">Jetson Setup for VPI</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../getting_started/sensors/index.html">Sensors Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/realsense_setup.html">Isaac ROS RealSense Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/zed_setup.html">Isaac ROS ZED Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/camera_calibration.html">Monocular Camera Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/isaac_for_manipulation_camera_calibration.html">Isaac for Manipulation Camera Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/amr_extrinsic_calibration.html">Extrinsic Calibration for Mobile Robots</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_workflows/index.html">Reference Workflows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/index.html">Isaac for Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/reference_architecture.html">Isaac for Manipulation Reference Architecture</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper.html">Set Up Hardware and Software for Real Robot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim.html">Setup for Simulated Robot in Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html">Run Tests for various components of Isaac for Manipulation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorials.html">Isaac for Manipulation Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_e2e.html">Tutorial for Obstacle Avoidance and Object Following Using cuMotion with Perception</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place.html">Multi-Object Pick and Place Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">Tutorial for Multi-Object Pick and Place using cuMotion with Perception</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place_from_cloud_service.html">Tutorial for Multi-Object Pick and Place from Isaac Cloud Service</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_gear_assembly.html">Tutorial for Gear Assembly with Contact Rich Insertion Policy and cuMotion</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim.html">Isaac for Manipulation Tutorials with Isaac Sim</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pose_to_pose.html">Pose to Pose Planning</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_object_following.html">Object Following</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pick_and_place.html">Pick and Place</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_grasp_authoring.html">Grasp Authoring</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_gear_insertion_policy.html">Gear Insertion Policy</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_gear_assembly.html">Gear Assembly Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_asset_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_asset_bringup</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_bringup</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/manipulation_workflow_config_guide.html">Manipulation Workflow Configuration Guide</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_gear_assembly/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_gear_assembly</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_orchestration</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/behavior_reference.html">Behavior Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/blackboard_reference.html">Blackboard Reference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_pick_and_place</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference.html">API Reference and Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide.html">Configuration Guide</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_ros_python_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ros_python_utils</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_servers/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_servers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_ur_dnn_policy/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ur_dnn_policy</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_workflows/isaac_for_mobility/index.html">Isaac for Mobility</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../performance/index.html">Performance Summary</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../concepts/index.html">Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/benchmarking/index.html">Benchmarking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/dev_env/index.html">Isaac ROS Development Environment</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/dnn_inference/index.html">DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/dnn_inference/model_preparation.html">Preparing Deep Learning Models for Isaac ROS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/dnn_inference/tensorrt_and_triton_info.html">Isaac ROS Triton and TensorRT Nodes for DNN Inference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/jetson_stats/index.html">Jetson Stats</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/manipulation/index.html">Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/orchestration.html">Manipulation Orchestration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/pick_and_place.html">Multi-Object Pick and Place</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/xrdf.html">Extended Robot Description Format (XRDF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/isaac_grasp.html">Isaac Grasp File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">Tutorial for integrating custom manipulators with cuMotion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/manipulation/cumotion_moveit/tutorial_isaac_sim.html">Tutorial for cuMotion MoveIt plugin with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/missions/index.html">Missions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/nitros/index.html">NITROS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/nitros/cuda_with_nitros.html">CUDA with NITROS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/nitros/pynitros/index.html">PyNITROS</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/object_detection/index.html">Object Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/object_detection/detectnet/index.html">DetectNet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/object_detection/grounding_dino/index.html">Grounding DINO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/object_detection/rtdetr/index.html">RT-DETR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/object_detection/yolov8/index.html">YOLOv8</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/pose_estimation/index.html">Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/pose_estimation/centerpose/index.html">CenterPose</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/pose_estimation/dope/index.html">DOPE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/index.html">FoundationPose</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/scene_reconstruction/index.html">Scene Reconstruction</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/index.html">Nvblox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/technical_details.html">Technical Details</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_isaac_sim.html">Isaac Sim Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense.html">RealSense Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_multi_realsense.html">Multi-RealSense Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_zed.html">ZED Camera Examples</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segformer/index.html">Segformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segformer/tutorial_isaac_sim.html">Tutorial for People Segmentation with Segformer and Isaac Sim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segformer/tutorial_tensorrt.html">Tutorial for People Segmentation with Segformer and TensorRT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segment_anything/index.html">Segment Anything</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/segment_anything/tutorial_isaac_sim.html">Tutorial for Segment Anything with Isaac Sim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/segmentation/unet/tutorial_isaac_sim.html">Tutorial for DNN Image Segmentation with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/stereo_depth/index.html">Stereo Depth</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/stereo_depth/foundationstereo/index.html">FoundationStereo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/stereo_depth/ess/index.html">ESS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/stereo_depth/sgm/index.html">SGM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/stereo_dnn/index.html">Stereo DNN</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial for cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial for cuVGL Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/index.html">cuVSLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_isaac_sim.html">Tutorial for Visual SLAM with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_realsense.html">Tutorial for Visual SLAM Using a RealSense Camera with Integrated IMU</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_cuvslam_mask.html">Tutorial for Isaac ROS Visual SLAM with Segmentation Masks</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../concepts/visualization/index.html">Visualization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/visualization/foxglove.html">Foxglove Visualization</a></li>
+
+
+
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../repositories_and_packages/index.html">Repositories and Packages</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_apriltag/index.html">Isaac ROS AprilTag</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_apriltag/isaac_ros_apriltag/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_apriltag</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/fiducials/apriltag/tutorial_usb_cam.html">Tutorial with a USB camera</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/fiducials/apriltag/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_benchmark/index.html">Isaac ROS Benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_benchmark/isaac_ros_benchmark/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_benchmark</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_benchmark/benchmarks/isaac_ros_moveit_benchmark/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_moveit_benchmark</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cloud_control/index.html">Isaac ROS Cloud Control</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cloud_control/isaac_ros_mission_client/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_mission_client</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/missions/isaac_ros_mission_client.html">Isaac ROS Mission Client Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cloud_control/isaac_ros_scene_recorder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_scene_recorder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cloud_control/vda5050_action_handler/index.html"><code class="docutils literal notranslate"><span class="pre">vda5050_action_handler</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_common/index.html">Isaac ROS Common</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_compression/index.html">Isaac ROS Compression</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_decoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_decoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_compression/isaac_ros_h264_encoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/index.html">Isaac ROS cuMotion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_moveit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_esdf_visualizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_esdf_visualizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_moveit_goal_setter/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_moveit_goal_setter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_goal_setter_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_goal_setter_interfaces</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_object_attachment</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/index.html">Isaac ROS DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dnn_image_encoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_tensor_proc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_tensor_rt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_triton</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_stereo_depth/index.html">Isaac ROS DNN Stereo Depth</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_ess</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/ess/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/ess/visualize_image.html">Visualize ESS Disparity Output</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationstereo</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/foundationstereo/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/foundationstereo/visualize_image.html">Visualize FoundationStereo Disparity Output</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/index.html">Isaac ROS Image Pipeline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_depth_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_depth_image_proc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_pipeline/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_pipeline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_proc</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_stereo_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_stereo_image_proc</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/stereo_depth/sgm/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/index.html">Isaac ROS Image Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segformer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segformer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/segmentation/segformer/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/segmentation/segformer/tutorial_tensorrt.html">Tutorial with TensorRT</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/segmentation/segment_anything/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything2_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything2_interfaces</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unet</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/segmentation/unet/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_jetson/index.html">Isaac ROS Jetson</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_jetson/isaac_ros_jetson_stats/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_jetson_stats</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_jetson/isaac_ros_jetson_stats_services/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_jetson_stats_services</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: Create Maps for Visual Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_pointcloud_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pointcloud_utils</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_global_localization</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial with Map Creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial with Visual Global Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_mapping/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_mapping</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/index.html">Isaac ROS NITROS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_gxf/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_gxf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_managed_nitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_managed_nitros</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_bridge/index.html">Isaac ROS NITROS Bridge</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/nitros_bridge/tutorial_isaac_sim.html">Tutorial for NITROS Bridge with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_topic_tools/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_topic_tools</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros_type/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_type</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nitros/isaac_ros_pynitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/nitros/pynitros/tutorial_pynitros.html">Tutorial to use PyNITROS with NITROS</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/index.html">Isaac ROS Nvblox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nvblox</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/api/parameters.html">ROS Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/api/topics_and_services.html">ROS Topics and Services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_isaac_sim.html">Isaac Sim Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense.html">RealSense Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_ros_communication.html">ROS Communication Issues</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_examples_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_examples_bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_image_padding/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_image_padding</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_msgs/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_msgs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_nav2/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_nav2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_ros/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_ros</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_ros_common/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_ros_common</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/nvblox_rviz_plugin/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_rviz_plugin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/realsense_splitter/index.html"><code class="docutils literal notranslate"><span class="pre">realsense_splitter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_nvblox/semantic_label_conversion/index.html"><code class="docutils literal notranslate"><span class="pre">semantic_label_conversion</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/index.html">Isaac ROS Object Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_detectnet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_detectnet</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/object_detection/detectnet/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/object_detection/detectnet/tutorial_custom_model.html">Tutorial with Custom Model</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_grounding_dino/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_grounding_dino</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_rtdetr/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_rtdetr</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/object_detection/rtdetr/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_yolov8</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/index.html">Isaac ROS Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dope</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/dope/tutorial_triton.html">Tutorial with Triton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/dope/tutorial_custom_model.html">Tutorial with Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/dope/tutorial_custom_size.html">Tutorial with Custom Size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/dope/dope_verification.html">Verifying DOPE Accuracy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationpose</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_tracking.html">Tutorial to launch FoundationPose Tracking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_create_your_own_mesh.html">Tutorial to create your own 3D object mesh in .obj</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_shift_mesh_center.html">Tutorial to shift the Mesh origin frame to the center of the Mesh using Meshlab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_usd_to_obj.html">Tutorial to convert a 3D mesh from .usd to .obj using Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_simplify_mesh.html">Tutorial to simplify a 3D mesh using Meshlab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/pose_estimation/foundationpose/tutorial_switch_mesh_runtime.html">Tutorial to switch the mesh during runtime</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_visual_slam/index.html">Isaac ROS Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/validating_cuvslam_setup.html">Validating cuVSLAM Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../concepts/visual_slam/cuvslam/tutorial_realsense.html">Tutorial with RealSense</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam_interfaces</span></code></a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Robots</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../isaac_urdf_requirements/index.html">Calibration File Requirements for Isaac</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Universal Robots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../troubleshooting/index.html">Troubleshooting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../troubleshooting/dev_env.html">Developer Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../troubleshooting/hardware_setup.html">Hardware Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../troubleshooting/deep_learning.html">Deep Learning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog/index.html">Blogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../releases/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../about/index.html">About</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../about/license.html">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../about/contact.html">Contact</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a></div>
+      <div class="sidebar-primary-item"><div class="version-switcher__container dropdown">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    latest
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <dl>
+        <dd><a href="../../v/release-3.2/index.html">release-3.2</a></dd>
+        <dd><a href="../../v/release-4.0/robots/universal_robots/index.html">release-4.0</a></dd>
+        <dd><a href="index.html">latest</a></dd>
+        <dd><a href="../../v/release-2.1/index.html">release-2.1</a></dd>
+        <dd><a href="../../v/release-3.1/index.html">release-3.1</a></dd>
+    </dl>
+  </div>
+</div></div>
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Robots</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Universal Robots</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="universal-robots">
+<span id="id1"></span><h1>Universal Robots<a class="headerlink" href="#universal-robots" title="Link to this heading">#</a></h1>
+<section id="set-up-ur-robot">
+<h2>Set Up UR Robot<a class="headerlink" href="#set-up-ur-robot" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Set up the UR robot by following <a class="reference external" href="https://docs.ros.org/en/jazzy/p/ur_robot_driver/doc/installation/robot_setup.html">Setting up a UR robot</a>.</p></li>
+</ol>
+<ol class="arabic">
+<li><p>Create a program for external control by following <a class="reference external" href="https://docs.ros.org/en/humble/p/ur_robot_driver/doc/installation/install_urcap_e_series.html">Installing a URCap</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><a class="reference external" href="https://docs.ros.org/en/jazzy/p/ur_robot_driver/doc/installation/robot_setup.html#extract-calibration-information">Extraction of calibration information</a>
+from the UR robot is required to ensure that the ROS <code class="docutils literal notranslate"><span class="pre">ur_robot_driver</span></code> is able to accurately compute the TCP pose
+for a given joint configuration.</p>
+</div>
+</li>
+<li><p>Save the IP address of the robot and substitute it for <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT_IP_ADDRESS&gt;</span></code> in the instructions below.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>PolyScope &gt;=5.23 is required for the <code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ur_dnn_policy</span></code> package. This is available for download on UR’s <a class="reference external" href="https://www.universal-robots.com/download">website</a>. Instructions on how to update PolyScope can be found <a class="reference external" href="https://www.universal-robots.com/manuals/EN/HTML/SW5_20/Content/prod-serv-man/E-series/serv-man-update.htm">here</a>.</p>
+</div>
+</section>
+<section id="set-up-cameras-for-robot">
+<span id="id2"></span><h2>Set Up Cameras for Robot<a class="headerlink" href="#set-up-cameras-for-robot" title="Link to this heading">#</a></h2>
+<ol class="arabic">
+<li><p>Connect your cameras:</p>
+<ul class="simple">
+<li><p>If you are using <strong>RealSense</strong> cameras, connect them via USB 3. See available USB ports of the Jetson AGX Thor <a class="reference external" href="https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-thor/">here</a>. When connecting your RealSense cameras via USB, make sure to use a USB 3 port and cable.</p></li>
+</ul>
+<p>It is recommended to use cables shorter than 3 m to guarantee stable transmission.</p>
+</li>
+<li><p>Place your stereo cameras such that their field of view fully covers the workspace that the robot arm will be operating in.</p>
+<blockquote>
+<div><p><strong>Camera Placement Guide:</strong> Object detection networks, as well as <code class="docutils literal notranslate"><span class="pre">nvblox</span></code>, which is used for collision avoidance, are affected
+by the placement of cameras with respect to the workspace. Here we provide guidelines for placing cameras to
+achieve the best results. <em>Deviation from these guidelines will degrade the quality of object detection and
+3D reconstruction for obstacle avoidance.</em> We recommend the following:</p>
+<ul class="simple">
+<li><p><strong>Distance:</strong> Place cameras approximately 1 m from the bounds of the workspace.</p></li>
+<li><p><strong>Pitch:</strong> Locate cameras above the workspace surface such that they pitch down. We recommend 20 degrees,
+however pitches within the range of [10-30] are acceptable.</p></li>
+<li><p><strong>Multiple Cameras:</strong> For multiple cameras (currently a maximum of two are supported) we recommend that they view
+the workspace from significantly different viewing directions. In particular, we recommend that the yaw difference
+between the two cameras’ viewing angles around the world z-axis is greater than 90 degrees. Greater yaw and
+increased viewpoint differences between the cameras reduce occlusion in the scene. They also increase
+the quality and completeness of the 3D reconstruction being used for collision avoidance.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Decide on a name for your setup and substitute it for <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> in the instructions below.</p></li>
+<li><p>If your test setup includes multiple RealSense cameras <a class="reference external" href="https://dev.realsenseai.com/docs/ros2-multiple-cameras">identify their serial numbers</a>.
+Copy the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/config/sensors/realsense_camera_ids/unspecified.yaml">unspecified.yaml</a> file
+to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in the same folder and fill in the camera serial numbers.</p></li>
+<li><p>Follow <a class="reference internal" href="../../getting_started/sensors/isaac_for_manipulation_camera_calibration.html"><span class="doc">Isaac for Manipulation Camera Calibration</span></a>
+instructions to calibrate the cameras with respect to the robot. The <code class="docutils literal notranslate"><span class="pre">calibration.launch.py</span></code>
+output from each calibration process will include a code snippet similar to the following
+example (values included for illustration only as they will differ for different setups):</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;&quot;&quot; Static transform publisher acquired via MoveIt 2 hand-eye calibration &quot;&quot;&quot;</span>
+<span class="s2">&quot;&quot;&quot; EYE-TO-HAND: world -&gt; camera &quot;&quot;&quot;</span>
+from<span class="w"> </span>launch<span class="w"> </span>import<span class="w"> </span>LaunchDescription
+from<span class="w"> </span>launch_ros.actions<span class="w"> </span>import<span class="w"> </span>Node
+
+
+def<span class="w"> </span>generate_launch_description<span class="o">()</span><span class="w"> </span>-&gt;<span class="w"> </span>LaunchDescription:
+<span class="w">    </span><span class="nv">nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>
+<span class="w">        </span>Node<span class="o">(</span>
+<span class="w">            </span><span class="nv">package</span><span class="o">=</span><span class="s2">&quot;tf2_ros&quot;</span>,
+<span class="w">            </span><span class="nv">executable</span><span class="o">=</span><span class="s2">&quot;static_transform_publisher&quot;</span>,
+<span class="w">            </span><span class="nv">output</span><span class="o">=</span><span class="s2">&quot;log&quot;</span>,
+<span class="w">            </span><span class="nv">arguments</span><span class="o">=[</span>
+<span class="w">                </span><span class="s2">&quot;--frame-id&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;world&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--child-frame-id&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;camera&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--x&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;1.77278&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--y&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;0.939827&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--z&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;-0.0753478&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--qx&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;-0.128117&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--qy&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;-0.0317539&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--qz&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;0.955077&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;--qw&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;-0.265339&quot;</span>,
+<span class="w">                </span><span class="c1"># &quot;--roll&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;0.132507&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;--pitch&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;-0.229891&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;--yaw&quot;,</span>
+<span class="w">                </span><span class="c1"># &quot;-2.5843&quot;,</span>
+<span class="w">            </span><span class="o">]</span>,
+<span class="w">        </span><span class="o">)</span>,
+<span class="w">    </span><span class="o">]</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span>LaunchDescription<span class="o">(</span>nodes<span class="o">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>In the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>
+file, duplicate the <code class="docutils literal notranslate"><span class="pre">hubble_test_bench</span></code> item in the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code> dictionary and rename its key to <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code>.</p></li>
+<li><p>Update the transforms in the new <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item with the calibrated pose values found in the calibration step above.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If installing from Debian, modify the <code class="docutils literal notranslate"><span class="pre">static_transforms.launch.py</span></code> file found in <code class="docutils literal notranslate"><span class="pre">/opt/ros/jazzy/share/isaac_manipulator_bringup/launch/include/</span></code>.</p>
+</div>
+<p>Specifically, copy the calibrated values <code class="docutils literal notranslate"><span class="pre">--x</span> <span class="pre">tx</span></code>, <code class="docutils literal notranslate"><span class="pre">--y</span> <span class="pre">ty</span></code>, and <code class="docutils literal notranslate"><span class="pre">--z</span> <span class="pre">tz</span></code> to the
+<code class="docutils literal notranslate"><span class="pre">&quot;translation&quot;:</span> <span class="pre">[tx,</span> <span class="pre">ty,</span> <span class="pre">tz]</span></code> field, and the calibrated values <code class="docutils literal notranslate"><span class="pre">--qx</span> <span class="pre">qx</span></code>, <code class="docutils literal notranslate"><span class="pre">qy</span> <span class="pre">qy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">--qz</span> <span class="pre">qz</span></code>, and <code class="docutils literal notranslate"><span class="pre">--qw</span> <span class="pre">qw</span></code> to the <code class="docutils literal notranslate"><span class="pre">&quot;rotation&quot;:</span> <span class="pre">[qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw]</span></code> field.</p>
+<p>For example, adding a setup named <code class="docutils literal notranslate"><span class="pre">hawk_example</span></code> with the calibrated values (for illustration
+only) from the previous point would look as follows:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">calibrations_dict</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="s1">&#39;hubble_test_bench&#39;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="s1">&#39;world_to_hawk&#39;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">            </span><span class="s1">&#39;parent_frame&#39;</span>:<span class="w"> </span><span class="s1">&#39;world&#39;</span>,
+<span class="w">            </span><span class="s1">&#39;child_frame&#39;</span>:<span class="w"> </span><span class="s1">&#39;hawk&#39;</span>,
+<span class="w">            </span><span class="s1">&#39;translation&#39;</span>:<span class="w"> </span><span class="o">[</span>-1.75433,<span class="w"> </span>-0.0887958,<span class="w"> </span><span class="m">0</span>.419998<span class="o">]</span>,
+<span class="w">            </span><span class="s1">&#39;rotation&#39;</span>:<span class="w"> </span><span class="o">[</span>-0.00447052,<span class="w"> </span><span class="m">0</span>.138631,<span class="w"> </span>-0.0101076,<span class="w"> </span><span class="m">0</span>.990282<span class="o">]</span>,<span class="w">  </span><span class="c1"># [qx, qy ,qz, qw]</span>
+<span class="w">        </span><span class="o">}</span>,
+<span class="w">    </span><span class="s1">&#39;hawk_example&#39;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="s1">&#39;world_to_hawk&#39;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">            </span><span class="s1">&#39;parent_frame&#39;</span>:<span class="w"> </span><span class="s1">&#39;world&#39;</span>,
+<span class="w">            </span><span class="s1">&#39;child_frame&#39;</span>:<span class="w"> </span><span class="s1">&#39;hawk&#39;</span>,
+<span class="w">            </span><span class="s1">&#39;translation&#39;</span>:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.77278,<span class="w"> </span><span class="m">0</span>.939827,<span class="w"> </span>-0.0753478<span class="o">]</span>,
+<span class="w">            </span><span class="s1">&#39;rotation&#39;</span>:<span class="w"> </span><span class="o">[</span>-0.128117<span class="w"> </span>-0.0317539,<span class="w"> </span><span class="m">0</span>.955077,<span class="w"> </span>-0.265339<span class="o">]</span>,<span class="w">  </span><span class="c1"># [qx, qy ,qz, qw]</span>
+<span class="w">        </span><span class="o">}</span>,
+...
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Modify other appropriate values based on the tutorial:</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Object Following</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Pose to Pose</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p>Modify the <code class="docutils literal notranslate"><span class="pre">object_to_grasp_frame</span></code> transform in the <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item of the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code>
+dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>,
+to a desired grasp pose relative to the detected object. Feel free to leave this as the default for simplicity.</p>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p>Update the <code class="docutils literal notranslate"><span class="pre">world_to_target_frame_1</span></code> and <code class="docutils literal notranslate"><span class="pre">world_to_target_frame_2</span></code> transforms in the <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item of the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code>
+dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/launch/include/static_transforms.launch.py">static_transforms.launch.py</a>,
+to be two distinct poses that are reachable by the robot.</p>
+</div></div>
+</li>
+<li><p>Set the workspace bounds for nvblox:</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">Installation from Source</button><button aria-controls="panel-1-1-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-1-1-1" name="1-1" role="tab" tabindex="-1">Installation from Debian</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_ur5e_test_bench.yaml">hubble_ur5e_test_bench.yaml</a>
+to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in the same folder and update the workspace bound corners.</p></li>
+<li><p>Rebuild and source the <code class="docutils literal notranslate"><span class="pre">isaac_manipulator_bringup</span></code> package inside the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-select<span class="w"> </span>isaac_manipulator_bringup<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</li>
+</ol>
+</div><div aria-labelledby="tab-1-1-1" class="sphinx-tabs-panel" hidden="true" id="panel-1-1-1" name="1-1" role="tabpanel" tabindex="0"><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/config/nvblox/workspace_bounds/hubble_ur5e_test_bench.yaml">hubble_ur5e_test_bench.yaml</a>
+to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in
+<code class="docutils literal notranslate"><span class="pre">/opt/ros/jazzy/share/isaac_manipulator_bringup/config/nvblox/workspace_bounds/</span></code>.</p>
+</div><p><strong>How to choose the workspace bounds:</strong></p>
+<ul class="simple">
+<li><p>The workspace bounds define the space that is mapped for obstacle-aware planning and must cover the full space that the robot arm will be operating in.</p></li>
+<li><p>The workspace min and max corners are defined in the nvblox <code class="docutils literal notranslate"><span class="pre">global_frame</span></code> set <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/config/nvblox/nvblox_manipulator_base.yaml">here</a>.</p></li>
+<li><p>The workspace bounds will be visualized when running the launch files (as a red bounding box). You can return to this step to adjust them after the system is running and producing visualizations.</p></li>
+<li><p>A larger workspace will result in increased computational demands, which scale with the total number of voxels. The Isaac for Manipulation reference workflows have been tested on Jetson AGX Thor with workspace volumes of up to 8 m<sup>3</sup> with 1 cm<sup>3</sup> voxels.  If a larger workspace is desired, the voxel size may be increased proportionally while keeping the total number of voxels fixed.  The trade-off is that larger voxels may increase the likelihood of planning failures or increase motion time in scenarios that require the robot to move in tight proximity to obstacles.</p></li>
+</ul>
+</div>
+</li>
+</ol>
+</section>
+<section id="create-a-manipulator-configuration-file">
+<span id="create-manipulator-configuration-file"></span><h2>Create a Manipulator Configuration File<a class="headerlink" href="#create-a-manipulator-configuration-file" title="Link to this heading">#</a></h2>
+<p>The manipulator configuration file defines the settings for both simulation and real-hardware operation in the Isaac ROS environment. One can use this file to change the camera type, workflow type and other parameters to suit different use cases.</p>
+<p>The configuration file uses YAML format and can be created manually or generated using included configuration tools. Below are the key parameter groups and their descriptions:</p>
+<ol class="arabic simple">
+<li><p><strong>Global Settings</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">camera_type</span></code>: Type of camera being used (e.g., <code class="docutils literal notranslate"><span class="pre">REALSENSE</span></code> or <code class="docutils literal notranslate"><span class="pre">ISAAC_SIM</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_cameras</span></code>: Number of cameras to run for 3d reconstruction.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow_type</span></code>: Type of workflow to run (e.g., <code class="docutils literal notranslate"><span class="pre">PICK_AND_PLACE</span></code>, <code class="docutils literal notranslate"><span class="pre">POSE_TO_POSE</span></code>, <code class="docutils literal notranslate"><span class="pre">OBJECT_FOLLOWING</span></code>)</p></li>
+</ul>
+</li>
+<li><p><strong>Robot Hardware Settings</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ur_type</span></code>: Type of UR manipulator (e.g., <code class="docutils literal notranslate"><span class="pre">ur5e</span></code> or <code class="docutils literal notranslate"><span class="pre">ur10e</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gripper_type</span></code>: Type of gripper attached (e.g., <code class="docutils literal notranslate"><span class="pre">robotiq_2f_85</span></code> or <code class="docutils literal notranslate"><span class="pre">robotiq_2f_140</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use_sim_time</span></code>: Whether to use simulation time ( <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> )</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup</span></code>: The name of the setup you are running on (specifying calibration, workspace bounds and camera ids)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">robot_ip</span></code>: Robot controller IP address</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_level</span></code>: Logging verbosity level</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">moveit_collision_objects_scene_file</span></code>: Path to a MoveIt scene file that defines static collision objects in the robot’s environment. These objects can represent tables, walls, or other static obstacles in the workspace that the robot needs to avoid during motion planning. The scene file can be created and exported from RViz’s MoveIt Motion Planning panel using the Scene Objects tab. Supported geometric primitives are boxes, spheres, and cylinders. The scene file is loaded at startup and the objects are added to the planning scene for collision avoidance.</p></li>
+</ul>
+</li>
+<li><p><strong>Robot Description Parameters</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">urdf_path</span></code>: Path to robot/gripper URDF file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">srdf_path</span></code>: Path to semantic robot description file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">joint_limits_file_path</span></code>: Joint limits configuration file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kinematics_file_path</span></code>: Robot kinematics configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">moveit_controllers_file_path</span></code>: MoveIt controllers configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ros2_controllers_file_path</span></code>: ROS 2 controllers configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">controller_spawner_timeout</span></code>: Controller initialization timeout (seconds)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tf_prefix</span></code>: Prefix for TF frames</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">runtime_config_package</span></code>: Package with runtime configurations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">initial_joint_controller</span></code>: Primary joint controller name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ur_calibration_file_path</span></code>: Path to the UR calibration file. Generate the calibration file for your robot using <a class="reference external" href="https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver/blob/main/ur_calibration/doc/usage.rst">this process</a>.</p></li>
+</ul>
+</li>
+<li><p><strong>cuMotion specific Parameters</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cumotion_urdf_file_path</span></code>: Path to the cuMotion-specific URDF file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cumotion_xrdf_file_path</span></code>: Path to the cuMotion-specific XRDF file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">distance_threshold</span></code>: Proximity threshold (in meters) for collision checks</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_nvblox</span></code>: Enable/disable nvblox for 3D scene reconstruction and dynamic collision avoidance ( <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> )</p></li>
+</ul>
+</li>
+<li><p><strong>Time Synchronization Parameters</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">time_sync_slop</span></code>: The time in seconds nodes keep as sync threshold to sync images and joint states. If one has a slower machine, tweaking this variable is useful to get syncs but at the cost of accuracy. If the slop parameter is too high, the robot will sync with older images or joint states leading to incorrect depth segmentation and object attachment</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">filter_depth_buffer_time</span></code>: Filters Depth buffers for object attachment. This informs how many seconds in the past object attachment looks at to get depth image input for object detection.</p></li>
+</ul>
+</li>
+<li><p><strong>Perception Parameters</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">depth_type</span></code>: Stereo disparity engine mode (choices include <code class="docutils literal notranslate"><span class="pre">ESS_FULL</span></code>, <code class="docutils literal notranslate"><span class="pre">ESS_LIGHT</span></code>, <code class="docutils literal notranslate"><span class="pre">FOUNDATIONSTEREO</span></code>, <code class="docutils literal notranslate"><span class="pre">ISAAC_SIM</span></code>, <code class="docutils literal notranslate"><span class="pre">REALSENSE</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ess_engine_file_path</span></code>: Path to ESS engine binary</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_dnn_depth_in_realsense</span></code>: Enable/disable DNN stereo depth estimation for RealSense cameras (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pose_estimation_type</span></code>: Method for pose estimation (choices include <code class="docutils literal notranslate"><span class="pre">FOUNDATION_POSE</span></code> or <code class="docutils literal notranslate"><span class="pre">DOPE</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pose_estimation_input_qos</span></code>: Quality of Service for pose estimation input</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pose_estimation_input_fps</span></code>: Input frame rate for pose estimation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pose_estimation_dropped_fps</span></code>: Expected frame rate after message drops</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dope_engine_file_path</span></code>: Path to DOPE engine file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dope_model_file_path</span></code>: Path to DOPE model (ONNX format)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">foundation_pose_mesh_file_path</span></code>: Mesh file for pose estimation via FoundationPose</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">foundation_pose_refine_engine_file_path</span></code>: Engine file for refining pose estimation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">foundation_pose_texture_path</span></code>: Texture file for pose estimation via FoundationPose</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">foundation_pose_score_engine_file_path</span></code>: Engine file for scoring pose quality</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">object_detection_type</span></code>: Type of object detection method (choices include <code class="docutils literal notranslate"><span class="pre">GROUNDING_DINO</span></code>, <code class="docutils literal notranslate"><span class="pre">RTDETR</span></code>, <code class="docutils literal notranslate"><span class="pre">SEGMENT_ANYTHING</span></code>, or <code class="docutils literal notranslate"><span class="pre">SEGMENT_ANYTHING2</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grounding_dino_confidence_threshold</span></code>: Confidence threshold for Grounding DINO detections</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grounding_dino_default_prompt</span></code>: Default text prompt for Grounding DINO object detection</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grounding_dino_engine_file_path</span></code>: Path to Grounding DINO engine file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grounding_dino_model_file_path</span></code>: Path to Grounding DINO model (ONNX format)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grounding_dino_network_image_height</span></code>: Network input image height for Grounding DINO</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grounding_dino_network_image_width</span></code>: Network input image width for Grounding DINO</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rtdetr_engine_file_path</span></code>: Engine file for RT-DETR object detection</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">object_class_id</span></code>: Class ID of the object to be detected. The default corresponds to the Mac and Cheese box if the SyntheticaDETR v1.0.0 model file is used. Refer to the SyntheticaDETR model documentation for additional supported objects and their class IDs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rt_detr_confidence_threshold</span></code>: Confidence threshold for RT-DETR detections</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sam_model_repository_paths</span></code>: list of paths to segment anything model repositories</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sam2_model_repository_paths</span></code>: list of paths to segment anything 2 model repositories</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">segment_anything_input_detections_topic</span></code>: topic name for segment anything input detections</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">segment_anything_input_points_topic</span></code>: topic name for segment anything input points</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">segment_anything2_input_points_topic</span></code>: topic name for segment anything 2 input points</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">segmentation_type</span></code>: type of segmentation method (choices include <code class="docutils literal notranslate"><span class="pre">NONE</span></code>, <code class="docutils literal notranslate"><span class="pre">SEGMENT_ANYTHING</span></code>, or <code class="docutils literal notranslate"><span class="pre">SEGMENT_ANYTHING2</span></code>)</p></li>
+</ul>
+</li>
+<li><p><strong>Pick and Place Parameters</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">use_ground_truth_pose_in_sim</span></code>: Whether to use ground truth pose in simulation ( <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> )</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pick_and_place_planner_retries</span></code>: Number of retries for the planning algorithm</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pick_and_place_retry_wait_time</span></code>: Wait time (in seconds) between planning retries</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sim_gt_asset_frame_id</span></code>: Ground truth asset frame identifier in simulation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grasps_file_path</span></code>: Path to the file containing predefined grasp configurations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trigger_aabb_object_clearing</span></code>: Flag to trigger bounding box (AABB) object clearing (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time_dilation_factor</span></code>: Factor to control the simulation speed of the robot</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">move_to_home_pose_after_place</span></code>: Flag to move the robot to the home pose after placing the object (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>). This can be used for automated testing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">home_pose</span></code>: List of joint values for the home pose</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use_pose_from_rviz</span></code>: When enabled, the end effector interactive marker is used to set the place pose through RViz (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">selection_policy</span></code>: Object selection policy to filter the output poses from the pose estimation backend (choices include <code class="docutils literal notranslate"><span class="pre">HIGHEST_SCORE</span></code>, <code class="docutils literal notranslate"><span class="pre">FIRST</span></code>, or <code class="docutils literal notranslate"><span class="pre">RANDOM</span></code>)</p></li>
+</ul>
+</li>
+<li><p><strong>Object Attachment Parameters</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">object_attachment_type</span></code>: Shape of the attachment geometry (<code class="docutils literal notranslate"><span class="pre">SPHERE</span></code>, <code class="docutils literal notranslate"><span class="pre">CUBOID</span></code>, or <code class="docutils literal notranslate"><span class="pre">CUSTOM_MESH</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">object_attachment_scale</span></code>: Dimensions of the attachment geometry (list of floats)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">attach_object_mesh_file_path</span></code>: Path to the object visualization mesh</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end_effector_mesh_resource_uri</span></code>: URI for the end effector mesh resource</p></li>
+</ul>
+</li>
+<li><p><strong>Visualization Options</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_rviz_visualization</span></code>: Enable or disable RViz visualization (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_foxglove_visualization</span></code>: Enable or disable Foxglove Studio visualization (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rviz_config_file</span></code>: Path to the RViz configuration file</p></li>
+</ul>
+</li>
+<li><p><strong>Performance and Profiling Settings</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_cuda_mps</span></code>: Enable CUDA Multi-Process Service (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_mps_pipe_directory</span></code>: Directory for CUDA MPS pipes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_nsight_profiling</span></code>: Enable Nsight profiling (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nsight_profile_duration</span></code>: Duration of Nsight profiling session (in seconds)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">delay_to_start_nsight</span></code>: Delay (in seconds) before beginning Nsight profiling. This provides time for systems to stabilize prior to profiling.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nsight_profile_output_file_path</span></code>: File path where the Nsight profiling results will be saved.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_system_wide_profiling</span></code>: Enable system-wide profiling (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+</ul>
+</li>
+<li><p><strong>Gear Assembly Parameters</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_model_path</span></code>: Path to the gear assembly model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_model_file_name</span></code>: Name of the gear assembly model file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_policy_alpha</span></code>: Alpha value for the gear assembly policy</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_observation_topic</span></code>: Topic name for the gear assembly observation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_joint_state_topic</span></code>: Topic name for the gear assembly joint states</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_target_joint_state_topic</span></code>: Topic name for the gear assembly target joint states</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_target_tcp_state_topic</span></code>: Topic name for the gear assembly target TCP states</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_gear_insertion_request_topic</span></code>: Topic name for the gear assembly gear insertion request</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_goal_pose_topic</span></code>: Topic name for the gear assembly goal pose</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_gear_insertion_status_topic</span></code>: Topic name for the gear assembly gear insertion status</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_ros_bag_folder_path</span></code>: Path to the gear assembly ROS bag folder</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_enable_recording</span></code>: Enable recording of the gear assembly ROS bag</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_use_joint_state_planner</span></code>: Use joint state planner for gear assembly (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_peg_stand_mesh_file_path</span></code>: Path to the peg stand mesh file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_gear_large_mesh_file_path</span></code>: Path to the gear large mesh file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_gear_small_mesh_file_path</span></code>: Path to the gear small mesh file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_gear_medium_mesh_file_path</span></code>: Path to the gear medium mesh file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_use_ground_truth_pose_in_sim</span></code>: Use ground truth pose in simulation (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_verify_pose_estimation_accuracy</span></code>: Verify pose estimation accuracy (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_run_rl_inference</span></code>: Run RL inference (<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gear_assembly_output_dir</span></code>: Output directory for the gear assembly</p></li>
+</ul>
+</li>
+<li><p><strong>Additional MPS Parameters</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_mps_client_priority_container</span></code>: Client priority for container tasks in MPS</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_mps_client_priority_robot_segmenter</span></code>: Client priority for robot segmentation tasks in MPS</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_mps_active_thread_percentage_robot_segmenter</span></code>: Active thread percentage for robot segmentation in MPS</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_mps_client_priority_planner</span></code>: Client priority for the cuMotion planner in MPS</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_mps_active_thread_percentage_planner</span></code>: Active thread percentage for the cuMotion planner in MPS</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_mps_active_thread_percentage_container</span></code>: Percentage of active threads reserved for container tasks when CUDA Multi-Process Service (MPS) is enabled</p></li>
+</ul>
+</li>
+</ol>
+<p>For a complete example configuration, see the sample files in the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.0/isaac_manipulator_bringup/params">params</a> directory.</p>
+<p id="run-pre-flight-test-manipulator-on-robot-e2e">To verify that you have setup Isaac for Manipulation correctly, run the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ENABLE_MANIPULATOR_TESTING</span><span class="o">=</span>on_robot
+<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_MANIPULATOR_TEST_CONFIG</span><span class="o">=</span>&lt;config_file_path_for_your_robot&gt;
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_manipulator/isaac_manipulator_bringup/test
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>One can also use <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">test</span> <span class="pre">--packages-select</span> <span class="pre">isaac_manipulator_bringup</span></code> to run the tests.
+However, <code class="docutils literal notranslate"><span class="pre">pytest</span></code> has a better output and makes it easier to view status and progress of the tests.
+If these tests fail, please look at <a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html"><span class="doc">Isaac for Manipulation Testing Guide</span></a> for more information.
+It is recommended to run the tests manually using <code class="docutils literal notranslate"><span class="pre">launch_test</span></code> and then manually inspecting the results.</p>
+</div>
+<p>This will run a series of tests to verify that Isaac for Manipulation is working correctly.</p>
+<section id="why-does-my-robot-driver-not-launch-correctly">
+<span id="id3"></span><h3>Why does my robot driver not launch correctly ?<a class="headerlink" href="#why-does-my-robot-driver-not-launch-correctly" title="Link to this heading">#</a></h3>
+<p>There can be several reasons but a lot of them can pertain to poor networking setup.</p>
+<ol class="arabic simple">
+<li><p>Make sure <code class="docutils literal notranslate"><span class="pre">192.56.1.2</span></code> and <code class="docutils literal notranslate"><span class="pre">192.56.1.1</span></code> are ping-able from your Jetson machine.</p></li>
+<li><p>Make sure the Ethernet connection is set up correctly.</p></li>
+</ol>
+<figure class="align-center">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_1.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_1.jpg/" />
+</figure>
+<ol class="arabic simple">
+<li><p>Make sure you have setup External control correctly as shown in the figure below.</p></li>
+</ol>
+<figure class="align-center">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_4.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_4.jpg/" />
+</figure>
+<ol class="arabic simple">
+<li><p>Make sure you have setup the Robotiq Gripper up correctly and pointed it to <code class="docutils literal notranslate"><span class="pre">User</span></code> mode.</p></li>
+</ol>
+<figure class="align-center">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_2.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_2.jpg/" />
+</figure>
+<ol class="arabic simple">
+<li><p>Make sure after setting up URCaps and doing the above step you can control the gripper using the open and close buttons as shown below.</p></li>
+</ol>
+<figure class="align-center">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_5.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_5.jpg/" />
+</figure>
+<ol class="arabic simple">
+<li><p>Make sure you have setup the program correctly to External control as shown below.</p></li>
+</ol>
+<figure class="align-center">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_6.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_6.jpg/" />
+</figure>
+<ol class="arabic simple">
+<li><p>Make sure you have given all the permissions required for the Jetson compute box to communicate with the robot.</p></li>
+</ol>
+<figure class="align-center">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_8.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_8.jpg/" />
+</figure>
+<ol class="arabic simple">
+<li><p>Before running the drivers, make sure your <code class="docutils literal notranslate"><span class="pre">Run</span></code> screen looks like this.</p></li>
+</ol>
+<figure class="align-center">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_7.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.0/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_7.jpg/" />
+</figure>
+<ol class="arabic simple">
+<li><p>If you are still facing issues, please refer to the <a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html"><span class="doc">Isaac for Manipulation Testing Guide</span></a> for more information.</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../isaac_urdf_requirements/index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Calibration File Requirements for Isaac</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../troubleshooting/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Troubleshooting</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-ur-robot">Set Up UR Robot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-cameras-for-robot">Set Up Cameras for Robot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-manipulator-configuration-file">Create a Manipulator Configuration File</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-does-my-robot-driver-not-launch-correctly">Why does my robot driver not launch correctly ?</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Manage My Privacy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/preferences/start/">Do Not Sell or Share My Data</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2023-2025 NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on Nov 13, 2025.
+  <br/>
+</p></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
+  </body>
+</html>

@@ -2,8 +2,8 @@
 
 ROS 2 packages based on NVIDIA `libArgus` library for NVIDIA-accelerated CSI camera support.
 
-<div align="center"><img src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_sample_raw.png/" width="300px" title="raw image"/>
-<img src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_sample_isp.png/" width="300px" title="isp processed image"/></div>
+<div align="center"><img src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_sample_raw.png/" width="300px" title="raw image"/>
+<img src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_sample_isp.png/" width="300px" title="isp processed image"/></div>
 
 ## Overview
 
@@ -22,7 +22,7 @@ Jetson, Argus provides multi-camera frame synchronization, with very
 high precision frame acquisition timestamping and jitter less than
 100us.
 
-<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera_nodegraph.png/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera_nodegraph.png/" width="800px"/></a></div>
+<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera_nodegraph.png/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera_nodegraph.png/" width="800px"/></a></div>
 
 In the example graph of nodes above, the Argus Camera module processes
 sensor image data from the camera for input to vision-based perception
@@ -31,7 +31,7 @@ encode. Each of the nodes in green is GPU accelerated for a
 high-performance compute graph from Argus camera to vision-based
 perception functions.
 
-<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera_zeromemcpy.png/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/main/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera_zeromemcpy.png/" width="800px"/></a></div>
+<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera_zeromemcpy.png/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_argus_camera/isaac_ros_argus_camera_zeromemcpy.png/" width="800px"/></a></div>
 
 Argus Camera uses dedicated hardware engines to access the full memory
 bandwidth in Jetson. Raw camera images are delivered via CSI or GMSL

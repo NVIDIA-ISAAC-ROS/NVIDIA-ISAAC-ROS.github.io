@@ -1,0 +1,105 @@
+======================
+Gear Assembly Workflow
+======================
+
+Overview
+--------
+
+This tutorial builds on the :doc:`Gear Insertion Policy tutorial <tutorial_isaac_sim_gear_insertion_policy>` and demonstrates a complex gear assembly workflow using Isaac for Manipulation in Isaac Sim.
+The robot picks up gears and inserts them into a peg stand in sequence, demonstrating precise
+manipulation and assembly operations. We use ground truth poses for the gear objects and perfect depth from the simulation.
+
+The example uses `RViz <https://github.com/ros2/rviz>`__ for visualization.
+RViz is the default visualization tool when Isaac for Manipulation is running on the same computer
+that is displaying the visualization.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/gear_assembly_sim.gif>`
+    :width: 100%
+    :alt: Isaac Sim scene used for gear assembly with the gear and peg stand objects
+
+Prerequisites
+-------------
+
+- Follow the setup instructions in :doc:`Setup for Simulated Robot in Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim>`.
+
+
+Tutorial
+--------
+
+.. include:: _snippets/isaac_sim_launch.rst
+
+How to use cuMotion controller and the Insertion policy controller in Isaac Sim
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. The cuMotion controller uses ``ros2_topic_based_controller`` which takes the last joint state set point and publishes that to the simulation.
+
+#. This is not ideal since when we need to run the insertion policy and control the robot, those set points are lost by the messages being published by the ``ros2_topic_based_controller``.
+
+#. Hence, we fork the ``ros2_topic_based_controller`` and add the ability to shut down the controller via a topic based message.
+
+#. The forked repository is available `here <https://github.com/karanchahal-nv/topic_based_ros2_control>`__.
+
+Configure the Gear Assembly Workflow
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Open the ``sim_launch_params.yaml`` file and set the ``grasps_file_path`` to the path to the grasps file you want to use.
+
+   .. code:: yaml
+
+      grasps_file_path: $(ros2 pkg prefix --share isaac_manipulator_robot_description)/config/robotiq_2f_140_grasps_large_gear.yaml
+      segmentation_type: SEGMENT_ANYTHING
+      object_detection_type: SEGMENT_ANYTHING
+      enable_nvblox: 'false'
+      workflow_type: GEAR_ASSEMBLY
+
+#. Set the ``use_ground_truth_pose_in_sim`` to ``true`` if you want to use ground truth poses for the gear insertion.
+
+#. Set the ``gear_assembly_use_ground_truth_pose_in_sim`` to ``true`` if you want to use ground truth poses for the gear insertion.
+
+
+Run Gear Assembly Workflow
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Once you hit **Play** on the scene in Isaac Sim, go to the Window tab and select Script Editor.
+
+#. Copy and paste the script inside of the below mentioned path and run it.
+
+   .. code:: bash
+
+      $(ros2 pkg prefix --share isaac_manipulator_bringup)/test/isaac_sim_script_editor_scripts/get_robot_in_home_position.py
+
+#. Once the robot is in the home position, you can run the gear assembly workflow as described below.
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Launch the gear assembly workflow:
+
+   .. code:: bash
+
+      ros2 launch isaac_manipulator_bringup workflows.launch.py \
+          manipulator_workflow_config:=$(ros2 pkg prefix --share isaac_manipulator_bringup)/params/sim_launch_params.yaml
+
+#. Trigger the gear assembly workflow after seeing the prompt that signifies that cuMotion is ready for planning calls:
+
+   .. code:: bash
+
+      ros2 action send_goal /gear_assembly isaac_manipulator_interfaces/action/GearAssembly {}
+
+#. The robot will pick up the gears and insert them into the peg stand in sequence. Note that we use ground truth poses for the gear insertion via the ``use_ground_truth_pose_in_sim`` parameter which we set to ``true`` in the manipulator configuration file.
+
+#. The workflow should end after inserting the medium gear.
+
+.. warning::
+
+   This simulation tutorial exercises experimental work that may encounter issues such as the grasp being unstable causing the gripper to drop the gear, picking at the wrong gear, and failing insertion. Many of these issues can be traced to the wrong pose information being propagated in simulation, however, and do not manifest for the real robot workflows.
+
+Next Steps
+----------
+
+- Try the :doc:`Gear Insertion Policy tutorial <tutorial_isaac_sim_gear_insertion_policy>` for learning-based insertion
+- Try the :doc:`Pick and Place tutorial <tutorial_isaac_sim_pick_and_place>` for general manipulation workflows
+- Learn more about :doc:`Isaac for Manipulation Reference Architecture </reference_workflows/isaac_for_manipulation/reference_architecture>`

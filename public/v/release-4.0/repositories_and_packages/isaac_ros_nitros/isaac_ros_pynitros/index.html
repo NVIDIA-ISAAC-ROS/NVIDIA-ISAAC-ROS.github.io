@@ -1,0 +1,1846 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>isaac_ros_pynitros &#8212; Isaac ROS</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css?v=a5c4661c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/isaac.css?v=177ef1d8" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=01823362"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script src="../../../_static/tabs.js?v=3030b3cb"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'repositories_and_packages/isaac_ros_nitros/isaac_ros_pynitros/index';</script>
+    <script>mermaid.initialize({"startOnLoad": true})</script>
+    <link rel="icon" href="../../../_static/isaac_ros_logo.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Tutorial to use PyNITROS with NITROS" href="../../../concepts/nitros/pynitros/tutorial_pynitros.html" />
+    <link rel="prev" title="isaac_ros_nitros_type" href="../isaac_ros_nitros_type/index.html" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Nov 13, 2025"/>
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../getting_started/index.html">Getting Started</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../getting_started/compute/index.html">Compute Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/compute/jetson_storage.html">Jetson Storage Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/compute/preempt_setup.html">PREEMPT_RT Kernel for Jetson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/compute/jetson_vpi.html">Jetson Setup for VPI</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../getting_started/sensors/index.html">Sensors Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/realsense_setup.html">Isaac ROS RealSense Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/zed_setup.html">Isaac ROS ZED Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/camera_calibration.html">Monocular Camera Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/isaac_for_manipulation_camera_calibration.html">Isaac for Manipulation Camera Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/amr_extrinsic_calibration.html">Extrinsic Calibration for Mobile Robots</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference_workflows/index.html">Reference Workflows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/index.html">Isaac for Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/reference_architecture.html">Isaac for Manipulation Reference Architecture</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper.html">Set Up Hardware and Software for Real Robot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim.html">Setup for Simulated Robot in Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html">Run Tests for various components of Isaac for Manipulation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorials.html">Isaac for Manipulation Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_e2e.html">Tutorial for Obstacle Avoidance and Object Following Using cuMotion with Perception</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place.html">Multi-Object Pick and Place Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">Tutorial for Multi-Object Pick and Place using cuMotion with Perception</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place_from_cloud_service.html">Tutorial for Multi-Object Pick and Place from Isaac Cloud Service</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_gear_assembly.html">Tutorial for Gear Assembly with Contact Rich Insertion Policy and cuMotion</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim.html">Isaac for Manipulation Tutorials with Isaac Sim</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pose_to_pose.html">Pose to Pose Planning</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_object_following.html">Object Following</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pick_and_place.html">Pick and Place</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_grasp_authoring.html">Grasp Authoring</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_gear_insertion_policy.html">Gear Insertion Policy</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_gear_assembly.html">Gear Assembly Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_asset_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_asset_bringup</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_bringup</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/manipulation_workflow_config_guide.html">Manipulation Workflow Configuration Guide</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_gear_assembly/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_gear_assembly</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_orchestration</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/behavior_reference.html">Behavior Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/blackboard_reference.html">Blackboard Reference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_pick_and_place</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/api_reference.html">API Reference and Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide.html">Configuration Guide</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_ros_python_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ros_python_utils</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_servers/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_servers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_ur_dnn_policy/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ur_dnn_policy</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_workflows/isaac_for_mobility/index.html">Isaac for Mobility</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../performance/index.html">Performance Summary</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../concepts/index.html">Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/benchmarking/index.html">Benchmarking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/dev_env/index.html">Isaac ROS Development Environment</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/dnn_inference/index.html">DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/dnn_inference/model_preparation.html">Preparing Deep Learning Models for Isaac ROS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/dnn_inference/tensorrt_and_triton_info.html">Isaac ROS Triton and TensorRT Nodes for DNN Inference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/jetson_stats/index.html">Jetson Stats</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/manipulation/index.html">Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/orchestration.html">Manipulation Orchestration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/pick_and_place.html">Multi-Object Pick and Place</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/xrdf.html">Extended Robot Description Format (XRDF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/isaac_grasp.html">Isaac Grasp File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">Tutorial for integrating custom manipulators with cuMotion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/cumotion_moveit/tutorial_isaac_sim.html">Tutorial for cuMotion MoveIt plugin with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/missions/index.html">Missions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/nitros/index.html">NITROS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/nitros/cuda_with_nitros.html">CUDA with NITROS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/nitros/pynitros/index.html">PyNITROS</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/object_detection/index.html">Object Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/object_detection/detectnet/index.html">DetectNet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/object_detection/grounding_dino/index.html">Grounding DINO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/object_detection/rtdetr/index.html">RT-DETR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/object_detection/yolov8/index.html">YOLOv8</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/pose_estimation/index.html">Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/pose_estimation/centerpose/index.html">CenterPose</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/pose_estimation/dope/index.html">DOPE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/index.html">FoundationPose</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/scene_reconstruction/index.html">Scene Reconstruction</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/index.html">Nvblox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/technical_details.html">Technical Details</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_isaac_sim.html">Isaac Sim Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense.html">RealSense Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_multi_realsense.html">Multi-RealSense Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_zed.html">ZED Camera Examples</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segformer/index.html">Segformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segformer/tutorial_isaac_sim.html">Tutorial for People Segmentation with Segformer and Isaac Sim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segformer/tutorial_tensorrt.html">Tutorial for People Segmentation with Segformer and TensorRT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segment_anything/index.html">Segment Anything</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segment_anything/tutorial_isaac_sim.html">Tutorial for Segment Anything with Isaac Sim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/unet/tutorial_isaac_sim.html">Tutorial for DNN Image Segmentation with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/stereo_depth/index.html">Stereo Depth</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/stereo_depth/foundationstereo/index.html">FoundationStereo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/stereo_depth/ess/index.html">ESS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/stereo_depth/sgm/index.html">SGM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/stereo_dnn/index.html">Stereo DNN</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial for cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial for cuVGL Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/index.html">cuVSLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_isaac_sim.html">Tutorial for Visual SLAM with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_realsense.html">Tutorial for Visual SLAM Using a RealSense Camera with Integrated IMU</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_cuvslam_mask.html">Tutorial for Isaac ROS Visual SLAM with Segmentation Masks</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/visualization/index.html">Visualization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/visualization/foxglove.html">Foxglove Visualization</a></li>
+
+
+
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">Repositories and Packages</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_apriltag/index.html">Isaac ROS AprilTag</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_apriltag/isaac_ros_apriltag/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_apriltag</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/fiducials/apriltag/tutorial_usb_cam.html">Tutorial with a USB camera</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/fiducials/apriltag/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_benchmark/index.html">Isaac ROS Benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_benchmark/isaac_ros_benchmark/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_benchmark</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_benchmark/benchmarks/isaac_ros_moveit_benchmark/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_moveit_benchmark</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_cloud_control/index.html">Isaac ROS Cloud Control</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_mission_client/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_mission_client</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/missions/isaac_ros_mission_client.html">Isaac ROS Mission Client Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_scene_recorder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_scene_recorder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cloud_control/vda5050_action_handler/index.html"><code class="docutils literal notranslate"><span class="pre">vda5050_action_handler</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../isaac_ros_common/index.html">Isaac ROS Common</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_compression/index.html">Isaac ROS Compression</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_compression/isaac_ros_h264_decoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_decoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_compression/isaac_ros_h264_encoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_cumotion/index.html">Isaac ROS cuMotion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_cumotion/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_cumotion_moveit/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_moveit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_esdf_visualizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_esdf_visualizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_moveit_goal_setter/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_moveit_goal_setter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_goal_setter_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_goal_setter_interfaces</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_object_attachment</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_dnn_inference/index.html">Isaac ROS DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dnn_image_encoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_inference/isaac_ros_tensor_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_tensor_proc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_inference/isaac_ros_tensor_rt/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_tensor_rt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_inference/isaac_ros_triton/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_triton</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_dnn_stereo_depth/index.html">Isaac ROS DNN Stereo Depth</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_dnn_stereo_depth/isaac_ros_ess/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_ess</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/ess/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/ess/visualize_image.html">Visualize ESS Disparity Output</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationstereo</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/foundationstereo/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/foundationstereo/visualize_image.html">Visualize FoundationStereo Disparity Output</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_image_pipeline/index.html">Isaac ROS Image Pipeline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_depth_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_depth_image_proc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_image_pipeline/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_pipeline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_proc</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_stereo_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_stereo_image_proc</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/sgm/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_image_segmentation/index.html">Isaac ROS Image Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_segformer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segformer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/segmentation/segformer/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/segmentation/segformer/tutorial_tensorrt.html">Tutorial with TensorRT</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/segmentation/segment_anything/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_segment_anything2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_segment_anything2_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything2_interfaces</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_unet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unet</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/segmentation/unet/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_jetson/index.html">Isaac ROS Jetson</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_jetson/isaac_ros_jetson_stats/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_jetson_stats</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_jetson/isaac_ros_jetson_stats_services/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_jetson_stats_services</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: Create Maps for Visual Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_ros_pointcloud_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pointcloud_utils</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_global_localization</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial with Map Creation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial with Visual Global Localization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_ros_visual_mapping/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_mapping</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">Isaac ROS NITROS</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../isaac_ros_gxf/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_gxf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../isaac_ros_managed_nitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_managed_nitros</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../isaac_ros_nitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../isaac_ros_nitros_bridge/index.html">Isaac ROS NITROS Bridge</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/nitros_bridge/tutorial_isaac_sim.html">Tutorial for NITROS Bridge with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../isaac_ros_nitros_topic_tools/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_topic_tools</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../isaac_ros_nitros_type/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_type</span></code></a></li>
+<li class="toctree-l3 current active has-children"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros</span></code></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/nitros/pynitros/tutorial_pynitros.html">Tutorial to use PyNITROS with NITROS</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_nvblox/index.html">Isaac ROS Nvblox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nvblox</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/api/parameters.html">ROS Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/api/topics_and_services.html">ROS Topics and Services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_isaac_sim.html">Isaac Sim Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense.html">RealSense Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_ros_communication.html">ROS Communication Issues</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_examples_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_examples_bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_image_padding/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_image_padding</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_msgs/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_msgs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_nav2/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_nav2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_ros/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_ros</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_ros_common/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_ros_common</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_rviz_plugin/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_rviz_plugin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/realsense_splitter/index.html"><code class="docutils literal notranslate"><span class="pre">realsense_splitter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/semantic_label_conversion/index.html"><code class="docutils literal notranslate"><span class="pre">semantic_label_conversion</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_object_detection/index.html">Isaac ROS Object Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_object_detection/isaac_ros_detectnet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_detectnet</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/object_detection/detectnet/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/object_detection/detectnet/tutorial_custom_model.html">Tutorial with Custom Model</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_object_detection/isaac_ros_grounding_dino/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_grounding_dino</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_object_detection/isaac_ros_rtdetr/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_rtdetr</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/object_detection/rtdetr/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_object_detection/isaac_ros_yolov8/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_yolov8</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_pose_estimation/index.html">Isaac ROS Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_pose_estimation/isaac_ros_dope/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dope</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/dope/tutorial_triton.html">Tutorial with Triton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/dope/tutorial_custom_model.html">Tutorial with Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/dope/tutorial_custom_size.html">Tutorial with Custom Size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/dope/dope_verification.html">Verifying DOPE Accuracy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationpose</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_tracking.html">Tutorial to launch FoundationPose Tracking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_create_your_own_mesh.html">Tutorial to create your own 3D object mesh in .obj</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_shift_mesh_center.html">Tutorial to shift the Mesh origin frame to the center of the Mesh using Meshlab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_usd_to_obj.html">Tutorial to convert a 3D mesh from .usd to .obj using Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_simplify_mesh.html">Tutorial to simplify a 3D mesh using Meshlab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_switch_mesh_runtime.html">Tutorial to switch the mesh during runtime</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_visual_slam/index.html">Isaac ROS Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_visual_slam/isaac_ros_visual_slam/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/validating_cuvslam_setup.html">Validating cuVSLAM Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_realsense.html">Tutorial with RealSense</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_visual_slam/isaac_ros_visual_slam_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam_interfaces</span></code></a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../robots/index.html">Robots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../robots/isaac_urdf_requirements/index.html">Calibration File Requirements for Isaac</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../robots/universal_robots/index.html">Universal Robots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../troubleshooting/index.html">Troubleshooting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../troubleshooting/dev_env.html">Developer Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../troubleshooting/hardware_setup.html">Hardware Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../troubleshooting/deep_learning.html">Deep Learning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../blog/index.html">Blogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../releases/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../about/index.html">About</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../about/license.html">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../about/contact.html">Contact</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a></div>
+      <div class="sidebar-primary-item"><div class="version-switcher__container dropdown">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    release-4.0
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <dl>
+        <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_nitros/isaac_ros_pynitros/index.html">release-3.2</a></dd>
+        <dd><a href="index.html">release-4.0</a></dd>
+        <dd><a href="../../../../../repositories_and_packages/isaac_ros_nitros/isaac_ros_pynitros/index.html">latest</a></dd>
+        <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
+        <dd><a href="../../../../release-3.1/index.html">release-3.1</a></dd>
+    </dl>
+  </div>
+</div></div>
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Repositories and Packages</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Isaac ROS NITROS</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros</span></code></span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="package-name">
+<h1><code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros</span></code><a class="headerlink" href="#package-name" title="Link to this heading">#</a></h1>
+<p><p>Source code available on <a class="reference isaac-github-icon" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros/blob/release-4.0/isaac_ros_pynitros">GitHub</a>.</p></p>
+<section id="creating-pynitros-accelerated-nodes">
+<h2>Creating PyNITROS-Accelerated Nodes<a class="headerlink" href="#creating-pynitros-accelerated-nodes" title="Link to this heading">#</a></h2>
+<p>The following steps outline how to create PyNITROS-accelerated nodes using the PyNITROS API. This example
+demonstrates how to use PyNITROS to publish and subscribe image messages. PyNITROS also supports tensor list messages,
+which can be used in a similar manner. You can find the source code of this example under the <code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros/examples</span></code> directory.</p>
+<ol class="arabic">
+<li><p>Instantiate the <code class="docutils literal notranslate"><span class="pre">PyNitrosSubscriber</span></code>. Developers can instantiate the <code class="docutils literal notranslate"><span class="pre">PyNitrosSubscriber</span></code> class with the following
+five parameters:</p>
+<ul class="simple">
+<li><p>ROS node</p></li>
+<li><p>NITROS Bridge message type</p></li>
+<li><p>NITROS Bridge message topic name</p></li>
+<li><p>raw ROS message topic name</p></li>
+<li><p>enable ROS subscribe flag</p></li>
+</ul>
+<p>After instantiation, use the <code class="docutils literal notranslate"><span class="pre">create_subscription</span></code> function to create a subscription with a user-defined callback function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pynitros_subscriber</span> <span class="o">=</span> <span class="n">PyNitrosSubscriber</span><span class="p">(</span><span class="n">Node</span><span class="p">,</span> <span class="n">NitrosBridgeImage</span><span class="p">,</span> <span class="s2">&quot;pynitros_image&quot;</span><span class="p">,</span> <span class="s2">&quot;pynitros_image_raw&quot;</span><span class="p">,</span> <span class="n">enable_ros_subscribe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pynitros_subscriber</span><span class="o">.</span><span class="n">create_subscription</span><span class="p">(</span><span class="n">sub_callback</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">PyNitrosPublisher</span></code> by specifying ROS node, NITROS Bridge message type, NITROS Bridge topic name, and raw ROS topic name respectively.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pynitros_publisher</span> <span class="o">=</span> <span class="n">PyNitrosPublisher</span><span class="p">(</span><span class="n">Node</span><span class="p">,</span> <span class="n">NitrosBridgeImage</span><span class="p">,</span> <span class="s2">&quot;pynitros_image&quot;</span><span class="p">,</span> <span class="s2">&quot;pynitros_image_raw&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create the PyNITROS image builder. This builder will create a memory pool
+with a number of buffers to hold the IPC GPU data of messages pending to publish.
+To instantiate the builder, you need to specify the number of buffers and timeout
+for reclaiming the buffer back to the pool.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pynitros_image_builder</span> <span class="o">=</span> <span class="n">PyNitrosImageBuilder</span><span class="p">(</span><span class="n">num_buffer</span> <span class="p">(</span><span class="n">optional</span><span class="p">),</span> <span class="n">timeout</span> <span class="p">(</span><span class="n">optional</span><span class="p">))</span>
+</pre></div>
+</div>
+</li>
+<li><p>When a subscribed message arrives, the callback function is triggered with a <code class="docutils literal notranslate"><span class="pre">PyNITROSView</span></code> of the message.
+You can convert this view to another data type of your choice, such as a PyTorch tensor,
+by passing in <code class="docutils literal notranslate"><span class="pre">pynitros_image_view</span></code> into the <code class="docutils literal notranslate"><span class="pre">torch.as_tensor()</span></code> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">sub_callback</span><span class="p">(</span><span class="n">pynitros_image_view</span><span class="p">):</span>
+   <span class="c1"># (Optional) If user has async GPU operations in the fly, pass stream back to the view</span>
+   <span class="n">stream</span> <span class="o">=</span> <span class="n">runtime</span><span class="o">.</span><span class="n">cudaStreamCreate</span><span class="p">()</span>
+   <span class="n">pynitros_image_view</span><span class="o">.</span><span class="n">set_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+   <span class="c1"># Get data as tensor, or any other data type supports __cuda_array_interface__</span>
+   <span class="n">image_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">pynitros_image_view</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">gpu</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>After processing the received image, pass the device pointer of the output and metadata
+into the <code class="docutils literal notranslate"><span class="pre">PyNitrosBuilder</span></code> build function. This generates a <code class="docutils literal notranslate"><span class="pre">NitrosBridgeImage</span></code>
+that can then be published using the <code class="docutils literal notranslate"><span class="pre">PyNitrosPublisher</span></code>. If the <code class="docutils literal notranslate"><span class="pre">enable_ros_publish</span></code> flag is
+set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the publisher also sends the raw image (that is, an <code class="docutils literal notranslate"><span class="pre">Image</span></code> message)
+to the second topic specified during instantiation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">built_image</span> <span class="o">=</span> <span class="n">pynitros_image_builder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">image_data_ptr</span><span class="p">,</span>
+                                           <span class="n">image_height</span><span class="p">,</span>
+                                           <span class="n">image_width</span><span class="p">,</span>
+                                           <span class="n">image_step</span><span class="p">,</span>
+                                           <span class="n">image_encoding</span><span class="p">,</span>
+                                           <span class="n">image_header</span><span class="p">,</span>
+                                           <span class="n">device_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                           <span class="n">enable_ros_publish</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Publish the built image using the publisher:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pynitros_publisher</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">built_image</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>PyNITROS requires the permission of <code class="docutils literal notranslate"><span class="pre">PTRACE_ATTACH</span></code> for IPC. You can
+set the <code class="docutils literal notranslate"><span class="pre">ptrace_scope</span></code> by running the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/proc/sys/kernel/yama/ptrace_scope
+</pre></div>
+</div>
+</div>
+</section>
+<section id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
+<p>This quickstart uses the <code class="docutils literal notranslate"><span class="pre">image_forward</span></code> node built with PyNITROS to demonstrate the zero-copy inter-op between PyNITROS nodes.</p>
+<section id="set-up-development-environment">
+<h3>Set Up Development Environment<a class="headerlink" href="#set-up-development-environment" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Set up your development environment by following the instructions in <a class="reference internal" href="../../../getting_started/index.html"><span class="doc">getting started</span></a>.</p></li>
+<li><p>(Optional) Install dependencies for any sensors you want to use by following the <a class="reference internal" href="../../../getting_started/sensors/index.html"><span class="doc">sensor-specific guides</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We strongly recommend installing all sensor dependencies <strong>before</strong> starting any quickstarts.
+Some sensor dependencies require restarting the development environment during installation, which will interrupt the quickstart process.</p>
+</div>
+</li>
+</ol>
+<section id="download-quickstart-assets">
+<h4>Download Quickstart Assets<a class="headerlink" href="#download-quickstart-assets" title="Link to this heading">#</a></h4>
+<ol class="arabic">
+<li><p>Download quickstart data from NGC:</p>
+<p>Make sure required libraries are installed.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>curl<span class="w"> </span>jq<span class="w"> </span>tar
+</pre></div>
+</div>
+<p>Then, run these commands to download the asset from NGC:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">NGC_ORG</span><span class="o">=</span><span class="s2">&quot;nvidia&quot;</span>
+<span class="nv">NGC_TEAM</span><span class="o">=</span><span class="s2">&quot;isaac&quot;</span>
+<span class="nv">PACKAGE_NAME</span><span class="o">=</span><span class="s2">&quot;isaac_ros_pynitros&quot;</span>
+<span class="nv">NGC_RESOURCE</span><span class="o">=</span><span class="s2">&quot;isaac_ros_pynitros_assets&quot;</span>
+<span class="nv">NGC_FILENAME</span><span class="o">=</span><span class="s2">&quot;quickstart.tar.gz&quot;</span>
+<span class="nv">MAJOR_VERSION</span><span class="o">=</span><span class="m">4</span>
+<span class="nv">MINOR_VERSION</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">VERSION_REQ_URL</span><span class="o">=</span><span class="s2">&quot;https://catalog.ngc.nvidia.com/api/resources/versions?orgName=</span><span class="nv">$NGC_ORG</span><span class="s2">&amp;teamName=</span><span class="nv">$NGC_TEAM</span><span class="s2">&amp;name=</span><span class="nv">$NGC_RESOURCE</span><span class="s2">&amp;isPublic=true&amp;pageNumber=0&amp;pageSize=100&amp;sortOrder=CREATED_DATE_DESC&quot;</span>
+<span class="nv">AVAILABLE_VERSIONS</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/json&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_REQ_URL</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="nv">LATEST_VERSION_ID</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="nv">$AVAILABLE_VERSIONS</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">    .recipeVersions[]</span>
+<span class="s2">    | .versionId as \$v</span>
+<span class="s2">    | \$v | select(test(\&quot;^\\\\d+\\\\.\\\\d+\\\\.\\\\d+</span>$<span class="s2">\&quot;))</span>
+<span class="s2">    | split(\&quot;.\&quot;) | {major: .[0]|tonumber, minor: .[1]|tonumber, patch: .[2]|tonumber}</span>
+<span class="s2">    | select(.major == </span><span class="nv">$MAJOR_VERSION</span><span class="s2"> and .minor &lt;= </span><span class="nv">$MINOR_VERSION</span><span class="s2">)</span>
+<span class="s2">    | \$v</span>
+<span class="s2">    &quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span>-V<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span>
+<span class="k">)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LATEST_VERSION_ID</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;No corresponding version found for Isaac ROS </span><span class="nv">$MAJOR_VERSION</span><span class="s2">.</span><span class="nv">$MINOR_VERSION</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Found versions:&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$AVAILABLE_VERSIONS</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.recipeVersions[].versionId&#39;</span>
+<span class="k">else</span>
+<span class="w">    </span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">FILE_REQ_URL</span><span class="o">=</span><span class="s2">&quot;https://api.ngc.nvidia.com/v2/resources/</span><span class="nv">$NGC_ORG</span><span class="s2">/</span><span class="nv">$NGC_TEAM</span><span class="s2">/</span><span class="nv">$NGC_RESOURCE</span><span class="s2">/\</span>
+<span class="s2">versions/</span><span class="nv">$LATEST_VERSION_ID</span><span class="s2">/files/</span><span class="nv">$NGC_FILENAME</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>curl<span class="w"> </span>-LO<span class="w"> </span>--request<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">FILE_REQ_URL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>tar<span class="w"> </span>-xf<span class="w"> </span><span class="si">${</span><span class="nv">NGC_FILENAME</span><span class="si">}</span><span class="w"> </span>-C<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>rm<span class="w"> </span><span class="si">${</span><span class="nv">NGC_FILENAME</span><span class="si">}</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="build-isaac-ros-pynitros">
+<h3>Build <code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros</span></code><a class="headerlink" href="#build-isaac-ros-pynitros" title="Link to this heading">#</a></h3>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Binary Package</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Build from Source</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Install the prebuilt Debian package:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-isaac-ros-pynitros
+</pre></div>
+</div>
+</li>
+</ol>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Install Git LFS:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>git-lfs<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>lfs<span class="w"> </span>install
+</pre></div>
+</div>
+</li>
+<li><p>Clone this repository under <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/src</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>release-4.0<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_nitros.git<span class="w"> </span>isaac_ros_nitros
+</pre></div>
+</div>
+</li>
+<li><p>Activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> to install the package’s dependencies:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_nitros/isaac_ros_pynitros<span class="w"> </span>--ignore-src<span class="w"> </span>-y
+</pre></div>
+</div>
+</li>
+<li><p>Build the package from source:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-up-to<span class="w"> </span>isaac_ros_pynitros<span class="w"> </span>--base-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_nitros/isaac_ros_pynitros
+</pre></div>
+</div>
+</li>
+<li><p>Source the ROS workspace:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure to repeat this step in <strong>every</strong> terminal created inside the Isaac ROS environment.</p>
+<p>Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package’s contents.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</li>
+</ol>
+</div></div>
+</section>
+<section id="run-launch-file">
+<h3>Run Launch File<a class="headerlink" href="#run-launch-file" title="Link to this heading">#</a></h3>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">Rosbag</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><ol class="arabic simple">
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">ptrace_scope</span></code>:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/proc/sys/kernel/yama/ptrace_scope
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic">
+<li><p>Run the following launch files to spin up a demo of this package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/workspaces/isaac_ros-dev<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_pynitros<span class="w"> </span>isaac_ros_pynitros_quickstart.launch.py<span class="w"> </span>rosbag_path:<span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/isaac_ros_pynitros/quickstart.bag
+</pre></div>
+</div>
+</li>
+<li><p>Open a <strong>second</strong> terminal and activate the Isaac ROS environment:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Visualize the output topic <code class="docutils literal notranslate"><span class="pre">/pynitros2_output_msg_ros</span></code> in RViz:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/workspaces/isaac_ros-dev/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>rviz2
+</pre></div>
+</div>
+</li>
+</ol>
+</div></div>
+</section>
+</section>
+<section id="try-more-examples">
+<h2>Try More Examples<a class="headerlink" href="#try-more-examples" title="Link to this heading">#</a></h2>
+<p>To continue your exploration, explore the following examples:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../concepts/nitros/pynitros/tutorial_pynitros.html">Tutorial to use PyNITROS with NITROS</a></li>
+</ul>
+</div>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="PyNitrosPublisher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PyNitrosPublisher</span></span><span class="sig-paren">(</span>
+
+<dl>
+<dd><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">nitros_bridge_msg_type</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">nitros_bridge_topic_name</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">raw_ros_topic_name</span></span></em>,</dd>
+</dl>
+
+<span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosPublisher" title="Link to this definition">#</a></dt>
+<dd><p>Publisher to publish PyNITROS messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>rclpy.node.Node</em>) – The ROS node.</p></li>
+<li><p><strong>nitros_bridge_msg_type</strong> (<em>MsgType</em>) – The type of NITROS Bridge message the publisher will publish.</p></li>
+<li><p><strong>nitros_bridge_topic_name</strong> (<em>str</em>) – The name of NITROS Bridge topic the publisher will publish to.</p></li>
+<li><p><strong>raw_ros_topic_name</strong> (<em>str</em>) – The name of raw topic the publisher will publish to when applicable.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosPublisher.publish">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitros_bridge_msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosPublisher.publish" title="Link to this definition">#</a></dt>
+<dd><p>Publish a PyNITROS message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nitros_bridge_msg</strong> (<em>isaac_ros_nitros_bridge_interfaces.msg</em>) – The NITROS Bridge message to publish.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PyNitrosSubscriber">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PyNitrosSubscriber</span></span><span class="sig-paren">(</span>
+
+<dl>
+<dd><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">message_type</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">sub_topic_name</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">enable_ros_subscribe</span></span></em>,</dd>
+</dl>
+
+<span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosSubscriber" title="Link to this definition">#</a></dt>
+<dd><p>Subscriber subscribe to PyNITROS messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>rclpy.node.Node</em>) – The ROS node.</p></li>
+<li><p><strong>message_type</strong> (<em>MsgType</em>) – The type of NITROS Bridge message the subscriber will subscribe to.</p></li>
+<li><p><strong>sub_topic_name</strong> (<em>str</em>) – The name of the topic the subscriber will subscribe to.</p></li>
+<li><p><strong>enable_ros_subscribe</strong> (<em>bool</em>) – A flag to enable subscribing to raw message exclusively.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosSubscriber.create_subscription">
+<span class="sig-name descname"><span class="pre">create_subscription</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_callback</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosSubscriber.create_subscription" title="Link to this definition">#</a></dt>
+<dd><p>Create a subscription with a user-defined callback function. The callback function will be
+triggered with a PyNITROS view of the arrived message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_callback</strong> – A user-defined callback for the subscriber.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PyNITROSMessageFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PyNITROSMessageFilter</span></span><span class="sig-paren">(</span>
+
+<dl>
+<dd><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">subscribers</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">synchronizer_type</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">queue_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">slop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>,</dd>
+</dl>
+
+<span class="sig-paren">)</span><a class="headerlink" href="#PyNITROSMessageFilter" title="Link to this definition">#</a></dt>
+<dd><p>Message filters to synchronize multiple NITROS Bridge or ROS2 raw messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>rclpy.node.Node</em>) – The ROS node.</p></li>
+<li><p><strong>subscribers</strong> (<em>list</em>) – A list of PyNITROS or <code class="docutils literal notranslate"><span class="pre">rclpy</span></code> subscribers.</p></li>
+<li><p><strong>synchronizer_type</strong> (<em>SynchronizerType</em>) – The type of synchronizer to use. Select from <code class="docutils literal notranslate"><span class="pre">TimeSynchronizer</span></code> or <code class="docutils literal notranslate"><span class="pre">ApproximateTimeSynchronizer</span></code></p></li>
+<li><p><strong>callback</strong> (<em>Callable</em>) – A user-defined callback for the message filter.</p></li>
+<li><p><strong>queue_size</strong> (<em>int</em>) – The size of the queue for the message filter.</p></li>
+<li><p><strong>slop</strong> (<em>float</em>) – The delay (in seconds) with which messages can be synchronized.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PyNitrosImageBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PyNitrosImageBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageBuilder" title="Link to this definition">#</a></dt>
+<dd><p>A class to build PyNITROS images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_buffer</strong> (<em>int</em>) – The number of CUDA IPC buffers to allocate.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em>) – The timeout for reclaiming the buffer back to the pool.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageBuilder.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span>
+
+<dl>
+<dd><em class="sig-param"><span class="n"><span class="pre">image_data</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">image_height</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">image_width</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">image_step</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">image_encoding</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">image_header</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">enable_ros_publish</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,</dd>
+</dl>
+
+<span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageBuilder.build" title="Link to this definition">#</a></dt>
+<dd><p>Build a PyNITROS image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_data</strong> (<em>int</em>) – Device data pointer of the image.</p></li>
+<li><p><strong>image_height</strong> (<em>int</em>) – Height of the image.</p></li>
+<li><p><strong>image_width</strong> (<em>int</em>) – Width of the image.</p></li>
+<li><p><strong>image_step</strong> (<em>int</em>) – Step of the image.</p></li>
+<li><p><strong>image_encoding</strong> (<em>str</em>) – Encoding of the image.</p></li>
+<li><p><strong>image_header</strong> (<em>str</em>) – Header of the image.</p></li>
+<li><p><strong>device_id</strong> (<em>int</em>) – Device ID on which the image data is stored.</p></li>
+<li><p><strong>enable_ros_publish</strong> (<em>bool</em>) – A flag to enable publishing ROS message in the meantime.</p></li>
+<li><p><strong>event</strong> (<em>cuda.bindings.runtime.cudaEvent_t</em>) – CUDA event to synchronize on.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of the built NITROS Bridge image, and the raw ROS image if <code class="docutils literal notranslate"><span class="pre">enable_ros_publish</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PyNitrosTensorListBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PyNitrosTensorListBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListBuilder" title="Link to this definition">#</a></dt>
+<dd><p>A class to build PyNITROS tensor list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_buffer</strong> (<em>int</em>) – The number of CUDA IPC buffers to allocate.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em>) – The minimum time allows reclaiming the buffer back to the pool.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListBuilder.build_tensor">
+<span class="sig-name descname"><span class="pre">build_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_data_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListBuilder.build_tensor" title="Link to this definition">#</a></dt>
+<dd><p>Build a PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tensor_data</strong> (<em>int</em>) – Device data pointer of the tensor.</p></li>
+<li><p><strong>tensor_name</strong> – Name of the tensor.</p></li>
+<li><p><strong>tensor_shape</strong> (<em>list</em>) – Shape of the tensor.</p></li>
+<li><p><strong>tensor_data_type</strong> (<em>int</em>) – Data type of the tensor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The built NITROS Bridge tensor.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NitrosBridgeTensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListBuilder.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span>
+
+<dl>
+<dd><em class="sig-param"><span class="n"><span class="pre">built_tensors</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">tensors_header</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">enable_ros_publish</span></span></em>,</dd>
+<dd><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,</dd>
+</dl>
+
+<span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListBuilder.build" title="Link to this definition">#</a></dt>
+<dd><p>Build a PyNITROS tensor list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>built_tensors</strong> (<em>int</em>) – Built tensors returned by <code class="docutils literal notranslate"><span class="pre">build_tensor</span></code> function.</p></li>
+<li><p><strong>tensor_header</strong> (<em>str</em>) – Header of the tensor list.</p></li>
+<li><p><strong>device_id</strong> (<em>int</em>) – Device ID on which the tensor list is stored.</p></li>
+<li><p><strong>enable_ros_publish</strong> (<em>bool</em>) – A flag to enable publishing ROS message in the meantime.</p></li>
+<li><p><strong>event</strong> (<em>cuda.bindings.runtime.cudaEvent_t</em>) – CUDA event to synchronize on.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of the built NITROS Bridge tensor list, and the raw ROS tensor list if <code class="docutils literal notranslate"><span class="pre">enable_ros_publish</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PyNitrosImageView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PyNitrosImageView</span></span><a class="headerlink" href="#PyNitrosImageView" title="Link to this definition">#</a></dt>
+<dd><p>A class to view PyNITROS image.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_size_in_bytes">
+<span class="sig-name descname"><span class="pre">get_size_in_bytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_size_in_bytes" title="Link to this definition">#</a></dt>
+<dd><p>Get the size of the PyNITROS image in bytes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The size of the PyNITROS image in bytes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_width">
+<span class="sig-name descname"><span class="pre">get_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_width" title="Link to this definition">#</a></dt>
+<dd><p>Get the width of the PyNITROS image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The width of the PyNITROS image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_height">
+<span class="sig-name descname"><span class="pre">get_height</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_height" title="Link to this definition">#</a></dt>
+<dd><p>Get the height of the PyNITROS image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The height of the PyNITROS image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_stride">
+<span class="sig-name descname"><span class="pre">get_stride</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_stride" title="Link to this definition">#</a></dt>
+<dd><p>Get the stride of the PyNITROS image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The stride of the PyNITROS image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_buffer">
+<span class="sig-name descname"><span class="pre">get_buffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_buffer" title="Link to this definition">#</a></dt>
+<dd><p>Get the device data pointer of the PyNITROS image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The device data pointer of the PyNITROS image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_encoding">
+<span class="sig-name descname"><span class="pre">get_encoding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_encoding" title="Link to this definition">#</a></dt>
+<dd><p>Get the encoding of the PyNITROS image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The encoding of the PyNITROS image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_frame_id">
+<span class="sig-name descname"><span class="pre">get_frame_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_frame_id" title="Link to this definition">#</a></dt>
+<dd><p>Get the frame ID of the PyNITROS image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Frame ID of the PyNITROS image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_timestamp_seconds">
+<span class="sig-name descname"><span class="pre">get_timestamp_seconds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_timestamp_seconds" title="Link to this definition">#</a></dt>
+<dd><p>Get the seconds from the PyNITROS image header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Seconds from the PyNITROS image header.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.get_timestamp_nanoseconds">
+<span class="sig-name descname"><span class="pre">get_timestamp_nanoseconds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.get_timestamp_nanoseconds" title="Link to this definition">#</a></dt>
+<dd><p>Get the nanoseconds from the PyNITROS image header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nanoseconds from the PyNITROS image header.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosImageView.set_stream">
+<span class="sig-name descname"><span class="pre">set_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosImageView.set_stream" title="Link to this definition">#</a></dt>
+<dd><p>If the subscriber callback contains asynchronous CUDA operations, set the stream for the PyNITROS image view.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stream</strong> (<em>cuda.bindings.runtime.cudaStream_t</em>) – CUDA stream.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PyNitrosTensorListView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PyNitrosTensorListView</span></span><a class="headerlink" href="#PyNitrosTensorListView" title="Link to this definition">#</a></dt>
+<dd><p>A class to view PyNITROS tensor list.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.get_size_in_bytes">
+<span class="sig-name descname"><span class="pre">get_size_in_bytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.get_size_in_bytes" title="Link to this definition">#</a></dt>
+<dd><p>Get the total size of the PyNITROS tensor list in bytes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Total size of the PyNITROS tensor in bytes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.get_buffer">
+<span class="sig-name descname"><span class="pre">get_buffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.get_buffer" title="Link to this definition">#</a></dt>
+<dd><p>Get the device pointer of the first PyNITROS tensor data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The device pointer of the first PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.get_tensor_count">
+<span class="sig-name descname"><span class="pre">get_tensor_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.get_tensor_count" title="Link to this definition">#</a></dt>
+<dd><p>Get the number of tensors in the PyNITROS tensor list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of tensors in the PyNITROS tensor list.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.get_named_tensor">
+<span class="sig-name descname"><span class="pre">get_named_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.get_named_tensor" title="Link to this definition">#</a></dt>
+<dd><p>Get the tensor with the specified name from the PyNITROS tensor list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The tensor with the specified name.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#PyNitrosTensorView" title="PyNitrosTensorView">PyNitrosTensorView</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.get_all_tensors">
+<span class="sig-name descname"><span class="pre">get_all_tensors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.get_all_tensors" title="Link to this definition">#</a></dt>
+<dd><p>Get all the tensors in the PyNITROS tensor list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>All the tensors in the PyNITROS tensor list.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.get_frame_id">
+<span class="sig-name descname"><span class="pre">get_frame_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.get_frame_id" title="Link to this definition">#</a></dt>
+<dd><p>Get the frame ID of the PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Frame ID of the PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.get_timestamp_seconds">
+<span class="sig-name descname"><span class="pre">get_timestamp_seconds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.get_timestamp_seconds" title="Link to this definition">#</a></dt>
+<dd><p>Get the seconds from the PyNITROS image header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Seconds from the PyNITROS image header.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.get_timestamp_nanoseconds">
+<span class="sig-name descname"><span class="pre">get_timestamp_nanoseconds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.get_timestamp_nanoseconds" title="Link to this definition">#</a></dt>
+<dd><p>Get the nanoseconds from the PyNITROS image header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nanoseconds from the PyNITROS image header.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorListView.set_stream">
+<span class="sig-name descname"><span class="pre">set_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorListView.set_stream" title="Link to this definition">#</a></dt>
+<dd><p>If the subscriber callback contains asynchronous CUDA operations, set the stream for the PyNITROS image view.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stream</strong> (<em>cuda.bindings.runtime.cudaStream_t</em>) – CUDA stream.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PyNitrosTensorView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PyNitrosTensorView</span></span><a class="headerlink" href="#PyNitrosTensorView" title="Link to this definition">#</a></dt>
+<dd><p>A class to view PyNITROS tensors.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorView.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorView.get_name" title="Link to this definition">#</a></dt>
+<dd><p>Get the name of the PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of the PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorView.get_buffer">
+<span class="sig-name descname"><span class="pre">get_buffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorView.get_buffer" title="Link to this definition">#</a></dt>
+<dd><p>Get the device pointer of the PyNITROS tensor data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The device pointer of the PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorView.get_rank">
+<span class="sig-name descname"><span class="pre">get_rank</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorView.get_rank" title="Link to this definition">#</a></dt>
+<dd><p>Get the rank of the PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The rank of the PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorView.get_element_count">
+<span class="sig-name descname"><span class="pre">get_element_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorView.get_element_count" title="Link to this definition">#</a></dt>
+<dd><p>Get the element count of the PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The element count of the PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorView.get_tensor_size">
+<span class="sig-name descname"><span class="pre">get_tensor_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorView.get_tensor_size" title="Link to this definition">#</a></dt>
+<dd><p>Get the size in bytes of the PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The size of the PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorView.get_shape">
+<span class="sig-name descname"><span class="pre">get_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorView.get_shape" title="Link to this definition">#</a></dt>
+<dd><p>Get the shape of the PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The shape of the PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorView.get_element_type">
+<span class="sig-name descname"><span class="pre">get_element_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorView.get_element_type" title="Link to this definition">#</a></dt>
+<dd><p>Get the data type of the PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The data type of the PyNITROS tensor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PyNitrosTensorView.get_bytes_per_element">
+<span class="sig-name descname"><span class="pre">get_bytes_per_element</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PyNitrosTensorView.get_bytes_per_element" title="Link to this definition">#</a></dt>
+<dd><p>Get the element size in bytes of the PyNITROS tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The element size of the PyNITROS tensor in bytes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../isaac_ros_nitros_type/index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_type</span></code></p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../../concepts/nitros/pynitros/tutorial_pynitros.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorial to use PyNITROS with NITROS</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-pynitros-accelerated-nodes">Creating PyNITROS-Accelerated Nodes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quickstart">Quickstart</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-development-environment">Set Up Development Environment</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#download-quickstart-assets">Download Quickstart Assets</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-isaac-ros-pynitros">Build <code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-launch-file">Run Launch File</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#try-more-examples">Try More Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-reference">API Reference</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosPublisher"><code class="docutils literal notranslate"><span class="pre">PyNitrosPublisher</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosPublisher.publish"><code class="docutils literal notranslate"><span class="pre">publish()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosSubscriber"><code class="docutils literal notranslate"><span class="pre">PyNitrosSubscriber</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosSubscriber.create_subscription"><code class="docutils literal notranslate"><span class="pre">create_subscription()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNITROSMessageFilter"><code class="docutils literal notranslate"><span class="pre">PyNITROSMessageFilter</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageBuilder"><code class="docutils literal notranslate"><span class="pre">PyNitrosImageBuilder</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageBuilder.build"><code class="docutils literal notranslate"><span class="pre">build()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListBuilder"><code class="docutils literal notranslate"><span class="pre">PyNitrosTensorListBuilder</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListBuilder.build_tensor"><code class="docutils literal notranslate"><span class="pre">build_tensor()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListBuilder.build"><code class="docutils literal notranslate"><span class="pre">build()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView"><code class="docutils literal notranslate"><span class="pre">PyNitrosImageView</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_size_in_bytes"><code class="docutils literal notranslate"><span class="pre">get_size_in_bytes()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_width"><code class="docutils literal notranslate"><span class="pre">get_width()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_height"><code class="docutils literal notranslate"><span class="pre">get_height()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_stride"><code class="docutils literal notranslate"><span class="pre">get_stride()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_buffer"><code class="docutils literal notranslate"><span class="pre">get_buffer()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_encoding"><code class="docutils literal notranslate"><span class="pre">get_encoding()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_frame_id"><code class="docutils literal notranslate"><span class="pre">get_frame_id()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_timestamp_seconds"><code class="docutils literal notranslate"><span class="pre">get_timestamp_seconds()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.get_timestamp_nanoseconds"><code class="docutils literal notranslate"><span class="pre">get_timestamp_nanoseconds()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosImageView.set_stream"><code class="docutils literal notranslate"><span class="pre">set_stream()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView"><code class="docutils literal notranslate"><span class="pre">PyNitrosTensorListView</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.get_size_in_bytes"><code class="docutils literal notranslate"><span class="pre">get_size_in_bytes()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.get_buffer"><code class="docutils literal notranslate"><span class="pre">get_buffer()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.get_tensor_count"><code class="docutils literal notranslate"><span class="pre">get_tensor_count()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.get_named_tensor"><code class="docutils literal notranslate"><span class="pre">get_named_tensor()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.get_all_tensors"><code class="docutils literal notranslate"><span class="pre">get_all_tensors()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.get_frame_id"><code class="docutils literal notranslate"><span class="pre">get_frame_id()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.get_timestamp_seconds"><code class="docutils literal notranslate"><span class="pre">get_timestamp_seconds()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.get_timestamp_nanoseconds"><code class="docutils literal notranslate"><span class="pre">get_timestamp_nanoseconds()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorListView.set_stream"><code class="docutils literal notranslate"><span class="pre">set_stream()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView"><code class="docutils literal notranslate"><span class="pre">PyNitrosTensorView</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView.get_name"><code class="docutils literal notranslate"><span class="pre">get_name()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView.get_buffer"><code class="docutils literal notranslate"><span class="pre">get_buffer()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView.get_rank"><code class="docutils literal notranslate"><span class="pre">get_rank()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView.get_element_count"><code class="docutils literal notranslate"><span class="pre">get_element_count()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView.get_tensor_size"><code class="docutils literal notranslate"><span class="pre">get_tensor_size()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView.get_shape"><code class="docutils literal notranslate"><span class="pre">get_shape()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView.get_element_type"><code class="docutils literal notranslate"><span class="pre">get_element_type()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#PyNitrosTensorView.get_bytes_per_element"><code class="docutils literal notranslate"><span class="pre">get_bytes_per_element()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../../../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../../../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Manage My Privacy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/preferences/start/">Do Not Sell or Share My Data</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2023-2025 NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on Nov 13, 2025.
+  <br/>
+</p></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
+  </body>
+</html>

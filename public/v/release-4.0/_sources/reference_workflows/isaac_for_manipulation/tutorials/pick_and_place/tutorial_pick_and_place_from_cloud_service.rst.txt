@@ -1,0 +1,267 @@
+=================================================================
+Tutorial for Multi-Object Pick and Place from Isaac Cloud Service
+=================================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/pick_and_place_sped_up.gif>`
+   :width: 100%
+   :alt: Multi object pick and place example.
+
+Overview
+--------
+This tutorial walks through the process of triggering pick and place workflow from Isaac cloud service using Mission Dispatch APIs. In this tutorial, you will setup Mission Dispatch on one x86_64 machine, launch mission client along with other ROS 2 nodes on the robot and trigger pick and place workflow by cloud APIs.
+
+Prerequisites
+--------------
+
+- Complete the :doc:`pick and place tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place>` for pick and place using ROS 2 action servers first.
+- If you are using Isaac Sim, complete the following sections in :doc:`pick and place tutorial for Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pick_and_place>`:
+
+  1. Set Up Development Environment
+  2. Build Isaac ROS cuMotion
+  3. Launch Isaac Sim
+
+- Follow the setup instructions in :doc:`Setup Hardware and Software for Real Robot </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper>`.
+
+Tutorial Walkthrough
+--------------------
+
+Setup Mission Dispatch
+~~~~~~~~~~~~~~~~~~~~~~
+The following steps should be done on an x86_64 machine.
+
+1. Start MQTT broker on the x86_64 machine.
+
+    The MQTT broker is used for communication between the Mission Dispatch and the robots. There are many ways to run an MQTT broker, including as a system daemon, a standalone application, or a Docker container. The following example uses `mosquitto` as the MQTT broker.
+
+    1. Create a file ``~/mosquitto.sh`` with the following contents outside the container:
+
+      .. code-block:: bash
+
+        CONFIG_FILE=/mosquitto.conf
+        if [ $# != 2 ] ; then
+            echo "usage: $0 <tcp_port> <websocket_port>"
+            exit 1
+        fi
+        PORT=$1
+        PORT_WEBSOCKET=$2
+        echo "allow_anonymous true" >> $CONFIG_FILE
+        echo "listener $PORT 0.0.0.0" >> $CONFIG_FILE
+        echo "listener $PORT_WEBSOCKET" >> $CONFIG_FILE
+        echo "protocol websockets" >> $CONFIG_FILE
+        mosquitto -c $CONFIG_FILE
+
+    2. Run the command outside the container:
+
+      .. code-block:: bash
+
+        docker run -it --network host -v ~/mosquitto.sh:/mosquitto.sh -d eclipse-mosquitto:latest sh mosquitto.sh 1883 9001
+
+2. Start `Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`__ with Docker.
+
+    1. Set the following environment variable:
+    
+    .. code-block:: bash
+
+        export POSTGRES_PASSWORD=<Any password>
+
+    2. Start the Postgres database by running the following:
+
+    .. code-block:: bash
+
+        docker run --rm --name postgres \
+            --network host \
+            -p 5432:5432 \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD \
+            -e POSTGRES_DB=mission \
+            -d postgres:14.5
+
+
+    3. Start the API and database server with the official Docker container.
+
+    .. code-block:: bash
+
+        docker run -it --network host nvcr.io/nvidia/isaac/mission-database:4.0.0
+
+    4. Start the mission dispatch server with the official docker container.
+
+    .. code-block:: bash
+
+        docker run -it --network host nvcr.io/nvidia/isaac/mission-dispatch:4.0.0
+
+    Read `this tutorial <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`_ for more deployment options for Mission Dispatch.
+
+3. Open ``http://localhost:5000/docs`` in a web browser.
+
+Launch ROS 2 Nodes
+~~~~~~~~~~~~~~~~~~
+Complete the following steps on the robot.
+
+1. Complete :ref:`Set Up Development Environment <mission_client_set_up_env>`
+   and :ref:`Build isaac_ros_mission_client <mission_client_build>` to build the packages.
+
+2. Run the following launch files within the container to spin up ``mission_client``:
+
+    .. code-block:: bash
+
+        ros2 launch isaac_ros_vda5050_client_bringup isaac_ros_vda5050_client.launch.py \
+            robot_type:=MANIPULATOR \
+            launch_ws_bridge:=True \
+            serial_number:=arm01 \
+            mqtt_host_name:=<mission_dispatch_ip>
+
+3. Complete the required sections in the :doc:`pick and place tutorial </reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place>` or the :doc:`pick and place tutorial for Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pick_and_place>` first as described in :ref:`Overview <reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place_from_cloud_service:overview>`.
+
+4. Run the following command to verify that Isaac for Manipulation is working correctly:
+
+   .. code:: bash
+
+      export ENABLE_MANIPULATOR_TESTING=on_robot  # use isaac_sim if running on Isaac Sim
+      export ISAAC_MANIPULATOR_TEST_CONFIG=<config_file_path_for_your_robot>
+      python -m pytest ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/test
+
+   .. note::
+
+      One can also use ``colcon test --packages-select isaac_manipulator_bringup`` to run the tests.
+      However, ``pytest`` has a better output and makes it easier to view status and progress of the tests.
+      If these tests fail, please look at :doc:`Isaac for Manipulation Testing Guide </reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator>` for more information.
+      It is recommended to run the tests manually using ``launch_test`` and then manually inspecting the results.
+
+5. Launch pick and place servers:
+
+    .. tabs::
+
+        .. tab:: On RealSense Robot
+
+           #. Open a new terminal inside the container and run:
+
+            .. code:: bash
+
+                cd ${ISAAC_ROS_WS} && \
+                   source install/setup.bash
+
+            .. tabs::
+
+                .. tab:: Realsense
+
+                    #. Change the ``camera_type`` to ``REALSENSE`` in the configuration file before launching this workflow.
+
+            .. code:: bash
+
+                ros2 launch isaac_manipulator_bringup workflows.launch.py \
+                    manipulator_workflow_config:=$(ros2 pkg prefix --share isaac_manipulator_bringup)/params/ur5e_robotiq_85_mac_and_cheese.yaml
+
+            .. note::
+
+                This tutorial was validated using ``ur_type: ur5e``, ``ur_type: ur10e`` with gripper types
+                ``robotiq_2f_140`` and ``robotiq_2f_85``. These values may be changed in the workflow configuration file to select between supported robots and grippers.
+
+        .. tab:: In Isaac Sim
+
+            #. Open Isaac Sim and load the scene below and hit **Play**.
+
+            .. code:: bash
+
+                https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Samples/ROS2/Scenario/isaac_manipulator_scene.usd
+
+            #. Set this flag to enable CycloneDDS.
+
+            .. code:: bash
+
+                export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+            Inside the container, change ``workflow_type`` in the configuration file to ``PICK_AND_PLACE``, and run:
+
+            .. code:: bash
+
+                ros2 launch isaac_manipulator_bringup workflows.launch.py \
+                    manipulator_workflow_config:=$(ros2 pkg prefix --share isaac_manipulator_bringup)/params/sim_launch_params.yaml
+
+            The ``manipulator_workflow_config`` parameter points to the manipulator configuration file. Please refer to :ref:`Create Manipulator Configuration File section <create-manipulator-configuration-file>`.
+
+            For increased reliability, we recommend using the ``CUSTOM_MESH`` or ``CUBOID`` approach:
+
+               * For ``CUSTOM_MESH``, this can be done by setting ``object_attachment_type: CUSTOM_MESH``
+                 and ``attach_object_mesh_file_path: <PATH-TO-MESH>`` in the configuration files above.
+
+               * For ``CUBOID``, this can be done by setting ``object_attachment_type: CUBOID``
+                 and setting ``object_attachment_scale: <CHOSEN_SCALE>`` in the configuration files above.
+                 The ``CHOSEN_SCALE`` consists of 3 floating point values, representing the
+                 dimensions of the cuboid.
+
+            .. warning::
+
+                If you see the log ``No depth images from X seconds``, consider changing the
+                ``filter_depth_buffer_time`` to a higher value (the unit is seconds). This will
+                allow object attachment to buffer more depth images from the past. The caveat
+                is that the software will operate on an older set of data that might lead to
+                creating object spheres that might not model the object position accurately.
+
+                The
+                other parameter of interest is the ``time_sync_slop`` parameter. It defines the
+                synchronization threshold for finding a matched pair of depth images, joint states
+                and transforms. For slower systems, slightly tweaking the value up will allow for
+                collision sphere and obstacle avoidance to work. Using a very large
+                value will synchronize older pieces of data together leading to unpredictable
+                downstream effects in planning, collision voxel cloud generation and obstacle
+                avoidance.
+
+                This only applies when ``SPHERE`` is used as the object
+                attachment type. The other modes do not use depth as input to create the object
+                spheres.
+
+            #. If the gripper is in a bad state, that is, it is moving in on it self and causing the robot movement to self collide, you need to open the gripper as Isaac Sim caches the last known joint state in it's action graphs and pushes that in when you hit **Play**. If you need to close the gripper, just make position ``0.623``.
+
+                You must have the launch file running to run this command.
+
+                .. code:: bash
+
+                    ros2 action send_goal /robotiq_gripper_controller/gripper_cmd \
+                        control_msgs/action/GripperCommand "{command: {position: 0.0, max_effort: 0.0}}"
+
+Trigger Pick and Place Workflow
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Open ``http://localhost:5000/docs`` in a web browser.
+
+2. Use the ``POST /robot`` endpoint to create robot with name ``arm01``.
+
+    .. code:: json
+
+        {
+            "labels": [],
+            "heartbeat_timeout": 30,
+            "name": "arm01"
+        }
+
+    When using the interactive documentation page, the default value for the the robot object
+    ``name`` in the ``spec`` is 'string', you must change it from 'string' to another name that has
+    more meaning, like 'arm01'. Delete the ``prefix`` entry.
+
+3. Trigger pick and place using ``POST /mission`` endpoint. 
+
+    .. code:: json
+
+        {
+            "robot": "arm01",
+            "mission_tree": [
+                {
+                    "name": "pick_place",
+                    "parent": "root",
+                    "action": {
+                        "action_type": "multi_object_pick_and_place",
+                        "action_parameters": {
+                            "mode": "SINGLE_BIN",
+                            "class_ids": "",
+                            "target_poses": "{\"frame_id\": \"base_link\", \"poses\": [{\"position\": {\"x\": -0.25, \"y\": 0.45, \"z\": 0.50}, \"orientation\": {\"x\": -0.678, \"y\": 0.735, \"z\": 0.021, \"w\": 0.018}}]}"
+                        }
+                    }
+                }
+            ],
+            "timeout": 300,
+            "needs_canceled": false
+        }
+
+.. note::
+
+    ``mode`` can be ``SINGLE_BIN`` or ``MULTI_BIN``. ``class_ids`` is a string of comma separated class IDs. ``target_poses`` is a string serialized JSON of ``geometry_msgs/PoseArray``.
