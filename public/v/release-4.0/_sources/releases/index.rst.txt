@@ -16,6 +16,7 @@ Updates including:
 - support for JetPack 7.0 / Ubuntu 24.04 on CUDA 13.0
 - tested with Isaac Sim 5.1
 - Isaac for Manipulation reference workflows formerly known as Isaac Manipulator
+- improved NITROS performance through non-blocking CUDA streams
 - ``isaac_manipulator``: New gear assembly with contact rich insertion policy workflow
 - ``isaac_manipulator``: New multi-object pick-and-place workflow based on behavior trees orchestration
 - ``isaac_ros_image_pipeline``: Improved SGM disparity using confidence thresholding in VPI
@@ -23,6 +24,7 @@ Updates including:
 - ``isaac_ros_dnn_stereo_depth``: Add FoundationStereo support
 - ``isaac_ros_object_detection``: Add GroundingDINO support
 - ``isaac_ros_image_segmentation``: Add Segment Anything 2 support
+- ``isaac_ros_mapping_and_localization``: Consolidated repository with ``isaac_ros_map_localization``, improved localization robustness with learning-based descriptors, improved map creation with FoundationStereo 
 
 Limitations
 ~~~~~~~~~~~
@@ -38,10 +40,10 @@ This release has the following known limitations, with workarounds available in 
 - NITROS Bridge topics from Isaac Sim 5.1 may not be received through DDS, impacts object following manipulation Sim tutorial `(nvbugs/5559459)`
 - loading Nvblox sample scene in Isaac Sim 5.1 can fail unless loaded through content window > Samples > NvBlox > `nvblox_sample_scene.usd` `(nvbugs/5604335)`
 - FoundationStereo model conversion can take more than 30 minutes or more `(nvbugs/5588008)`
-- running `isaac_ros_h264_decoder`` concurrently with `isaac_ros_h264_encoder`` can cause the decoder to intermittently produce no output `(nvbugs/5554121)`
+- running ``isaac_ros_h264_decoder`` concurrently with ``isaac_ros_h264_encoder`` can cause the decoder to intermittently produce no output `(nvbugs/5554121)`
 - DOPE can fail to detect objects in manipulation workflows `(nvbugs/5605372)`
 - DetectNet decoder can produce multiple, overlapping image bounding box detections due to issue in DBScan implementation `(nvbugs/5569952)`
-- nvblox RealSense people segmentation example may not show correct color overlay in RViz for people detection `(nvbugs/5604032)` 
+- nvblox RealSense people segmentation example may not show correct color overlay in RViz for people detection `(nvbugs/5604032)`
 
 Contributions
 ~~~~~~~~~~~~~
