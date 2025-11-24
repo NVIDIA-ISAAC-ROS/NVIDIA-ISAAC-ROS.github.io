@@ -62,7 +62,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Nov 13, 2025"/>
+    <meta name="docbuild:last-update" content="Nov 24, 2025"/>
 
 
 <script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
@@ -738,6 +738,7 @@
 <li><p>support for JetPack 7.0 / Ubuntu 24.04 on CUDA 13.0</p></li>
 <li><p>tested with Isaac Sim 5.1</p></li>
 <li><p>Isaac for Manipulation reference workflows formerly known as Isaac Manipulator</p></li>
+<li><p>improved NITROS performance through non-blocking CUDA streams</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">isaac_manipulator</span></code>: New gear assembly with contact rich insertion policy workflow</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">isaac_manipulator</span></code>: New multi-object pick-and-place workflow based on behavior trees orchestration</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_pipeline</span></code>: Improved SGM disparity using confidence thresholding in VPI</p></li>
@@ -745,6 +746,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">isaac_ros_dnn_stereo_depth</span></code>: Add FoundationStereo support</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">isaac_ros_object_detection</span></code>: Add GroundingDINO support</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_segmentation</span></code>: Add Segment Anything 2 support</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">isaac_ros_mapping_and_localization</span></code>: Consolidated repository with <code class="docutils literal notranslate"><span class="pre">isaac_ros_map_localization</span></code>, improved localization robustness with learning-based descriptors, improved map creation with FoundationStereo</p></li>
 </ul>
 </section>
 <section id="limitations">
@@ -760,7 +762,7 @@
 <li><p>NITROS Bridge topics from Isaac Sim 5.1 may not be received through DDS, impacts object following manipulation Sim tutorial <cite>(nvbugs/5559459)</cite></p></li>
 <li><p>loading Nvblox sample scene in Isaac Sim 5.1 can fail unless loaded through content window &gt; Samples &gt; NvBlox &gt; <cite>nvblox_sample_scene.usd</cite> <cite>(nvbugs/5604335)</cite></p></li>
 <li><p>FoundationStereo model conversion can take more than 30 minutes or more <cite>(nvbugs/5588008)</cite></p></li>
-<li><p>running <cite>isaac_ros_h264_decoder`</cite> concurrently with <cite>isaac_ros_h264_encoder`</cite> can cause the decoder to intermittently produce no output <cite>(nvbugs/5554121)</cite></p></li>
+<li><p>running <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_decoder</span></code> concurrently with <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> can cause the decoder to intermittently produce no output <cite>(nvbugs/5554121)</cite></p></li>
 <li><p>DOPE can fail to detect objects in manipulation workflows <cite>(nvbugs/5605372)</cite></p></li>
 <li><p>DetectNet decoder can produce multiple, overlapping image bounding box detections due to issue in DBScan implementation <cite>(nvbugs/5569952)</cite></p></li>
 <li><p>nvblox RealSense people segmentation example may not show correct color overlay in RViz for people detection <cite>(nvbugs/5604032)</cite></p></li>
@@ -1680,7 +1682,7 @@ autonomous robots with new features including:</p>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Nov 13, 2025.
+  Last updated on Nov 24, 2025.
   <br/>
 </p></div>
       

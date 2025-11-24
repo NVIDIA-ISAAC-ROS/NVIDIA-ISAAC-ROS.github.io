@@ -175,14 +175,31 @@
 <p>Nova Orin Init is a Debian package that includes drivers, device trees, system services, configurations, and tools provided for users to start working on robotics software on Jetson Orin.</p>
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Link to this heading"></a></h2>
-<p><strong>NVIDIA Internal:</strong> Run these commands to add the apt repository:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>curl<span class="w"> </span>-y
-<span class="nv">k</span><span class="o">=</span><span class="s2">&quot;/usr/share/keyrings/nvidia-nova-internal.gpg&quot;</span><span class="p">;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://urm.nvidia.com/artifactory/api/security/keypair/default-gpg-key/public<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span><span class="nv">$k</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
-<span class="nv">f</span><span class="o">=</span><span class="s2">&quot;/etc/apt/sources.list.d/nvidia-nova-internal.list&quot;</span>
-<span class="nv">s</span><span class="o">=</span><span class="s2">&quot;deb [signed-by=</span><span class="nv">$k</span><span class="s2">] https://urm.nvidia.com/artifactory/sw-rpt-debian-local noble main&quot;</span>
+<p>Run one of the following commands to add the apt repository. Two options are listed, one for <code class="docutils literal notranslate"><span class="pre">.com</span></code> (US CDN) and one for <code class="docutils literal notranslate"><span class="pre">.cn</span></code> (China CDN) - choose whichever you prefer.</p>
+<ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">.com</span></code> (US CDN)</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>curl<span class="w"> </span>-y
+<span class="nv">k</span><span class="o">=</span><span class="s2">&quot;/usr/share/keyrings/nvidia-nova.gpg&quot;</span><span class="p">;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://isaac.download.nvidia.com/nova-init/repos.key<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span><span class="nv">$k</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="nv">f</span><span class="o">=</span><span class="s2">&quot;/etc/apt/sources.list.d/nvidia-nova.list&quot;</span>
+<span class="nv">s</span><span class="o">=</span><span class="s2">&quot;deb [signed-by=</span><span class="nv">$k</span><span class="s2">] https://isaac.download.nvidia.com/nova-init noble main&quot;</span>
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span><span class="nv">$f</span>
 </pre></div>
 </div>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.cn</span></code> (China CDN)</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>curl<span class="w"> </span>-y
+<span class="nv">k</span><span class="o">=</span><span class="s2">&quot;/usr/share/keyrings/nvidia-nova.gpg&quot;</span><span class="p">;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://isaac.download.nvidia.cn/nova-init/repos.key<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span><span class="nv">$k</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="nv">f</span><span class="o">=</span><span class="s2">&quot;/etc/apt/sources.list.d/nvidia-nova.list&quot;</span>
+<span class="nv">s</span><span class="o">=</span><span class="s2">&quot;deb [signed-by=</span><span class="nv">$k</span><span class="s2">] https://isaac.download.nvidia.cn/nova-init noble main&quot;</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span><span class="nv">$f</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
 <p>Install Nova.</p>
 <ol class="arabic">
 <li><p>Update APT and install the Debian:</p>
@@ -293,7 +310,7 @@ sudo<span class="w"> </span>rm<span class="w"> </span>/etc/nova/manager_selectio
 
   <div role="contentinfo">
     <p>&#169; Copyright 2025, NVIDIA.
-      <span class="lastupdated">Last updated on Nov 13, 2025.
+      <span class="lastupdated">Last updated on Nov 24, 2025.
       </span></p>
   </div>
 
