@@ -69,10 +69,22 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Nova Carter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#robot-operator-safety">Robot Operator Safety</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unboxing-nova-carter">Unboxing Nova Carter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#connecting-the-robot-to-your-wifi-network">Connecting the Robot to your WiFi Network</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#connecting-the-pc-to-the-robot">Connecting the PC to the Robot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nova-orin-initialization"><cite>Nova Orin</cite> Initialization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pairing-the-joystick-controller">Pairing the Joystick Controller</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#docker-configuration">Docker Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#checking-the-battery-status">Checking the Battery Status</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tutorials">Tutorials</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="nova_devkit.html">Nova Orin Developer Kit</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nova_devkit.html#setting-up-network-connections-on-nova-orin-developer-kit">Setting up Network Connections on <cite>Nova Orin Developer Kit</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nova_devkit.html#connecting-a-pc-to-the-nova-orin-developer-kit">Connecting a PC to the <cite>Nova Orin Developer Kit</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nova_devkit.html#nova-orin-initialization"><cite>Nova Orin</cite> Initialization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="nova_devkit.html#docker-configuration">Docker Configuration</a></li>
 <li class="toctree-l4"><a class="reference internal" href="nova_devkit.html#tutorials">Tutorials</a></li>
 </ul>
 </li>
@@ -176,14 +188,321 @@
 <figure class="align-center">
 <a class="reference external image-reference" href="https://robotics.segway.com/nova-carter/"><img alt="Nova Carter" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/robots/nova_carter/carter_header.jpg/" style="width: 800px;" /></a>
 </figure>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Before operating the Nova Carter robot, read all of the following safety
+guidelines carefully. You must follow all of these guidelines during
+operation of the robot.</p>
+</div>
+<section id="robot-operator-safety">
+<h2>Robot Operator Safety<a class="headerlink" href="#robot-operator-safety" title="Link to this heading"></a></h2>
+<p>The Nova Carter robot is small and lightweight, weighing less than 100 kg even
+with its full payload. The main hazard is impact from the robot itself, where
+moderate harm could result from a worst-case direct collision. Robot operators
+must take the following precautions:</p>
+<ul class="simple">
+<li><p>Familiarize yourself with the Nova Carter controls and dynamics in an open
+area away from bystanders.</p></li>
+<li><p>Be aware of the speed at which Nova Carter can accelerate, decelerate, and
+turn.</p></li>
+<li><p>Be aware that stopping Nova Carter quickly while it’s moving forward can cause
+it to overshoot and move backwards.</p></li>
+</ul>
+<p>In the event of a safety incident, inspect the Nova Carter for the following:</p>
+<ul class="simple">
+<li><p>Damage to the robot chassis (including dents and punctures to the housing or
+drivetrain).</p></li>
+<li><p>Damage to the sensors that emit IR (including scratches and pits on the
+optical window).</p></li>
+<li><p>If there is damage, do not power on Nova Carter. Use the tow handle to move
+the robot and contact your Segway representative immediately. Nova Carter has a
+tow handle for manual transport located above the caster wheels.</p></li>
+</ul>
+<p>A red emergency stop (ESTOP) button is located above the caster wheels below
+the tow handle. Pushing the ESTOP button disconnects power to the motors, but
+the Carter robot can continue to coast in the direction it was previously
+moving.  It can also roll if placed on a sloped surface while the ESTOP is
+pressed.</p>
+<p>Do not open or remove any panels from the robot, and do not loosen or remove
+any sensors.</p>
+</section>
+<section id="unboxing-nova-carter">
+<h2>Unboxing Nova Carter<a class="headerlink" href="#unboxing-nova-carter" title="Link to this heading"></a></h2>
+<p>After receiving your Nova Carter robot from Segway, follow the guide below to
+unpack and power on the robot.</p>
+<p>Make sure you are familiar with or have completed the following:</p>
+<ol class="arabic">
+<li><p>Remove Nova Carter from its packaging.</p></li>
+<li><p>Remove the protective Lidar cover (colored red) using a 2.5 mm hex driver,
+and re-install any bolts which were removed.</p></li>
+<li><p>Familiarize yourself with the following parts of Nova Carter:</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li><p>Wall charger and its connection to the robot. You can connect Nova Carter
+to its charger when it is powered on or off.</p></li>
+</ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Nova Carter setup instructions are available in the Nova hardware documentation.</p>
+<p>The robot does not respond to movement commands while plugged into
+the wall charger.</p>
 </div>
+<ol class="loweralpha simple" start="2">
+<li><p>E-Stop button at the rear of the robot and its operation. Press to engage,
+twist clockwise to disengage.</p></li>
+<li><p>IO panel at rear of robot with USB-C, DisplayPort, and Ethernet connections.
+These connect directly to the Jetson, and can be used for development, rapid
+data transfer, or to re-flash the Jetson AGX Orin.</p></li>
+<li><p>Status indicator LED bar at the front. This shows yellow on boot, green when
+Jetson is actively communicating with the wheelbase, and red if there is an
+error or E-Stop button is pressed.</p></li>
+</ol>
+</div></blockquote>
+</li>
+<li><p>Power on the robot using the button at its front. The LED panels at each
+corner of the robot flash white. After Jetson has finished booting, they
+transition to green. If the status indicator light flashes red, disengage the
+E-Stop.</p></li>
+</ol>
+</section>
+<section id="connecting-the-robot-to-your-wifi-network">
+<h2>Connecting the Robot to your WiFi Network<a class="headerlink" href="#connecting-the-robot-to-your-wifi-network" title="Link to this heading"></a></h2>
+<p>Follow these steps to connect the Nova Carter to the local WiFi network:</p>
+<ol class="arabic simple">
+<li><p>Connect the robot to a display using the DisplayPort on the rear IO panel.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A recommended best practice is to engage the E-Stop button any time you
+connect external cables to the robot, to prevent it from responding to any
+movement commands.</p>
+</div>
+<ol class="arabic" start="2">
+<li><p>Connect the keyboard with touchpad to the USB-C port on the rear IO panel.</p></li>
+<li><p>Log in to the robot (contact the NVIDIA Solutions team for the robot
+password).</p></li>
+<li><p>Follow the <a class="reference external" href="https://help.ubuntu.com/lts/ubuntu-help/net-wireless-connect.html.en">WiFi instructions for Ubuntu</a>.</p></li>
+<li><p>After connecting to the internet it is required to reboot the system. Press the power button or run:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>reboot
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</section>
+<section id="connecting-the-pc-to-the-robot">
+<span id="nova-carter-ssh-setup"></span><h2>Connecting the PC to the Robot<a class="headerlink" href="#connecting-the-pc-to-the-robot" title="Link to this heading"></a></h2>
+<p>To control, deploy, launch, and debug applications, you have to connect your PC
+to the robot.</p>
+<p>First, you must get the IP address of the robot. Assuming you have the robot
+connected to a display and a keyboard with touchpad from the previous section,
+follow these instructions:</p>
+<ol class="arabic simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">CTRL+ALT+t</span></code> to open a terminal.</p></li>
+<li><p>Find the IP address of the WiFi by running <code class="docutils literal notranslate"><span class="pre">ifconfig</span> <span class="pre">wlan0</span></code>. You should see
+an output similar to the screenshot below. The IP address is highlighted with a
+red rectangle.</p></li>
+</ol>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/robots/nova_carter/ifconfig.png/"><img alt="ifconfig console screenshot" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/robots/nova_carter/ifconfig.png/" style="width: 800px;" /></a>
+</figure>
+<ol class="arabic" start="3">
+<li><p>Record the IP address (in the above case it is <code class="docutils literal notranslate"><span class="pre">10.110.66.127</span></code>). This IP
+address will be used for connecting in all further tutorials and may need to be
+retrieved again if it changes.</p></li>
+<li><p>From your PC run the following command to SSH into the robot.  Make sure to
+use a PC that is connected to the same WiFi network as your robot. Enter
+the robot password when asked for it.</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ssh<span class="w"> </span>&lt;USER&gt;@&lt;ROBOT_IP&gt;
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure to replace <code class="docutils literal notranslate"><span class="pre">&lt;USER&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT_IP&gt;</span></code> with the values for your
+robot. In the above case, it would be <code class="docutils literal notranslate"><span class="pre">ssh</span> <span class="pre">nvidia&#64;10.110.66.127</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The login will timeout for security reasons. Also, the DisplayPort
+will turn off after a while due to inactivity, so retry if the screen goes
+black.</p>
+</div>
+</section>
+<section id="nova-orin-initialization">
+<h2><cite>Nova Orin</cite> Initialization<a class="headerlink" href="#nova-orin-initialization" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you need to install the <cite>Nova Orin</cite> software after reflashing the Jetson, follow
+<a class="reference external" href="https://nvidia-isaac-ros.github.io/nova/nova_init/index.html#install">these instructions</a> and select the <cite>nova-carter</cite>
+YAML option when prompted.</p>
+</div>
+<ol class="arabic">
+<li><p>Verify if <cite>Nova Orin</cite> software is the latest version by comparing the installed package with the candidate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ apt policy nova-orin-init
+nova-orin-init:
+  Installed: 1.3.2+b4
+  Candidate: 1.3.2+b4
+  Version table:
+ *** 1.3.2+b4 600
+        600 https://isaac.download.nvidia.com/nova-init jammy/main arm64 Packages
+</pre></div>
+</div>
+</li>
+<li><p>If the installed version is lower than the candidate, follow <a class="reference external" href="https://nvidia-isaac-ros.github.io/nova/nova_init/index.html#upgrade">the nova init upgrade process here</a>. Otherwise proceed to the next step.</p></li>
+<li><p>Verify that sensors are functioning by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nova_preflight_checker
+</pre></div>
+</div>
+<p>It is expected for all tests to pass. Refer to the <a class="reference external" href="https://nvidia-isaac-ros.github.io/nova/tools/pfc.html">Nova PFC documentation</a> for more details.</p>
+</li>
+</ol>
+</section>
+<section id="pairing-the-joystick-controller">
+<span id="nova-carter-joystick-setup"></span><h2>Pairing the Joystick Controller<a class="headerlink" href="#pairing-the-joystick-controller" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>A PS5 joystick controller is shipped with the robot. To connect the joystick
+with the robot, put the controller in pairing mode, by pressing and holding down
+the two buttons shown in the image below until the controller lights start
+blinking:</p></li>
+</ol>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/robots/nova_carter/joystick_pairing.png/"><img alt="joystick_pairing" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/robots/nova_carter/joystick_pairing.png/" style="width: 800px;" /></a>
+</figure>
+<ol class="arabic simple" start="2">
+<li><p>SSH into the robot and pair the controller to the robot.</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ssh<span class="w"> </span>&lt;USER&gt;@&lt;ROBOT<span class="w"> </span>IP&gt;
+
+<span class="c1"># This should list the available devices</span>
+$<span class="w"> </span>sudo<span class="w"> </span>bluetoothctl
+**<span class="o">[</span>bluetooth<span class="o">]</span><span class="c1">#** scan on</span>
+Discovery<span class="w"> </span>started
+<span class="o">[</span>CHG<span class="o">]</span><span class="w"> </span>Controller<span class="w"> </span><span class="m">90</span>:E8:68:84:35:24<span class="w"> </span>Discovering:<span class="w"> </span>yes
+<span class="o">[</span>NEW<span class="o">]</span><span class="w"> </span>Device<span class="w"> </span>D4:20:B0:42:66:4F<span class="w"> </span>D4-20-B0-42-66-4F
+<span class="o">[</span>NEW<span class="o">]</span><span class="w"> </span>Device<span class="w"> </span>D4:20:<span class="w"> </span>B0:42:5C:CC<span class="w"> </span>D4-20-B0-42-5C-CC
+<span class="o">[</span>NEW<span class="o">]</span><span class="w"> </span>Device<span class="w"> </span>D4:20:B0:42:64:1A<span class="w"> </span>D4-20-B0-42-64-1A
+<span class="o">[</span>NEW<span class="o">]</span><span class="w"> </span>Device<span class="w"> </span>7C:66:EF:5D:36:B1<span class="w"> </span>Wireless<span class="w"> </span>Controller
+<span class="o">[</span>NEW<span class="o">]</span><span class="w"> </span>Device<span class="w"> </span>D4:20:B0:42:C6:80<span class="w"> </span>D4-20-B0-42-C6-80
+<span class="o">[</span>NEW<span class="o">]</span><span class="w"> </span>Device<span class="w"> </span>D4:20:B0:42:5B:37<span class="w"> </span>D4-20-B0-42-5B-37
+
+<span class="c1"># The mac address used should match the one named Wireless Controller, in</span>
+<span class="c1"># this case it is.</span>
+**<span class="o">[</span>bluetooth<span class="o">]</span><span class="c1">#** scan off</span>
+7C:66:EF:5D:36:B1
+
+<span class="c1"># Upon successful pairing, it should ask you to type yes/no to trust the</span>
+<span class="c1"># device. Type &quot;yes&quot;.</span>
+**<span class="o">[</span>bluetooth<span class="o">]</span><span class="c1">#** pair 7C:66:EF:5D:36:B1</span>
+**<span class="o">[</span>bluetooth<span class="o">]</span><span class="c1">#** trust 7C:66:EF:5D:36:B1</span>
+**<span class="o">[</span>bluetooth<span class="o">]</span><span class="c1">#** exit</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Once the controller is connected, the LEDs on the controller should stay solid
+blue; flashing blue LEDs indicate the controller is trying to connect.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the terminal run <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">/dev/input/js0</span></code>. If the connection was successful it
+prints out <code class="docutils literal notranslate"><span class="pre">/dev/input/js0</span></code>. If the connection was <strong>not</strong> successful the
+command prints out <code class="docutils literal notranslate"><span class="pre">\</span> <span class="pre">ls:</span> <span class="pre">cannot</span> <span class="pre">access</span> <span class="pre">'/dev/input/js0':</span> <span class="pre">No</span> <span class="pre">such</span> <span class="pre">file</span> <span class="pre">or</span>
+<span class="pre">directory\</span></code>.</p>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>The controller should now be connected. You should not need to pair again. If
+you want to connect again after the controller turns off press the PS button as
+shown below.</p></li>
+</ol>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/robots/nova_carter/joystick_on.png/"><img alt="PS5 Controller" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-3.2/resources/isaac_ros_docs/robots/nova_carter/joystick_on.png/" style="width: 800px;" /></a>
+</figure>
+</section>
+<section id="docker-configuration">
+<h2>Docker Configuration<a class="headerlink" href="#docker-configuration" title="Link to this heading"></a></h2>
+<p>To run applications on <cite>Nova Carter</cite>, you shall configure docker as below.</p>
+<ol class="arabic">
+<li><p>Add the <code class="docutils literal notranslate"><span class="pre">nvidia</span></code> user to the docker group to enable using docker without sudo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add your user to the docke group</span>
+sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>docker<span class="w"> </span><span class="nv">$USER</span>
+<span class="c1"># Verify that command succeeded</span>
+id<span class="w"> </span>nvidia<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>docker
+<span class="c1"># Log out and log in for the changes to take effect</span>
+newgrp<span class="w"> </span>docker
+</pre></div>
+</div>
+</li>
+<li><p>Stop the Docker service.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>docker
+</pre></div>
+</div>
+</li>
+<li><p>Move the existing Docker folder.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>du<span class="w"> </span>-csh<span class="w"> </span>/var/lib/docker/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>mkdir<span class="w"> </span>/mnt/nova_ssd/docker<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>rsync<span class="w"> </span>-axPS<span class="w"> </span>/var/lib/docker/<span class="w"> </span>/mnt/nova_ssd/docker/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>du<span class="w"> </span>-csh<span class="w">  </span>/mnt/nova_ssd/docker/
+</pre></div>
+</div>
+</li>
+<li><p>Use a text editor (e.g. Vi) to edit <code class="docutils literal notranslate"><span class="pre">/etc/docker/daemon.json</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>vi<span class="w"> </span>/etc/docker/daemon.json
+</pre></div>
+</div>
+<p>Insert <code class="docutils literal notranslate"><span class="pre">&quot;data-root&quot;</span></code> line similar to the following:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;runtimes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;nvidia&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nvidia-container-runtime&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;runtimeArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;default-runtime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nvidia&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;data-root&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/mnt/nova_ssd/docker&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Rename the old Docker data directory.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>mv<span class="w"> </span>/var/lib/docker<span class="w"> </span>/var/lib/docker.old
+</pre></div>
+</div>
+</li>
+<li><p>Restart the Docker daemon.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>docker<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w"> </span>docker
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="checking-the-battery-status">
+<h2>Checking the Battery Status<a class="headerlink" href="#checking-the-battery-status" title="Link to this heading"></a></h2>
+<p>Before using the robot check the battery level. Run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nova_battery_status
+host version build date: [23-09-19]
+host version build time: [14:21:54]
+Communication interface adding CAN_INTERFACE
+Please guarantee the &#39;canbus_pre.sh&#39; file has been taken into the
+&#39;/home/sdcard/firmware&#39; directory, if can register has not been configed HAL
+CANBUS init success!
+Scheduler Num 0 Start. Task Num = 1. Period = 100000
+Scheduler Num 1 Start. Task Num = 1. Period = 50000
+Scheduler Num 2 Start. Task Num = 1. Period = 20000
+
+battery: 54%
+</pre></div>
+</div>
+</section>
 <section id="tutorials">
 <h2>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading"></a></h2>
 <p>Nova Carter is ready to go. If you intend to use Isaac ROS or are looking for example use cases
-please refer to the Isaac ROS <a class="reference external" href="https://nvidia-isaac-ros.github.io/">tutorials for supported versions</a>.</p>
+please refer to the <a class="reference external" href="https://nvidia-isaac-ros.github.io/v/release-3.2/robots/nova_carter/index.html#tutorials">tutorials here</a>.</p>
 </section>
 </section>
 
@@ -198,8 +517,8 @@ please refer to the Isaac ROS <a class="reference external" href="https://nvidia
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, NVIDIA.
-      <span class="lastupdated">Last updated on Dec 10, 2025.
+    <p>&#169; Copyright 2026, NVIDIA.
+      <span class="lastupdated">Last updated on Feb 02, 2026.
       </span></p>
   </div>
 

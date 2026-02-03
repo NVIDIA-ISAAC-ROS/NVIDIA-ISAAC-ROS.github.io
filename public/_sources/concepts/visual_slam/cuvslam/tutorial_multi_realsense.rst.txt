@@ -1,0 +1,332 @@
+Tutorial for Multi-camera Visual SLAM Using RealSense Cameras
+===============================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Foxglove_multirealsense.gif>`
+   :align: center
+   :width: 600px
+   :alt: Multi-camera Visual SLAM using RealSense cameras
+
+Overview
+--------
+
+This tutorial demonstrates how to set up multi-camera VSLAM with
+:ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>` using multiple
+RealSense cameras with hardware synchronization.
+
+Requirements
+------------
+
+- Multiple identical RealSense cameras from :ref:`the list of compatible camera models <getting_started/sensors/realsense_setup:camera compatibility>`
+- All cameras are `hardware synchronized <https://dev.realsenseai.com/docs/multiple-depth-cameras-configuration>`_
+- Cameras are mounted on a solid frame with known precise positions
+
+.. note::
+
+   This tutorial provides instructions following :doc:`RealSense hardware sync and Thor developer kit rig mounting guide </robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly>` which will satisfy the requirements for this tutorial and provide mounting for up to 3 RealSense cameras.
+
+Prerequisites
+-------------
+
+#. Complete the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>` and confirm cameras are functioning.
+
+#. Set up hardware synchronization following the :doc:`RealSense hardware sync and Thor rig mounting guide </robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly>`. This includes:
+
+   - Assembling the inter-camera sync circuit for hardware synchronization
+   - Mounting cameras on the Thor DevKit RealSense rig
+
+If you would like to setup your own custom mounting, you need to create a URDF file for your own camera configuration.
+
+#. Identify your RealSense camera serial numbers and determine which is front, left, and right.
+
+   .. code:: bash
+
+      rs-enumerate-devices -S
+
+   Example output:
+
+   .. code:: bash
+
+      Device Name                   Serial Number       Firmware Version
+      Intel RealSense D455          123456789123        5.16.0.1
+      Intel RealSense D455          123456789124        5.16.0.1
+      Intel RealSense D455          123456789125        5.16.0.1
+
+#. Add the camera serial numbers to the `multi_realsense.yaml` config file and specify which to be master before building the `isaac_ros_visual_slam` package.
+
+   .. note::
+
+      If using the Thor DevKit RealSense rig and URDF file, the configuration for the 3 cameras assumes the front camera is named camera0, the left camera is camera1, and the right camera is camera2.
+
+#. Complete the :ref:`isaac_ros_visual_slam (cuVSLAM) quickstart <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`.
+
+#. Clone the Sensor Mounting Rig repository for the Thor DevKit RealSense rig description package:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src
+      git clone :ir_clone:`<sensor_mounting_rig>`
+
+Tutorial Walkthrough - Multi-camera Visual SLAM Execution
+----------------------------------------------------------
+
+#. Open a terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Build the required packages:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}
+      colcon build --packages-up-to isaac_ros_visual_slam thor_devkit_realsense_rig_description
+      source install/setup.bash
+
+#. **[Terminal 1]** Launch the cameras and visual SLAM. This also launches the robot description which publishes the TF tree with the spatial relationship between cameras.
+
+   Use the serial numbers identified in the prerequisites, in order of front, left, right cameras.
+   The first camera will be configured as the hardware sync master, and the remaining cameras as slaves.
+
+   For **D455 cameras** (default):
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam_multi_realsense.launch.py
+
+   For **D435i cameras**:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam_multi_realsense.launch.py \
+          camera_model:=d435
+
+#. **[Terminal 2]** In a new terminal, activate the Isaac ROS environment and verify the system is running by checking that topics are being published:
+
+   .. code:: bash
+
+      isaac-ros activate
+      ros2 topic list
+
+   You should see topics like:
+
+   .. dropdown:: Expected output:
+
+      .. code:: bash
+
+         /camera0/extrinsics/depth_to_infra1
+         /camera0/extrinsics/depth_to_infra2
+         /camera0/infra1/camera_info
+         /camera0/infra1/image_rect_raw
+         /camera0/infra1/image_rect_raw/compressed
+         /camera0/infra1/image_rect_raw/compressedDepth
+         /camera0/infra1/image_rect_raw/nitros
+         /camera0/infra1/image_rect_raw/theora
+         /camera0/infra1/metadata
+         /camera0/infra2/camera_info
+         /camera0/infra2/image_rect_raw
+         /camera0/infra2/image_rect_raw/compressed
+         /camera0/infra2/image_rect_raw/compressedDepth
+         /camera0/infra2/image_rect_raw/nitros
+         /camera0/infra2/image_rect_raw/theora
+         /camera0/infra2/metadata
+         /camera1/extrinsics/depth_to_infra1
+         /camera1/extrinsics/depth_to_infra2
+         /camera1/infra1/camera_info
+         /camera1/infra1/image_rect_raw
+         /camera1/infra1/image_rect_raw/compressed
+         /camera1/infra1/image_rect_raw/compressedDepth
+         /camera1/infra1/image_rect_raw/nitros
+         /camera1/infra1/image_rect_raw/theora
+         /camera1/infra1/metadata
+         /camera1/infra2/camera_info
+         /camera1/infra2/image_rect_raw
+         /camera1/infra2/image_rect_raw/compressed
+         /camera1/infra2/image_rect_raw/compressedDepth
+         /camera1/infra2/image_rect_raw/nitros
+         /camera1/infra2/image_rect_raw/theora
+         /camera1/infra2/metadata
+         /camera2/extrinsics/depth_to_infra1
+         /camera2/extrinsics/depth_to_infra2
+         /camera2/infra1/camera_info
+         /camera2/infra1/image_rect_raw
+         /camera2/infra1/image_rect_raw/compressed
+         /camera2/infra1/image_rect_raw/compressedDepth
+         /camera2/infra1/image_rect_raw/nitros
+         /camera2/infra1/image_rect_raw/theora
+         /camera2/infra1/metadata
+         /camera2/infra2/camera_info
+         /camera2/infra2/image_rect_raw
+         /camera2/infra2/image_rect_raw/compressed
+         /camera2/infra2/image_rect_raw/compressedDepth
+         /camera2/infra2/image_rect_raw/nitros
+         /camera2/infra2/image_rect_raw/theora
+         /camera2/infra2/metadata
+         /diagnostics
+         /joint_states
+         /parameter_events
+         /robot_description
+         /rosout
+         /tf
+         /tf_static
+         /visual_slam/initial_pose
+         /visual_slam/status
+         /visual_slam/tracking/odometry
+         /visual_slam/tracking/slam_path
+         /visual_slam/tracking/vo_path
+         /visual_slam/tracking/vo_pose
+         /visual_slam/tracking/vo_pose_covariance
+         /visual_slam/vis/gravity
+         /visual_slam/vis/landmarks_cloud
+         /visual_slam/vis/localizer
+         /visual_slam/vis/localizer_loop_closure_cloud
+         /visual_slam/vis/localizer_map_cloud
+         /visual_slam/vis/localizer_observations_cloud
+         /visual_slam/vis/loop_closure_cloud
+         /visual_slam/vis/observations_cloud
+         /visual_slam/vis/pose_graph_edges
+         /visual_slam/vis/pose_graph_edges2
+         /visual_slam/vis/pose_graph_nodes
+         /visual_slam/vis/slam_odometry
+         /visual_slam/vis/velocity
+
+
+#. Check the output rates for quick sanity checks:
+
+   .. code:: bash
+
+      ros2 topic hz /visual_slam/tracking/odometry --window 20
+
+   You should see output at approximately 30 Hz (matching the camera frame rate):
+
+   .. code:: bash
+
+      average rate: 29.964
+         min: 0.032s max: 0.034s std dev: 0.00054s window: 20
+      average rate: 30.038
+         min: 0.032s max: 0.035s std dev: 0.00082s window: 20
+      average rate: 30.029
+         min: 0.032s max: 0.034s std dev: 0.00053s window: 20
+
+
+Tutorial Walkthrough - Visualizing the Outputs
+-----------------------------------------------
+
+.. note::
+
+   Visualization may impact the performance of Visual SLAM. Images and landmark visualization require significant bandwidth. Use visualization primarily for debugging and demonstration purposes.
+
+Visualization with Foxglove Studio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Complete the :ref:`foxglove setup <foxglove-setup>` guide.
+
+#. In Foxglove Studio, open the layout file from
+   :ir_repo:`isaac_ros_visual_slam <isaac_ros_visual_slam> <isaac_ros_visual_slam/foxglove_layouts/foxglove_layout_multi_realsense.json>`.
+
+#. Validate that you can see:
+
+   - 3D visualization of the robot TF tree
+   - Live camera images from camera0, camera1, and camera2
+   - Visual odometry path
+   - Feature observations (colored points)
+   - SLAM landmarks
+
+   You should expect a visualization similar to the following:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Foxglove_multirealsense_vo_3cam.png>`
+      :align: center
+      :width: 600px
+      :alt: Foxglove visualization of multi-camera SLAM
+
+Visualization with RViz2
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. In a new terminal, activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Install RViz:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+      source /opt/ros/:ir_ros_distro:/setup.bash
+
+#. Open RViz2 with the multi-RealSense configuration:
+
+   .. code:: bash
+
+      source ${ISAAC_ROS_WS}/install/setup.bash
+      rviz2 -d $(ros2 pkg prefix isaac_ros_visual_slam --share)/rviz/multi_realsense.cfg.rviz
+
+#. Verify you can see:
+
+   - Robot frame tree with all camera frames
+   - Camera infrared images
+   - Visual odometry and SLAM paths
+   - Feature observations and landmarks
+
+   You should expect a visualization similar to the following:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Rviz_multirealsense_vo_3cam.png>`
+      :align: center
+      :width: 600px
+
+SLAM Visualization
+~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+   Isaac ROS Visual SLAM can publish various SLAM-related topics. During Loop Closure events,
+   it publishes sparse visual features to the ``/visual_slam/vis/loop_closure_cloud`` topic and
+   the poses on the internal cuVSLAM map to the ``/visual_slam/vis/pose_graph_edges2`` topic.
+
+   These visualization features are enabled by default in the launch file with:
+
+   - ``enable_slam_visualization: true``
+   - ``enable_landmarks_view: true``
+   - ``enable_observations_view: true``
+
+When the robot revisits a previously mapped area, you will see:
+
+- Red points indicating feature correspondences between current images and stored map features
+- Pose graph edges showing the connections between keyframes
+- Loop closure events that help reduce drift
+
+Troubleshooting
+---------------
+
+Camera Reliability Issues
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+RealSense cameras may occasionally enter an error state and become unable to stream data and may even cause the driver to crash.
+This is a known issue with RealSense cameras and is not related to Isaac ROS applications.
+To recover, try the following:
+
+#. Power-cycle the cameras
+#. If the issue persists, restart the host computer
+
+Hardware Synchronization Issues
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you see error messages such as the ones below, you may have synchronization issues with your slave cameras:
+
+   .. code:: bash
+
+      [component_container_mt-1] [WARN] [1761166871.733246924] [camera2]: XXX Hardware Notification:Right MIPI error,1.76117e+12,Error,Hardware Error
+      [component_container_mt-1] [WARN] [1761166871.733380100] [camera2]: Hardware Notification:Right MIPI error,1.76117e+12,Error,Hardware Error
+
+To investigate, check the following:
+
+#. Check that the hardware sync circuit is correctly wired with noise minimization. Refer to the :doc:`hardware sync guide </robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly>` for details.
+#. Verify the inter-camera sync signal with an oscilloscope
+#. Ensure the first camera (master) is producing the sync signal correctly
+
+For more RealSense camera troubleshooting:
+
+- :doc:`RealSense hardware setup and troubleshooting </troubleshooting/hardware_setup>`
+- Search ``librealsense`` SDK `issues <https://github.com/realsenseai/librealsense/issues?q=is%3Aissue>`__
+- :doc:`cuVSLAM setup validation </concepts/visual_slam/cuvslam/validating_cuvslam_setup>`

@@ -1,0 +1,142 @@
+==========================
+|package name|
+==========================
+
+.. note::
+
+  This package is only released as a Debian package and is not available in source form.
+
+Overview
+--------
+This package contains a thin ROS 2 wrapper for ISAAC Mapping package to expose the built libraries
+and headers to ROS 2 ecosystem.
+
+It also contains tools for running the Isaac Mapping applications, including:
+
+- ``rosbag_to_mapping_data``: a tool to convert rosbags to Isaac Mapping format, which is used for cuVGL map creation.
+- ``rosbag_poses_to_tum_format``: a tool to convert pose messages in the rosbag to `TUM <https://cvg.cit.tum.de/data/datasets/rgbd-dataset/file_formats>`__ format, where each line contains a single pose of ``timestamp tx ty tz qx qy qz qw``.
+
+Installation
+------------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /repositories_and_packages/isaac_ros_mapping_and_localization/_snippets/setup_dev_env_mapping.rst
+
+Install the Package
+^^^^^^^^^^^^^^^^^^^
+
+:ir_apt:
+
+Launch dev container and install it with:
+
+.. code-block:: bash
+
+  sudo apt-get install -y ros-:ir_ros_distro:-isaac-mapping-ros
+
+
+
+Tutorials
+---------
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   tutorial_map_creation.rst
+
+
+Tools
+-----
+
+After building the package, you can use ``--help`` to find the command line flags by using:
+
+.. code-block:: bash
+
+    ros2 run isaac_mapping_ros <Binary Name> --help
+
+For example:
+
+.. code-block:: bash
+
+    ros2 run isaac_mapping_ros rosbag_to_mapping_data --help
+
+rosbag_to_mapping_data
+^^^^^^^^^^^^^^^^^^^^^^
+
+This tool converts rosbags to Isaac Mapping format. It can either extract raw images from rosbags or extract
+keyframes from them.
+
+To extract raw images from the rosbag, use the following command:
+
+.. code-block:: bash
+
+    ros2 run isaac_mapping_ros rosbag_to_mapping_data \
+        --sensor_data_bag_file $INPUT_ROS_BAG \
+        --pose_bag_file $INPUT_POSE_BAG \
+        --output_folder_path $OUTPUT_DIR \
+        --pose_topic_name $POSE_TOPIC_NAME
+
+.. note::
+  Only ``geometry_msgs/msg/PoseStamped``, ``geometry_msgs/msg/PoseWithCovarianceStamped``, ``nav_msgs/msg/Odometry``, and ``nav_msgs/msg/Path`` message types are supported for pose type in the pose rosbag.
+
+One can create a camera topic config that matches with the corresponding rosbag recording. For example:
+
+.. code-block:: yaml
+
+  stereo_cameras:
+    - name: my_camera
+      left: /my_camera/left/image_raw
+      left_camera_info: /my_camera/left/camera_info
+      right: /my_camera/right/image_raw
+      right_camera_info: /my_camera/right/camera_info
+
+Then pass the camera topic config file to the command:
+
+.. code-block:: bash
+
+    ros2 run isaac_mapping_ros rosbag_to_mapping_data \
+        --sensor_data_bag_file $INPUT_ROS_BAG \
+        --pose_bag_file $INPUT_POSE_BAG \
+        --output_folder_path $OUTPUT_DIR/keyframes \
+        --pose_topic_name $POSE_TOPIC_NAME \
+        --camera_topic_config $CAMERA_TOPIC_CONFIG
+
+These are the available options:
+
+- ``sensor_data_bag_file``: required, the path to the bag file that contains sensor data. Default value: "".
+- ``output_folder_path``: required, the path to the converted folder. Default value: "".
+- ``rectify_images``: optional, if to rectify images. Default value: true.
+- ``sample_sync_threshold_microseconds``: optional, the max timestamp differences of two images to be considered the same sample. Default value: 50 microseconds.
+- ``extracted_image_dir``: optional, if specified, use images under this directory instead of parsing it from sensor data bag. Default value: "".
+- ``expected_pose_child_frame_name``: optional, the expected pose message's child frame name, if the name doesn't match, it raises error. Default value: ``base_link``.
+
+For sampling images:
+
+- ``pose_bag_file``: optional, the path to the bag file that contains poses for keyframe selection. Default value: "".
+- ``pose_topic_name``: optional, the topic name of the pose to use. Default value: ``/visual_slam/vis/slam_odometry``.
+- ``tum_pose_file``: optional, the path to the TUM pose file that contains poses for keyframe selection. Default value: "".
+- ``min_inter_frame_distance``: optional, minimal inter-frame distance between two key frames. Default value: 0.05 meters.
+- ``min_inter_frame_rotation_degrees``: optional, the minimal inter-frame rotation between two key frames. Default value: 1 degree.
+
+rosbag_poses_to_tum_format
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This tool converts the pose messages in the rosbag to TUM format.
+
+.. code-block:: bash
+
+  ros2 run isaac_mapping_ros rosbag_poses_to_tum_format \
+    --pose_bag_file <path_to_pose_bag> \
+    --pose_topic_name <pose_topic_name> \
+    --output_tum_file <output_tum_file>
+
+These are available options:
+
+- ``pose_bag_file``: required, the path to the bag file that contains pose messages. Default value: "".
+- ``output_tum_file``: required, the file path where poses will be written. Default value: "".
+- ``pose_topic_name``: optional, the topic name of the pose to use. Default value: ``/visual_slam/vis/slam_odometry``.
+- ``base_link_name``: optional, the name of the base link, or the vehicle coordinate. Default value: ``base_link``.
+
+.. |package name| replace:: ``isaac_mapping_ros``

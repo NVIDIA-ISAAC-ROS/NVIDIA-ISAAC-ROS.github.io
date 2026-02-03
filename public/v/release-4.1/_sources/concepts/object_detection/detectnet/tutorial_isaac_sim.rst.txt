@@ -1,0 +1,48 @@
+Tutorial for DNN Object Detection with Isaac Sim
+================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/object_detection/detectnet/isaac_sim_detectnet_output.png>`
+    :align: center
+    :width: 600px
+
+Overview
+------------
+
+This tutorial walks you through a pipeline for object (people) detection
+using :ir_repo:`DetectNet <isaac_ros_object_detection> <isaac_ros_detectnet>`
+consuming images from Isaac Sim.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the :ref:`quickstart <repositories_and_packages/isaac_ros_object_detection/isaac_ros_detectnet/index:quickstart>`.
+2.  Activate the Isaac ROS environment:
+
+    .. code:: bash
+
+       isaac-ros activate
+
+3.  Run the setup script to download the `PeopleNet
+    Model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__
+    from NVIDIA GPU Cloud(NGC) and convert ``.onnx`` model to a engine plan file
+
+    .. code:: bash
+
+       ros2 run isaac_ros_detectnet setup_model.sh --config-file peoplenet_config.pbtxt
+
+4.  Launch the pre-composed pipeline launch file:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_detectnet isaac_ros_detectnet_isaac_sim.launch.py
+
+5.  Install and launch Isaac Sim following the steps in the :ref:`Isaac ROS Isaac Sim Setup Guide <gs_isaac_sim>`.
+
+6.  Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 600px
+    
+7.  You should see the image from Isaac Sim with the rectangles
+    overlaid over detected people in the frame.
