@@ -1,10 +1,22 @@
-Tutorial for cuVGL Localization
-===============================
+Tutorial: Localization with cuVGL
+=================================
+
+After you have created a cuVGL map with :doc:`Tutorial: cuVGL Map Creation </concepts/visual_global_localization/tutorials/tutorial_map_creation>`,
+you can use it for localization.
+
+Use Global Localization Node in ROS 2
+-------------------------------------
+
+Follow the steps to :ref:`Set Up the Development Environment<isaac_ros_visual_global_localization_setup_dev_env>`
+and :ref:`Install or Build isaac_ros_visual_global_localization<isaac_ros_visual_global_localization_install>` before running the following commands.
+
+.. _export_tensorrt_engine_files:
 
 Export TensorRT Engine Files
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note::
+
     This is a one time setup. You can export the engine files for a feature type and then use the same engine files for all the subsequent runs.
 
 .. code-block:: bash
@@ -21,29 +33,97 @@ Export TensorRT Engine Files
         --model_dir $(ros2 pkg prefix --share isaac_ros_visual_mapping)/models \
         --output_model_dir $OUTPUT_MODEL_DIR
 
-Use Global Localization Node in ROS 2
--------------------------------------
+.. _live_localization_in_ros_2:
 
-You can:
+Live Localization in ROS 2
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* directly include the :ir_repo:`visual_global_localization.launch.py <isaac_ros_mapping_and_localization> <isaac_ros_visual_global_localization/launch/include/visual_global_localization.launch.py>` in your launch file
-* use the following command to launch the localization node
+Use the following command to launch the localization node:
 
-    .. code-block:: bash
+#. Create a map by following :doc:`Tutorial: cuVGL Map Creation </concepts/visual_global_localization/tutorials/tutorial_map_creation>`.
+#. Launch container and go to container's terminal.
+#. Inside container, export TensorRT engine files as described in :ref:`export_tensorrt_engine_files`.
+#. Inside container, run the following command to launch the localization node:
 
-        ros2 launch visual_global_localization isaac_ros_visual_global_localization_node.launch.py vgl_model_dir:=$OUTPUT_MODEL_DIR
+   .. code:: bash
 
+      ros2 launch isaac_ros_visual_global_localization isaac_ros_visual_global_localization_node.launch.py \
+         camera_names:='front_stereo_camera,left_stereo_camera,right_stereo_camera,back_stereo_camera' \
+         vgl_map_dir:=${MAP_DIR}/cuvgl_map \
+         vgl_model_dir:=$OUTPUT_MODEL_DIR
 
-See :doc:`/repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization/index`
-to build or install the package.
+More parameters are available in the ``include/visual_global_localization.launch.py`` file. You can also directly include the
+:ir_repo:`visual_global_localization.launch.py <isaac_ros_mapping_and_localization> <isaac_ros_visual_global_localization/launch/include/visual_global_localization.launch.py>` in your launch file.
 
+.. _localization_with_rosbag_replay:
 
-This launches the localization node with the default parameters.
-You can change the parameters by modifying the ``include/visual_global_localization.launch.py`` file
-or by passing the parameters as arguments, for details see :doc:`/repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization/index`.
+Localization with Rosbag Replay
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We provide an end-to-end ROS launch file for replaying a rosbag and running global localization. It continuously
+runs global localization on incoming frames, even if a localization pose has already been computed. It also
+activates the 3D Lidar to create a point cloud overlay on the occupancy map using the result poses.
+
+#. Create a map by following :doc:`Tutorial: cuVGL Map Creation </concepts/visual_global_localization/tutorials/tutorial_map_creation>`.
+#. Record a localization rosbag using appropriate data recording tools. Please keep the localization trajectory within 1m from the map trajectory's coverage.
+#. Inside container, export TensorRT engine files as described in :ref:`export_tensorrt_engine_files`.
+#. Inside container, run the following command to replay the localization rosbag and localize the robot:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_visual_global_localization run_cuvgl_rosbag_replay.launch.py \
+         rosbag_path:=$ROS_BAG_PATH \
+         camera_names:='front_stereo_camera,left_stereo_camera,right_stereo_camera,back_stereo_camera' \
+         vgl_map_dir:=${MAP_DIR}/cuvgl_map \
+         occupancy_map_yaml_file:=${MAP_DIR}/occupancy_map.yaml \
+         vgl_model_dir:=$OUTPUT_MODEL_DIR
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/visualize_vgl_pose.png>`
+    :align: center
+    :width: 800px
+
+Visualize the `/map`, `/front_3d_lidar/lidar_points_filtered`, and `/visual_localization/pose` topics in
+RViz or Foxglove. The alignment between the point cloud and the occupancy map indicates the accuracy of
+the result pose, which is used to transform the point cloud into the occupancy map frame. The axes shows
+the localization pose, with the red axes pointing in the the robot's forward direction.
+
+Coordinate Frames
+^^^^^^^^^^^^^^^^^
+
+This section describes the coordinate frames that are involved in the
+``VisualGlobalLocalizationNode``. The frames discussed below are oriented as follows:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/Axes.png>`
+   :width: 300px
+   :align: center
+
+- ``base_frame``: The base frame of the robot or camera rig. It is assumed that
+  all cameras are rigidly mounted to this frame, such that the transforms between
+  the ``base_frame`` and the ``camera_optical_frames`` can assumed to be static.
+  The estimated odometry and SLAM pose will represent the pose of this frame.
+
+- ``map_frame``: The frame corresponding to the origin of the map that cuVGL
+  creates or localizes in. The SLAM pose reported by cuVGL corresponds with
+  the transform ``map_frame`` -> ``base_frame``.
+
+- ``camera_optical_frames``: The frames corresponding to the optical center of
+  every camera. The frame is expected to lie at the center of the camera lens
+  and oriented with the z-axis pointing in the view direction and the y-axis
+  pointing to the floor.
+
+Troubleshooting
+^^^^^^^^^^^^^^^
+
+- If localization frequently fails to return a pose, consider relaxing the rejection criteria, allowing it to return less confident results, by setting: ``vgl_localization_precision_level:=0``.
+- To print more debug messages from the localization node, use launch parameters: ``vgl_verbose_logging:=True vgl_init_glog:=True vgl_glog_v:=1``.
+
 
 Use cuVGL in C++
 ----------------
-The :doc:`isaac_ros_visual_global_localization </repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization/index>`
-ROS 2 package serves as a demonstration for using the cuVGL libraries,
-see the source code GitHub: :ir_github:`<isaac_ros_mapping_and_localization> <isaac_ros_visual_global_localization>`
+See the :ref:`cuVGL <repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_mapping/index:cuvgl>`
+section in :doc:`isaac_ros_visual_mapping package </repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_mapping/index>` for C++ API.
+
+:ir_github:`<isaac_ros_mapping_and_localization> <isaac_ros_visual_global_localization>`

@@ -6,4 +6,4 @@ Tools for inspecting and validating data sent through graphs containing Isaac RO
 
 ## Latest
 
-Update 2025-10-24: Support for ROS 2 Jazzy
+Update 2026-02-02: Support for two new Docker-optional development and deployment modes

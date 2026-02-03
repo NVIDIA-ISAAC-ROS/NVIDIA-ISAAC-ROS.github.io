@@ -1,57 +1,24 @@
-Tutorial for cuVGL Map Creation
-===============================
+Tutorial: cuVGL Map Creation
+============================
 
-Introduction
-------------
+End-to-End Visual and Occupancy Map Creation
+--------------------------------------------
 
-The map creation process in cuVGL requires two inputs:
+We provide an end-to-end script to create visual maps from ROS bags,
+refer to :doc:`Tutorial: End-to-End Visual and Occupancy Map Creation </repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation>`.
+It outputs a cuVSLAM map, a cuVGL map, and an occupancy map in the same coordinate system.
+The output maps can be used by cuVSLAM and cuVGL localization.
 
-* Raw Images (From stereo camera)
-* Poses
 
-cuVGL extract features from the raw images and save them in the cuVGL map, along with the corresponding poses.
-The cuVGL map is structured as a folder that contains the following files:
+Create cuVGL Map Using Your Own SLAM Algorithm
+----------------------------------------------
 
-* ``keyframes``: This folder contains the features extracted from the raw images, with each individual keyframe saved as a binary protobuf file.
-* ``keyframes/frames_meta.pb.txt``: This protobuf file contains metadata for the keyframes including timestamp, poses, image_name, etc.
-* ``bow_index.pb``: This is the bag-of-words index file for image retrieval.
-* ``vocabulary``: This folder contains all the vocabulary files.
-
-Map Creation From ROS Bags
----------------------------
-
-.. warning::
-
-    Map Creation, typically, uses all the CPU and GPU resources, make sure you do not have anything important running at the same time.
-
-.. note::
-
-    This functionality was tested with ROS 2 rosbags collected using data recording tools.
-
-If you want to create the cuVGL map from rosbags, follow these steps:
+If you want to use your own SLAM algorithm to create the cuVGL map, you can follow these steps:
 
 #. Collect a rosbag using appropriate data recording tools.
-#. Run your own SLAM algorithm to generate the poses. If you use cuVSLAM, refer to the appropriate documentation to create the map instead.
-#. Export TensorRT engine files (optional and one time setup):
-
-    .. code-block:: bash
-
-      OUTPUT_MODEL_DIR="path_to_output_model_dir"
-
-      mkdir -p $OUTPUT_MODEL_DIR
-      # Then export the lightglue and aliked extractor engine files
-      $(ros2 pkg prefix isaac_ros_visual_mapping)/bin/visual_mapping/export_lightglue_engine \
-          --worker_config_file $(ros2 pkg prefix --share isaac_ros_visual_mapping)/configs/isaac/matching_task_worker_config.pb.txt \
-          --model_dir $(ros2 pkg prefix --share isaac_ros_visual_mapping)/models \
-          --output_model_dir $OUTPUT_MODEL_DIR
-
-      $(ros2 pkg prefix isaac_ros_visual_mapping)/bin/visual_mapping/export_extractor_engine \
-          --configure_file $(ros2 pkg prefix --share isaac_ros_visual_mapping)/configs/isaac/keypoint_creation_config.pb.txt \
-          --model_dir $(ros2 pkg prefix --share isaac_ros_visual_mapping)/models \
-          --output_model_dir $OUTPUT_MODEL_DIR
-
-
-#. Extract images from the rosbags. You can use the following command to extract features from rosbags. cuVGL only supports converting h264 compressed image in the rosbag:
+#. Run your own SLAM algorithm to generate the poses.
+#. Export TensorRT engine files as described in :ref:`Export TensorRT Engine Files <export_tensorrt_engine_files>`.
+#. Extract images from the rosbags. You can use the following command to extract features from rosbags.
 
     Create a camera topic config that matches with your rosbag recording.
 
@@ -81,14 +48,11 @@ If you want to create the cuVGL map from rosbags, follow these steps:
         --min_inter_frame_rotation_degrees=5 \
         --min_inter_frame_distance=0.2 \
         --pose_topic_name=$POSE_TOPIC_NAME \
-        --camera_topic_config=$CAMERA_TOPIC_CONFIG \
+        --camera_topic_config=$CAMERA_TOPIC_CONFIG
 
     .. note::
-      Only ``geometry_msgs/msg/PoseStamped``, ``geometry_msgs/msg/PoseWithCovarianceStamped``, ``nav_msgs/msg/Odometry``, and ``nav_msgs/msg/Path`` message types are supported for pose type in the pose rosbag.
-      Poses stored in the pose bag are in ``base_link`` frame.
-
-    .. note::
-      Change ``--min_inter_frame_rotation_degrees`` and ``--min_inter_frame_distance`` to your own values for proper density of the keyframes. Larger environment might require larger values.
+      * Only ``geometry_msgs/msg/PoseStamped``, ``geometry_msgs/msg/PoseWithCovarianceStamped``, ``nav_msgs/msg/Odometry``, and ``nav_msgs/msg/Path`` message types are supported for pose type in the pose rosbag. Poses stored in the pose bag are in ``base_link`` frame.
+      * Change ``--min_inter_frame_rotation_degrees`` and ``--min_inter_frame_distance`` to your own values for proper density of the keyframes. Larger environments might require larger values.
 
     More documentation about the ``rosbag_to_mapping_data`` tool can be found in the :doc:`isaac_mapping_ros documentation </repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index>`.
 
@@ -104,25 +68,37 @@ If you want to create the cuVGL map from rosbags, follow these steps:
         --model_dir $(ros2 pkg prefix --share isaac_ros_visual_mapping)/models/
 
     .. note::
-      If you export the TensorRT engine files, pass ``--model_dir $OUTPUT_MODEL_DIR`` when running ``create_cuvgl_map.py``.
-
-    .. note::
-      If you have a prebuilt vocabulary, pass ``--prebuilt_bow_vocabulary_folder <path_to_vocabulary_folder>`` when running ``create_cuvgl_map.py``. For example:
+      * If you export the TensorRT engine files, pass ``--model_dir $OUTPUT_MODEL_DIR`` when running ``create_cuvgl_map.py``.
+      * If you have a prebuilt vocabulary, pass ``--prebuilt_bow_vocabulary_folder <path_to_vocabulary_folder>`` when running ``create_cuvgl_map.py``. For example:
 
       .. code-block:: bash
 
-        ln -s /path/to/vocabulary $MAP_FOLDER/vocabulary
         ros2 run isaac_ros_visual_mapping create_cuvgl_map.py --map_folder=$MAP_FOLDER --prebuilt_bow_vocabulary_folder=<path_to_vocabulary_folder>
 
-Map Creation From Raw Images
+
+Create cuVGL Map From Images
 ----------------------------
+
+The map creation process in cuVGL requires two inputs:
+
+* Rectified Images (From stereo camera)
+* Poses
+
+cuVGL extracts features from the images and saves them along with the corresponding poses.
+The cuVGL map is structured as a folder that contains the following files:
+
+* ``keyframes``: This folder contains the features extracted from the raw images, with each individual keyframe saved as a binary protobuf file.
+* ``keyframes/frames_meta.pb.txt``: This ``protobuf`` file contains metadata for the keyframes including timestamp, poses, and ``image_name``.
+* ``bow_index.pb``: This is the bag-of-words index file for image retrieval.
+* ``vocabulary``: This folder contains all the vocabulary files.
 
 While it's recommended to directly use the rosbag data converter to create cuVGL data format, you can also
 create the map from raw images.
 
-To do this you must prepare the keyframe ``frames_meta.pb.txt`` metadata file for your raw images.
+To do this you must prepare the keyframe ``frames_meta.pb.txt`` metadata file
+for your raw images.
 
-The ``frames_meta.pb.txt`` is a text protobuf file of message ``KeyframesMetadataCollection``, for the detailed
+The ``frames_meta.pb.txt`` is a text ``protobuf`` file of message ``KeyframesMetadataCollection``, for the detailed
 definition see the ``keyframe_metadata.pb.h`` file under the install folder of cuVGL.
 
 .. code-block:: bash
@@ -133,7 +109,7 @@ definition see the ``keyframe_metadata.pb.h`` file under the install folder of c
 
     .. code-block:: bash
 
-      $MAP_FOLDER/raw/
+      $MAP_FOLDER/rectified/
         image_0.jpg
         image_1.jpg
         ...
@@ -144,4 +120,4 @@ definition see the ``keyframe_metadata.pb.h`` file under the install folder of c
     .. code-block:: bash
 
       # Create the global localization map, it will create bow index, bow vocabulary
-      ros2 run isaac_ros_visual_mapping create_cuvgl_map.py --map_folder=$MAP_FOLDER
+      ros2 run isaac_ros_visual_mapping create_cuvgl_map.py --map_folder=$MAP_FOLDER --raw_image_folder=$MAP_FOLDER/rectified

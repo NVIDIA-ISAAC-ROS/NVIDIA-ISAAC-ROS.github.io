@@ -1,0 +1,120 @@
+============================================
+Preparing Deep Learning Models for Isaac ROS
+============================================
+
+Obtaining a Pre-trained Model from NGC
+--------------------------------------
+
+The NVIDIA GPU Cloud hosts a
+`catalog <https://catalog.ngc.nvidia.com/models>`__ of Deep Learning
+pre-trained models that are available for your development.
+
+1. Use the **Search Bar** to find a pre-trained model that you are
+   interested in working with.
+
+2. Click on the model's card to view an expanded description, and then
+   click on the **File Browser** tab along the navigation bar.
+
+3. Using the **File Browser**, find a deployable ``.onnx`` file for the
+   model you are interested in.
+
+4. Under the **Actions** heading, click on the **…** icon for the file
+   you selected in the previous step, and then click **Copy** ``wget``
+   **command**.
+5. **Paste** the copied command into a terminal to download the model in
+   the current working directory.
+
+.. _trtexec:
+
+Using ``trtexec`` to convert an ONNX Model (``.onnx``) to a TensorRT Plan File (``.plan``)
+------------------------------------------------------------------------------------------
+
+``trtexec`` is already included in the Docker images available as
+part of the standard :doc:`Isaac ROS Development Environment </getting_started/index>`.
+The version of ``trtexec`` matches the version of TensorRT installed from the same Docker image.
+
+The per-platform installation paths are described below:
+
+==================== =============================================================== =====================================
+Platform             Installation Path                                               Symlink Path
+==================== =============================================================== =====================================
+``x86_64``           ``/usr/src/tensorrt/bin/trtexec``                               ``/usr/src/tensorrt/bin/trtexec``
+Jetson (``aarch64``) ``/usr/src/tensorrt/bin/trtexec``                               ``/usr/src/tensorrt/bin/trtexec``
+==================== =============================================================== =====================================
+
+.. warning::
+
+   Reading the documentation of `trtexec <https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#trtexec>`__ is highly recommended to
+   obtain best performance. In particular, we recommend pay attention to the quantization of the model (e.g. ``fp32`` vs ``fp16`` vs ``int8``).
+
+Converting ``.onnx`` to a TensorRT Engine Plan
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here are some examples for generating the TensorRT engine file using
+``trtexec``. In this example, we will use the
+`PeopleSemSegnet Shuffleseg model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplesemsegnet/files?version=deployable_shuffleseg_unet_onnx_v1.0>`__:
+
+Generate an engine file for the ``fp16`` data type
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: bash
+
+   mkdir -p /workspaces/isaac_ros-dev/models && \
+      /usr/src/tensorrt/bin/trtexec --onnx=/workspaces/isaac_ros-dev/models/peoplesemsegnet_shuffleseg.onnx --saveEngine=/workspaces/isaac_ros-dev/models/peoplesemsegnet_shuffleseg.engine --fp16 --minShapes=input_2:0:1x3x544x960 --optShapes=input_2:0:1x3x544x960 --maxShapes=input_2:0:1x3x544x960
+
+.. note::
+   The input ONNX file is specified using the ``--onnx`` option. The output file is specified
+   using the ``--saveEngine`` option. The specific values used in the command above are retrieved
+   from the **PeopleSemSegnet** page under the **Overview** tab. The
+   model input node name can be found in
+   ``peoplesemsegnet_shuffleseg_cache.txt`` from ``File Browser``. The tool needs
+   write permission to the output directory.
+
+   A detailed explanation of the input parameters is available
+   `here <https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#trtexec>`__.
+
+Generate an engine file for the data type ``int8``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In this example, we will use the
+`PeopleNet model <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet/files?version=deployable_quantized_onnx_v2.6.3>`__:
+
+Create the models directory:
+
+.. code:: bash
+
+   mkdir -p /workspaces/isaac_ros-dev/models
+
+| Download the calibration cache file:
+
+.. note::
+
+   Check the model's page on NGC for the latest ``wget``
+   command.
+
+.. code:: bash
+
+   wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&path=resnet34_peoplenet.onnx' -O /workspaces/isaac_ros-dev/models/resnet34_peoplenet.onnx && \
+   wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&path=resnet34_peoplenet_int8.txt' -O /workspaces/isaac_ros-dev/models/resnet34_peoplenet_int8.txt
+
+.. code:: bash
+
+   /usr/src/tensorrt/bin/trtexec --onnx=/workspaces/isaac_ros-dev/models/resnet34_peoplenet.onnx --saveEngine=/workspaces/isaac_ros-dev/models/resnet34_peoplenet.plan --int8 --calib=/workspaces/isaac_ros-dev/models/resnet34_peoplenet_int8.txt --minShapes=input_1:0:1x3x544x960 --optShapes=input_1:0:1x3x544x960 --maxShapes=input_1:0:1x3x544x960
+
+..
+
+.. note::
+
+   The calibration cache file (specified using the ``--calib``
+   option) is required to generate the ``int8`` engine file. This file
+   is provided in the **File Browser** tab of the model's page on NGC.
+
+Inspecting The Input and Output Binding Names of a Model
+--------------------------------------------------------
+
+Deep learning models have ``input_binding_names`` and ``output_binding_names``. These correspond to the model's inputs and outputs
+respectively. These are determined by the model itself during export. To determine this, `netron <https://netron.app/>`__ can be used to visualize the ONNX model.
+
+.. note::
+
+   In addition, the ``TensorRTNode`` and ``TritonNode`` have parameters called ``input_tensor_names`` and ``output_tensor_names``,
+   these correspond to the expected tensor names within the ROS 2 ``TensorList``.
