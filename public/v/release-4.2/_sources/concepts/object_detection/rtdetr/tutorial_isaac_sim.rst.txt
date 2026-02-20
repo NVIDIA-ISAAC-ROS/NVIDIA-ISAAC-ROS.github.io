@@ -1,0 +1,43 @@
+Tutorial for RT-DETR with Isaac Sim
+===================================
+
+Overview
+--------
+   
+1. Detect object bounding boxes using :ir_repo:`Isaac ROS RT-DETR object detection <isaac_ros_object_detection> <isaac_ros_rtdetr>`
+   
+.. note::
+
+    This tutorial detects the Mac and Cheese Box mentioned in the :ir_ngc:`SyntheticaDETR Object Classes section <teams/isaac/models/synthetica_detr>`. In order to detect other objects not supported by ``SyntheticaDETR``, you will have to modify the launch file and replace the 2D object detection pipeline with one that supports the object you are trying to detect.
+
+Tutorial Walkthrough
+--------------------
+   
+1.  Complete the :ref:`Isaac ROS RT-DETR tutorial <repositories_and_packages/isaac_ros_object_detection/isaac_ros_rtdetr/index:quickstart>`.
+
+
+2.  Open a new terminal and activate the Isaac ROS environment:
+
+    .. code:: bash
+
+       isaac-ros activate
+
+3.  Install and launch Isaac Sim following the steps in the :ref:`Isaac ROS Isaac Sim Setup Guide <gs_isaac_sim>`.
+
+4.  Run the launch file.
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_rtdetr isaac_ros_rtdetr_isaac_sim.launch.py
+   
+5.  Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 600px
+
+6.  Validate that you see a visualization of the 2D object detection as shown below:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/object_detection/rtdetr/isaac_sim_rtdetr.gif>`
+      :alt: Isaac ROS RT-DETR
+      :align: center

@@ -1,0 +1,76 @@
+=================================================
+Tutorial for AprilTag Detection with a USB Camera
+=================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/fiducials/apriltag/rviz_usb_cam.png>`
+    :width: 800px
+    :align: center
+
+Overview
+------------
+
+This tutorial walks you through a graph to estimate the 6DOF pose of
+:ir_repo:`AprilTags <isaac_ros_apriltag>`
+using images streamed from a USB camera.
+
+Tutorial Walkthrough
+--------------------
+
+#. Complete the :ref:`Isaac ROS AprilTag Quickstart section <repositories_and_packages/isaac_ros_apriltag/isaac_ros_apriltag/index:quickstart>`.
+#. Calibrate the camera following instructions in the
+   :doc:`camera calibration tutorial </getting_started/sensors/camera_calibration>`.
+   For step 11, use ``isaac_ros_apriltag`` in place of
+   ``<isaac_ros_package>``
+#. Install the ROS 2 ``usb_cam`` package
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-usb-cam
+
+#. Activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Finally, launch the provided launch file:
+
+   .. warning::
+
+      Make sure to set the ``camera_width`` and ``camera_height`` arguments based on your camera's resolution.
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_apriltag isaac_ros_apriltag_usb_cam.launch.py camera_width:=1280 camera_height:=720
+
+#. Launch a second terminal inside the container
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Install RViz:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+      source /opt/ros/:ir_ros_distro:/setup.bash
+
+#. Run RViz2 using the preset config file
+
+   .. code:: bash
+
+      rviz2 -d $(ros2 pkg prefix isaac_ros_apriltag --share)/rviz/usb_cam.rviz
+
+.. note::
+
+   Your camera vendor may offer a specific ROS 2-compatible
+   camera driver package and you can use that in place of the ``usb_cam``
+   package.
+
+.. warning::
+
+   If you are using a different camera driver
+   package ensure that the camera stream publishes ``Image`` and
+   ``CameraInfo`` pairs to the topics ``/image`` and ``/camera_info``,
+   respectively.

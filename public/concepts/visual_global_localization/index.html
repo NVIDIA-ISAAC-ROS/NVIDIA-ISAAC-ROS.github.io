@@ -55,14 +55,14 @@
     <link rel="icon" href="../../_static/isaac_ros_logo.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial: cuVGL Map Creation" href="tutorials/tutorial_map_creation.html" />
+    <link rel="next" title="Tutorial: End-to-End Visual and Occupancy Map Creation" href="tutorials/tutorial_map_creation.html" />
     <link rel="prev" title="Stereo DNN" href="../stereo_dnn/index.html" />
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Feb 03, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 19, 2026"/>
 
 
 <script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
@@ -395,8 +395,9 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../stereo_dnn/index.html">Stereo DNN</a></li>
 <li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">Visual Global Localization</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_localization.html">Tutorial: Localization with cuVGL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_cuvgl_localization.html">Tutorial: Localization with cuVGL</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -511,10 +512,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
-</ul>
-</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
 </ul>
@@ -681,12 +679,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../../v/release-4.1/concepts/visual_global_localization/index.html">release-4.1</a></dd>
+        <dd><a href="../../v/release-4.2/concepts/visual_global_localization/index.html">release-4.2</a></dd>
         <dd><a href="index.html">latest</a></dd>
         <dd><a href="../../v/release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../v/release-3.1/index.html">release-3.1</a></dd>
         <dd><a href="../../v/release-3.2/concepts/visual_global_localization/index.html">release-3.2</a></dd>
         <dd><a href="../../v/release-4.0/concepts/visual_global_localization/index.html">release-4.0</a></dd>
+        <dd><a href="../../v/release-4.1/concepts/visual_global_localization/index.html">release-4.1</a></dd>
     </dl>
   </div>
 </div></div>
@@ -764,11 +763,11 @@ The library focuses on two main components:</p>
 <p>cuVGL uses external poses, such as those provided by a SLAM system,
 along with images to produce a keyframe database. This database is later used for global localization,
 making cuVGL a flexible component for systems that do not have global localization capabilities.</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/vgl_mapping_localization_process.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/vgl_mapping_localization_process.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/vgl_mapping_localization_process.png/" style="width: 800px;" /></a>
+</figure>
 <section id="map-creation-process">
 <h3>Map Creation Process<a class="headerlink" href="#map-creation-process" title="Link to this heading">#</a></h3>
-<figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/map_creation_process.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/map_creation_process.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/map_creation_process.png/" style="width: 800px;" /></a>
-</figure>
 <p>The map creation process in cuVGL is unique as it consumes external poses and images to build a <strong>keyframe database</strong>,
 rather than generating a traditional map like a sparse feature map.</p>
 <p>The input for the map creation includes:</p>
@@ -785,14 +784,25 @@ rather than generating a traditional map like a sparse feature map.</p>
 </section>
 <section id="localization-process">
 <h3>Localization Process<a class="headerlink" href="#localization-process" title="Link to this heading">#</a></h3>
-<figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/localization_process.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/localization_process.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/localization_process.png/" style="width: 800px;" /></a>
-</figure>
 <p>Localization in cuVGL is performed using stereo images for relative pose estimation. The process involves:</p>
 <ul class="simple">
 <li><p><strong>image retrieval</strong>: for the current input image, cuVGL retrieves the best matching candidates from the keyframe database using the BoW image retrieval index.</p></li>
 <li><p><strong>relative pose estimation</strong>: after matching candidates are identified, the library computes the relative pose between the input stereo image and the map image candidate.</p></li>
 <li><p><strong>absolute pose calculation</strong>: by applying the relative transform to the mapping pose of the map image (recorded during the mapping phase), cuVGL outputs an absolute pose for the current input image.</p></li>
+</ul>
+</section>
+<section id="cuvslam-hinted-localization-with-cuvgl">
+<h3>cuVSLAM Hinted Localization with cuVGL<a class="headerlink" href="#cuvslam-hinted-localization-with-cuvgl" title="Link to this heading">#</a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/vgl_cuvslam_hinted_localization.png/"><img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/vgl_cuvslam_hinted_localization.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/vgl_cuvslam_hinted_localization.png/" style="width: 800px;" /></a>
+</figure>
+<p>cuVGL provides an external initial global pose to bootstrap cuVSLAM localization. The workflow is as follows:</p>
+<ul class="simple">
+<li><p><strong>map creation</strong>: run cuVSLAM to estimate image poses and build a cuVSLAM map, then
+use the poses and mapping images to generate a cuVGL map for localization.</p></li>
+<li><p><strong>localization</strong>: launch cuVGL and cuVSLAM ROS nodes with their maps and stereo image inputs.
+cuVGL first estimates a global pose to bootstrap cuVSLAM localization. Once cuVSLAM successfully
+localizes, cuVGL stops and cuVSLAM starts to continuously localize in the map frame.</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -816,7 +826,7 @@ rather than generating a traditional map like a sparse feature map.</p>
 one for creating a localization map, and the other for running localization on that map. The two bags were collected along
 similar routes to ensure the map provides good coverage for localization. The benchmarks were run on x86_64.</p>
 <figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/hubble_lab_occupancy_map.png/"><img alt="Occupancy Map for the Hubble Lab" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/hubble_lab_occupancy_map.png/" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/hubble_lab_occupancy_map.png/"><img alt="Occupancy Map for the Hubble Lab" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/hubble_lab_occupancy_map.png/" style="width: 800px;" /></a>
 </figure>
 <ul class="simple">
 <li><p>For <strong>map creation</strong>, we extracted 951 samples from the rosbag based on translation and rotation distance threshold. Each sample is associated with four stereo pairs, so total 7608 keyframes are used for building the global localization map.</p></li>
@@ -890,21 +900,21 @@ similar routes to ensure the map provides good coverage for localization. The be
 <tr class="row-odd"><td><p><strong>Trajectory of Ground-Truth Poses Shown in Gray, and Localization Poses Colored Based on Their Translation and Rotation Error</strong></p></td>
 </tr>
 <tr class="row-even"><td><figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_location_3_stereos.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_location_3_stereos.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_location_3_stereos.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_location_3_stereos.png/" />
 </figure>
 </td>
 </tr>
 <tr class="row-odd"><td><p><strong>Histogram of Translation and Rotation Error for Localization Poses</strong></p></td>
 </tr>
 <tr class="row-even"><td><figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_hist_3_stereos.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_hist_3_stereos.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_hist_3_stereos.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_hist_3_stereos.png/" />
 </figure>
 </td>
 </tr>
 <tr class="row-odd"><td><p><strong>Translation and Rotation Errors in the Localization Trajectory Over Time</strong></p></td>
 </tr>
 <tr class="row-even"><td><figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_line_3_stereos.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_line_3_stereos.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_line_3_stereos.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_global_localization/absolute_error_line_3_stereos.png/" />
 </figure>
 </td>
 </tr>
@@ -956,8 +966,9 @@ similar routes to ensure the map provides good coverage for localization. The be
 <p>To get started with cuVGL, review the following examples:</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_localization.html">Tutorial: Localization with cuVGL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_cuvgl_localization.html">Tutorial: Localization with cuVGL</a></li>
 </ul>
 </div>
 </section>
@@ -987,7 +998,7 @@ similar routes to ensure the map provides good coverage for localization. The be
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial: cuVGL Map Creation</p>
+        <p class="prev-next-title">Tutorial: End-to-End Visual and Occupancy Map Creation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1016,6 +1027,7 @@ similar routes to ensure the map provides good coverage for localization. The be
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-cuvgl">What is cuVGL?</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#map-creation-process">Map Creation Process</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#localization-process">Localization Process</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cuvslam-hinted-localization-with-cuvgl">cuVSLAM Hinted Localization with cuVGL</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metrics-of-cuvgl">Metrics of cuVGL</a></li>
@@ -1115,7 +1127,7 @@ similar routes to ensure the map provides good coverage for localization. The be
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Feb 03, 2026.
+  Last updated on Feb 19, 2026.
   <br/>
 </p></div>
       

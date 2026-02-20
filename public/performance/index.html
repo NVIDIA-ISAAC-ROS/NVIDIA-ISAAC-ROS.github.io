@@ -62,7 +62,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Feb 03, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 19, 2026"/>
 
 
 <script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
@@ -395,8 +395,9 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../concepts/stereo_dnn/index.html">Stereo DNN</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial: Localization with cuVGL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_cuvgl_localization.html">Tutorial: Localization with cuVGL</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -511,10 +512,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
-</ul>
-</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../concepts/localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
 </ul>
@@ -681,12 +679,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../v/release-4.1/performance/index.html">release-4.1</a></dd>
+        <dd><a href="../v/release-4.2/performance/index.html">release-4.2</a></dd>
         <dd><a href="index.html">latest</a></dd>
         <dd><a href="../v/release-2.1/performance/index.html">release-2.1</a></dd>
         <dd><a href="../v/release-3.1/performance/index.html">release-3.1</a></dd>
         <dd><a href="../v/release-3.2/performance/index.html">release-3.2</a></dd>
         <dd><a href="../v/release-4.0/performance/index.html">release-4.0</a></dd>
+        <dd><a href="../v/release-4.1/performance/index.html">release-4.1</a></dd>
     </dl>
   </div>
 </div></div>
@@ -739,10 +738,12 @@
 <p>The performance results of benchmarking the Isaac ROS packages on both Jetson and x86_64 platforms are below:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <colgroup>
-<col style="width: 43.6%" />
-<col style="width: 2.7%" />
-<col style="width: 26.8%" />
-<col style="width: 26.8%" />
+<col style="width: 28.2%" />
+<col style="width: 1.8%" />
+<col style="width: 17.3%" />
+<col style="width: 17.7%" />
+<col style="width: 17.5%" />
+<col style="width: 17.5%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><div class="line-block">
@@ -754,7 +755,15 @@
 </div>
 </th>
 <th class="head"><div class="line-block">
-<div class="line">AGX Thor</div>
+<div class="line">AGX Thor T5000</div>
+</div>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">AGX Thor T4000</div>
+</div>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">DGX Spark</div>
 </div>
 </th>
 <th class="head"><div class="line-block">
@@ -765,7 +774,7 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_node.py">AprilTag Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_node.py">AprilTag Node</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -773,18 +782,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_apriltag_node-agx_thor.json">392 fps</a></div>
-<div class="line">10 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_apriltag_node-agx_thor.json">385 fps</a></div>
+<div class="line">2.9 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_apriltag_node-x86-5090.json">596 fps</a></div>
-<div class="line">2.3 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_apriltag_node-thor-t4000.json">280 fps</a></div>
+<div class="line">11 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_apriltag_node-dgx_spark.json">462 fps</a></div>
+<div class="line">2.4 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_apriltag_node-x86-5090.json">596 fps</a></div>
+<div class="line">2.0 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_foundationpose_benchmark/scripts/isaac_ros_foundationpose_node.py">FoundationPose Pose Estimation Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_foundationpose_benchmark/scripts/isaac_ros_foundationpose_node.py">FoundationPose Pose Estimation Node</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -792,18 +811,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_foundationpose_node-agx_thor.json">3.92 fps</a></div>
-<div class="line">260 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_foundationpose_node-agx_thor.json">3.15 fps</a></div>
+<div class="line">370 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_foundationpose_node-x86-5090.json">10.1 fps</a></div>
-<div class="line">89 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_foundationpose_node-thor-t4000.json">3.40 fps</a></div>
+<div class="line">350 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_foundationpose_node-dgx_spark.json">2.77 fps</a></div>
+<div class="line">360 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_foundationpose_node-x86-5090.json">10.1 fps</a></div>
+<div class="line">99 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_ess_benchmark/scripts/isaac_ros_ess_node.py">DNN Stereo Disparity Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_ess_benchmark/scripts/isaac_ros_ess_node.py">DNN Stereo Disparity Node</a></div>
 <div class="line">Full</div>
 </div>
 </td>
@@ -812,18 +841,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_ess_node-agx_thor.json">178 fps</a></div>
-<div class="line">22 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_ess_node-agx_thor.json">175 fps</a></div>
+<div class="line">8.8 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_ess_node-x86-5090.json">350 fps</a></div>
-<div class="line">5.6 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_ess_node-thor-t4000.json">160 fps</a></div>
+<div class="line">26 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_ess_node-dgx_spark.json">167 fps</a></div>
+<div class="line">8.2 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_ess_node-x86-5090.json">350 fps</a></div>
+<div class="line">5.3 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_ess_benchmark/scripts/isaac_ros_light_ess_node.py">DNN Stereo Disparity Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_ess_benchmark/scripts/isaac_ros_light_ess_node.py">DNN Stereo Disparity Node</a></div>
 <div class="line">Light</div>
 </div>
 </td>
@@ -832,37 +871,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_light_ess_node-agx_thor.json">350 fps</a></div>
-<div class="line">9.4 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_light_ess_node-agx_thor.json">350 fps</a></div>
+<div class="line">3.5 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_light_ess_node-x86-5090.json">350 fps</a></div>
-<div class="line">5.0 ms &#64; 30Hz</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_stereo_image_proc_benchmark/scripts/isaac_ros_disparity_node.py">Stereo Disparity Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_light_ess_node-thor-t4000.json">349 fps</a></div>
+<div class="line">12 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line">1080p</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_disparity_node-agx_thor.json">217 fps</a></div>
-<div class="line">51 ms &#64; 30Hz</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_disparity_node-x86-5090.json">863 fps</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_light_ess_node-dgx_spark.json">350 fps</a></div>
 <div class="line">4.1 ms &#64; 30Hz</div>
 </div>
 </td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_light_ess_node-x86-5090.json">350 fps</a></div>
+<div class="line">3.5 ms &#64; 30Hz</div>
+</div>
+</td>
 </tr>
-<tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_image_proc_benchmark/scripts/isaac_ros_rectify_node.py">Rectify Node</a></div>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_stereo_image_proc_benchmark/scripts/isaac_ros_disparity_node.py">Stereo Disparity Node</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -870,38 +900,57 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_rectify_node-agx_thor.json">1800 fps</a></div>
-<div class="line">3.4 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_disparity_node-agx_thor.json">217 fps</a></div>
+<div class="line">5.7 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_rectify_node-x86-5090.json">2500 fps</a></div>
-<div class="line">2.8 ms &#64; 30Hz</div>
-</div>
-</td>
-</tr>
-<tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_tensor_rt_benchmark/scripts/isaac_ros_tensor_rt_dope_node.py">TensorRT Node</a></div>
-<div class="line">DOPE</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_disparity_node-thor-t4000.json">196 fps</a></div>
+<div class="line">20 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line">VGA</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_disparity_node-dgx_spark.json">249 fps</a></div>
+<div class="line">5.4 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_tensor_rt_dope_node-agx_thor.json">180 fps</a></div>
-<div class="line">7.1 ms &#64; 30Hz</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_tensor_rt_dope_node-x86-5090.json">321 fps</a></div>
-<div class="line">5.2 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_disparity_node-x86-5090.json">747 fps</a></div>
+<div class="line">4.0 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_triton_benchmark/scripts/isaac_ros_triton_dope_node.py">Triton Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_image_proc_benchmark/scripts/isaac_ros_rectify_node.py">Rectify Node</a></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">1080p</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_rectify_node-agx_thor.json">1550 fps</a></div>
+<div class="line">1.6 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_rectify_node-thor-t4000.json">768 fps</a></div>
+<div class="line">4.8 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_rectify_node-dgx_spark.json">2500 fps</a></div>
+<div class="line">2.3 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_rectify_node-x86-5090.json">2500 fps</a></div>
+<div class="line">2.9 ms &#64; 30Hz</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_tensor_rt_benchmark/scripts/isaac_ros_tensor_rt_dope_node.py">TensorRT Node</a></div>
 <div class="line">DOPE</div>
 </div>
 </td>
@@ -910,18 +959,58 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_triton_dope_node-agx_thor.json">164 fps</a></div>
-<div class="line">32 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_tensor_rt_dope_node-agx_thor.json">165 fps</a></div>
+<div class="line">6.4 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_triton_dope_node-x86-5090.json">281 fps</a></div>
-<div class="line">4.5 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_tensor_rt_dope_node-thor-t4000.json">147 fps</a></div>
+<div class="line">27 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_tensor_rt_dope_node-dgx_spark.json">107 fps</a></div>
+<div class="line">8.6 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_tensor_rt_dope_node-x86-5090.json">300 fps</a></div>
+<div class="line">4.0 ms &#64; 30Hz</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_triton_benchmark/scripts/isaac_ros_triton_dope_node.py">Triton Node</a></div>
+<div class="line">DOPE</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">VGA</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_triton_dope_node-agx_thor.json">161 fps</a></div>
+<div class="line">7.5 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_triton_dope_node-thor-t4000.json">153 fps</a></div>
+<div class="line">30 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_triton_dope_node-dgx_spark.json">94.5 fps</a></div>
+<div class="line">10 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_triton_dope_node-x86-5090.json">281 fps</a></div>
+<div class="line">4.4 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_tensor_rt_benchmark/scripts/isaac_ros_tensor_rt_ps_node.py">TensorRT Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_tensor_rt_benchmark/scripts/isaac_ros_tensor_rt_ps_node.py">TensorRT Node</a></div>
 <div class="line">PeopleSemSegNet</div>
 </div>
 </td>
@@ -930,38 +1019,58 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_tensor_rt_ps_node-agx_thor.json">589 fps</a></div>
-<div class="line">7.6 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_tensor_rt_ps_node-agx_thor.json">566 fps</a></div>
+<div class="line">2.1 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_tensor_rt_ps_node-x86-5090.json">557 fps</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_tensor_rt_ps_node-thor-t4000.json">407 fps</a></div>
+<div class="line">6.8 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_tensor_rt_ps_node-dgx_spark.json">594 fps</a></div>
+<div class="line">1.4 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_tensor_rt_ps_node-x86-5090.json">1570 fps</a></div>
+<div class="line">1.5 ms &#64; 30Hz</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_triton_benchmark/scripts/isaac_ros_triton_ps_node.py">Triton Node</a></div>
+<div class="line">PeopleSemSegNet</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">544p</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_triton_ps_node-agx_thor.json">361 fps</a></div>
+<div class="line">4.0 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_triton_ps_node-thor-t4000.json">280 fps</a></div>
+<div class="line">11 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_triton_ps_node-dgx_spark.json">362 fps</a></div>
 <div class="line">3.1 ms &#64; 30Hz</div>
 </div>
 </td>
-</tr>
-<tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_triton_benchmark/scripts/isaac_ros_triton_ps_node.py">Triton Node</a></div>
-<div class="line">PeopleSemSegNet</div>
-</div>
-</td>
 <td><div class="line-block">
-<div class="line">544p</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_triton_ps_node-agx_thor.json">365 fps</a></div>
-<div class="line">9.6 ms &#64; 30Hz</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_triton_ps_node-x86-5090.json">475 fps</a></div>
-<div class="line">5.1 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_triton_ps_node-x86-5090.json">485 fps</a></div>
+<div class="line">5.4 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_dnn_image_encoder_benchmark/scripts/isaac_ros_dnn_image_encoder_node.py">DNN Image Encoder Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_dnn_image_encoder_benchmark/scripts/isaac_ros_dnn_image_encoder_node.py">DNN Image Encoder Node</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -969,18 +1078,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_dnn_image_encoder_node-agx_thor.json">416 fps</a></div>
-<div class="line">13 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_dnn_image_encoder_node-agx_thor.json">356 fps</a></div>
+<div class="line">11 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_dnn_image_encoder_node-x86-5090.json">446 fps</a></div>
-<div class="line">9.4 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_dnn_image_encoder_node-thor-t4000.json">300 fps</a></div>
+<div class="line">19 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_dnn_image_encoder_node-dgx_spark.json">318 fps</a></div>
+<div class="line">10 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_dnn_image_encoder_node-x86-5090.json">417 fps</a></div>
+<div class="line">10 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_occupancy_grid_localizer_benchmark/scripts/isaac_ros_grid_localizer_node.py">Occupancy Grid Localizer Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_occupancy_grid_localizer_benchmark/scripts/isaac_ros_grid_localizer_node.py">Occupancy Grid Localizer Node</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -988,18 +1107,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_grid_localizer_node-agx_thor.json">28.3 fps</a></div>
-<div class="line">58 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_grid_localizer_node-agx_thor.json">28.1 fps</a></div>
+<div class="line">40 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_grid_localizer_node-x86-5090.json">50.1 fps</a></div>
-<div class="line">12 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_grid_localizer_node-thor-t4000.json">21.1 fps</a></div>
+<div class="line">110 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_grid_localizer_node-dgx_spark.json">40.1 fps</a></div>
+<div class="line">27 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_grid_localizer_node-x86-5090.json">50.1 fps</a></div>
+<div class="line">13 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_h264_decoder_benchmark/scripts/isaac_ros_h264_decoder_node.py">H.264 Decoder Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_h264_decoder_benchmark/scripts/isaac_ros_h264_decoder_node.py">H.264 Decoder Node</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -1007,18 +1136,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_h264_decoder_node-agx_thor.json">596 fps</a></div>
-<div class="line">10 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_decoder_node-agx_thor.json">296 fps</a></div>
+<div class="line">4.5 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_h264_decoder_node-x86-5090.json">596 fps</a></div>
-<div class="line">4.0 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_decoder_node-thor-t4000.json">296 fps</a></div>
+<div class="line">5.3 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_decoder_node-dgx_spark.json">736 fps</a></div>
+<div class="line">4.4 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_decoder_node-x86-5090.json">296 fps</a></div>
+<div class="line">4.1 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_h264_encoder_benchmark/scripts/isaac_ros_h264_encoder_iframe_node.py">H.264 Encoder Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_h264_encoder_benchmark/scripts/isaac_ros_h264_encoder_iframe_node.py">H.264 Encoder Node</a></div>
 <div class="line">I-frame Support</div>
 </div>
 </td>
@@ -1027,18 +1166,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_h264_encoder_iframe_node-agx_thor.json">390 fps</a></div>
-<div class="line">11 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_encoder_iframe_node-agx_thor.json">296 fps</a></div>
+<div class="line">2.9 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_h264_encoder_iframe_node-x86-5090.json">596 fps</a></div>
-<div class="line">3.9 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_encoder_iframe_node-thor-t4000.json">297 fps</a></div>
+<div class="line">10 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_encoder_iframe_node-dgx_spark.json">921 fps</a></div>
+<div class="line">2.7 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_encoder_iframe_node-x86-5090.json">1050 fps</a></div>
+<div class="line">3.8 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_h264_encoder_benchmark/scripts/isaac_ros_h264_encoder_pframe_node.py">H.264 Encoder Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_h264_encoder_benchmark/scripts/isaac_ros_h264_encoder_pframe_node.py">H.264 Encoder Node</a></div>
 <div class="line">P-frame Support</div>
 </div>
 </td>
@@ -1047,18 +1196,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_h264_encoder_pframe_node-agx_thor.json">429 fps</a></div>
-<div class="line">8.6 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_encoder_pframe_node-agx_thor.json">296 fps</a></div>
+<div class="line">2.9 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_h264_encoder_pframe_node-x86-5090.json">596 fps</a></div>
-<div class="line">4.4 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_encoder_pframe_node-thor-t4000.json">297 fps</a></div>
+<div class="line">9.5 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_encoder_pframe_node-dgx_spark.json">846 fps</a></div>
+<div class="line">3.1 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_h264_encoder_pframe_node-x86-5090.json">1050 fps</a></div>
+<div class="line">3.8 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_nvblox_benchmark/scripts/isaac_ros_nvblox_node.py">Nvblox Node</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_nvblox_benchmark/scripts/isaac_ros_nvblox_node.py">Nvblox Node</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -1066,12 +1225,20 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_nvblox_node-agx_thor.json">4.94 fps</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_nvblox_node-agx_thor.json">4.94 fps</a></div>
 <div class="line">89.8 ms</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_nvblox_node-x86-5090.json">4.96 fps</a></div>
+<div class="line">–</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">–</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_nvblox_node-x86-5090.json">4.96 fps</a></div>
 <div class="line">23.1 ms</div>
 </div>
 </td>
@@ -1081,10 +1248,12 @@
 </div>
 <div class="pst-scrollable-table-container"><table class="table">
 <colgroup>
-<col style="width: 44.6%" />
-<col style="width: 2.8%" />
-<col style="width: 26.4%" />
-<col style="width: 26.2%" />
+<col style="width: 29.0%" />
+<col style="width: 1.8%" />
+<col style="width: 17.2%" />
+<col style="width: 17.6%" />
+<col style="width: 17.4%" />
+<col style="width: 17.0%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><div class="line-block">
@@ -1096,7 +1265,15 @@
 </div>
 </th>
 <th class="head"><div class="line-block">
-<div class="line">AGX Thor</div>
+<div class="line">AGX Thor T5000</div>
+</div>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">AGX Thor T4000</div>
+</div>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">DGX Spark</div>
 </div>
 </th>
 <th class="head"><div class="line-block">
@@ -1107,7 +1284,7 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_graph.py">AprilTag Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_graph.py">AprilTag Graph</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -1115,18 +1292,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_apriltag_graph-agx_thor.json">366 fps</a></div>
-<div class="line">13 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_apriltag_graph-agx_thor.json">354 fps</a></div>
+<div class="line">5.2 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_apriltag_graph-x86-5090.json">596 fps</a></div>
-<div class="line">4.1 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_apriltag_graph-thor-t4000.json">273 fps</a></div>
+<div class="line">15 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_apriltag_graph-dgx_spark.json">546 fps</a></div>
+<div class="line">3.9 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_apriltag_graph-x86-5090.json">596 fps</a></div>
+<div class="line">2.8 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_centerpose_benchmark/scripts/isaac_ros_centerpose_graph.py">Centerpose Pose Estimation Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_centerpose_benchmark/scripts/isaac_ros_centerpose_graph.py">Centerpose Pose Estimation Graph</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -1134,18 +1321,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_centerpose_graph-agx_thor.json">50.5 fps</a></div>
-<div class="line">50 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_centerpose_graph-agx_thor.json">50.2 fps</a></div>
+<div class="line">27 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_centerpose_graph-x86-5090.json">50.2 fps</a></div>
-<div class="line">16 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_centerpose_graph-thor-t4000.json">50.4 fps</a></div>
+<div class="line">73 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_centerpose_graph-dgx_spark.json">50.2 fps</a></div>
+<div class="line">23 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_centerpose_graph-x86-5090.json">50.2 fps</a></div>
+<div class="line">19 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_dope_benchmark/scripts/isaac_ros_dope_graph.py">DOPE Pose Estimation Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_dope_benchmark/scripts/isaac_ros_dope_graph.py">DOPE Pose Estimation Graph</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -1153,18 +1350,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_dope_graph-agx_thor.json">138 fps</a></div>
-<div class="line">24 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_dope_graph-agx_thor.json">143 fps</a></div>
+<div class="line">22 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_dope_graph-x86-5090.json">199 fps</a></div>
-<div class="line">14 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_dope_graph-thor-t4000.json">116 fps</a></div>
+<div class="line">53 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_dope_graph-dgx_spark.json">89.3 fps</a></div>
+<div class="line">27 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_dope_graph-x86-5090.json">193 fps</a></div>
+<div class="line">17 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_ess_benchmark/scripts/isaac_ros_ess_graph.py">DNN Stereo Disparity Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_ess_benchmark/scripts/isaac_ros_ess_graph.py">DNN Stereo Disparity Graph</a></div>
 <div class="line">Full</div>
 </div>
 </td>
@@ -1173,18 +1380,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_ess_graph-agx_thor.json">73.6 fps</a></div>
-<div class="line">29 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_ess_graph-agx_thor.json">157 fps</a></div>
+<div class="line">13 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_ess_graph-x86-5090.json">348 fps</a></div>
-<div class="line">8.5 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_ess_graph-thor-t4000.json">68.5 fps</a></div>
+<div class="line">38 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_ess_graph-dgx_spark.json">150 fps</a></div>
+<div class="line">13 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_ess_graph-x86-5090.json">347 fps</a></div>
+<div class="line">9.9 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_ess_benchmark/scripts/isaac_ros_light_ess_graph.py">DNN Stereo Disparity Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_ess_benchmark/scripts/isaac_ros_light_ess_graph.py">DNN Stereo Disparity Graph</a></div>
 <div class="line">Light</div>
 </div>
 </td>
@@ -1193,18 +1410,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_light_ess_graph-agx_thor.json">219 fps</a></div>
-<div class="line">17 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_light_ess_graph-agx_thor.json">285 fps</a></div>
+<div class="line">9.2 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_light_ess_graph-x86-5090.json">350 fps</a></div>
-<div class="line">7.3 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_light_ess_graph-thor-t4000.json">155 fps</a></div>
+<div class="line">20 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_light_ess_graph-dgx_spark.json">231 fps</a></div>
+<div class="line">11 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_light_ess_graph-x86-5090.json">349 fps</a></div>
+<div class="line">9.2 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_stereo_image_proc_benchmark/scripts/isaac_ros_disparity_graph.py">Stereo Disparity Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_stereo_image_proc_benchmark/scripts/isaac_ros_disparity_graph.py">Stereo Disparity Graph</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -1212,18 +1439,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_disparity_graph-agx_thor.json">223 fps</a></div>
-<div class="line">5.6 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_disparity_graph-agx_thor.json">203 fps</a></div>
+<div class="line">10 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_disparity_graph-x86-5090.json">634 fps</a></div>
-<div class="line">6.6 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_disparity_graph-thor-t4000.json">185 fps</a></div>
+<div class="line">26 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_disparity_graph-dgx_spark.json">183 fps</a></div>
+<div class="line">9.0 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_disparity_graph-x86-5090.json">600 fps</a></div>
+<div class="line">6.9 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_detectnet_benchmark/scripts/isaac_ros_detectnet_graph.py">DetectNet Object Detection Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_detectnet_benchmark/scripts/isaac_ros_detectnet_graph.py">DetectNet Object Detection Graph</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -1231,18 +1468,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_detectnet_graph-agx_thor.json">143 fps</a></div>
-<div class="line">27 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_detectnet_graph-agx_thor.json">143 fps</a></div>
+<div class="line">18 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_detectnet_graph-x86-5090.json">242 fps</a></div>
-<div class="line">17 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_detectnet_graph-thor-t4000.json">111 fps</a></div>
+<div class="line">43 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_detectnet_graph-dgx_spark.json">88.0 fps</a></div>
+<div class="line">19 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_detectnet_graph-x86-5090.json">227 fps</a></div>
+<div class="line">18 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_grounding_dino_benchmark/scripts/isaac_ros_grounding_dino_graph.py">Grounding DINO Object Detection Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_grounding_dino_benchmark/scripts/isaac_ros_grounding_dino_graph.py">Grounding DINO Object Detection Graph</a></div>
 </div>
 </td>
 <td><div class="line-block">
@@ -1250,18 +1497,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_grounding_dino_graph-agx_thor.json">22.9 fps</a></div>
-<div class="line">70 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_grounding_dino_graph-agx_thor.json">23.4 fps</a></div>
+<div class="line">50 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_grounding_dino_graph-x86-5090.json">144 fps</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_grounding_dino_graph-thor-t4000.json">22.3 fps</a></div>
+<div class="line">90 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_grounding_dino_graph-dgx_spark.json">17.5 fps</a></div>
+<div class="line">63 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_grounding_dino_graph-x86-5090.json">130 fps</a></div>
 <div class="line">15 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_rtdetr_benchmark/scripts/isaac_ros_rtdetr_graph.py">RT-DETR Object Detection Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_rtdetr_benchmark/scripts/isaac_ros_rtdetr_graph.py">RT-DETR Object Detection Graph</a></div>
 <div class="line">SyntheticaDETR</div>
 </div>
 </td>
@@ -1270,18 +1527,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_rtdetr_graph-agx_thor.json">219 fps</a></div>
-<div class="line">23 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_rtdetr_graph-agx_thor.json">188 fps</a></div>
+<div class="line">12 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_rtdetr_graph-x86-5090.json">457 fps</a></div>
-<div class="line">8.0 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_rtdetr_graph-thor-t4000.json">156 fps</a></div>
+<div class="line">35 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_rtdetr_graph-dgx_spark.json">165 fps</a></div>
+<div class="line">12 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_rtdetr_graph-x86-5090.json">444 fps</a></div>
+<div class="line">11 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_unet_benchmark/scripts/isaac_ros_unet_graph.py">TensorRT Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_unet_benchmark/scripts/isaac_ros_unet_graph.py">TensorRT Graph</a></div>
 <div class="line">PeopleSemSegNet</div>
 </div>
 </td>
@@ -1290,18 +1557,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_unet_graph-agx_thor.json">460 fps</a></div>
-<div class="line">15 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_unet_graph-agx_thor.json">449 fps</a></div>
+<div class="line">8.1 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_unet_graph-x86-5090.json">510 fps</a></div>
-<div class="line">12 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_unet_graph-thor-t4000.json">319 fps</a></div>
+<div class="line">19 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_unet_graph-dgx_spark.json">562 fps</a></div>
+<div class="line">6.7 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_unet_graph-x86-5090.json">1330 fps</a></div>
+<div class="line">6.3 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-even"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_segment_anything_benchmark/scripts/isaac_ros_segment_anything_graph.py">SAM Image Segmentation Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_segment_anything_benchmark/scripts/isaac_ros_segment_anything_graph.py">SAM Image Segmentation Graph</a></div>
 <div class="line">Full SAM</div>
 </div>
 </td>
@@ -1310,18 +1587,28 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_sam_graph-agx_thor.json">2.23 fps</a></div>
-<div class="line">270 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_sam_graph-agx_thor.json">2.26 fps</a></div>
+<div class="line">350 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_sam_graph-x86-5090.json">20.8 fps</a></div>
-<div class="line">58 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_sam_graph-thor-t4000.json">2.24 fps</a></div>
+<div class="line">290 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_sam_graph-dgx_spark.json">2.22 fps</a></div>
+<div class="line">280 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_sam_graph-x86-5090.json">20.8 fps</a></div>
+<div class="line">57 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 <tr class="row-odd"><td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks/isaac_ros_segment_anything_benchmark/scripts/isaac_ros_mobile_segment_anything_graph.py">SAM Image Segmentation Graph</a></div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks/isaac_ros_segment_anything_benchmark/scripts/isaac_ros_mobile_segment_anything_graph.py">SAM Image Segmentation Graph</a></div>
 <div class="line">Mobile SAM</div>
 </div>
 </td>
@@ -1330,30 +1617,35 @@
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_mobile_sam_graph-agx_thor.json">21.0 fps</a></div>
-<div class="line">580 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_mobile_sam_graph-agx_thor.json">15.0 fps</a></div>
+<div class="line">230 ms &#64; 30Hz</div>
 </div>
 </td>
 <td><div class="line-block">
-<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/results/isaac_ros_mobile_sam_graph-x86-5090.json">74.1 fps</a></div>
-<div class="line">26 ms &#64; 30Hz</div>
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_mobile_sam_graph-thor-t4000.json">15.0 fps</a></div>
+<div class="line">200 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_mobile_sam_graph-dgx_spark.json">14.6 fps</a></div>
+<div class="line">82 ms &#64; 30Hz</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/results/isaac_ros_mobile_sam_graph-x86-5090.json">70.3 fps</a></div>
+<div class="line">20 ms &#64; 30Hz</div>
 </div>
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Live graph benchmarks are available for specific hardware configurations.
-Please refer to the relevant package documentation for more details on supported configurations.</p>
-</div>
 <section id="methodology">
 <h2>Methodology<a class="headerlink" href="#methodology" title="Link to this heading">#</a></h2>
 <p>The performance numbers provided above are measured using
 <a class="reference internal" href="../repositories_and_packages/isaac_ros_benchmark/index.html"><span class="doc">Isaac ROS Benchmark</span></a>.
 Configuration files for reproducing results are provided in the launch scripts for each benchmark
-<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.1/benchmarks">here</a>.</p>
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/release-4.2/benchmarks">here</a>.</p>
 <p>Frames per second (fps) are measured using the maximum sustained framerate for the accelerated
 computational pipeline on each listed platforms. Performance measured includes input node → graph
 of nodes under performance test → output node where the publishing rate of the input node is
@@ -1506,7 +1798,7 @@ capture rate.</p>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Feb 03, 2026.
+  Last updated on Feb 19, 2026.
   <br/>
 </p></div>
       

@@ -1,0 +1,222 @@
+Tutorial for Visual SLAM Using a RealSense Camera in RGBD mode
+==============================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/vslam_realsense_rgbd.gif>`
+   :align: center
+   :width: 600px
+
+Overview
+--------
+
+This tutorial demonstrates how to set up
+:ir_repo:`Isaac ROS Visual SLAM <isaac_ros_visual_slam>` with
+a `RealSense camera <https://realsenseai.com/stereo-depth-cameras>`__ in RGBD mode.
+
+.. note::
+
+   The :ir_repo:`launch file <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_realsense_rgbd.launch.py>`
+   provided in this tutorial is designed for RealSense cameras with
+   an integrated depth estimation engine. We strongly recommend using this mode for RealSense cameras that
+   support synchronization between the RGB sensor and depth sensor. For cameras without hardware synchronization (such as the RealSense D435),
+   you may experience FPS drops, as weakly-synchronized depth-image pairs may be discarded.
+
+.. note::
+
+   This tutorial requires a compatible RealSense camera. Please refer to the
+   :ref:`camera compatibility list <getting_started/sensors/realsense_setup:camera compatibility>`
+   for supported models.
+
+Tutorial Walkthrough - VSLAM Execution
+--------------------------------------
+
+1. Complete the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`.
+
+2. Complete the quickstart :ref:`here <repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index:quickstart>`.
+
+3. [Terminal 1] Run ``realsense-camera`` node and ``visual_slam`` node.
+
+   Make sure you have your RealSense camera attached to the system, and
+   then start the Isaac ROS container.
+
+   .. code:: bash
+
+      isaac-ros activate
+
+4. [Terminal 1] Inside the container, build and source the workspace:
+
+   .. code:: bash
+
+      cd /workspaces/isaac_ros-dev && \
+        colcon build --symlink-install && \
+        source install/setup.bash
+
+5. [Terminal 1] Run the launch file to start the RealSense camera and Visual SLAM nodes:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam_realsense_rgbd.launch.py
+
+6. [Terminal 2] Attach a second terminal to verify the operation.
+
+   Attach another terminal to the running container for issuing other ROS commands:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+   Verify that you can see all the ROS topics expected:
+
+   .. code:: bash
+
+      ros2 topic list
+
+   ..
+
+   .. dropdown:: Expected output:
+
+      .. code:: bash
+
+         /camera/aligned_depth_to_color/camera_info
+         /camera/aligned_depth_to_color/image_raw
+         /camera/aligned_depth_to_color/image_raw/compressed
+         /camera/aligned_depth_to_color/image_raw/compressedDepth
+         /camera/aligned_depth_to_color/image_raw/nitros
+         /camera/aligned_depth_to_color/image_raw/theora
+         /camera/aligned_depth_to_color/image_raw/zstd
+         /camera/color/camera_info
+         /camera/color/image_raw
+         /camera/color/image_raw/compressed
+         /camera/color/image_raw/compressedDepth
+         /camera/color/image_raw/nitros
+         /camera/color/image_raw/theora
+         /camera/color/image_raw/zstd
+         /camera/color/metadata
+         /camera/depth/camera_info
+         /camera/depth/image_rect_raw
+         /camera/depth/image_rect_raw/compressed
+         /camera/depth/image_rect_raw/compressedDepth
+         /camera/depth/image_rect_raw/theora
+         /camera/depth/image_rect_raw/zstd
+         /camera/depth/metadata
+         /camera/extrinsics/depth_to_color
+         /diagnostics
+         /parameter_events
+         /rosout
+         /tf
+         /tf_static
+         /visual_slam/initial_pose
+         /visual_slam/status
+         /visual_slam/tracking/odometry
+         /visual_slam/tracking/slam_path
+         /visual_slam/tracking/vo_path
+         /visual_slam/tracking/vo_pose
+         /visual_slam/tracking/vo_pose_covariance
+         /visual_slam/trigger_hint
+         /visual_slam/vis/gravity
+         /visual_slam/vis/landmarks_cloud
+         /visual_slam/vis/localizer
+         /visual_slam/vis/localizer_loop_closure_cloud
+         /visual_slam/vis/localizer_map_cloud
+         /visual_slam/vis/localizer_observations_cloud
+         /visual_slam/vis/loop_closure_cloud
+         /visual_slam/vis/observations_cloud
+         /visual_slam/vis/pose_graph_edges
+         /visual_slam/vis/pose_graph_edges2
+         /visual_slam/vis/pose_graph_nodes
+         /visual_slam/vis/slam_odometry
+         /visual_slam/vis/velocity
+
+
+   Check the output frequency of the ``realsense-camera`` RGB topic:
+
+   .. code:: bash
+
+      ros2 topic hz /camera/color/image_raw --window 20
+
+   ..
+
+      Example output:
+
+      .. code:: bash
+
+         average rate: 56.729
+                     min: 0.016s max: 0.034s std dev: 0.00369s window: 20
+         average rate: 59.532
+                     min: 0.017s max: 0.034s std dev: 0.00314s window: 20
+
+      Press ``Ctrl`` + ``C`` to stop the output.
+
+   You can also check the output frequency of the aligned depth topic:
+
+   .. code:: bash
+
+      ros2 topic hz /camera/aligned_depth_to_color/image_raw --window 20
+
+   ..
+
+      Example output:
+
+      .. code:: bash
+
+         average rate: 59.399
+                       min: 0.017s max: 0.018s std dev: 0.00020s window: 20
+         average rate: 59.431
+                       min: 0.015s max: 0.019s std dev: 0.00047s window: 20
+
+   Verify that the ``visual_slam`` node is producing output at the same rate as the input:
+
+   .. code:: bash
+
+      ros2 topic hz /visual_slam/tracking/odometry --window 20
+
+   ..
+
+      Example output:
+
+      .. code:: bash
+
+         average rate: 58.086
+                       min: 0.012s max: 0.019s std dev: 0.00309s window: 20
+         average rate: 59.556
+                       min: 0.012s max: 0.021s std dev: 0.00220s window: 20
+         average rate: 56.812
+                       min: 0.015s max: 0.029s std dev: 0.00282s window: 20
+
+Tutorial Walkthrough - Live Visualization
+------------------------------------------
+
+Run RViz2 while the ``realsense-camera`` and ``visual_slam`` nodes are running.
+
+.. note::
+
+   Running ``RViz2`` on a remote PC over the network can be challenging,
+   especially when subscribing to image topics, due to the increased burden on ROS 2 network transport.
+   Working with RViz2 in an X11-forwarded window can also be difficult due to
+   network bandwidth limitations.
+
+#. In a new terminal, activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Install RViz:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+      source /opt/ros/:ir_ros_distro:/setup.bash
+
+#. Open RViz2 with the RealSense RGBD configuration:
+
+   .. code:: bash
+
+      source ${ISAAC_ROS_WS}/install/setup.bash
+      rviz2 -d $(ros2 pkg prefix isaac_ros_visual_slam --share)/rviz/realsense_rgbd.cfg.rviz
+
+As you move the camera, verify that the position and orientation of the frames
+correspond to the camera's movement relative to its starting pose.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/vslam_realsense_rgbd.gif>`
+   :align: center
+   :width: 600px

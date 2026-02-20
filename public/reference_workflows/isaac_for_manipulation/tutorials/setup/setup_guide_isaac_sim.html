@@ -62,7 +62,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Feb 03, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 19, 2026"/>
 
 
 <script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
@@ -395,8 +395,9 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../concepts/stereo_dnn/index.html">Stereo DNN</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../concepts/visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial: Localization with cuVGL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../concepts/visual_global_localization/tutorials/tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../concepts/visual_global_localization/tutorials/tutorial_cuvgl_localization.html">Tutorial: Localization with cuVGL</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../concepts/visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -511,10 +512,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
-</ul>
-</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../concepts/localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
 </ul>
@@ -681,12 +679,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../../../../v/release-4.1/reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim.html">release-4.1</a></dd>
+        <dd><a href="../../../../v/release-4.2/reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim.html">release-4.2</a></dd>
         <dd><a href="setup_guide_isaac_sim.html">latest</a></dd>
         <dd><a href="../../../../v/release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../../v/release-3.1/index.html">release-3.1</a></dd>
         <dd><a href="../../../../v/release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../../v/release-4.0/reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim.html">release-4.0</a></dd>
+        <dd><a href="../../../../v/release-4.1/reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim.html">release-4.1</a></dd>
     </dl>
   </div>
 </div></div>
@@ -780,16 +779,7 @@ Binary Package</label><div class="sd-tab-content docutils">
 </div>
 </li>
 <li><p>Install system dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-pip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--break-system-packages<span class="w"> </span>cupy-cuda13x<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--break-system-packages<span class="w"> </span>hdbscan
-</pre></div>
-</div>
-</li>
-<li><p>Install Python Dependencies (only required for workflows that run <code class="docutils literal notranslate"><span class="pre">RL</span></code> policies):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-git<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--break-system-packages<span class="w"> </span>tensordict<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--break-system-packages<span class="w"> </span>--no-deps<span class="w"> </span>rsl-rl-lib<span class="o">==</span><span class="m">3</span>.1.1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-pip
 </pre></div>
 </div>
 </li>
@@ -808,7 +798,7 @@ python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </s
 Build from Source</label><div class="sd-tab-content docutils">
 <ol class="arabic">
 <li><p>Clone this repository under <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/src</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>-b<span class="w"> </span>release-4.1<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator.git<span class="w"> </span>isaac_manipulator
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>-b<span class="w"> </span>release-4.2<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator.git<span class="w"> </span>isaac_manipulator
 </pre></div>
 </div>
 </li>
@@ -824,16 +814,7 @@ Build from Source</label><div class="sd-tab-content docutils">
 </div>
 </li>
 <li><p>Install system dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-pip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--break-system-packages<span class="w"> </span>cupy-cuda13x<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--break-system-packages<span class="w"> </span>hdbscan
-</pre></div>
-</div>
-</li>
-<li><p>Install Python Dependencies (only required for workflows that run <code class="docutils literal notranslate"><span class="pre">RL</span></code> policies):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-git<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--break-system-packages<span class="w"> </span>tensordict<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--break-system-packages<span class="w"> </span>--no-deps<span class="w"> </span>rsl-rl-lib<span class="o">==</span><span class="m">3</span>.1.1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-pip
 </pre></div>
 </div>
 </li>
@@ -1037,7 +1018,7 @@ Other Workflows</label><div class="sd-tab-content docutils">
 <li><p>Change the <code class="docutils literal notranslate"><span class="pre">PhysicsScene</span></code> prim (<code class="docutils literal notranslate"><span class="pre">/World/PhysicsScene</span></code>) by going to its properties and changing the <code class="docutils literal notranslate"><span class="pre">Time</span> <span class="pre">Step</span> <span class="pre">Per</span> <span class="pre">Second</span></code> to <code class="docutils literal notranslate"><span class="pre">30</span></code> or <code class="docutils literal notranslate"><span class="pre">60</span></code>. This will make the scene run significantly faster. Gear Assembly needs a time step of <code class="docutils literal notranslate"><span class="pre">120</span></code> because of the higher quality of physics simulation required.</p>
 <blockquote>
 <div><figure class="align-default">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/physics_scene_speedup.png/"><img alt="PhysicsScene" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/physics_scene_speedup.png/" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/physics_scene_speedup.png/"><img alt="PhysicsScene" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/physics_scene_speedup.png/" style="width: 100%;" /></a>
 </figure>
 </div></blockquote>
 </li>
@@ -1204,7 +1185,7 @@ Other Workflows</label><div class="sd-tab-content docutils">
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Feb 03, 2026.
+  Last updated on Feb 19, 2026.
   <br/>
 </p></div>
       

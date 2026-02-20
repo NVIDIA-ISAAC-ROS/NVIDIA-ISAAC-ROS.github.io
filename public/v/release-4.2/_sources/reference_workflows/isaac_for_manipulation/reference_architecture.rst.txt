@@ -1,0 +1,286 @@
+Isaac for Manipulation Reference Architecture
+=============================================
+
+What is NVIDIA Isaac for Manipulation?
+---------------------------------------
+
+NVIDIA Isaac for Manipulation is a collection of GPU-accelerated libraries and Isaac ROS
+packages for perception-driven manipulation using robotic arms. The targeted use-cases
+range from automated inspection to Pick and Place for logistics and manufacturing. Isaac
+for Manipulation provides capabilities for object detection, object pose estimation, and
+time-optimal collision-free motion generation using cuMotion. cuMotion is a
+GPU-accelerated library developed by NVIDIA for computing time-optimal, minimal-jerk
+trajectories for serial robot arms. These modular and extensible capabilities allow
+developers to integrate any combination of packages into their existing pipelines to
+accelerate tasks.
+
+What is this Reference Architecture?
+------------------------------------
+
+This reference architecture explains the various components that are part of Isaac for Manipulation. It
+includes a validated reference architecture that has been tested and validated to run on
+NVIDIA Jetson Orin platforms and Ampere or higher NVIDIA GPUs.
+
+Who is this document for?
+-------------------------
+
+This document is to assist engineers in the robotic platform ecosystem, including those at
+Original Equipment Manufacturers (OEMs), Systems Integrators (SIs), and Independent
+Software Vendors (ISVs). It provides guidance on utilizing the reference architecture as a
+starting point to develop robust and performant manipulation solutions for robotic arms.
+
+Reference Architecture
+----------------------
+
+The Reference Architecture for Isaac for Manipulation includes the following components.
+
+1. **Visual Input:** Generates RGB and Depth images using live or simulated stereo cameras. This component uses the **ESS depth estimation** model to generate depth images when using RGB cameras.
+
+2. **Environment and Obstacle Perception:** Integrates RGB images, depth images, camera poses, and segmentation masks to create environment representation. This component uses **Nvblox** for 3D scene reconstruction.
+
+3. **Robot Configuration:** Provides robot description.
+
+4. **Goal State Estimation:** Provides desired goal pose to achieve.
+
+5. **Motion Planner:** Generates trajectory for collision-free motion to goal. This component uses the **cuMotion** library for generating time-optimal trajectories.
+
+6. **Hardware Platform:** Includes list of supported compute platforms and robot arm manipulators.
+
+This architecture is shown in the following diagram:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_main.png>`
+
+The components in the reference architecture represent functional blocks that can have
+multiple implementations. The primary implementation for each component has
+undergone testing by NVIDIA.
+
+Components
+----------
+
+This section details the components used in Isaac for Manipulation and provides links to tested
+examples you can run out of the box.
+
+Component 1 - Visual Input and depth estimation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_component1.png>`
+
+This component is responsible for supplying the RGB and depth images required by the
+Environment and Obstacle Perception (2) component.
+
+In the reference architecture, this component is implemented using:
+
+* RGBD camera: The Intel RealSense camera provides RGBD images, which can be used directly by the environment perception component. Alternatively, the RGB images can be processed by the ESS Depth Estimation model, which generates depth images for environment perception.
+
+.. admonition:: Useful Links
+
+   - :doc:`ESS Depth Estimation </concepts/stereo_depth/ess/index>`
+   - :doc:`Supported Intel RealSense cameras </getting_started/sensors/realsense_setup>`
+
+There are other ways visual input can be provided to the workflow. These include the
+following input sources:
+
+* Rosbag: Running with pre-recorded data from a rosbag.
+* NVIDIA Isaac Sim: The tutorial below shows how to use Isaac for Manipulation with Isaac Sim. It demonstrates trajectory planning for a Franka robot simulated in Isaac Sim.
+
+.. hint::
+
+   - :doc:`Tutorial for robot trajectory planning using RealSense camera. </reference_workflows/isaac_for_manipulation/tutorials/tutorial_e2e>`
+   - :doc:`Tutorial for cuMotion MoveIt Plugin with Isaac Sim. </concepts/manipulation/cumotion_moveit/tutorial_isaac_sim>`
+   - :doc:`Tutorial for Isaac for Manipulation workflows with Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim>`
+
+Component 2 - Nvblox for Environment and Obstacle Perception
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_component2.png>`
+
+This component provides a representation of the environment and obstacles in it for
+avoiding collisions during robot arm motion.
+
+In the reference architecture, this obstacle representation is created by Nvblox, a library for
+3D scene reconstruction. Nvblox processes RGB images and depth images from the Visual
+Input (component 1) to produce cuboids or meshes representing obstacles. This is utilized
+by the Motion Planner (component 5) for planning collision-free motion.
+
+Camera calibration is required while using Nvblox, which is done using the MoveIt
+Calibration package. For information on how to use this, please visit the link for setting up a
+UR5e robot below.
+
+.. admonition:: Useful Links
+
+   - :doc:`Nvblox </concepts/scene_reconstruction/nvblox/index>`
+   - `MoveIt Calibration <https://github.com/illumo-robotics/moveit_calibration>`__
+   - :doc:`Setting Up UR5e robot </reference_workflows/isaac_for_manipulation/tutorials/tutorial_e2e>`
+
+Component 3 - Robot Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_component3.png>`
+    :align: center
+
+This component provides the robot configuration to cuMotion - the Motion Planner
+(component 5). This configuration is used to generate motion and perform segmentation
+to filter out the robot arm.
+
+Two files are required:
+
+#. URDF (Universal Robot Description Format) file - for basic kinematics.
+
+#. XRDF (Extended Robot Description Format) file - for collision geometry, definition of
+the configuration space, and more data. Please see Robot Configuration below.
+
+.. admonition:: Useful Links
+
+   - :doc:`Robot Configuration </concepts/manipulation/index>`
+
+Component 4 - Goal State Estimation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_component4.png>`
+
+This component provides an interface for users to give a goal pose to the robot arm.
+In the reference architecture, this is done using RViz or via Python scripts.
+
+Below is the MotionPlanning panel on RViz from where you can enable cuMotion and select
+a target goal pose for the robot.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_rviz.png>`
+
+Refer to the Isaac ROS MoveIt goal setter on how to provide the goal state using scripts.
+
+.. admonition:: Useful Links
+
+   - :doc:`Isaac ROS MoveIt goal setter </repositories_and_packages/isaac_ros_cumotion/isaac_ros_moveit_goal_setter/index>`
+
+Component 5 - Motion Planner
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_component5.png>`
+    :align: center
+
+This is the key component in the Isaac for Manipulation pipeline - cuMotion.
+
+The environment state (from component 2), robot configuration (from component 3) and
+goal pose (from component 4) are passed as input to cuMotion. The cuMotion Planner’s
+motion generation functions are exposed via a plugin for MoveIt 2.
+
+cuMotion includes functions to accurately segment and filter out parts of the robot. This
+eliminates misleading contributions from the robot itself while reconstructing obstacles in
+the environment.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_segmentation.png>`
+    :align: center
+
+cuMotion generates a time-optimal trajectory to the goal state considering obstacles in
+the environment. This joint-space trajectory is passed to the robot controller on the robot
+for execution. The robot controller is exposed via drivers on a physical robot or the Isaac
+Sim API in a simulated setup.
+
+.. admonition:: Useful Links
+
+   - :doc:`NVIDIA cuMotion </concepts/manipulation/index>`
+   - :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>`
+   - `cuRobo library <https://curobo.org/>`__
+   - `MoveIt 2 documentation <https://moveit.picknik.ai/main/index.html>`__
+   - :doc:`Isaac ROS cuMotion Robot Segmentation </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index>`
+
+Component 6 - Hardware Platform
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_RA_component6.PNG>`
+    :align: center
+
+This component consists of hardware platforms and robot arm manipulators on which
+Isaac for Manipulation has been tested:
+
+1. Universal Robots UR5e manipulator
+2. Universal Robots UR10e manipulator
+3. Franka
+
+Isaac for Manipulation has been tested on the Jetson Thor platforms running JetPack 7 and on
+x86_64 systems with NVIDIA GPUs. See more in Supported Platforms below.
+
+.. admonition:: Useful Links
+
+   - :doc:`cuMotion Supported Platforms </repositories_and_packages/isaac_ros_cumotion/index>`
+   - `NVIDIA Jetson Thor <https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-thor>`__
+   - `Universal Robots <https://www.universal-robots.com>`__
+   - `Franka Robotics <https://franka.de>`__
+
+.. hint::
+
+   - :doc:`Tutorial for cuMotion with a Universal Robots manipulator. </reference_workflows/isaac_for_manipulation/tutorials/tutorial_e2e>`
+   - :doc:`Tutorial for Isaac for Manipulation workflows with Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim>`
+
+Integration with additional Isaac packages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some use-cases would additionally benefit from the following Isaac packages. These can
+be integrated into existing pipelines that optionally may be using Isaac for Manipulation
+components.
+
+* **Isaac ROS Pose Estimation** - estimating the 6 DoF pose of objects using FoundationPose. FoundationPose is a pre-trained model that works on different, novel objects without retraining. The output includes object pose and tracking information, which can be used by manipulator grippers to calculate grasps for objects.
+
+* **Isaac ROS Object Detection** - detecting objects using SyntheticaDETR trained models. SyntheticaDETR is trained exclusively on synthetically generated data using NVIDIA Omniverse. This package can be used individually for object detection and the output bounding boxes can also be used as initial estimates for FoundationPose when used together.
+
+.. admonition:: Useful Links
+
+   - :doc:`FoundationPose model </concepts/pose_estimation/foundationpose/index>`
+   - :doc:`Isaac ROS Pose Estimation </repositories_and_packages/isaac_ros_pose_estimation/index>`
+   - `SyntheticaDETR models <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/synthetica_detr>`__
+   - :doc:`Isaac ROS Object Detection </repositories_and_packages/isaac_ros_object_detection/index>`
+   - `NVIDIA Omniverse <https://www.nvidia.com/en-us/omniverse>`__
+
+.. hint::
+
+   - :doc:`Isaac ROS Pose Estimation using FoundationPose </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`
+   - :doc:`Tutorial to launch FoundationPose Tracking </concepts/pose_estimation/foundationpose/tutorial_tracking>`
+
+* **Isaac ROS Gear Assembly** - a workflow for inserting gears into a peg stand using a contact rich policy.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/robot-arm-gear-assembly-1.gif>`
+    :align: center
+
+This component is responsible for rich contact insertion behavior skills on the robot. Unlike the previous motion planner,
+this planner is dynamic to changes in the environment during execution of the policy, this allows the robot to constantly
+adapt to the environment since it receives the real-time environment state during execution and is able to
+adjust its trajectory due to the memory aware algorithmic design.
+
+.. admonition:: Useful Links
+
+   - :doc:`Dynamic Contact Rich Insertion Policy </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_gear_assembly/index>`
+   - `NVIDIA Jetson Thor <https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-thor/>`__
+   - `Universal Robots <https://www.universal-robots.com>`__
+   - `Robotiq Grippers <https://robotiq.com/products/adaptive-grippers>`__
+   - `Blog Post on Dynamic Contact Rich Insertion Policy <https://developer.nvidia.com/blog/bridging-the-sim-to-real-gap-for-industrial-robotic-assembly-applications-using-nvidia-isaac-lab/>`__
+
+Summary
+-------
+
+This reference architecture for Isaac for Manipulation explains components and examples that have undergone
+testing, and provide a robust foundation for developing end-use case applications. Individual components of Isaac for Manipulation can be used together and integrated to meet diverse application requirements.
+
+Additional Resources
+--------------------
+
+Check out our resources on using Isaac for Manipulation with your robots.
+
+**Learn more about featured NVIDIA solutions:**
+
+  * :doc:`cuMotion </concepts/manipulation/index>`
+  * :doc:`Nvblox </concepts/scene_reconstruction/nvblox/index>`
+  * `NVIDIA Isaac Sim <https://developer.nvidia.com/isaac/sim>`__
+  * `NVIDIA Omniverse <https://www.nvidia.com/en-us/omniverse>`__
+  * `NGC pre-trained models <https://catalog.ngc.nvidia.com/models?filters=&orderBy=weightPopularDESC&query=&page=&pageSize=>`__
+
+**Review Documentation & Samples:**
+
+  * Isaac for Manipulation
+  * `Developer Documentation <https://nvidia-isaac-ros.github.io/index.html>`__
+  * `NVIDIA Isaac ROS <https://developer.nvidia.com/isaac/ros>`__
+  * `Isaac ROS Developer Forum <https://forums.developer.nvidia.com/c/agx-autonomous-machines/isaac/isaac-ros/600>`__
+
+**Build your business case:**
+
+  * See how `Intrinsic.ai <https://developer.nvidia.com/blog/automating-smart-pick-and-place-with-intrinsic-flowstate-and-nvidia-isaac-manipulator/>`__ uses Isaac for Manipulation to generate grasp poses and robot motions, generating motion plans within 30 milliseconds.
+  * See how to `design, create, and deploy <https://developer.nvidia.com/blog/create-design-and-deploy-robotics-applications-using-new-nvidia-isaac-foundation-models-and-workflows/>`__ robotics applications using NVIDIA Isaac.

@@ -1,0 +1,349 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_segmentation> <isaac_ros_unet>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_unet> <quickstart.tar.gz>`
+
+.. _install-peoplesemsegnet:
+
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-unet
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_image_segmentation>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_segmentation/isaac_ros_unet --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_unet --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_segmentation/isaac_ros_unet
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Prepare PeopleSemSegnet Model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Download and install model assets inside the Isaac ROS environment:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-peoplesemseg-models-install &&
+      ros2 run isaac_ros_peoplesemseg_models_install install_peoplesemsegnet_vanilla.sh --eula &&
+      ros2 run isaac_ros_peoplesemseg_models_install install_peoplesemsegnet_shuffleseg.sh --eula
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=unet interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_unet/quickstart_interface_specs.json engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegnet/deployable_quantized_vanilla_unet_onnx_v2.0/1/model.plan input_binding_names:=['input_1:0']
+
+      #. Open a **second** terminal inside the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_unet/quickstart.bag
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,unet engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegnet/deployable_quantized_vanilla_unet_onnx_v2.0/1/model.plan input_binding_names:=['input_1:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax'
+
+   .. tab:: ZED Camera
+
+      #. Ensure that you have already set up your ZED camera using :doc:`ZED setup tutorial </getting_started/sensors/zed_setup>`.
+
+      #. Continuing inside the Isaac ROS environment, install dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-image-proc ros-:ir_ros_distro:-isaac-ros-zed
+
+      #. Run the following launch file to spin up a demo of this package using a ZED Camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
+            launch_fragments:=zed_mono_rect,unet \
+            engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegnet/deployable_quantized_vanilla_unet_onnx_v2.0/1/model.plan input_binding_names:=['input_1:0'] output_binding_names:=['argmax_1'] network_output_type:='argmax' \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_unet/zed2_quickstart_interface_specs.json
+
+         .. note::
+
+            If you are using the `ZED X` series, replace  `zed2_quickstart_interface_specs.json` with `zedx_quickstart_interface_specs.json` in the above command.
+
+.. note::
+
+   If you want to use the ``shuffleseg`` model, replace the ``engine_file_path``  with the ``shuffleseg`` engine location, set the ``input_binding_names`` to ``['input_2']``, and set  ``use_planar_input`` to ``False``.
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+#. Open a **new** terminal inside the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Install ``rqt_image_view``:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-rqt-image-view
+
+#. Visualize and validate the output of the package with ``rqt_image_view``:
+
+   .. code:: bash
+
+      ros2 run rqt_image_view rqt_image_view /unet/colored_segmentation_mask
+
+   After **about 1 minute**, your output should look like this:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/peoplesemsegnet_shuffleseg_rqt.png>`
+      :alt: RQT showing segmentation of people
+      :align: center
+
+#. Visualize the blended image with ``rqt_image_view``:
+
+   .. code:: bash
+
+      ros2 run rqt_image_view rqt_image_view /segmentation_image_overlay
+
+   Your output should look like this:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/peoplesemsegnet_blend_rqt.png>`
+      :alt: RQT showing alpha blended image
+      :align: center
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+
+   Tutorial with Isaac Sim </concepts/segmentation/unet/tutorial_isaac_sim>
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, see :doc:`troubleshooting deeplearning </troubleshooting/deep_learning>`.
+
+API
+----
+
+Usage
+~~~~~
+
+Two launch files are provided to use this package. The first launch file launches ``isaac_ros_tensor_rt``, whereas the other one uses ``isaac_ros_triton``, along with
+the necessary components to perform encoding on images and decoding of ``U-Net``'s output.
+
+.. note::
+
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+========================================= ====================
+Launch File                               Components Used
+========================================= ====================
+``isaac_ros_unet_tensor_rt.launch.py``    :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TensorRTNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index>`, :doc:`UNetDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+``isaac_ros_unet_triton.launch.py``       :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`UNetDecoderNode </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index>`
+========================================= ====================
+
+UNetDecoderNode
+~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``color_segmentation_mask_encoding``
+     - ``string``
+     - ``rgb8``
+     - The image encoding of the colored segmentation mask. Supported values: ``rgb8``, ``bgr8``
+
+   * - ``color_palette``
+     - ``int64_t list``
+     - ``[]``
+     - Vector of integers where each element represents the RGB color hex code for the corresponding class
+
+   * - ``network_output_type``
+     - ``string``
+     - ``softmax``
+     - The type of output that the network provides. Supported values: ``softmax``, ``argmax``, ``sigmoid``
+
+   * - ``mask_width``
+     - ``int16_t``
+     - ``960``
+     - The width of the segmentation mask.
+
+   * - ``mask_height``
+     - ``int16_t``
+     - ``544``
+     - The height of the segmentation mask.
+
+.. note::
+
+   -  The model output should be ``NCHW`` or ``NHWC``. In this context, the ``C`` refers to the class.
+   -  For the ``network_output_type``, the ``softmax`` and ``sigmoid`` option expects a single 32 bit floating point tensor. For the ``argmax`` option, a single signed 32 bit integer tensor is expected.
+   -  Models with greater than 255 classes are not supported. If a class label greater than 255 is detected, this mask will be downcast to 255 in the raw segmentation.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``tensor_sub``
+     - :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`
+     - The tensor that contains raw probabilities for every class in each pixel.
+
+.. note::
+
+   All input images are required to have height and width that are both an even number of pixels.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``unet/raw_segmentation_mask``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - The raw segmentation mask, encoded in mono8. Each pixel represents a class label.
+
+   * - ``unet/colored_segmentation_mask``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - The colored segmentation mask. The color palette is user specified by the ``color_palette`` parameter.
+
+.. |package_name| replace:: ``isaac_ros_unet``

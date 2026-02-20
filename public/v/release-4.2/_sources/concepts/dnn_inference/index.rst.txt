@@ -1,0 +1,45 @@
+=============
+DNN Inference
+=============
+
+Overview
+------------
+
+DNN (deep neural network) inference is the computational process involved with feeding input through a **pretrained** neural network model to infer or predict an output.
+The input, such as images, text, or audio, must first be encoded or pre-processed into a set of tensors (collection of numbers).
+Similarly, the output is a set of tensors that must be decoded or post-processed into a semantically meaningful output (e.g., text, image, image masks, poses, pixel coordinates, etc.).
+
+In robotics, DNN inference is often used to wire streams of sensor data through an encoder which feeds into a DNN inference package that has been loaded with a model capable of predicting useful outputs that lead to intelligent behaviors.
+For example, monocular camera images can be fed to a DNN inference framework such as TensorRT configured with a YOLOv8 model pre-trained for detecting cats.
+Streams of images are encoded as tensors and fed into TensorRT to run inference over the model to predict tensors that are interpreted by a YOLOv8 decoder as a set of bounding boxes in pixel coordinates.
+This information can now be used in a variety of intelligent behaviors such as stopping the robot until said cat has lost interest in your roaming robot.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/dnn_inference/graph.png>`
+   :alt: Encoder/inference/decoder pipeline
+   :align: center
+
+Resources
+------------
+- For more information on deep learning, see `NVIDIA Developer for Deep Learning <https://developer.nvidia.com/deep-learning>`__.
+- For more information on Triton and TensorRT, click :doc:`here </concepts/dnn_inference/tensorrt_and_triton_info>`.
+- For more models to use in your robotics application, click :doc:`here </concepts/dnn_inference/model_preparation>`.
+
+Repositories and Packages
+-------------------------
+
+We provide decoders for a variety of model architectures for various tasks:
+
+============================================================ ======================================================================
+Package Name                                                 Use Case
+============================================================ ======================================================================
+:ir_repo:`DNN Stereo Disparity <isaac_ros_dnn_stereo_depth>` Deep learned stereo disparity estimation
+:ir_repo:`Image Segmentation <isaac_ros_image_segmentation>` NVIDIA-accelerated, deep learned semantic image segmentation
+:ir_repo:`Object Detection <isaac_ros_object_detection>`     Deep learning model support for object detection including DetectNet
+:ir_repo:`Pose Estimation <isaac_ros_pose_estimation>`       Deep-learned, NVIDIA-accelerated 3D object pose estimation
+============================================================ ======================================================================
+
+.. toctree::
+   :hidden:
+   :glob:
+
+   *

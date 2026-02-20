@@ -1,0 +1,62 @@
+========
+Missions
+========
+
+**Webinar Available**
+
+Learn more about missions by watching the on-demand webinar: `Build Connected Robots with NVIDIA Isaac Dispatch and Client <https://gateway.on24.com/wcc/experience/elitenvidiabrill/1407606/3998202/isaac-ros-webinar-series>`_
+
+-------------
+Architecture
+-------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/missions/MD.png>`
+   :width: 650px
+   :alt: Mission Dispatch and Client Architecture
+   :align: center
+
+-----------------
+What is a Mission
+-----------------
+
+A mission is a series of tasks to be completed by a given robot. It is represented as a behavior tree generated from the ``mission_tree``, which is a list of task nodes that can be performed on the robot. The advantage of using a mission tree instead of an array of steps, is that it allows the robot to react to all sorts of situations. The behavior tree has an implicit sequence node as its root, which is also named “root”.
+
+Each mission tree node has four possible states: ``IDLE``, ``RUNNING``, ``SUCCESS``, and ``FAILURE``. Supported mission tree nodes are: *sequence*, *selector*, *route*, and *action*:
+
+======== ==================== =================================================================================================================================================================== =================================================================================================================================================================================================================================================================================================
+Field    Type                  Parameters                                                                                                                                                          Description
+======== ==================== =================================================================================================================================================================== =================================================================================================================================================================================================================================================================================================
+name     ``Optional[str]``    None                                                                                                                                                                A unique name to give the node. If not specified, it will be automatically set to the index of the node in the list
+parent   ``Optional[str]``    None                                                                                                                                                                The parent of the node. If not specified, it will be the “root” node.
+sequence ``Optional[object]`` None                                                                                                                                                                Executes children nodes in order. If the child node currently running completes with ``SUCCESS``, then the next child node is started. Otherwise, the sequence node completes with ``FAILURE``. If all children nodes complete with ``SUCCESS``, then the sequence node completes with ``SUCCESS``.
+selector ``Optional[object]`` None                                                                                                                                                                Executes children nodes in order. If the child node currently running completes with ``SUCCESS``, then the selector node completes with ``SUCCESS``. Otherwise, the next child node is started. If all children nodes fail, then the selector node completes with ``FAILURE``.
+action   ``Optional[object]`` ``name(string)``: The name of the action to trigger on the robot ``params(json)``: An arbitrary, action-specific JSON payload to send as parameters to the action   Performs some generic, named action on the robot.
+route    ``Optional[object]`` ``waypoints(List[Pose2D])``: A list of 2D poses for the robot to visit                                                                                                Instructs the robot to travel a given route. The robot may or may not visit intermediate waypoints, but the final waypoint must be visited. Will return either ``SUCCESS`` or ``FAILURE``, depending on whether the robot can successfully navigate to the final waypoint.
+======== ==================== =================================================================================================================================================================== =================================================================================================================================================================================================================================================================================================
+
+The difference between the *sequence* and *selector* node:
+
+* a *sequence* node attempts to run all the child nodes as long as ``SUCCESS`` is being returned and instantly returns ``FAILURE`` on a node failing*
+* a *selector* node attempts to get a single ``SUCCESS``, and on failure, keeps trying child nodes until it gets ``SUCCESS`` or exhausts all child nodes.
+
+ **Note**: All mission tree nodes are mutually exclusive -- a sequence node cannot also be a selector node, an action node cannot also be a route node.
+
+-----------------
+How it Works
+-----------------
+Each route or action mission tree node is translated into a separate VDA5050 Order message. Each of the waypoints in the route mission tree node is an Order node. They are appended together to form an Order message. For the action mission tree node, the action is attached to the first node of the Order, which is the one corresponding to the current pose of the robot. The Order messages are then sent out sequentially, based on the progression of the behavior tree. An example is shown in the following figure:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/missions/mission_orders.png>`
+   :width: 650px
+   :alt: Mission Orders
+   :align: center
+
+In this example, the mission is shown on the left. The robot is asked to go to a pick-up point and execute the action of picking up a book. After the action is executed successfully, the robot jumps to the next ``route_fallback`` selector node. If it fails to go to the drop-off point, then it goes back to the previous point and drops off the book. Otherwise, it drops off the book at the final goal point. The corresponding VDA5050 Order messages are shown on the right.
+
+----------
+References
+----------
+- :doc:`Isaac ROS Mission Client </repositories_and_packages/isaac_ros_cloud_control/index>`
+- `Isaac Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch>`_
+- `VDA5050 Specification <https://github.com/VDA5050/VDA5050/blob/main/VDA5050_EN.md>`_
+- `Build Connected Robots with NVIDIA Isaac Dispatch and Client <https://gateway.on24.com/wcc/experience/elitenvidiabrill/1407606/3998202/isaac-ros-webinar-series>`_

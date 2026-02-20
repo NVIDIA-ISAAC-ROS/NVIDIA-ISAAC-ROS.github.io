@@ -1,0 +1,92 @@
+Ouster OS1 LiDAR Examples
+=========================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/os1_lidar_example.gif>`
+    :width: 600px
+    :align: center
+
+This page contains tutorials for running nvblox with the `Ouster OS1 <https://ouster.com/>`__ 3D LiDAR sensor.
+
+.. note::
+
+   This tutorial only supports running from rosbags, specifically the `DOALS dataset <https://projects.asl.ethz.ch/datasets/doals>`__.
+   For live OS1 sensor integration, you will need to modify the provided launch file to include a sensor driver.
+
+Prerequisites
+-------------
+
+These are the steps common to running all examples on the Ouster OS1.
+
+#. Complete the :doc:`/getting_started/index`.
+
+#. Complete the :ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`.
+
+OS1 Example
+-----------
+
+This example runs nvblox-based reconstruction from Ouster OS1 3D LiDAR data recorded in a rosbag.
+
+
+#. Download and convert the DOALS dataset:
+
+   a. Follow the instructions on the `DOALS dataset page <https://projects.asl.ethz.ch/datasets/doals/>`__ to download `hauptgebaeude.zip`.
+
+   b. Unzip the dataset in the assets folder:
+
+      .. code:: bash
+
+         cd $ISAAC_ROS_WS/isaac_ros_assets
+         unzip <DOWNLOAD_FOLDER>/hauptgebaeude.zip
+
+   c. Convert the ROS1 bag to ROS2 format:
+
+      .. code:: bash
+
+         pip install rosbags --break-system-packages
+         rosbags-convert --src hauptgebaeude/sequence_1/2020-02-20-11-58-45.bag --dst hauptgebaeude_ros2
+
+   .. note::
+
+      The ``--break-system-packages`` option is required on recent versions of Python-pip if you are not using a virtual environment.
+
+   .. note::
+
+      For more details, see the `Rosbags Conversion Guide <https://ternaris.gitlab.io/rosbags/topics/convert.html>`__.
+
+   .. note::
+
+      If you find the DOALS dataset useful for your research, please consider citing the corresponding paper in your publications:
+
+      .. epigraph::
+
+         Patrick Pfreundschuh, Hubertus F.C. Hendrikx, Victor Reijgwart, Renaud Dubé, Roland Siegwart, Andrei Cramariuc.
+         **Dynamic Object Aware LiDAR SLAM based on Automatic Generation of Training Data**.
+         In *IEEE International Conference on Robotics and Automation (ICRA)*, 2021.
+         [ `IEEE <https://ieeexplore.ieee.org/document/9560730>`__ | `ArXiv <https://arxiv.org/abs/2104.03657>`__ ]
+
+#. Activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Run the OS1 example with your converted rosbag:
+
+   .. code:: bash
+
+      ros2 launch nvblox_examples_bringup os1_example.launch.py \
+          rosbag:=$ISAAC_ROS_WS/isaac_ros_assets/hauptgebaeude_ros2 mode:=dynamic
+
+.. note::
+
+   The OS1 example supports ``mode:=static`` (default) and ``mode:=dynamic`` arguments.
+   As the DOALS dataset contains groups of people walking around, the dynamic mode is recommended to reconstruct the scene.
+   Unlike camera-based examples, LiDAR does not support people segmentation or detection modes.
+
+.. note::
+
+   The DOALS dataset contains motion distorted LiDAR data (i.e. the sensor was moving significantly during scan recordings).
+   To increase the quality of the reconstruction, nvblox is running CUDA-accelerated motion compensation.
+   Each point in the pointcloud is motion compensated by approximating the sensor frame at the time of the
+   point's acquisition with an interpolation of the sensor pose between scan start and end.
+   The ``use_lidar_motion_compensation`` parameter (default is ``true``) can be used to enable or disable motion compensation.

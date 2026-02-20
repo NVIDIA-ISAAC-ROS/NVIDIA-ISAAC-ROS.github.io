@@ -10,4 +10,4 @@ Please see [the guide](https://nvidia-isaac-ros.github.io/robots/sensor_mounting
 
 ## Latest
 
-Update 2026-02-02: Initial release
+Update 2026-02-19: Support for DGX Spark and JetPack 7.1

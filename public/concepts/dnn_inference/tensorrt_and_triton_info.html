@@ -62,7 +62,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Feb 03, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 19, 2026"/>
 
 
 <script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
@@ -395,8 +395,9 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../stereo_dnn/index.html">Stereo DNN</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../visual_global_localization/tutorials/tutorial_localization.html">Tutorial: Localization with cuVGL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../visual_global_localization/tutorials/tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../visual_global_localization/tutorials/tutorial_cuvgl_localization.html">Tutorial: Localization with cuVGL</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -511,10 +512,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
-</ul>
-</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
 </ul>
@@ -681,12 +679,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../../v/release-4.1/concepts/dnn_inference/tensorrt_and_triton_info.html">release-4.1</a></dd>
+        <dd><a href="../../v/release-4.2/concepts/dnn_inference/tensorrt_and_triton_info.html">release-4.2</a></dd>
         <dd><a href="tensorrt_and_triton_info.html">latest</a></dd>
         <dd><a href="../../v/release-2.1/concepts/dnn_inference/tensorrt_and_triton_info.html">release-2.1</a></dd>
         <dd><a href="../../v/release-3.1/concepts/dnn_inference/tensorrt_and_triton_info.html">release-3.1</a></dd>
         <dd><a href="../../v/release-3.2/concepts/dnn_inference/tensorrt_and_triton_info.html">release-3.2</a></dd>
         <dd><a href="../../v/release-4.0/concepts/dnn_inference/tensorrt_and_triton_info.html">release-4.0</a></dd>
+        <dd><a href="../../v/release-4.1/concepts/dnn_inference/tensorrt_and_triton_info.html">release-4.1</a></dd>
     </dl>
   </div>
 </div></div>
@@ -775,7 +774,7 @@ configuration.</p>
 </section>
 <section id="using-either-triton-or-tensorrt-nodes">
 <h2>Using either Triton or TensorRT Nodes<a class="headerlink" href="#using-either-triton-or-tensorrt-nodes" title="Link to this heading">#</a></h2>
-<p>Both nodes use the Isaac ROS <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/release-4.1/isaac_ros_tensor_list_interfaces/msg/TensorList.msg">Tensor List message</a>
+<p>Both nodes use the Isaac ROS <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/release-4.2/isaac_ros_tensor_list_interfaces/msg/TensorList.msg">Tensor List message</a>
 for input data and output inference result.</p>
 <p>Users can either prepare a custom model or download pre-trained models
 from NGC as described <a class="reference internal" href="model_preparation.html"><span class="doc">here</span></a>.
@@ -809,7 +808,7 @@ example, a <code class="docutils literal notranslate"><span class="pre">post-pro
 class label from a classification problem.</p>
 <blockquote>
 <div><figure class="align-center">
-<img alt="Using TensorRT or Triton" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.1/resources/isaac_ros_docs/concepts/dnn_inference/graph.png/" />
+<img alt="Using TensorRT or Triton" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/dnn_inference/graph.png/" />
 </figure>
 </div></blockquote>
 </section>
@@ -969,7 +968,7 @@ class label from a classification problem.</p>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Feb 03, 2026.
+  Last updated on Feb 19, 2026.
   <br/>
 </p></div>
       

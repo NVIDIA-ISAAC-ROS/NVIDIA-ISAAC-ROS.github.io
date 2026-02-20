@@ -1,0 +1,120 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_benchmark> <isaac_ros_benchmark>`
+
+Quickstart
+----------
+
+Follow the steps below to run a sample benchmark for measuring
+performance of an Isaac ROS AprilTag node with ``ros2_benchmark``. This
+process can also be used to benchmark the other Isaac ROS nodes, and the
+``ros2_benchmark`` framework more generally supports benchmarking
+arbitrary graphs of ROS 2 nodes.
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Datasets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Most benchmarks for Isaac ROS nodes use the standard ``r2b Dataset`` as input data.
+Download the datasets by following the instructions :ir_repo:`here <ros2_benchmark> <README.md#datasets>`
+or fetch just the rosbag used in this Quickstart with the following command.
+
+.. code:: bash
+
+    mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/datasets/r2b_dataset/r2b_storage && \
+    cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/datasets/r2b_dataset/r2b_storage && \
+    wget 'https://api.ngc.nvidia.com/v2/resources/nvidia/isaac/r2bdataset2023/versions/2/files/r2b_storage/metadata.yaml' && \
+    wget 'https://api.ngc.nvidia.com/v2/resources/nvidia/isaac/r2bdataset2023/versions/2/files/r2b_storage/r2b_storage_0.db3'
+
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. group-tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-apriltag-benchmark
+
+   .. group-tab:: Build from Source
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_benchmark>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_benchmark/benchmarks/isaac_ros_apriltag_benchmark --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_apriltag_benchmark --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_benchmark/benchmarks/isaac_ros_apriltag_benchmark
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+#. Continuing inside the Isaac ROS environment, run the following launch file to start benchmarking Isaac ROS AprilTag:
+
+   .. code:: bash
+
+      launch_test $(ros2 pkg prefix isaac_ros_apriltag_benchmark)/share/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_node.py
+
+#. Once the benchmark is finished, the final performance measurements
+   are displayed in the terminal.
+
+   Additionally, the final results and benchmark metadata (e.g., system
+   information, benchmark configurations) are also exported as a JSON
+   file whose path is printed in the terminal when the benchmark ends.
+
+Troubleshooting
+---------------
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+.. |package_name| replace:: ``isaac_ros_benchmark``

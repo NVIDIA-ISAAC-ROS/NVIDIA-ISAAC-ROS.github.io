@@ -1,0 +1,533 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_visual_slam> <isaac_ros_visual_slam>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_visual_slam> <quickstart.tar.gz>`
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-visual-slam
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_visual_slam>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_visual_slam/isaac_ros_visual_slam --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_visual_slam --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_visual_slam/isaac_ros_visual_slam
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=visual_slam \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_visual_slam/quickstart_interface_specs.json \
+            rectified_images:=false
+
+      #. Open a **second** terminal inside the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_visual_slam/quickstart_bag --remap  \
+            /front_stereo_camera/left/image_raw:=/left/image_rect \
+            /front_stereo_camera/left/camera_info:=/left/camera_info_rect \
+            /front_stereo_camera/right/image_raw:=/right/image_rect \
+            /front_stereo_camera/right/camera_info:=/right/camera_info_rect \
+            /back_stereo_camera/left/image_raw:=/rear_left/image_rect \
+            /back_stereo_camera/left/camera_info:=/rear_left/camera_info_rect \
+            /back_stereo_camera/right/image_raw:=/rear_right/image_rect \
+            /back_stereo_camera/right/camera_info:=/rear_right/camera_info_rect
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_stereo_rect,visual_slam \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_visual_slam/quickstart_interface_specs.json \
+            base_frame:=camera_link camera_optical_frames:="['camera_infra1_optical_frame', 'camera_infra2_optical_frame']"
+
+   .. tab:: ZED Camera
+
+      #. Ensure that you have already set up your ZED camera using :doc:`ZED setup tutorial </getting_started/sensors/zed_setup>`.
+
+      #. Continuing inside the Isaac ROS environment, install dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-stereo-image-proc ros-:ir_ros_distro:-isaac-ros-zed
+
+      #. Run the following launch file to spin up a demo of this package using a ZED Camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
+            launch_fragments:=zed_stereo_rect,visual_slam pub_frame_rate:=30.0 \
+            base_frame:=zed2_camera_center camera_optical_frames:="['zed2_left_camera_optical_frame', 'zed2_right_camera_optical_frame']" \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_visual_slam/zed2_quickstart_interface_specs.json
+
+         .. note::
+
+            If you are using the `ZED X` series, replace  all `zed2` in the `base_frame`, `camera_optical_frames` and `interface_specs_file` launch arguments with `zedx`.
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+#. Open a **new** terminal inside the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Install RViz:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+      source /opt/ros/:ir_ros_distro:/setup.bash
+
+#. Visualize and validate the output of the package with ``rviz``:
+
+   .. code:: bash
+
+      rviz2 -d $(ros2 pkg prefix isaac_ros_visual_slam --share)/rviz/default.cfg.rviz
+
+   RViz should start displaying the point clouds and poses like below:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/Rviz_quick_start.png>`
+      :width: 600px
+      :align: center
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+
+   Validating cuVSLAM Setup </concepts/visual_slam/cuvslam/validating_cuvslam_setup>
+
+   Tutorial with Isaac Sim </concepts/visual_slam/cuvslam/tutorial_isaac_sim>
+
+   Tutorial with RealSense </concepts/visual_slam/cuvslam/tutorial_realsense>
+
+
+   Tutorial with multiple RealSenses </concepts/visual_slam/cuvslam/tutorial_multi_realsense>
+
+Coordinate Frames
+-----------------
+
+This section describes the coordinate frames that are involved in the
+``VisualSlamNode``. The frames discussed below are oriented as follows:
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/Axes.png>`
+   :width: 300px
+   :align: center
+
+#. ``base_frame``: The base frame of the robot or camera rig. It is assumed that
+   all cameras are rigidly mounted to this frame, such that the transforms between
+   the ``base_frame`` and the ``camera_optical_frames`` can assumed to be static.
+   The estimated odometry and SLAM pose will represent the pose of this frame.
+
+#. ``map_frame``: The frame corresponding to the origin of the map that cuVSLAM
+   creates or localizes in. The SLAM pose reported by cuVSLAM corresponds with
+   the transform ``map_frame`` -> ``base_frame``.
+
+#. ``odom_frame``: The frame corresponding to the origin of the odometry that
+   cuVSLAM estimates. The odometry pose reported by cuVSLAM corresponds with the
+   transform ``odom_frame`` -> ``base_frame``.
+
+#. ``camera_optical_frames``: The frames corresponding to the optical center of
+   every camera. The frame is expected to lie at the center of the camera lens
+   and oriented with the z-axis pointing in the view direction and the y-axis
+   pointing to the floor.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
+
+Troubleshooting Suggestions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. If the target frames in RViz are being updated at a **lower rate**
+   than the input image rate:
+
+   #. Check if the input image frame rate is equal to the value set in
+      the launch file by opening a new terminal and running the command
+
+      .. code:: bash
+
+         ros2 topic hz --window 100 <image_topic_name>
+
+#. If RViz is not showing the poses, check the **Fixed Frame** value.
+
+#. If you are seeing ``Visual tracking is lost.`` messages frequently,
+   it could be caused by the following issues:
+
+   #. Fast motion causing the motion blur in the frames
+   #. Low-lighting conditions.
+   #. The wrong ``camera_info`` is being published.
+
+#. For better performance:
+
+   #. Increase the capture framerate from the camera to yield a better
+      tracking result.
+   #. If input images are noisy, you can use the
+      ``denoise_input_images`` flag in the node.
+
+#. For RealSense cameras check that:
+
+   #. You are using the firmware and ``realsense_ros`` versions recommended in
+      :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`.
+   #. You are using the parameters set in the
+      :ir_repo:`RealSense tutorial launch file <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_realsense.launch.py>`
+   #. If the pose estimate frames in RViz is **drifting** from actual
+      real-world poses and you see white dots on nearby objects(refer to
+      the screenshot below), this means that the emitter of the
+      RealSense camera is on and it needs to be
+      :ir_repo:`turned off <isaac_ros_visual_slam> <isaac_ros_visual_slam/launch/isaac_ros_visual_slam_realsense.launch.py#L35>`.
+   #. Left and right images being published are not compressed or
+      encoded. Isaac ROS Visual Slam expects raw images.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/realsense_emitter.png>`
+  :width: 400px
+  :align: center
+
+#. For global localization:
+
+   Isaac ROS Visual SLAM does not yet support global localization and needs an
+   external system to provide a pose hint in order to localize in an existing
+   map.
+
+   We recommend to use
+   :ir_repo:`Isaac ROS Visual Global Localization <isaac_ros_mapping_and_localization> <isaac_ros_visual_global_localization>`
+   for global localization.
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_visual_slam isaac_ros_visual_slam.launch.py
+
+ROS Parameters
+^^^^^^^^^^^^^^
+======================================== ============================ ================ =====================================================================================================================================================================================================================
+ROS Parameter                            Type                         Default          Description
+======================================== ============================ ================ =====================================================================================================================================================================================================================
+*Functional Parameters*
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``num_cameras``                          ``int``                      ``2``            Number of cameras used. Set to 2 for a single stereo camera. Maximum value is 32.
+``min_num_images``                       ``int``                      ``num_cameras``  Minimum number of images required to track the pose. If less than ``min_num_images`` with a synchronized timestamp are received then the synchronizer will drop all messages.
+``sync_matching_threshold_ms``           ``double``                   ``5.0``          Maximum duration between image timestamps to still consider them synced.
+``enable_image_denoising``               ``bool``                     ``false``        If enabled, input images are denoised. It can be enabled when images are noisy because of low-light conditions.
+``rectified_images``                     ``bool``                     ``true``         Flag to mark if the incoming images are rectified or raw.
+``enable_ground_constraint_in_odometry`` ``bool``                     ``false``        If enabled, odometry poses will be modified such that the camera moves on a horizontal plane.
+``enable_ground_constraint_in_slam``     ``bool``                     ``false``        If enabled, SLAM poses will be modified such that the camera moves on a horizontal plane.
+``enable_localization_n_mapping``        ``bool``                     ``true``         If enabled, SLAM mode is on. If disabled, only odometry is on.
+``tracking_mode``                        ``int``                      ``0``            Tracking mode enum values: Multi-camera (0), Visual Inertial (1), or RGBD Tracking (2).
+``gyro_noise_density``                   ``double``                   ``0.000244``     White noise parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``gyro_random_walk``                     ``double``                   ``0.000019393``  Random walk parameter for gyroscope based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``accel_noise_density``                  ``double``                   ``0.001862``     White noise parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``accel_random_walk``                    ``double``                   ``0.003``        Random walk parameter for accelerometer based on `IMU Noise Model <https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model>`__.
+``calibration_frequency``                ``double``                   ``200.0``        IMU frequency used for generating noise model parameters.
+``depth_scale_factor``                   ``double``                   ``1000.0``       Scale factor for the depth images to convert unit from :spelling:ignore:`uint16` depth image values to meters.
+``depth_camera_id``                      ``int``                      ``0``            ID of the color camera that has pixel-wise corresponding depth camera.
+``depth_enable_stereo_tracking``         ``bool``                     ``false``        If enabled, stereo tracking is enabled for the RGBD-mode, a valid stereo pair is required.
+``image_jitter_threshold_ms``            ``double``                   ``34.0``         Acceptable time delta between consecutive synced image messages. If the messages exceed the threshold, it might be an indication of message drop from the source.
+``imu_jitter_threshold_ms``              ``double``                   ``10.0``         Acceptable time delta between consecutive IMU messages. If the messages exceed the threshold, it might be an indication of message drop from the source.
+``img_mask_top``                         ``int``                      ``0``            The number of pixels of the upper border of the image will be masked at the stage of selecting features for visual tracking.
+``img_mask_bottom``                      ``int``                      ``0``            The number of pixels of the lower border of the image will be masked at the stage of selecting features for tracking.
+``img_mask_left``                        ``int``                      ``0``            The number of pixels of the left border of the image from the left camera of the stereo pair (the right border for the right camera of a stereo pair) will be masked at the stage of selecting features for tracking.
+``img_mask_right``                       ``int``                      ``0``            The number of pixels of the right border of the image from the left camera of the stereo pair (the left border for the right camera of a stereo pair) will be masked at the stage of selecting features for tracking.
+``save_map_folder_path``                 ``std::string``              ``""``           If set the map will be stored in the set path after shutting down the node. Requires ``enable_localization_n_mapping`` mode to be enabled.
+``load_map_folder_path``                 ``std::string``              ``""``           If set the map will be loaded from the set path on starting up the node. Requires ``enable_localization_n_mapping`` mode to be enabled.
+``localize_on_startup``                  ``bool``                     ``false``        If set will try to localize in the ``load_map_folder_path`` using the identity pose as the pose hint.
+``localizer_horizontal_radius``          ``float``                    ``1.5``          Radius of the area on the horizontal plane used for localization in meters.
+``localizer_vertical_radius``            ``float``                    ``0.5``          Radius along the vertical axis used for localization in meters.
+``localizer_horizontal_step``            ``float``                    ``0.5``          Step size along each axis on the horizontal plane for localization in meters.
+``localizer_vertical_step``              ``float``                    ``0.25``         Step size along vertical axis for localization in meters.
+``localizer_angular_step``               ``float``                    ``0.1745``       Step size around vertical axis for localization in radians. Must be less then 2 Pi.
+``slam_max_map_size``                    ``int``                      ``300``          Maximum number of poses that is stored in the SLAM map. Default is 300. Adding more poses will invoke reduction of the map until it`s size matches this constant.
+``enable_request_hint``                  ``bool``                     ``true``         If set will request a second hint when hinted localization fails with the previous hint.
+*Frame Parameters*
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``map_frame``                            ``std::string``              ``map``          The frame name associated with the map origin.
+``odom_frame``                           ``std::string``              ``odom``         The frame name associated with the odometry origin.
+``base_frame``                           ``std::string``              ``base_link``    The frame name associated with the base of the robot or camera rig.
+``camera_optical_frames``                ``std::vector<std::string>`` ``[]``           The frame names associated with the cameras' optical frames. Using ROS optical frame conventions, i.e. z-axis front, y-axis down. If not specified will use the frames from the camera info messages.
+``imu_frame``                            ``std::string``              ``imu``          The frame name associated with the IMU.
+*Message Parameters*
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``image_buffer_size``                    ``int``                      ``100``          Buffer size used by the image synchronizer.
+``imu_buffer_size``                      ``int``                      ``50``           Buffer size used by the IMU sequencer.
+``image_qos``                            ``std::string``              ``DEFAULT``      QoS profile for the image subscribers.
+``imu_qos``                              ``std::string``              ``DEFAULT``      QoS profile for the IMU subscriber.
+*Output Parameters*
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``override_publishing_stamp``            ``bool``                     ``false``        Override timestamp received from the left image with the timestamp from ``rclcpp::Clock``.
+``publish_map_to_odom_tf``               ``bool``                     ``true``         Enable ``tf`` broadcaster for ``map_frame`` -> ``odom_frame`` transform.
+``publish_odom_to_base_tf``              ``bool``                     ``true``         Enable ``tf`` broadcaster for ``odom_frame`` -> ``base_frame`` transform.
+``invert_map_to_odom_tf``                ``bool``                     ``false``        Invert the ``map_frame`` -> ``odom_frame`` transform before broadcasting to the ``tf`` tree.
+``invert_odom_to_base_tf``               ``bool``                     ``false``        Invert the ``odom_frame`` -> ``base_frame`` transform before broadcasting to the ``tf`` tree.
+*Debug/Visualization Parameters*
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``enable_slam_visualization``            ``bool``                     ``false``        Main flag to enable or disable visualization.
+``enable_observations_view``             ``bool``                     ``false``        If enabled, 2D feature pointcloud will be available for visualization.
+``enable_landmarks_view``                ``bool``                     ``false``        If enabled, landmark pointcloud will be available for visualization.
+``path_max_size``                        ``int``                      ``1024``         The maximum size of the buffer for pose trail visualization.
+``verbosity``                            ``int``                      ``0``            Verbosity for cuVSLAM, 0 is silent.
+``enable_debug_mode``                    ``bool``                     ``false``        If enabled, a debug dump (images, IMU messages, timestamps, and camera info) is saved to the disk at the path indicated by ``debug_dump_path``.
+``debug_dump_path``                      ``std::string``              ``/tmp/cuvslam`` The path to the directory to store the debug dump data.
+======================================== ============================ ================ =====================================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``visual_slam/image_{i}``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - Image from the :spelling:ignore:`i-th` camera in grayscale (i is in range [0, ``num_cameras``-1]).
+   * - ``visual_slam/camera_info_{i}``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+     - Camera info from the :spelling:ignore:`i-th` camera (i is in range [0, ``num_cameras``-1]).
+   * - ``visual_slam/seg_mask_{i}``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - [Optional] Mask image for the corresponding :spelling:ignore:`i-th` camera in binary format (i is in range [0, ``num_cameras``-1]).
+   * - ``visual_slam/imu``
+     - `sensor_msgs/Imu <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Imu.msg>`__
+     - Sensor data from the IMU (is only present if ``tracking_mode`` is ``1``).
+   * - ``visual_slam/depth_0``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - Depth image from the camera in ``uint16`` format (is only present if ``tracking_mode`` is ``2``).
+   * - ``visual_slam/initial_pose``
+     - `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__
+     - Pose used as pose hint for localizing in an existing map. Every received message will trigger a localization.
+   * - ``visual_slam/trigger_hint``
+     - `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__
+     - A message will be sent on this topic when the node requires a new pose hint for localization.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``visual_slam/tracking/odometry``
+     - `nav_msgs/Odometry <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/nav_msgs/msg/Odometry.msg>`__
+     - Current odometry of the ``base_frame``.
+   * - ``visual_slam/tracking/vo_pose_covariance``
+     - `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__
+     - Current pose with covariance of the ``base_frame``.
+   * - ``visual_slam/tracking/vo_pose``
+     - `geometry_msgs/PoseStamped <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseStamped.msg>`__
+     - Current pose of the ``base_frame``.
+   * - ``visual_slam/tracking/slam_path``
+     - `nav_msgs/Path <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/nav_msgs/msg/Path.msg>`__
+     - Trail of poses generated by SLAM.
+   * - ``visual_slam/tracking/vo_path``
+     - `nav_msgs/Path <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/nav_msgs/msg/Path.msg>`__
+     - Trail of poses generated by pure Visual Odometry.
+   * - ``visual_slam/status``
+     - :ir_repo:`isaac_ros_visual_slam_interfaces/VisualSlamStatus <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/msg/VisualSlamStatus.msg>`
+     - Status message for diagnostics.
+   * - ``/diagnostics``
+     - `diagnostic_msgs/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/diagnostic_msgs/msg/DiagnosticArray.msg>`__
+     - Diagnostic message. Similar to ``status`` topic but in a different format.
+   * - Visualization Topics
+     -
+     -
+   * - ``visual_slam/vis/observations_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/PointCloud2.msg>`__
+     - Visualization containing all current observations.
+   * - ``visual_slam/vis/gravity``
+     - `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/visualization_msgs/msg/Marker.msg>`__
+     - Visualization containing the currently estimated gravity vector.
+   * - ``visual_slam/vis/velocity``
+     - `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/visualization_msgs/msg/Marker.msg>`__
+     - Visualization containing the currently estimated velocity.
+   * - ``visual_slam/vis/slam_odometry``
+     - `nav_msgs/Odometry <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/nav_msgs/msg/Odometry.msg>`__
+     - Visualization containing the currently estimated odometry from SLAM poses.
+   * - ``visual_slam/vis/landmarks_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/PointCloud2.msg>`__
+     - Visualization containing the 3D SLAM landmarks from the map.
+   * - ``visual_slam/vis/loop_closure_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/PointCloud2.msg>`__
+     - Visualization containing the 3D SLAM landmarks currently used for loop closure.
+   * - ``visual_slam/vis/pose_graph_nodes``
+     - `geometry_msgs/PoseArray <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseArray.msg>`__
+     - Visualization containing the pose graph nodes.
+   * - ``visual_slam/vis/pose_graph_edges``
+     - `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/visualization_msgs/msg/Marker.msg>`__
+     - Visualization containing the pose graph edges.
+   * - ``visual_slam/vis/pose_graph_edges2``
+     - `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/visualization_msgs/msg/Marker.msg>`__
+     - Visualization containing the pose graph edges2.
+   * - ``visual_slam/vis/localizer``
+     - `visualization_msgs/MarkerArray <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/visualization_msgs/msg/MarkerArray.msg>`__
+     - Visualization containing the poses used for localization.
+   * - ``visual_slam/vis/localizer_map_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/PointCloud2.msg>`__
+     - Visualization containing the map used for localization.
+   * - ``visual_slam/vis/localizer_observations_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/PointCloud2.msg>`__
+     - Visualization containing observations used for the localization.
+   * - ``visual_slam/vis/localizer_loop_closure_cloud``
+     - `sensor_msgs/PointCloud2 <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/PointCloud2.msg>`__
+     - Visualization containing landmarks used for loop closure in the localization.
+
+ROS Services Advertised
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+   * - ``visual_slam/reset``
+     - :ir_repo:`isaac_ros_visual_slam_interfaces/Reset <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/Reset.srv>`
+     - A service to reset the node.
+   * - ``visual_slam/get_all_poses``
+     - :ir_repo:`isaac_ros_visual_slam_interfaces/GetAllPoses <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/GetAllPoses.srv>`
+     - A service to get the series of poses for the path traversed.
+   * - ``visual_slam/set_slam_pose``
+     - :ir_repo:`isaac_ros_visual_slam_interfaces/SetSlamPose <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/SetSlamPose.srv>`
+     - A service to set the estimated SLAM pose of the ``base_frame``.
+   * - ``visual_slam/save_map``
+     - :ir_repo:`isaac_ros_visual_slam_interfaces/FilePath <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/FilePath.srv>`
+     - A service to store the current map to disk.
+   * - ``visual_slam/load_map``
+     - :ir_repo:`isaac_ros_visual_slam_interfaces/FilePath <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/FilePath.srv>`
+     - A service to load a map from disk.
+   * - ``visual_slam/localize_in_map``
+     - :ir_repo:`isaac_ros_visual_slam_interfaces/LocalizeInMap <isaac_ros_visual_slam> <isaac_ros_visual_slam_interfaces/srv/LocalizeInMap.srv>`
+     - A service to localize in an existing map with a pose hint.
+
+.. note::
+   The last 4 services only work in SLAM mode i.e. set ``enable_localization_n_mapping = true``.
+
+.. |package_name| replace:: ``isaac_ros_visual_slam``
