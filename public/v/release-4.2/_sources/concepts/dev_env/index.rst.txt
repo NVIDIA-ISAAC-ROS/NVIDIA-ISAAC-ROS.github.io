@@ -1,0 +1,161 @@
+=================================
+Isaac ROS Development Environment
+=================================
+
+.. note::
+
+   This page provides a detailed explanation of the development environment and its configuration.
+
+   To begin using Isaac ROS, use the :doc:`Getting Started </getting_started/index>` guide instead.
+
+Overview
+--------
+
+The Isaac ROS Development Environment provides a managed environment for developing and testing Isaac ROS packages.
+
+The Isaac ROS environment is managed and accessed via the Isaac ROS CLI in one of three isolation modes:
+
+- **Docker**: Full container isolation from the host system.
+- **Virtual Environment**: Python packages isolated from system Python, with Debian packages installed on host.
+- **Bare Metal**: All packages installed directly on the host system.
+
+All Isaac ROS packages, quickstarts, tutorials, and other workflows are tested in these development environments.
+
+You can further customize your development environment by updating the Isaac ROS CLI configuration files.
+
+General Configuration
+---------------------
+
+The following configuration options apply to all Isaac ROS environment isolation modes.
+
+Isaac ROS Workspace (``ISAAC_ROS_WS``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Isaac ROS Development Environment is based around a standard `ROS 2 workspace <https://docs.ros.org/en/:ir_ros_distro:/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html#create-a-workspace>`__.
+
+The Isaac ROS CLI, documentation, and other utilities all rely on the user-specified ``ISAAC_ROS_WS`` environment variable to locate your ROS workspace.
+
+As recommended in the :doc:`Getting Started </getting_started/index>` guide, a good place to set this variable is in your ``.bashrc`` file, so that it is pre-loaded into your shell's environment.
+
+Alternatively, advanced users with multiple workspaces may choose to use a tool like `direnv <https://direnv.net/>`__ to automatically set the variable based on the current working directory.
+
+In Docker mode, the Isaac ROS CLI mounts the workspace directory into the development container at ``/workspaces/isaac_ros-dev``. For convenience, the CLI also automatically overrides the in-container value of ``ISAAC_ROS_WS``, ensuring that ``${ISAAC_ROS_WS}`` always resolves to the correct location.
+
+.. _isaac-ros-cli-configuration-files:
+
+Isaac ROS CLI Configuration Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Isaac ROS CLI uses a layered series of YAML files for configuration. A base configuration is shipped with the Isaac ROS CLI during installation, and then higher-priority configuration files can selectively override portions of the base configuration.
+
+The configuration files are loaded in the following order:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Scope
+      - Location
+      - Access Control
+      - Description
+    * - Default
+      - ``/usr/share/isaac-ros-cli/config.yaml``
+      - Read-only
+      - | Default values shipped with the Isaac ROS CLI.
+        | This file is a useful reference for the CLI's configuration schema.
+    * - System
+      - ``/etc/isaac-ros-cli/config.yaml``
+      - Managed by the CLI
+      - Config written to by the Isaac ROS CLI.
+    * - User
+      - ``~/.config/isaac-ros-cli/config.yaml``
+      - Managed by the user
+      - | Optional user-level overrides to the base configuration.
+        | Some tutorials in the Isaac ROS documentation will require creating and updating this file.
+    * - Workspace
+      - ``${ISAAC_ROS_WS}/.isaac-ros-cli/config.yaml``
+      - Managed by the user
+      - | Optional workspace-level overrides to the base configuration.
+        | Advanced users with multiple workspaces can use this file to configure each workspace individually.
+
+If a `YAML node <https://yaml.org/spec/1.2.2/#3211-nodes>`__ is present in multiple configuration files, the Isaac ROS CLI recursively merges the values based on the node type:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Node Type
+      - Resolution Strategy
+    * - Scalar
+      - The value in the higher-priority configuration file **overrides** the value in the lower-priority configuration file.
+    * - Sequence
+      - The values in the higher-priority configuration file are **appended** to the values in the lower-priority configuration file.
+    * - Mapping
+      - The (key, value) pairs are **recursively merged** using these same resolution rules.
+
+Typically, you will only need to override small portions of the default configuration, and so your override config files will be correspondingly smaller than the default.
+
+.. note::
+
+   **Do not duplicate** the entire read-only configuration file in a user- or workspace-level configuration file.
+
+   During initialization, the Isaac ROS CLI writes important information to the system-level configuration file, overriding the uninitialized values stored in the default read-only configuration file.
+
+   A duplicated uninitialized configuration stored at the user- or workspace-level will override the Isaac ROS CLI's attempted initialization, preventing environment activation and other CLI commands.
+
+   Instead, selectively override **only the desired portions** of the default configuration file.
+
+Docker Mode Configuration
+-------------------------
+
+The following configuration options apply only when using the Isaac ROS CLI in Docker mode.
+
+Docker Image Keys
+~~~~~~~~~~~~~~~~~
+
+The Isaac ROS development container runs from an image composed from one or more individual Dockerfiles in a prescribed order.
+
+Each Dockerfile is named ``Dockerfile.<image_key>``, where ``<image_key>`` is a unique identifier that describes the file's contents.
+
+The Isaac ROS CLI ships with the following Dockerfiles:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Image Key
+      - Description
+    * - ``isaac_ros``
+      - Base image for Isaac ROS development.
+    * - ``realsense``
+      - Dependencies for RealSense cameras.
+    * - ``noble`` (deprecated)
+      - Deprecated image key for platform-specific dependencies for CUDA and other NVIDIA libraries on Ubuntu 24.04 Noble.
+    * - ``ros2_jazzy`` (deprecated)
+      - Deprecated image key for ROS 2 Jazzy and other Isaac ROS package dependencies.
+
+By default, the Isaac ROS CLI uses the image key sequence ``[isaac_ros]``, and NVIDIA provides a corresponding prebuilt Docker image via the `NGC Container Registry <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/containers/ros>`__.
+
+Additional image keys can be added by specifying new entries in an Isaac ROS CLI configuration file at the :ref:`appropriate scope <isaac-ros-cli-configuration-files>`.
+
+For example, to add the ``realsense`` image key, add the following to your configuration file:
+
+.. code:: yaml
+
+   docker:
+     image:
+       additional_image_keys:
+         - realsense
+
+.. note::
+
+   Since NVIDIA only provides prebuilt Docker images for the base image key sequence ``[isaac_ros]``, any additional image keys must be built locally.
+
+   Run ``isaac-ros activate --build-local`` to build the image with the new image key:
+
+   .. code:: bash
+
+      isaac-ros activate --build-local
+
+   Rebuilding can take several minutes.
+
+   After the image has been built once, you can use ``isaac-ros activate`` to launch the container from the saved image.
+
+   If the image is subsequently deleted from the local Docker registry, use the ``--build-local`` flag to rebuild the image.

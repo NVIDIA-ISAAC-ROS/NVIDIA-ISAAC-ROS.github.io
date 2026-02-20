@@ -1,0 +1,576 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_nitros> <isaac_ros_pynitros>`
+
+
+Creating PyNITROS-Accelerated Nodes
+-----------------------------------
+
+The following steps outline how to create PyNITROS-accelerated nodes using the PyNITROS API. This example
+demonstrates how to use PyNITROS to publish and subscribe image messages. PyNITROS also supports tensor list messages,
+which can be used in a similar manner. You can find the source code of this example under the ``isaac_ros_pynitros/examples`` directory.
+
+#. Instantiate the ``PyNitrosSubscriber``. Developers can instantiate the ``PyNitrosSubscriber`` class with the following
+   five parameters:
+
+   * ROS node
+   * NITROS Bridge message type
+   * NITROS Bridge message topic name
+   * raw ROS message topic name
+   * enable ROS subscribe flag
+
+   After instantiation, use the ``create_subscription`` function to create a subscription with a user-defined callback function.
+
+   .. code:: python
+
+      pynitros_subscriber = PyNitrosSubscriber(Node, NitrosBridgeImage, "pynitros_image", "pynitros_image_raw", enable_ros_subscribe=False)
+
+   .. code:: python
+
+      pynitros_subscriber.create_subscription(sub_callback)
+
+
+#. Create the ``PyNitrosPublisher`` by specifying ROS node, NITROS Bridge message type, NITROS Bridge topic name, and raw ROS topic name respectively.
+
+   .. code:: python
+
+      pynitros_publisher = PyNitrosPublisher(Node, NitrosBridgeImage, "pynitros_image", "pynitros_image_raw")
+
+#. Create the PyNITROS image builder. This builder will create a memory pool
+   with a number of buffers to hold the IPC GPU data of messages pending to publish.
+   To instantiate the builder, you need to specify the number of buffers and timeout
+   for reclaiming the buffer back to the pool.
+
+   .. code:: python
+
+      pynitros_image_builder = PyNitrosImageBuilder(num_buffer (optional), timeout (optional))
+
+#. When a subscribed message arrives, the callback function is triggered with a ``PyNITROSView`` of the message.
+   You can convert this view to another data type of your choice, such as a PyTorch tensor,
+   by passing in ``pynitros_image_view`` into the ``torch.as_tensor()`` function:
+
+   .. code:: python
+
+      def sub_callback(pynitros_image_view):
+         # (Optional) If user has async GPU operations in the fly, pass stream back to the view
+         stream = runtime.cudaStreamCreate()
+         pynitros_image_view.set_stream(stream)
+
+         # Get data as tensor, or any other data type supports __cuda_array_interface__
+         image_tensor = torch.as_tensor(pynitros_image_view, dtype=torch.uint8, device=gpu)
+
+#. After processing the received image, pass the device pointer of the output and metadata
+   into the ``PyNitrosBuilder`` build function. This generates a ``NitrosBridgeImage``
+   that can then be published using the ``PyNitrosPublisher``. If the ``enable_ros_publish`` flag is
+   set to ``True``, the publisher also sends the raw image (that is, an ``Image`` message)
+   to the second topic specified during instantiation.
+
+   .. code:: python
+
+      built_image = pynitros_image_builder.build(image_data_ptr,
+                                                 image_height,
+                                                 image_width,
+                                                 image_step,
+                                                 image_encoding,
+                                                 image_header,
+                                                 device_id=0,
+                                                 enable_ros_publish=False)
+
+#. Publish the built image using the publisher:
+
+   .. code:: python
+
+      pynitros_publisher.publish(built_image)
+
+.. note::
+
+      PyNITROS requires the permission of ``PTRACE_ATTACH`` for IPC. You can
+      set the ``ptrace_scope`` by running the following command:
+
+      .. code:: bash
+
+         echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+
+
+Quickstart
+----------
+
+This quickstart uses the ``image_forward`` node built with PyNITROS to demonstrate the zero-copy inter-op between PyNITROS nodes.
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_pynitros> <quickstart.tar.gz>`
+
+Build ``isaac_ros_pynitros``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-pynitros
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nitros>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nitros/isaac_ros_pynitros --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_pynitros --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_nitros/isaac_ros_pynitros
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #.  Set the ``ptrace_scope``:
+
+          .. code:: bash
+
+            echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+
+      #.  Run the following launch files to spin up a demo of this package:
+
+          .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+              ros2 launch isaac_ros_pynitros isaac_ros_pynitros_quickstart.launch.py rosbag_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_pynitros/quickstart.bag
+
+      #. Open a **second** terminal and activate the Isaac ROS environment:
+
+          .. code:: bash
+
+            isaac-ros activate
+
+      #. Install RViz:
+
+          .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+            source /opt/ros/:ir_ros_distro:/setup.bash
+
+      #.  Visualize the output topic ``/pynitros2_output_msg_ros`` in RViz:
+
+          .. code:: bash
+
+            cd /workspaces/isaac_ros-dev/ && \
+              rviz2
+
+Try More Examples
+-----------------
+
+To continue your exploration, explore the following examples:
+
+.. toctree::
+   :maxdepth: 1
+
+   Tutorial to use PyNITROS with NITROS </concepts/nitros/pynitros/tutorial_pynitros.rst>
+
+API Reference
+-------------
+
+.. class:: PyNitrosPublisher(node, nitros_bridge_msg_type, nitros_bridge_topic_name, raw_ros_topic_name)
+
+   Publisher to publish PyNITROS messages.
+
+   :param node: The ROS node.
+   :type node: rclpy.node.Node
+   :param nitros_bridge_msg_type: The type of NITROS Bridge message the publisher will publish.
+   :type nitros_bridge_msg_type: MsgType
+   :param nitros_bridge_topic_name: The name of NITROS Bridge topic the publisher will publish to.
+   :type nitros_bridge_topic_name: str
+   :param raw_ros_topic_name: The name of raw topic the publisher will publish to when applicable.
+   :type raw_ros_topic_name: str
+
+   .. method:: publish(nitros_bridge_msg)
+
+      Publish a PyNITROS message.
+
+      :param nitros_bridge_msg: The NITROS Bridge message to publish.
+      :type nitros_bridge_msg: isaac_ros_nitros_bridge_interfaces.msg
+      :returns: None
+
+.. class:: PyNitrosSubscriber(node, message_type, sub_topic_name, enable_ros_subscribe)
+
+   Subscriber subscribe to PyNITROS messages.
+
+   :param node: The ROS node.
+   :type node: rclpy.node.Node
+   :param message_type: The type of NITROS Bridge message the subscriber will subscribe to.
+   :type message_type: MsgType
+   :param sub_topic_name: The name of the topic the subscriber will subscribe to.
+   :type sub_topic_name: str
+   :param enable_ros_subscribe: A flag to enable subscribing to raw message exclusively.
+   :type enable_ros_subscribe: bool
+
+   .. method:: create_subscription(input_callback)
+
+      Create a subscription with a user-defined callback function. The callback function will be
+      triggered with a PyNITROS view of the arrived message.
+
+      :param input_callback: A user-defined callback for the subscriber.
+      :type callback: Callable
+      :returns: None
+
+.. class:: PyNITROSMessageFilter(node, subscribers, synchronizer_type, callback, queue_size=10, slop=0.1)
+
+   Message filters to synchronize multiple NITROS Bridge or ROS2 raw messages.
+
+   :param node: The ROS node.
+   :type node: rclpy.node.Node
+   :param subscribers: A list of PyNITROS or ``rclpy`` subscribers.
+   :type subscribers: list
+   :param synchronizer_type: The type of synchronizer to use. Select from ``TimeSynchronizer`` or ``ApproximateTimeSynchronizer``
+   :type synchronizer_type: SynchronizerType
+   :param callback: A user-defined callback for the message filter.
+   :type callback: Callable
+   :param queue_size: The size of the queue for the message filter.
+   :type queue_size: int
+   :param slop: The delay (in seconds) with which messages can be synchronized.
+   :type slop: float
+
+
+.. class:: PyNitrosImageBuilder(num_buffer, timeout)
+
+   A class to build PyNITROS images.
+
+   :param num_buffer: The number of CUDA IPC buffers to allocate.
+   :type num_buffer: int
+   :param timeout: The timeout for reclaiming the buffer back to the pool.
+   :type timeout: int
+
+
+   .. method:: build(image_data, image_height, image_width, image_step, image_encoding, image_header, device_id, enable_ros_publish, event=None)
+
+      Build a PyNITROS image.
+
+      :param image_data: Device data pointer of the image.
+      :type image_data: int
+      :param image_height: Height of the image.
+      :type image_height: int
+      :param image_width: Width of the image.
+      :type image_width: int
+      :param image_step: Step of the image.
+      :type image_step: int
+      :param image_encoding: Encoding of the image.
+      :type image_encoding: str
+      :param image_header: Header of the image.
+      :type image_header: str
+      :param device_id: Device ID on which the image data is stored.
+      :type device_id: int
+      :param enable_ros_publish: A flag to enable publishing ROS message in the meantime.
+      :type enable_ros_publish: bool
+      :param event: CUDA event to synchronize on.
+      :type event: cuda.bindings.runtime.cudaEvent_t
+      :returns: Tuple of the built NITROS Bridge image, and the raw ROS image if ``enable_ros_publish`` is set to ``True``.
+      :rtype: tuple
+
+.. class:: PyNitrosTensorListBuilder(num_buffer, timeout)
+
+   A class to build PyNITROS tensor list.
+
+   :param num_buffer: The number of CUDA IPC buffers to allocate.
+   :type num_buffer: int
+   :param timeout: The minimum time allows reclaiming the buffer back to the pool.
+   :type timeout: int
+
+   .. method:: build_tensor(tensor_data, tensor_name, tensor_shape, tensor_data_type)
+
+      Build a PyNITROS tensor.
+
+      :param tensor_data: Device data pointer of the tensor.
+      :type tensor_data: int
+      :param tensor_name: Name of the tensor.
+      :type tensor_data_type: str
+      :param tensor_shape: Shape of the tensor.
+      :type tensor_shape: list
+      :param tensor_data_type: Data type of the tensor.
+      :type tensor_data_type: int
+      :returns: The built NITROS Bridge tensor.
+      :rtype: NitrosBridgeTensor
+
+   .. method:: build(built_tensors, tensors_header, device_id, enable_ros_publish, event=None)
+
+      Build a PyNITROS tensor list.
+
+      :param built_tensors: Built tensors returned by ``build_tensor`` function.
+      :type built_tensors: int
+      :param tensor_header: Header of the tensor list.
+      :type tensor_header: str
+      :param device_id: Device ID on which the tensor list is stored.
+      :type device_id: int
+      :param enable_ros_publish: A flag to enable publishing ROS message in the meantime.
+      :type enable_ros_publish: bool
+      :param event: CUDA event to synchronize on.
+      :type event: cuda.bindings.runtime.cudaEvent_t
+      :returns: Tuple of the built NITROS Bridge tensor list, and the raw ROS tensor list if ``enable_ros_publish`` is set to ``True``.
+      :rtype: tuple
+
+.. class:: PyNitrosImageView
+
+   A class to view PyNITROS image.
+
+   .. method:: get_size_in_bytes()
+
+      Get the size of the PyNITROS image in bytes.
+
+      :returns: The size of the PyNITROS image in bytes.
+      :rtype: int
+
+   .. method:: get_width()
+
+      Get the width of the PyNITROS image.
+
+      :returns: The width of the PyNITROS image.
+      :rtype: int
+
+   .. method:: get_height()
+
+      Get the height of the PyNITROS image.
+
+      :returns: The height of the PyNITROS image.
+      :rtype: int
+
+   .. method:: get_stride()
+
+      Get the stride of the PyNITROS image.
+
+      :returns: The stride of the PyNITROS image.
+      :rtype: int
+
+   .. method:: get_buffer()
+
+      Get the device data pointer of the PyNITROS image.
+
+      :returns: The device data pointer of the PyNITROS image.
+      :rtype: int
+
+   .. method:: get_encoding()
+
+      Get the encoding of the PyNITROS image.
+
+      :returns: The encoding of the PyNITROS image.
+      :rtype: str
+
+   .. method:: get_frame_id()
+
+      Get the frame ID of the PyNITROS image.
+
+      :returns: Frame ID of the PyNITROS image.
+      :rtype: str
+
+   .. method:: get_timestamp_seconds()
+
+      Get the seconds from the PyNITROS image header.
+
+      :returns: Seconds from the PyNITROS image header.
+      :rtype: int
+
+   .. method:: get_timestamp_nanoseconds()
+
+      Get the nanoseconds from the PyNITROS image header.
+
+      :returns: Nanoseconds from the PyNITROS image header.
+      :rtype: int
+
+   .. method:: set_stream(stream)
+
+      If the subscriber callback contains asynchronous CUDA operations, set the stream for the PyNITROS image view.
+
+      :param stream: CUDA stream.
+      :type stream: cuda.bindings.runtime.cudaStream_t
+
+.. class:: PyNitrosTensorListView
+
+   A class to view PyNITROS tensor list.
+
+   .. method:: get_size_in_bytes()
+
+      Get the total size of the PyNITROS tensor list in bytes.
+
+      :returns: Total size of the PyNITROS tensor in bytes.
+      :rtype: int
+
+   .. method:: get_buffer()
+
+      Get the device pointer of the first PyNITROS tensor data.
+
+      :returns: The device pointer of the first PyNITROS tensor.
+      :rtype: int
+
+   .. method:: get_tensor_count()
+
+      Get the number of tensors in the PyNITROS tensor list.
+
+      :returns: Number of tensors in the PyNITROS tensor list.
+      :rtype: int
+
+   .. method:: get_named_tensor(name)
+
+      Get the tensor with the specified name from the PyNITROS tensor list.
+
+      :param name: The name of the tensor.
+      :type name: str
+      :returns: The tensor with the specified name.
+      :rtype: PyNitrosTensorView
+
+   .. method:: get_all_tensors()
+
+      Get all the tensors in the PyNITROS tensor list.
+
+      :returns: All the tensors in the PyNITROS tensor list.
+      :rtype: list
+
+   .. method:: get_frame_id()
+
+      Get the frame ID of the PyNITROS tensor.
+
+      :returns: Frame ID of the PyNITROS tensor.
+      :rtype: str
+
+   .. method:: get_timestamp_seconds()
+
+      Get the seconds from the PyNITROS image header.
+
+      :returns: Seconds from the PyNITROS image header.
+      :rtype: int
+
+   .. method:: get_timestamp_nanoseconds()
+
+      Get the nanoseconds from the PyNITROS image header.
+
+      :returns: Nanoseconds from the PyNITROS image header.
+      :rtype: int
+
+   .. method:: set_stream(stream)
+
+      If the subscriber callback contains asynchronous CUDA operations, set the stream for the PyNITROS image view.
+
+      :param stream: CUDA stream.
+      :type stream: cuda.bindings.runtime.cudaStream_t
+
+
+.. class:: PyNitrosTensorView
+
+   A class to view PyNITROS tensors.
+
+   .. method:: get_name()
+
+      Get the name of the PyNITROS tensor.
+
+      :returns: The name of the PyNITROS tensor.
+      :rtype: str
+
+   .. method:: get_buffer()
+
+      Get the device pointer of the PyNITROS tensor data.
+
+      :returns: The device pointer of the PyNITROS tensor.
+      :rtype: int
+
+   .. method:: get_rank()
+
+      Get the rank of the PyNITROS tensor.
+
+      :returns: The rank of the PyNITROS tensor.
+      :rtype: int
+
+   .. method:: get_element_count()
+
+      Get the element count of the PyNITROS tensor.
+
+      :returns: The element count of the PyNITROS tensor.
+      :rtype: int
+
+   .. method:: get_tensor_size()
+
+      Get the size in bytes of the PyNITROS tensor.
+
+      :returns: The size of the PyNITROS tensor.
+      :rtype: int
+
+   .. method:: get_shape()
+
+      Get the shape of the PyNITROS tensor.
+
+      :returns: The shape of the PyNITROS tensor.
+      :rtype: list
+
+   .. method:: get_element_type()
+
+      Get the data type of the PyNITROS tensor.
+
+      :returns: The data type of the PyNITROS tensor.
+      :rtype: str
+
+   .. method:: get_bytes_per_element()
+
+      Get the element size in bytes of the PyNITROS tensor.
+
+      :returns: The element size of the PyNITROS tensor in bytes.
+      :rtype: int
+
+.. |package_name| replace:: ``isaac_ros_pynitros``

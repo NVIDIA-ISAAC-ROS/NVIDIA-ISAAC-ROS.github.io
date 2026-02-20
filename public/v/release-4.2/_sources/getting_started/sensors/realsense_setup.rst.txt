@@ -1,0 +1,131 @@
+=========================
+Isaac ROS RealSense Setup
+=========================
+
+Camera Compatibility
+--------------------
+
+================= ==============
+RealSense Model   Supported?
+================= ==============
+D455              ✓
+D435i             ✓
+D415              ✗
+================= ==============
+
+.. note::
+
+   * It is required to use RealSense firmware `version 5.16.0.1 <https://dev.realsenseai.com/docs/firmware-releases-d400>`__,
+     `librealsense SDK` `version v2.56.3 <https://github.com/realsenseai/librealsense/releases/tag/v2.56.3>`__
+     and `realsense-ros` driver `version r/4.56.3 <https://github.com/realsenseai/realsense-ros/tree/r/4.56.3>`__.
+     **Any deviation from these versions may break or degrade the performance of Isaac ROS examples.**
+
+   * It is required to use USB3 ports and cables to run the cameras at higher resolutions and frame rates that some applications expect.
+
+   * For best results we suggest increasing the maximum Linux kernel receive buffer size as
+     detailed in `DDS tuning <https://docs.ros.org/en/:ir_ros_distro:/How-To-Guides/DDS-tuning.html#cyclone-dds-tuning>`__.
+
+   * The ``realsense-viewer`` tool has performance issues when running multiple cameras on the Jetson platforms. However the RealSense ROS drivers work fine with multiple cameras.
+
+
+.. _setup-instructions:
+
+Setup Instructions
+------------------
+
+This tutorial assumes that you have completed the instructions in :doc:`Developer Environment Setup </getting_started/index>`.
+
+#. Start with the RealSense camera unplugged. Then, add RealSense udev rules to your host machine.
+
+   .. code:: bash
+
+      wget https://raw.githubusercontent.com/realsenseai/librealsense/v2.56.3/config/99-realsense-libusb.rules && \
+      sudo mv 99-realsense-libusb.rules /etc/udev/rules.d/ && \
+      sudo udevadm control --reload-rules && sudo udevadm trigger && echo "Successfully added udev rules"
+
+   Verify that you have ``Successfully added udev rules`` in the output, which indicates all commands were successful.
+
+#. Configure the Isaac ROS environment to include ``librealsense SDK`` and ``realsense-ros``:
+
+   .. tab-set::
+
+      .. tab-item:: Docker
+         :sync: docker
+
+         Create a file called ``~/.config/isaac-ros-cli/config.yaml`` with the following content:
+
+         .. code:: bash
+
+            mkdir -p ~/.config/isaac-ros-cli
+            touch ~/.config/isaac-ros-cli/config.yaml
+
+         .. code:: yaml
+
+            docker:
+              image:
+                additional_image_keys:
+                  - realsense
+
+      .. tab-item:: Virtual Environment
+         :sync: venv
+
+         .. include:: _snippets/realsense_host_setup.rst
+
+      .. tab-item:: Bare Metal
+         :sync: baremetal
+
+         .. include:: _snippets/realsense_host_setup.rst
+
+#. Plug in your RealSense camera to USB3 ports before activating the Isaac ROS environment in the next step.
+
+#. Activate the Isaac ROS environment:
+
+   .. tab-set::
+
+      .. tab-item:: Docker
+         :sync: docker
+
+         .. code:: bash
+
+            isaac-ros activate --build-local
+
+         This ``--build-local`` flag rebuilds the container image using ``Dockerfile.realsense`` in one of its layered stages. Rebuilding can take several minutes.
+
+         After the image has been built once, you can use ``isaac-ros activate`` to launch the container without rebuilding the image.
+
+      .. tab-item:: Virtual Environment
+         :sync: venv
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      .. tab-item:: Bare Metal
+         :sync: baremetal
+
+         .. code:: bash
+
+            isaac-ros activate
+
+#. Verify that the RealSense camera is connected by running:
+
+   .. code:: bash
+
+      rs-enumerate-devices
+
+   Verify that this returns information about all connected RealSense cameras.
+
+   .. note::
+
+      The ``realsense-viewer`` tool requires a graphical environment, to use it you must connect the host to a monitor, use a remote desktop connection or similar.
+
+   .. code:: bash
+
+      realsense-viewer
+
+   If you turn on the "Stereo Module" in the GUI, verify that you have something like the following:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/realsense_viewer.png>`
+      :align: center
+
+If you come across issues, see if it's covered in :doc:`/troubleshooting/hardware_setup` or ``librealsense`` SDK `issues <https://github.com/realsenseai/librealsense/issues?q=is%3Aissue>`__.

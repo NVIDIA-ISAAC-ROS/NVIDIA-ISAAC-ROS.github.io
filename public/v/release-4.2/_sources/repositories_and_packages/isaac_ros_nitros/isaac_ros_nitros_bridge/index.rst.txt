@@ -1,0 +1,199 @@
+===========
+|repo_name|
+===========
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_overview.png>`
+    :width: 500px
+    :align: center
+
+Overview
+--------
+
+.. include:: _snippets/overview.rst
+
+
+Performance
+-----------
+
+.. include:: _snippets/performance.rst
+
+
+Packages
+--------
+
+.. toctree::
+    :maxdepth: 2
+    :glob:
+
+    **/index
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#. Set up your development environment by following the instructions in :doc:`getting started </getting_started/index>`.
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_nitros_bridge_ros2> <quickstart.tar.gz>`
+
+
+Build ``isaac_ros_nitros_bridge_ros2``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#. Add the ``--pid=host`` Docker argument (if not already present), then launch the Docker container:
+
+   .. code:: bash
+
+      grep -qxF -- '--pid=host' ~/.isaac_ros_dev-dockerargs 2>/dev/null || echo "--pid=host" >> ~/.isaac_ros_dev-dockerargs
+
+#. Set the ``ptrace_scope`` for NITROS Bridge:
+
+   .. code:: bash
+
+      echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-nitros-bridge-ros2
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_nitros>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2 --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_nitros_bridge_ros2 --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #.  Run the following launch files to spin up a demo of this package:
+
+          .. code:: bash
+
+            cd /workspaces/isaac_ros-dev && \
+              source install/setup.bash && \
+              ros2 launch isaac_ros_nitros_bridge_ros2 isaac_ros_nitros_bridge_quickstart.launch.py rosbag_path:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_nitros_bridge_ros2/quickstart.bag
+
+      #. Open a **second** terminal and activate the Isaac ROS environment:
+
+          .. code:: bash
+
+            isaac-ros activate
+
+      #. Install RViz:
+
+          .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+            source /opt/ros/:ir_ros_distro:/setup.bash
+
+      #.  Visualize the output topic ``/r2b/ros2_output_image`` in RViz:
+
+          .. code:: bash
+
+            cd /workspaces/isaac_ros-dev/ && \
+              source install/setup.bash && \
+              rviz2
+
+
+Try Another Example
+-------------------
+
+For an example to run Isaac Sim with NITROS Bridge, see :doc:`here</concepts/nitros_bridge/tutorial_isaac_sim>`.
+
+.. toctree::
+    :hidden:
+
+    /concepts/nitros_bridge/tutorial_isaac_sim.rst
+
+
+
+Troubleshooting
+---------------
+
+Isaac ROS NITROS Bridge ROS 2 Build Issues
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptoms
+~~~~~~~~
+
+You may encounter build issues when building ROS 2 packages.
+
+Solution
+~~~~~~~~
+
+You must source ``setup.bash`` from the ROS 2 installation before building:
+
+ .. code:: bash
+
+   source /opt/ros/:ir_ros_distro:/setup.bash
+
+
+Updates
+-------
+.. include:: _snippets/updates.rst
+
+.. |repo_name| replace:: Isaac ROS NITROS Bridge

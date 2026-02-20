@@ -1,0 +1,102 @@
+Isaac for Manipulation
+======================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_manipulator_scene.jpeg>`
+   :width: 100%
+   :alt: Isaac for Manipulation pick and place for a robot simulated in Isaac Sim
+
+`Isaac for Manipulation` is a collection of GPU-accelerated packages for perception-driven manipulation, providing capabilities
+such as object detection, pose estimation, and time-optimal collision-free motion generation using
+:ref:`cuMotion <concept-cumotion>`.  These packages are distributed in individual repositories as part of
+Isaac ROS to maximize reuse and flexibility.
+
+The `Isaac Manipulator` repository contains reference workflows that currently leverage the following Isaac packages:
+
+* :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>` for optimal-time, collision-free
+  trajectory generation.
+* :doc:`Isaac ROS Nvblox </repositories_and_packages/isaac_ros_nvblox/index>` for local 3D reconstruction and obstacle
+  detection.
+* :doc:`Isaac ROS DNN Stereo Depth </repositories_and_packages/isaac_ros_dnn_stereo_depth/index>` for
+  learning-based stereo depth estimation.
+
+Many deployments would also benefit from one or more of the following Isaac packages:
+
+* :doc:`Isaac ROS Object Detection </repositories_and_packages/isaac_ros_object_detection/index>` for detecting objects
+  using SyntheticaDETR trained models.
+* :doc:`Isaac ROS Pose Estimation </repositories_and_packages/isaac_ros_pose_estimation/index>` for estimating the pose
+  of objects using FoundationPose.
+* :doc:`Isaac ROS Image Pipeline </repositories_and_packages/isaac_ros_image_pipeline/index>` for GPU-accelerated image
+  processing.
+
+Reference Architecture
+----------------------
+
+The Isaac for Manipulation Reference Architecture explains the components used in Isaac for Manipulation at a high level.
+
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+    reference_architecture
+
+Setup Guide
+-----------
+
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+    tutorials/setup*
+
+Tutorials
+---------
+
+The tutorials detail options for implementing Isaac for Manipulation workflows with a specific example. You can develop similar things, but customized for your workflow.
+
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+    tutorials/tutorials.rst
+
+Packages
+--------
+
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+    packages/**/index
+
+
+Application Notes and Limitations
+---------------------------------
+
+* The reference workflows have been tested on Jetson AGX Thor with one or two RealSense D455 cameras.
+
+* The maximum number of cameras is constrained by both hardware limitations (specifically available USB 3 bandwidth or number of available GMSL ports) and by performance considerations.  In particular, environment reconstruction using Nvblox has been tested with at most two cameras.
+
+* For workflows that involve object perception using RT-DETR, FoundationPose, or DOPE, only a single camera is used for that purpose.  A second camera may be used together with the first for environment reconstruction using Nvblox.
+
+* The overhead associated with object perception is lower for the Pick and Place workflow than it is for object following.  This is because the perception models are run on demand (using an action call) for the former, while they're run for every input frame for the latter.  For object following, the input frame rate is limited by a ``Drop`` node to reduce overhead and avoid work wasted on stale detections.
+
+* As is common for cameras such as the RealSense D455, the computed depth may be inaccurate for shiny surfaces. If the robot itself is reflective, inaccurate depth may result in spurious points in the point cloud that are not filtered out by the cuMotion robot segmentation node, which operates in three dimensions.  These spurious points would then manifest as occupied voxels in the 3D reconstruction computed by nvblox, possibly causing planning failures or less-than-optimal motion plans.
+
+   It is recommended that the depth image returned by the camera be visually inspected to ensure accuracy.  If necessary, repositioning the camera or
+   adjusting lighting in the environment can often improve depth quality.  Filtering of the depth image, for
+   example by a combination of erosion and dilation, can help ensure that poor depth samples are filtered by robot
+   segmentation, albeit with some risk that points corresponding to true obstacles are filtered as well. Use of multiple cameras can reduce the likelihood that a poor depth sample results in an incorrectly occupied
+   voxel in the reconstruction produced by Nvblox.
+
+* Intel RealSense depth cameras may lose connection and cause errors unless connected to a USB 3 port with a high-quality USB cable, especially if the cable length exceeds one meter.
+
+* Use of multiple RealSense depth cameras may demand more power than the USB 3 ports on Jetson AGX Orin can reliably provide, leading to instability.  If this occurs, consider using a powered USB hub meeting the USB 3.2 Gen 1+ standard (for example, StarTech model HB30A7AME).
+
+* For increased reliability in two-camera configurations, we recommend the ``custom mesh`` or ``cuboid`` approaches to object attachment to reduce system load and thus improve reliability.
+
+* The system may throttle due to over-current especially when running with multiple cameras and big neural network models. This reduces performance of the system and can lead to jitters in the robotics pipeline and non deterministic behavior. Refer to :doc:`/troubleshooting/hardware_setup` for more details. We recommend using a lighter system load for your software or disabling the over-current throttle to operate at peak performance.
+
+Release Notes
+-------------
+
+.. include:: tutorials/_snippets/_updates.rst

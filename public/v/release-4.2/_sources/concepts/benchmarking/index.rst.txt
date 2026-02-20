@@ -1,0 +1,279 @@
+============
+Benchmarking
+============
+
+Robots are real-time systems that require complex graphs of heterogeneous computation to perform perception, planning, and control. These graphs of computation need to perform work deterministically and with known latency. The computing platform has a fixed budget for heterogeneous computation (TOPS) and throughput. Computation is typically performed on multiple CPUs, GPUs, and additional special purpose, fixed function hardware accelerators.
+
+:ir_repo:`ros2_benchmark <ros2_benchmark>` provides the tools for measuring the throughput, latency, and compute utilization of these complex graphs without altering the code under test. The results can be used to make informed design decisions on how a robotics application can best meet its real-time requirements.
+
+The following describes how to configure benchmarking for :doc:`Isaac ROS Benchmark </repositories_and_packages/isaac_ros_benchmark/index>`, which builds on :ir_repo:`ros2_benchmark <ros2_benchmark>` for Isaac ROS graphs.
+
+Benchmark Configurations
+------------------------
+
+Performance measurement for graphs of nodes requires:
+
+* a ROS 2 launch file to launch the benchmark
+* an input YAML file specifying the configuration information
+
+Each Isaac ROS Benchmark launch file details its own benchmark
+configuration via a comment near the top of the file. For example, the
+following comment is included immediately following the license header
+in ``isaac_ros_benchmark/benchmarks/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_node.py``:
+
+.. code:: python
+
+   """
+   Performance test for Isaac ROS AprilTagNode.
+
+   The graph consists of the following:
+   - Preprocessors:
+       1. PrepResizeNode: resizes images to HD
+   - Graph under Test:
+       1. AprilTagNode: detects AprilTags
+
+   Required:
+   - Packages:
+       - isaac_ros_image_proc
+       - isaac_ros_apriltag
+   - Datasets:
+       - assets/datasets/r2b_dataset/r2b_storage
+   """
+
+Each section of this comment is explained in further detail below.
+
+Preprocessors
+~~~~~~~~~~~~~
+
+In some cases, the desired input sequence contains data that is not yet
+in the appropriate format to be received by the ROS 2 graph under test.
+For example, in the case of ``isaac_ros_apriltag_node.py``, the input
+dataset's images must be resized into HD resolution before being
+passed into the AprilTag detecting node.
+
+The preprocessing nodes allow for these types of data transformations to
+be executed before the critical timing section of the benchmark begins,
+ensuring that there is no undesired penalty in performance.
+
+Graph Under Test
+~~~~~~~~~~~~~~~~
+
+The graph under test refers to the core selection of ROS 2 nodes whose
+performance is to be measured in this specific benchmark. For example,
+in the case of ``isaac_ros_apriltag_node.py``, only the Isaac ROS
+AprilTag detecting node is included under the graph under test.
+
+By contrast, the ``isaac_ros_apriltag_graph.py`` benchmark includes
+multiple nodes in its graph under test:
+
+.. code:: python
+
+   """
+   [...]
+   - Graph under Test:
+       1. RectifyNode: rectifies images
+       2. AprilTagNode: detects AprilTags
+   [...]
+   """
+
+The Isaac ROS Benchmark collection of benchmark scripts includes both
+individual node and composite graphs under test. Node-specific
+benchmarks, identified by the ``_node`` suffix, showcase the absolute
+maximum performance possible when a node is run in isolation. Larger
+graph benchmarks, identified by the ``_graph`` suffix, present
+performance in a more typical use case.
+
+Required Packages
+~~~~~~~~~~~~~~~~~
+
+Each benchmark in the Isaac ROS Benchmark collection includes a
+different selection of nodes as preprocessors or components of the graph
+under test. Consequently, each benchmark requires its own specific subset
+of the Isaac ROS suite of packages in order to successfully run.
+
+For example, the ``isaac_ros_apriltag_graph.py`` benchmark directly
+depends on the ``isaac_ros_image_proc`` and ``isaac_ros_apriltag``
+packages. These packages, along with their own recursive dependencies,
+must be properly built/installed and sourced prior to running the benchmark.
+For benchmarks in the Isaac ROS Benchmark collection these dependencies
+are captured in their benchmark packages, so it is sufficient to build/install
+the benchmark packages (``isaac_ros_apriltag_benchmark`` for instance).
+
+Required Datasets
+~~~~~~~~~~~~~~~~~
+
+Most Isaac ROS Benchmark scripts use the standard ``r2b Dataset`` as input data.
+Before running any benchmarks, the input datasets must be downloaded by following
+the instructions :ir_repo:`here <ros2_benchmark> <README.md#datasets>`.
+
+.. _benchmarking_required_models:
+
+Required Models
+~~~~~~~~~~~~~~~
+
+Some of the benchmark graphs require loading model files. Models used by
+a benchmark graph are listed in the benchmark script's header. By
+default models are expected to be accessible by a benchmark script under
+``${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models``.
+
+Before benchmarking a node that contains a DNN, the DNN must be
+downloaded and converted to a ``.plan`` file for the host system. You can do this
+using the instructions provided in the table below:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 50 50
+
+   * - Model
+     - Command
+
+   * - `ESS <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/models/dnn_stereo_disparity>`__
+     - .. code-block:: bash
+
+          mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models && \
+            cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models && \
+            wget 'https://api.ngc.nvidia.com/v2/models/nvidia/isaac/dnn_stereo_disparity/versions/4.1.0_onnx_trt10.13/files/dnn_stereo_disparity_v4.1.0_onnx_trt10.13.tar.gz' && \
+            tar -xvf dnn_stereo_disparity_v4.1.0_onnx_trt10.13.tar.gz && \
+            mv dnn_stereo_disparity_v4.1.0_onnx_trt10.13 ess
+
+   * - `DOPE <https://github.com/NVlabs/Deep_Object_Pose>`__ `Ketchup <https://drive.google.com/drive/folders/1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__
+     - | ``mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/ketchup && cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/ketchup``
+       | Download ``Ketchup.pth`` model from `here <https://drive.google.com/drive/folders/1DfoA3m_Bm0fW8tOWXGVxi4ETlLEAgmcg>`__ to the current directory. 
+       | Activate the Isaac ROS environment: ``isaac-ros activate``
+       | Run the following command: ``python3 /workspaces/isaac_ros-dev/src/isaac_ros_pose_estimation/isaac_ros_dope/scripts/dope_converter.py --format onnx --input Ketchup.pth --output ketchup.onnx``
+       | Create a file ``config.pbtxt`` in the current directory by using the configurations provided in setup 4 :doc:`here </concepts/pose_estimation/dope/tutorial_triton>`
+
+   * - `PeopleNet <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet>`__
+     - .. code-block:: bash
+
+          mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/peoplenet && \
+            cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/peoplenet && \
+            wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&path=resnet34_peoplenet.onnx' -O resnet34_peoplenet.onnx && \
+            wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&path=resnet34_peoplenet_int8.txt' -O resnet34_peoplenet_int8.txt && \
+            wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&path=labels.txt' -O labels.txt && \
+            cp ${ISAAC_ROS_WS}/src/isaac_ros_object_detection/isaac_ros_detectnet/config/peoplenet_config.pbtxt config.pbtxt
+
+   * - `PeopleSemSegNet ShuffleSeg <https://ngc.nvidia.com/catalog/models/nvidia:tao:peoplesemsegnet>`__
+     - .. code-block:: bash
+
+          mkdir -p ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/peoplesemsegnet_shuffleseg && \
+            cd ${ISAAC_ROS_WS}/src/ros2_benchmark/assets/models/peoplesemsegnet_shuffleseg && \
+            wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplesemsegnet/deployable_shuffleseg_unet_onnx_v1.0/files?redirect=true&path=peoplesemsegnet_shuffleseg.onnx' -O peoplesemsegnet_shuffleseg.onnx && \
+            wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplesemsegnet/deployable_shuffleseg_unet_onnx_v1.0/files?redirect=true&path=pgie_unet_tlt_config_peoplesemsegnet_shuffleseg.txt' -O pgie_unet_tlt_config_peoplesemsegnet_shuffleseg.txt && \
+            cp ${ISAAC_ROS_WS}/src/isaac_ros_dnn_inference/resources/peoplesemsegnet_shuffleseg_config.pbtxt config.pbtxt
+
+List of Isaac ROS Benchmarks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+   Prior to running any of the benchmark scripts,
+   your environment must satisfy the following prerequisites:
+
+   -  All required datasets have been downloaded per the
+      :ir_repo:`README datasets instructions <ros2_benchmark> <README.md#datasets>`.
+
+   -  For DNN-based benchmarks, all required DNNs have been prepared
+      per the :ref:`instructions above <benchmarking_required_models>`.
+
+   -  All required packages have been downloaded, built, and sourced.
+
+
+.. note::
+
+   The naming convention ``_node`` is used to represent a
+   graph under test that contains a single node (for example,
+   ``stereo_image_proc_node.py``) and ``_graph`` to represent a graph
+   of multiple nodes (for example, ``stereo_image_proc_graph.py``).
+
+================================= ============================================================================================== =============================== =================================================================================
+Name                              Description                                                                                    Dataset Sequence                Launch Command
+================================= ============================================================================================== =============================== =================================================================================
+AprilTag Node                     Detect AprilTags                                                                               ``r2b_storage``                 ``launch_test $(ros2 pkg prefix isaac_ros_apriltag_benchmark)/share/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_node.py``
+AprilTag Graph                    Rectify image and detect AprilTags                                                             ``r2b_storage``                 ``launch_test $(ros2 pkg prefix isaac_ros_apriltag_benchmark)/share/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_graph.py``
+CenterPose Pose Estimation Graph  Encode image, run CenterPose model inference on TensorRT, decode output tensor as marker array ``r2b_storage``                 ``launch_test $(ros2 pkg prefix isaac_ros_centerpose_benchmark)/share/isaac_ros_centerpose_benchmark/scripts/isaac_ros_centerpose_graph.py``
+DetectNet Object Detection Graph  Encode image, run PeopleNet on Triton, decode output tensor as detection array                 ``r2b_hallway``                 ``launch_test $(ros2 pkg prefix isaac_ros_detectnet_benchmark)/share/isaac_ros_detectnet_benchmark/scripts/isaac_ros_detectnet_graph.py``
+Stereo Disparity Node             Create stereo disparity image                                                                  ``r2b_datacenter``              ``launch_test $(ros2 pkg prefix isaac_ros_stereo_image_proc_benchmark)/share/isaac_ros_stereo_image_proc_benchmark/scripts/isaac_ros_disparity_node.py``
+Stereo Disparity Graph            Create stereo disparity image, convert disparity image to point cloud                          ``r2b_datacenter``              ``launch_test $(ros2 pkg prefix isaac_ros_stereo_image_proc_benchmark)/share/isaac_ros_stereo_image_proc_benchmark/scripts/isaac_ros_disparity_graph.py``
+DNN Image Encoder Node            Encode image as resized, normalized tensor                                                     ``r2b_hallway``                 ``launch_test $(ros2 pkg prefix isaac_ros_dnn_image_encoder_benchmark)/share/isaac_ros_dnn_image_encoder_benchmark/scripts/isaac_ros_dnn_image_encoder_node.py``
+DOPE Pose Estimation Graph        Encode image, run DOPE on TensorRT, decode output tensor as pose array                         ``r2b_hallway``                 ``launch_test $(ros2 pkg prefix isaac_ros_dope_benchmark)/share/isaac_ros_dope_benchmark/scripts/isaac_ros_dope_graph.py``
+DNN Stereo Disparity Node         Create ESS-inferred stereo disparity image                                                     ``r2b_hideaway``                ``launch_test $(ros2 pkg prefix isaac_ros_ess_benchmark)/share/isaac_ros_ess_benchmark/scripts/isaac_ros_ess_node.py``
+DNN Stereo Disparity Graph        Create ESS-inferred stereo disparity image, convert disparity image to point cloud             ``r2b_hideaway``                ``launch_test $(ros2 pkg prefix isaac_ros_ess_benchmark)/share/isaac_ros_ess_benchmark/scripts/isaac_ros_ess_graph.py``
+Occupancy Grid Localizer Node     Estimate pose relative to map                                                                  ``r2b_storage``                 ``launch_test $(ros2 pkg prefix isaac_ros_occupancy_grid_localizer_benchmark)/share/isaac_ros_occupancy_grid_localizer_benchmark/scripts/isaac_ros_grid_localizer_node.py``
+H264 Decoder Node                 Decode compressed image                                                                        ``r2b_compressed_image``\  [1]_ ``launch_test $(ros2 pkg prefix isaac_ros_h264_decoder_benchmark)/share/isaac_ros_h264_decoder_benchmark/scripts/isaac_ros_h264_decoder_node.py``
+H264 Encoder Node I-frame Support Encode compressed image (I-frame)                                                              ``r2b_mezzanine``               ``launch_test $(ros2 pkg prefix isaac_ros_h264_encoder_benchmark)/share/isaac_ros_h264_encoder_benchmark/scripts/isaac_ros_h264_encoder_iframe_node.py``
+H264 Encoder Node P-frame Support Encode compressed image (P-frame)                                                              ``r2b_mezzanine``               ``launch_test $(ros2 pkg prefix isaac_ros_h264_encoder_benchmark)/share/isaac_ros_h264_encoder_benchmark/scripts/isaac_ros_h264_encoder_pframe_node.py``
+Nvblox Node                       Generate colorized 3D mesh                                                                     ``r2b_hideaway``                ``launch_test $(ros2 pkg prefix isaac_ros_nvblox_benchmark)/share/isaac_ros_nvblox_benchmark/scripts/isaac_ros_nvblox_node.py``
+Rectify Node                      Rectify image                                                                                  ``r2b_storage``                 ``launch_test $(ros2 pkg prefix isaac_ros_image_proc_benchmark)/share/isaac_ros_image_proc_benchmark/scripts/isaac_ros_rectify_node.py``
+Resize Node                       Resize image (1920x1200 to 960x576)                                                            ``r2b_storage``                 ``launch_test $(ros2 pkg prefix isaac_ros_image_proc_benchmark)/share/isaac_ros_image_proc_benchmark/scripts/isaac_ros_resize_rgb8_1920x1200_to_960x576_node.py``
+TensorRT Node PeopleSemSegNet     Run PeopleSemSegNet inference on TensorRT                                                      ``r2b_hallway``                 ``launch_test $(ros2 pkg prefix isaac_ros_tensor_rt_benchmark)/share/isaac_ros_tensor_rt_benchmark/scripts/isaac_ros_tensor_rt_ps_node.py``
+TensorRT Node DOPE                Run DOPE inference on TensorRT                                                                 ``r2b_hope``                    ``launch_test $(ros2 pkg prefix isaac_ros_tensor_rt_benchmark)/share/isaac_ros_tensor_rt_benchmark/scripts/isaac_ros_tensor_rt_dope_node.py``
+Triton Node PeopleSemSegNet       Run PeopleSemSegNet inference on Triton                                                        ``r2b_hallway``                 ``launch_test $(ros2 pkg prefix isaac_ros_triton_benchmark)/share/isaac_ros_triton_benchmark/scripts/isaac_ros_triton_ps_node.py``
+Triton Node DOPE                  Run DOPE inference on Triton                                                                   ``r2b_hope``                    ``launch_test $(ros2 pkg prefix isaac_ros_triton_benchmark)/share/isaac_ros_triton_benchmark/scripts/isaac_ros_triton_dope_node.py``
+U-Net Graph                       Encode image, run PeopleSemSegNet on TensorRT, decode output tensor as segmentation masks      ``r2b_hallway``                 ``launch_test $(ros2 pkg prefix isaac_ros_unet_benchmark)/share/isaac_ros_unet_benchmark/scripts/isaac_ros_unet_graph.py``
+Segment Anything Graph            Encode image, run SAM on Triton, decode output tensor as segmentation masks                    ``r2b_robotarm``                ``launch_test $(ros2 pkg prefix isaac_ros_segment_anything_benchmark)/share/isaac_ros_segment_anything_benchmark/scripts/isaac_ros_segment_anything_graph.py``
+Mobile Segment Anything Graph     Encode image, run Mobile SAM on Triton, decode output tensor as segmentation masks             ``r2b_robotarm``                ``launch_test $(ros2 pkg prefix isaac_ros_segment_anything_benchmark)/share/isaac_ros_segment_anything_benchmark/scripts/isaac_ros_mobile_segment_anything_graph.py``
+RT-DETR Graph                     Encode image, run RT-DETR on TensorRT, decode output tensor as detection arrays                ``r2b_robotarm``                ``launch_test $(ros2 pkg prefix isaac_ros_rtdetr_benchmark)/share/isaac_ros_rtdetr_benchmark/scripts/isaac_ros_rtdetr_graph.py``
+FoundationPose Node               Detect 6D pose of objects                                                                      ``r2b_robotarm``                ``launch_test $(ros2 pkg prefix isaac_ros_foundationpose_benchmark)/share/isaac_ros_foundationpose_benchmark/scripts/isaac_ros_foundationpose_node.py``
+FoundationPose Tracking Node      Detect 6D pose of objects                                                                      ``r2b_robotarm``                ``launch_test $(ros2 pkg prefix isaac_ros_foundationpose_benchmark)/share/isaac_ros_foundationpose_benchmark/scripts/isaac_ros_foundationpose_tracking_node.py``
+CuMotion Planner Node             Create motion plan                                                                             N/A                             ``launch_test $(ros2 pkg prefix isaac_ros_cumotion_benchmark)/share/isaac_ros_cumotion_benchmark/scripts/isaac_ros_cumotion_node.py``
+Visual SLAM Node                  Perform stereo visual simultaneous localization and mapping                                    ``r2b_cafe``                    ``launch_test $(ros2 pkg prefix isaac_ros_visual_slam_benchmark)/share/isaac_ros_visual_slam_benchmark/scripts/isaac_ros_visual_slam_node.py``
+================================= ============================================================================================== =============================== =================================================================================
+
+Results
+~~~~~~~
+
+The :doc:`Isaac ROS Performance Summary </performance/index>`
+provides an overview of the benchmark results for the Isaac ROS
+configurations, along with links to each of the results
+in JSON format.
+
+Profiling
+---------
+
+When seeking to optimize performance, profiling is often used to gain
+deep insight into the call stack and to identify where processing time
+is spent in functions.
+`ros2_tracing <https://github.com/ros2/ros2_tracing>`__ provides
+tracing instrumentation to better understand performance on a CPU, but
+lacks information on GPU acceleration.
+
+`Nsight Systems <https://developer.nvidia.com/nsight-systems>`__ is a
+freely-available tool that provides tracing instrumentation for CPU,
+GPU, and other SOC (system-on-chip) hardware accelerators on
+``aarch64`` and ``x86_64`` platforms. The Isaac ROS team uses this
+tooling internally to profile Isaac ROS graphs, to optimize individual
+node-level computation, and to improve synchronization between
+heterogeneous computing hardware. These tools allow for before-and-after
+testing to inspect profile differences with the benchmark tooling.
+
+Profiling hooks for Nsight Systems have been integrated in
+:ir_repo:`ros2_benchmark <ros2_benchmark>`
+scripts for rich annotations. The following commands show an example of
+how to use Nsight Systems to profile a benchmark on a fiducial detection
+graph built with :ir_repo:`Isaac ROS AprilTag <isaac_ros_apriltag>`:
+
+.. code:: bash
+
+   launch_test $(ros2 pkg prefix isaac_ros_apriltag_benchmark)/share/isaac_ros_apriltag_benchmark/scripts/isaac_ros_apriltag_node.py enable_nsys:=true nsys_profile_name:=isaac_ros_apriltag_profile
+
+====================== ========================================= ===============================
+Nsys Parameters        Default                                   Description
+====================== ========================================= ===============================
+``enable_nsys``        ``false``                                 Enable ``nsys`` or not
+``nsys_profile_flags`` ``--trace=osrt,nvtx,cuda``                Flags passed to ``nsys``
+``nsys_profile_name``  ``profile_{machine_type}_{current_time}`` Nsys profiling output file name
+====================== ========================================= ===============================
+
+.. [1]
+   ``r2b_compressed_image`` was generated from ``r2b_mezzanine`` by
+   recapturing replayed data through ``isaac_ros_h264_encoder`` on a
+   Jetson using this :ir_repo:`launch graph <isaac_ros_compression> <isaac_ros_h264_encoder/launch/isaac_ros_encode_r2b_rosbag.launch.py>`.
+
+
+Repositories and Packages
+-------------------------
+
+The Isaac ROS implementations of this technology are available at the following:
+
+* :doc:`Isaac ROS Benchmark </repositories_and_packages/isaac_ros_benchmark/index>`

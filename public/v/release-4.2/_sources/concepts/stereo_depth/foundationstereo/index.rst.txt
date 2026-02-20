@@ -1,0 +1,50 @@
+=================
+FoundationStereo
+=================
+
+`FoundationStereo <https://arxiv.org/pdf/2501.09898>`__ is a foundation model for
+stereo depth estimation developed by NVIDIA. It is designed to predict the disparity
+for each pixel from stereo camera image pairs. 
+
+FoundationStereo advances beyond
+traditional computer vision and earlier deep learning approaches by leveraging a
+transformer-based architecture and large-scale training on diverse datasets.
+Notably, its feature extractor incorporates depth-specific priors through the use
+of the `Depth Anything V2 <https://depth-anything-v2.github.io/>`__ model, further
+enhancing its ability to generalize across scenes. This enables the model to
+generalize robustly to new environments, camera types, and challenging scenarios such as
+varying lighting, occlusions, and non-standard camera parameters, where classic epipolar
+geometry or feature matching may fail. 
+
+The model is optimized for accurate and reliable
+disparity estimation across a wide range of domains, outperforming previous methods
+in both benchmark performance and zero-shot transfer to unseen datasets. The model
+works best with color (RGB) stereo images and accuracy may vary with monochrome stereo
+images. 
+
+It is a heavy model that is best-suited for applications that do not require
+real-time performance.
+
+The predicted
+`disparity <https://en.wikipedia.org/wiki/Binocular_disparity>`__ values
+represent the distance a point moves from one image to the other in a
+stereo image pair (also known as, the binocular image pair). The disparity is
+inversely proportional to the depth, that is:
+
+.. math::
+
+     disparity = focalLength x baseline / depth
+ 
+Given the `focal
+length <https://en.wikipedia.org/wiki/Focal_length>`__ and
+`baseline <https://en.wikipedia.org/wiki/Stereo_camera>`__ of the camera
+that generates a stereo image pair, the predicted disparity map from the
+``isaac_ros_foundationstereo`` package can be used to compute depth and generate a
+`point cloud <https://en.wikipedia.org/wiki/Point_cloud>`__.
+
+Repositories and Packages
+-------------------------
+
+The Isaac ROS implementations of this technology are available here:
+
+* :doc:`Isaac ROS Depth Estimation using FoundationStereo </repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index>`

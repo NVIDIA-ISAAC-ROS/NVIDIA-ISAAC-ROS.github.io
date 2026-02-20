@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Tutorial: cuVGL Map Creation &#8212; Isaac ROS</title>
+    <title>Tutorial: End-to-End Visual and Occupancy Map Creation &#8212; Isaac ROS</title>
   
   
   
@@ -35,6 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css?v=a5c4661c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/isaac.css?v=177ef1d8" />
   
   <!-- So that users can add custom icons -->
@@ -50,19 +51,20 @@
     <script src="../../../_static/copybutton.js?v=01823362"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script src="../../../_static/tabs.js?v=3030b3cb"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'concepts/visual_global_localization/tutorials/tutorial_map_creation';</script>
     <script>mermaid.initialize({"startOnLoad": true})</script>
     <link rel="icon" href="../../../_static/isaac_ros_logo.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Tutorial: Localization with cuVGL" href="tutorial_localization.html" />
+    <link rel="next" title="Tutorial: cuVGL Map Creation" href="tutorial_cuvgl_map_creation.html" />
     <link rel="prev" title="Visual Global Localization" href="../index.html" />
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Feb 03, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 19, 2026"/>
 
 
 <script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
@@ -395,8 +397,9 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../stereo_dnn/index.html">Stereo DNN</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">Visual Global Localization</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">Tutorial: cuVGL Map Creation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial_localization.html">Tutorial: Localization with cuVGL</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_cuvgl_localization.html">Tutorial: Localization with cuVGL</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -511,10 +514,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
-</ul>
-</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
 </ul>
@@ -681,12 +681,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../../../v/release-4.1/concepts/visual_global_localization/tutorials/tutorial_map_creation.html">release-4.1</a></dd>
+        <dd><a href="../../../v/release-4.2/concepts/visual_global_localization/tutorials/tutorial_map_creation.html">release-4.2</a></dd>
         <dd><a href="tutorial_map_creation.html">latest</a></dd>
         <dd><a href="../../../v/release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../v/release-3.1/index.html">release-3.1</a></dd>
         <dd><a href="../../../v/release-3.2/concepts/visual_global_localization/tutorials/tutorial_map_creation.html">release-3.2</a></dd>
         <dd><a href="../../../v/release-4.0/concepts/visual_global_localization/tutorials/tutorial_map_creation.html">release-4.0</a></dd>
+        <dd><a href="../../../v/release-4.1/concepts/visual_global_localization/tutorials/tutorial_map_creation.html">release-4.1</a></dd>
     </dl>
   </div>
 </div></div>
@@ -723,7 +724,7 @@
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Visual Global Localization</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Tutorial: cuVGL Map Creation</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Tutorial: End-to-End Visual and Occupancy Map Creation</span></li>
   </ul>
 </nav>
 </div>
@@ -740,129 +741,552 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="tutorial-cuvgl-map-creation">
-<h1>Tutorial: cuVGL Map Creation<a class="headerlink" href="#tutorial-cuvgl-map-creation" title="Link to this heading">#</a></h1>
-<section id="end-to-end-visual-and-occupancy-map-creation">
-<h2>End-to-End Visual and Occupancy Map Creation<a class="headerlink" href="#end-to-end-visual-and-occupancy-map-creation" title="Link to this heading">#</a></h2>
-<p>We provide an end-to-end script to create visual maps from ROS bags,
-refer to <a class="reference internal" href="../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html"><span class="doc">Tutorial: End-to-End Visual and Occupancy Map Creation</span></a>.
-It outputs a cuVSLAM map, a cuVGL map, and an occupancy map in the same coordinate system.
-The output maps can be used by cuVSLAM and cuVGL localization.</p>
-</section>
-<section id="create-cuvgl-map-using-your-own-slam-algorithm">
-<h2>Create cuVGL Map Using Your Own SLAM Algorithm<a class="headerlink" href="#create-cuvgl-map-using-your-own-slam-algorithm" title="Link to this heading">#</a></h2>
-<p>If you want to use your own SLAM algorithm to create the cuVGL map, you can follow these steps:</p>
-<ol class="arabic">
-<li><p>Collect a rosbag using appropriate data recording tools.</p></li>
-<li><p>Run your own SLAM algorithm to generate the poses.</p></li>
-<li><p>Export TensorRT engine files as described in <a class="reference internal" href="tutorial_localization.html#export-tensorrt-engine-files"><span class="std std-ref">Export TensorRT Engine Files</span></a>.</p></li>
-<li><p>Extract images from the rosbags. You can use the following command to extract features from rosbags.</p>
-<blockquote>
-<div><p>Create a camera topic config that matches with your rosbag recording.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">stereo_cameras</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_camera</span>
-<span class="w">    </span><span class="nt">left</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/my_camera/left/image_raw</span>
-<span class="w">    </span><span class="nt">left_camera_info</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/my_camera/left/camera_info</span>
-<span class="w">    </span><span class="nt">right</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/my_camera/right/image_raw</span>
-<span class="w">    </span><span class="nt">right_camera_info</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/my_camera/right/camera_info</span>
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set following variables to your own paths</span>
-<span class="nv">SENSOR_DATA_BAG</span><span class="o">=</span><span class="s2">&quot;path_to_sensor_data.bag&quot;</span>
-<span class="nv">POSE_BAG</span><span class="o">=</span><span class="s2">&quot;path_to_pose.bag&quot;</span>
-<span class="nv">MAP_FOLDER</span><span class="o">=</span><span class="s2">&quot;path_to_map_folder&quot;</span>
-<span class="nv">POSE_TOPIC_NAME</span><span class="o">=</span><span class="s2">&quot;topic_name_of_the_pose&quot;</span>
-<span class="nv">CAMERA_TOPIC_CONFIG</span><span class="o">=</span><span class="s2">&quot;path_to_camera_topic_config.yaml&quot;</span>
-
-<span class="c1"># Then extract the keyframes with image features from the rosbag</span>
-ros2<span class="w"> </span>run<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>rosbag_to_mapping_data<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--sensor_data_bag_file<span class="o">=</span><span class="nv">$SENSOR_DATA_BAG</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--pose_bag_file<span class="o">=</span><span class="nv">$POSE_BAG</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--output_folder_path<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$MAP_FOLDER</span><span class="s2">/raw&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--min_inter_frame_rotation_degrees<span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--min_inter_frame_distance<span class="o">=</span><span class="m">0</span>.2<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--pose_topic_name<span class="o">=</span><span class="nv">$POSE_TOPIC_NAME</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--camera_topic_config<span class="o">=</span><span class="nv">$CAMERA_TOPIC_CONFIG</span>
-</pre></div>
-</div>
+  <section id="tutorial-end-to-end-visual-and-occupancy-map-creation">
+<span id="tutorial-map-creation"></span><h1>Tutorial: End-to-End Visual and Occupancy Map Creation<a class="headerlink" href="#tutorial-end-to-end-visual-and-occupancy-map-creation" title="Link to this heading">#</a></h1>
+<p>This tutorial describes how to create maps for visual localization including
+visual global (cuVGL) localization map creation, cuVSLAM map creation, and
+occupancy grid map creation. The three types of maps share the same coordinate
+system. The poses from cuVGL and cuVSLAM localization align with the occupancy map.</p>
+<p>Before starting the steps of the tutorial, read the sections as directed to learn more about concepts for your particular situation:</p>
+<ul class="simple">
+<li><p>To understand the different types of maps generated from the workflow, read the <a class="reference internal" href="#tutorial-map-creation-map-types"><span class="std std-ref">Map Types</span></a> section.</p></li>
+<li><p>If you collect your own rosbag for map creation, read the following sections:</p>
+<ul>
+<li><p><a class="reference internal" href="#tutorial-map-creation-data-collection"><span class="std std-ref">Data Collection</span></a></p></li>
+<li><p><a class="reference internal" href="#tutorial-map-creation-camera-calibration"><span class="std std-ref">Camera Calibration</span></a></p></li>
+</ul>
+</li>
+</ul>
+<p>You can use this tutorial to:</p>
+<ul class="simple">
+<li><p>Create maps from an existing rosbag in the <a class="reference internal" href="#tutorial-map-creation-quick-start-existing-rosbag"><span class="std std-ref">Quick Start with an Existing Rosbag</span></a> section.</p></li>
+<li><p>Use a RealSense camera for map creation and localization, in the <a class="reference internal" href="#tutorial-map-creation-map-and-localize-with-a-realsense"><span class="std std-ref">Map and Localize with a RealSense</span></a> section.</p></li>
+<li><p>Verify the map quality in the <a class="reference internal" href="#tutorial-map-creation-map-quality-verification"><span class="std std-ref">Map Quality Verification</span></a> section.</p></li>
+</ul>
+<section id="map-types">
+<span id="tutorial-map-creation-map-types"></span><h2>Map Types<a class="headerlink" href="#map-types" title="Link to this heading">#</a></h2>
+<p>The following list provides examples of some of the different types of maps that are generated with
+rosbags when running the <code class="code docutils literal notranslate"><span class="pre">create_map_offline.py</span></code> script:</p>
+<p><strong>cuVSLAM Map</strong></p>
+<p>cuVSLAM is able to create a map and load a saved map of an environment. It can then use that map to
+improve localization performance and maintain a consistent global frame of reference.</p>
+<p><strong>Visual Global Localization Map</strong></p>
+<p>During startup or after losing localization, the visual global localization map can be
+used to globally localize on a previously created map and operate in a shared
+global frame.</p>
+<p>For more info about visual global localization, refer to: <a class="reference internal" href="../index.html"><span class="doc">Concepts: Visual Global Localization</span></a></p>
+<p><strong>Occupancy Grid Map</strong></p>
+<p>Navigation packages such as <a class="reference external" href="https://docs.nav2.org/">nav2</a> use an occupancy
+grid map to represent the obstacles in a map. We use <a class="reference internal" href="../../visual_slam/cuvslam/index.html"><span class="doc">cuVSLAM</span></a>,
+<a class="reference internal" href="../../stereo_depth/index.html"><span class="doc">Stereo Depth</span></a> and <a class="reference internal" href="../../scene_reconstruction/nvblox/index.html"><span class="doc">Nvblox</span></a> to build an occupancy grid map from images.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>Only <code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/PoseStamped</span></code>, <code class="docutils literal notranslate"><span class="pre">geometry_msgs/msg/PoseWithCovarianceStamped</span></code>, <code class="docutils literal notranslate"><span class="pre">nav_msgs/msg/Odometry</span></code>, and <code class="docutils literal notranslate"><span class="pre">nav_msgs/msg/Path</span></code> message types are supported for pose type in the pose rosbag. Poses stored in the pose bag are in <code class="docutils literal notranslate"><span class="pre">base_link</span></code> frame.</p></li>
-<li><p>Change <code class="docutils literal notranslate"><span class="pre">--min_inter_frame_rotation_degrees</span></code> and <code class="docutils literal notranslate"><span class="pre">--min_inter_frame_distance</span></code> to your own values for proper density of the keyframes. Larger environments might require larger values.</p></li>
+<li><p>The generated occupancy map is only intended to be used for global path planning. Specifically it is not intended to be used for 2D Lidar localization. The generated map may contain slight artifacts and imprecisions and therefore is expected to be used with a planner that inflates obstacles.</p></li>
+<li><p>Because the ROS2 rosbag replay is nondeterministic, each run of the occupancy map creation can produce a slightly different map.</p></li>
 </ul>
 </div>
-<p>More documentation about the <code class="docutils literal notranslate"><span class="pre">rosbag_to_mapping_data</span></code> tool can be found in the <a class="reference internal" href="../../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><span class="doc">isaac_mapping_ros documentation</span></a>.</p>
-</div></blockquote>
-</li>
-<li><p>Create cuVGL map with following command:</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the global localization map, it will create bow index, bow vocabulary</span>
-ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_visual_mapping<span class="w"> </span>create_cuvgl_map.py<span class="w"> </span>--map_folder<span class="o">=</span><span class="nv">$MAP_FOLDER</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--binary_folder_path<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>isaac_ros_visual_mapping<span class="k">)</span>/bin/visual_mapping<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--config_folder_path<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_visual_mapping<span class="k">)</span>/configs/isaac/<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--model_dir<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_visual_mapping<span class="k">)</span>/models/
-</pre></div>
-</div>
+</section>
+<section id="data-collection">
+<span id="tutorial-map-creation-data-collection"></span><h2>Data Collection<a class="headerlink" href="#data-collection" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Closed Loop Segments: Build mapping trajectories in loops or segments of around 5-10 meters.
+This ensures that the same area is captured from different angles, which improves
+map detail and reduces drift.</p></li>
+<li><p>Avoid Long Straight Paths: Long drives in unexplored areas accumulate drift risk.
+Use short, closed loops instead.</p></li>
+<li><p>Vary Camera Angles: Capturing locations from multiple angles makes the visual map
+more reliable for future localization.</p></li>
+</ul>
+<p>The following schematic examples show efficient mapping paths in both narrow corridors and open
+spaces. They demonstrate optimal patterns for capturing comprehensive visual data
+and reducing tracking drift:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
+<p>For optimal pose correction and map accuracy, Loop Closing must
+be effectively exploited. This mechanism corrects the robot’s pose when
+the robot revisits a previously mapped location.</p>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Mapping_thincorridor.gif/"><img alt="Visualization of the mapping trajectory in corridor" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Mapping_thincorridor.gif/" style="width: 800px;" /></a>
+</figure>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Mapping_openspace.gif/"><img alt="Visualization of the mapping trajectory in open space" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Mapping_openspace.gif/" style="width: 800px;" /></a>
+</figure>
+</section>
+<section id="camera-calibration">
+<span id="tutorial-map-creation-camera-calibration"></span><h2>Camera Calibration<a class="headerlink" href="#camera-calibration" title="Link to this heading">#</a></h2>
+<p>In this tutorial, “raw” means original images with distortion, and “rectified” means stereo rectified images
+without distortion.</p>
+<p>Ensure the following topics are recorded in the rosbag:</p>
 <ul class="simple">
-<li><p>If you export the TensorRT engine files, pass <code class="docutils literal notranslate"><span class="pre">--model_dir</span> <span class="pre">$OUTPUT_MODEL_DIR</span></code> when running <code class="docutils literal notranslate"><span class="pre">create_cuvgl_map.py</span></code>.</p></li>
-<li><p>If you have a prebuilt vocabulary, pass <code class="docutils literal notranslate"><span class="pre">--prebuilt_bow_vocabulary_folder</span> <span class="pre">&lt;path_to_vocabulary_folder&gt;</span></code> when running <code class="docutils literal notranslate"><span class="pre">create_cuvgl_map.py</span></code>. For example:</p></li>
+<li><p>static transform between base frame and camera frame.</p></li>
+<li><p>raw or rectified images.</p></li>
+<li><p>camera parameters.</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_visual_mapping<span class="w"> </span>create_cuvgl_map.py<span class="w"> </span>--map_folder<span class="o">=</span><span class="nv">$MAP_FOLDER</span><span class="w"> </span>--prebuilt_bow_vocabulary_folder<span class="o">=</span>&lt;path_to_vocabulary_folder&gt;
+<p>Here is an example of the left camera topic names being given image types and compression:</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id1">
+<caption><span class="caption-text">Left Camera Topic Names</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 21.4%" />
+<col style="width: 21.4%" />
+<col style="width: 28.6%" />
+<col style="width: 28.6%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Image Type</p></th>
+<th class="head"><p>Camera Info</p></th>
+<th class="head"><p>Image</p></th>
+<th class="head"><p>Compressed Image</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Raw</p></td>
+<td><p><cite>/&lt;camera_name&gt;/left/camera_info</cite></p></td>
+<td><p><cite>/&lt;camera_name&gt;/left/image_raw</cite></p></td>
+<td><p><cite>/&lt;camera_name&gt;/left/image_raw/compressed</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>Rectified</p></td>
+<td><p><cite>/&lt;camera_name&gt;/left/camera_info_rect</cite></p></td>
+<td><p><cite>/&lt;camera_name&gt;/left/image_rect</cite></p></td>
+<td><p><cite>/&lt;camera_name&gt;/left/image_rect/compressed</cite></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Change the camera info and image topic names for the right camera by replacing “left” with “right” in the above table.</p>
+<p>If your rosbag topic names are different from the default ones, create a camera topic config that
+matches with your rosbag recording and use it in the map creation step. For example:</p>
+<blockquote>
+<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">stereo_cameras</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;camera_name&gt;</span>
+<span class="w">    </span><span class="nt">left</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/&lt;camera_name&gt;/left/image_raw</span>
+<span class="w">    </span><span class="nt">left_frame_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;camera_name&gt;_left_optical_frame</span>
+<span class="w">    </span><span class="nt">left_camera_info</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/&lt;camera_name&gt;/left/camera_info</span>
+<span class="w">    </span><span class="nt">right</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/&lt;camera_name&gt;/right/image_raw</span>
+<span class="w">    </span><span class="nt">right_camera_info</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/&lt;camera_name&gt;/right/camera_info</span>
+<span class="w">    </span><span class="nt">right_frame_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;camera_name&gt;_right_optical_frame</span>
 </pre></div>
 </div>
-</div>
 </div></blockquote>
+<p>You must either provide stereo-rectified images or supply the stereo rectification parameters in the camera info when using raw images.</p>
+<p>You can use the following checks to verify that the calibration is configured correctly.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Raw Images</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Rectified Images</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><ul class="simple">
+<li><p><cite>k</cite> and <cite>d</cite> correspond to the raw images.</p></li>
+<li><p><cite>r</cite> is typically not an identity matrix, since rectification is still required.</p></li>
+<li><p><cite>k</cite> (raw intrinsics) is typically different from the first 3x3 block in <cite>p</cite>, because <cite>p</cite> contains the rectified intrinsics.</p></li>
+<li><p>The first 3x3 block in <cite>p</cite> is the same for both left and right images, because both are projected to the same rectified image plane.</p></li>
+</ul>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><ul class="simple">
+<li><p><cite>d</cite> is an empty or all zeros (no distortion remains after rectification).</p></li>
+<li><p><cite>k</cite> is typically matches the first 3x3 block of <cite>p</cite>, since both describe the same rectified intrinsics.</p></li>
+<li><p><cite>r</cite> depends on the <cite>frame_id</cite>:</p>
+<ul>
+<li><p>If <cite>frame_id</cite> refers to rectified optical frame, <cite>r</cite> should be identity (no transform needed).</p></li>
+<li><p>If <cite>frame_id</cite> refers to raw optical frame, <cite>r</cite> is typically not identity (a transform from raw to rectified is needed).</p></li>
+</ul>
+</li>
+</ul>
+</div></div>
+</section>
+<section id="set-up-development-environment">
+<span id="tutorial-map-creation-set-up-development-environment"></span><h2>Set Up Development Environment<a class="headerlink" href="#set-up-development-environment" title="Link to this heading">#</a></h2>
+<ol class="arabic">
+<li><p>Set up your development environment by following the instructions in <a class="reference internal" href="../../../getting_started/index.html"><span class="doc">getting started</span></a>.</p></li>
+<li><p>(Optional) Install dependencies for any sensors you want to use by following the <a class="reference internal" href="../../../getting_started/sensors/index.html"><span class="doc">sensor-specific guides</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We strongly recommend installing all sensor dependencies <strong>before</strong> starting any quickstarts.
+Some sensor dependencies require restarting the development environment during installation, which will interrupt the quickstart process.</p>
+</div>
 </li>
 </ol>
 </section>
-<section id="create-cuvgl-map-from-images">
-<h2>Create cuVGL Map From Images<a class="headerlink" href="#create-cuvgl-map-from-images" title="Link to this heading">#</a></h2>
-<p>The map creation process in cuVGL requires two inputs:</p>
+<section id="check-gpu-memory-x86-only">
+<span id="tutorial-map-creation-check-gpu-memory"></span><h2>Check GPU Memory (x86 Only)<a class="headerlink" href="#check-gpu-memory-x86-only" title="Link to this heading">#</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <ul class="simple">
-<li><p>Rectified Images (From stereo camera)</p></li>
-<li><p>Poses</p></li>
+<li><p>Map creation only works with x86 laptops with NVIDIA GPU (compute_capability &gt;= 8.0 and 8 GB RAM or higher).</p></li>
+<li><p>Map Creation will use all the CPU and GPU resources, make sure you do not have anything important running at the same time.</p></li>
 </ul>
-<p>cuVGL extracts features from the images and saves them along with the corresponding poses.
-The cuVGL map is structured as a folder that contains the following files:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">keyframes</span></code>: This folder contains the features extracted from the raw images, with each individual keyframe saved as a binary protobuf file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">keyframes/frames_meta.pb.txt</span></code>: This <code class="docutils literal notranslate"><span class="pre">protobuf</span></code> file contains metadata for the keyframes including timestamp, poses, and <code class="docutils literal notranslate"><span class="pre">image_name</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">bow_index.pb</span></code>: This is the bag-of-words index file for image retrieval.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">vocabulary</span></code>: This folder contains all the vocabulary files.</p></li>
-</ul>
-<p>While it’s recommended to directly use the rosbag data converter to create cuVGL data format, you can also
-create the map from raw images.</p>
-<p>To do this you must prepare the keyframe <code class="docutils literal notranslate"><span class="pre">frames_meta.pb.txt</span></code> metadata file
-for your raw images.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">frames_meta.pb.txt</span></code> is a text <code class="docutils literal notranslate"><span class="pre">protobuf</span></code> file of message <code class="docutils literal notranslate"><span class="pre">KeyframesMetadataCollection</span></code>, for the detailed
-definition see the <code class="docutils literal notranslate"><span class="pre">keyframe_metadata.pb.h</span></code> file under the install folder of cuVGL.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>isaac_ros_visual_mapping<span class="k">)</span>/include/isaac_mapping/protos/visual/general/keyframe_metadata.pb.h
-</pre></div>
 </div>
 <ol class="arabic">
-<li><p>Prepare a text protobuf file of message <code class="docutils literal notranslate"><span class="pre">KeyframesMetadataCollection</span></code> and put it under:</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">$MAP_FOLDER</span>/rectified/
-<span class="w">  </span>image_0.jpg
-<span class="w">  </span>image_1.jpg
-<span class="w">  </span>...
-<span class="w">  </span>frames_meta.pb.txt
+<li><p>Activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
 </pre></div>
 </div>
-</div></blockquote>
 </li>
-<li><p>Create the global localization map using the following command:</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the global localization map, it will create bow index, bow vocabulary</span>
-ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_visual_mapping<span class="w"> </span>create_cuvgl_map.py<span class="w"> </span>--map_folder<span class="o">=</span><span class="nv">$MAP_FOLDER</span><span class="w"> </span>--raw_image_folder<span class="o">=</span><span class="nv">$MAP_FOLDER</span>/rectified
+<li><p>Check GPU memory:</p>
+<p>Install the tool to check GPU memory inside the container:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>gpustat<span class="w"> </span>--break-system-packages
 </pre></div>
 </div>
-</div></blockquote>
+<p>Run the command to check the GPU memory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gpustat
+</pre></div>
+</div>
+<p>The output will show GPU information. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[0] NVIDIA RTX A6000 | 44°C,   0 % |    15 / 49140 MB |
+</pre></div>
+</div>
+<p>In this example, the GPU has 49140 MB (approximately 49 GB) of total memory.</p>
+</li>
+<li><p>Set the model resolution environment variable based on your GPU memory:</p>
+<ul>
+<li><p>For above 16 GB, set:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="o">=</span>high_res
+</pre></div>
+</div>
+</li>
+<li><p>For less than 16 GB, set:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="o">=</span>low_res
+</pre></div>
+</div>
+</li>
+</ul>
 </li>
 </ol>
+<section id="build-package-name">
+<span id="tutorial-map-creation-build-isaac-mapping-ros-package"></span><h3>Build <code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code><a class="headerlink" href="#build-package-name" title="Link to this heading">#</a></h3>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">Binary Package</button><button aria-controls="panel-1-1-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-1-1-1" name="1-1" role="tab" tabindex="-1">Build from Source</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>(X86 Only) Run GPU memory check to set the environment variable for the FoundationStereo model resolution:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="o">=</span>&lt;high_res<span class="p">|</span>low_res&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Install the prebuilt Debian packages:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-isaac-mapping-ros<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-isaac-ros-foundationstereo-models-install
+</pre></div>
+</div>
+</li>
+<li><p>Download and install the FoundationStereo model files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_foundationstereo_models_install<span class="w"> </span>install_foundationstereo_models.sh<span class="w"> </span>--eula<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--model_res<span class="w"> </span><span class="si">${</span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="si">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div><div aria-labelledby="tab-1-1-1" class="sphinx-tabs-panel" hidden="true" id="panel-1-1-1" name="1-1" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Install Git LFS:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>git-lfs<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>lfs<span class="w"> </span>install
+</pre></div>
+</div>
+</li>
+<li><p>Clone this repository under <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/src</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>release-4.2<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_mapping_and_localization.git<span class="w"> </span>isaac_ros_mapping_and_localization
+</pre></div>
+</div>
+</li>
+<li><p>Activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>(X86 Only) Run GPU memory check to set the environment variable for the FoundationStereo model resolution:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="o">=</span>&lt;high_res<span class="p">|</span>low_res&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> to install the package’s dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_mapping_and_localization/isaac_mapping_ros<span class="w"> </span>--ignore-src<span class="w"> </span>-y
+</pre></div>
+</div>
+</li>
+<li><p>Download and install the FoundationStereo model files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-isaac-ros-foundationstereo-models-install<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_foundationstereo_models_install<span class="w"> </span>install_foundationstereo_models.sh<span class="w"> </span>--eula<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--model_res<span class="w"> </span><span class="si">${</span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="si">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Build the package from source:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-up-to<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>--base-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_mapping_and_localization/isaac_mapping_ros
+</pre></div>
+</div>
+</li>
+<li><p>Source the ROS workspace:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure to repeat this step in <strong>every</strong> terminal created inside the Isaac ROS environment.</p>
+<p>Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package’s contents.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</li>
+</ol>
+</div></div>
+</section>
+</section>
+<section id="quick-start-with-an-existing-rosbag">
+<span id="tutorial-map-creation-quick-start-existing-rosbag"></span><h2>Quick Start with an Existing Rosbag<a class="headerlink" href="#quick-start-with-an-existing-rosbag" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure that the rosbag and output map folder path are mounted to the Isaac ROS environment.
+You can add them in <code class="docutils literal notranslate"><span class="pre">~/.isaac_ros_dev-dockerargs</span></code> then restart the Isaac ROS environment.</p>
+</div>
+<ol class="arabic">
+<li><p>Download the <code class="docutils literal notranslate"><span class="pre">r2b_galileo</span></code> dataset from the
+<a class="reference external" href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/resources/r2bdataset2024">r2b 2024 dataset on NGC</a>.
+It is a 20-second rosbag containing synchronized images from four stereo camera pairs.</p></li>
+<li><p>Open a terminal and activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>(X86 Only) Run GPU memory check to set the environment variable for the FoundationStereo model resolution:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="o">=</span>&lt;high_res<span class="p">|</span>low_res&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Create the maps mentioned above using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>create_map_offline.py<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--sensor_data_bag<span class="o">=</span>&lt;PATH_TO_BAG&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--base_output_folder<span class="o">=</span>&lt;PATH_TO_OUTPUT_FOLDER&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--fs_model_res<span class="o">=</span><span class="si">${</span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="si">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>After successful completion, verify that you see a message confirming that maps have
+been created. The full logs for each step are stored in the outputs. All steps include:</p>
+<ul class="simple">
+<li><p><cite>Extract edex</cite> step extracts RGB images and metadata from rosbag.</p></li>
+<li><p><cite>Create cuVSLAM map</cite> step computes the cuVSLAM pose and map.</p></li>
+<li><p><cite>Optimize odometry pose with keyframe pose</cite> step processes the odometry pose and loop closures computed by cuVSLAM and outputs more accurate odometry poses.</p></li>
+<li><p><cite>Update frame metadata pose</cite> step updates the image metadata with the computed poses.</p></li>
+<li><p><cite>Select map frames</cite> step samples key frames using a translation and rotation distance from all images.</p></li>
+<li><p><cite>Copy map frames</cite> step copies the sampled keyframes to a keyframe folder.</p></li>
+<li><p><cite>Run Foundation Stereo inference</cite> step runs Foundation Stereo inference on keyframes and outputs depth images.</p></li>
+<li><p><cite>Run Nvblox</cite> step creates a 2D occupancy map from keyframes using RGB+depth images and poses.</p></li>
+<li><p><cite>Extract features</cite> step extracts <code class="docutils literal notranslate"><span class="pre">ALIKED</span></code> image features for keyframes.</p></li>
+<li><p><cite>Build vocabulary</cite> step builds a visual vocabulary from extracted features.</p></li>
+<li><p><cite>Build BoW index</cite> step builds a bag-of-words image retrieval database from extracted features, which together with vocabulary form the global localization map.</p></li>
+</ul>
+<p>Verify <cite>occupancy_map.png</cite> file in the output map folder:</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/r2b_galileo_omap.png/"><img alt="r2b_galileo_omap" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/r2b_galileo_omap.png/" style="width: 800px;" /></a>
+</figure>
+</section>
+<section id="map-and-localize-with-a-realsense">
+<span id="tutorial-map-creation-map-and-localize-with-a-realsense"></span><h2>Map and Localize with a RealSense<a class="headerlink" href="#map-and-localize-with-a-realsense" title="Link to this heading">#</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul class="simple">
+<li><p>Mapping workflow works best in closed, structured indoor spaces with nearby visual features. In more open environments or scenes with far backgrounds, mapping accuracy can degrade due to fewer constraints.</p></li>
+<li><p>Glass and very thin structures such as wires and cable railings cannot be detected by the current stereo networks used for depth estimation. If you have such structures in your environment, you might need to modify the environment so that they are more visible features, to have the unnavigable areas correctly estimated.</p></li>
+<li><p>The quality of the occupancy map is dependent on the disparity data provided to Nvblox. Degraded results can occur for wall corners. Improved results might be achieved with alternative stereo modalities, such as a different stereo camera or other AI/DNNs for stereo disparity estimation.</p></li>
+</ul>
+</div>
+<p>You can use a RealSense D435i camera for following the steps below.</p>
+<p>Activate the Isaac ROS environment for every new terminal created when running the following steps
+by running the command <code class="docutils literal notranslate"><span class="pre">isaac-ros</span> <span class="pre">activate</span></code> in the terminal.</p>
+<ol class="arabic">
+<li><p>Set up the development environment by following <a class="reference internal" href="#tutorial-map-creation-set-up-development-environment"><span class="std std-ref">Set Up Development Environment</span></a>
+instructions.</p></li>
+<li><p>Build the package by following <a class="reference internal" href="#tutorial-map-creation-build-isaac-mapping-ros-package"><span class="std std-ref">Build Isaac Mapping ROS Package</span></a>
+instructions.</p></li>
+<li><p>Set up the RealSense camera by following the <a class="reference internal" href="../../../getting_started/sensors/realsense_setup.html"><span class="doc">RealSense Setup</span></a> instructions.
+Plug in the camera and run the command <code class="docutils literal notranslate"><span class="pre">rs-enumerate-devices</span> <span class="pre">-S</span></code> in the terminal to check the
+camera model. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Device<span class="w"> </span>Name<span class="w">                </span>Serial<span class="w"> </span>Number<span class="w">       </span>Firmware<span class="w"> </span>Version
+Intel<span class="w"> </span>RealSense<span class="w"> </span>D435I<span class="w">      </span><span class="m">337122071493</span><span class="w">        </span><span class="m">5</span>.16.0.1
+</pre></div>
+</div>
+</li>
+<li><p>Set up visualization.</p>
+<ol class="arabic simple">
+<li><p>Follow the <a class="reference internal" href="../../visualization/foxglove.html#foxglove-setup"><span class="std std-ref">Foxglove setup</span></a> guide to launch Foxglove.</p></li>
+<li><p>Download Foxglove layout file from
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_mapping_and_localization/blob/release-4.2/isaac_mapping_ros/foxglove_layouts/localize_realsense.json">localize_realsense.json</a>.</p></li>
+<li><p>Import the downloaded layout file into Foxglove.</p></li>
+</ol>
+</li>
+<li><p>Run a quick check on cuVSLAM result with RealSense camera.</p>
+<ol class="arabic">
+<li><p>Open a terminal and activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Launch the RealSense camera with cuVSLAM node.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>localize_realsense.launch.py<span class="w"> </span>enable_vgl:<span class="o">=</span>False
+</pre></div>
+</div>
+</li>
+<li><p>Move the camera forward by 1m, and verify the cuVSLAM reports a translation of
+around <code class="docutils literal notranslate"><span class="pre">[1.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0]</span></code> in the Foxglove panel. If the reported
+odometry measurement is inaccurate, make sure the environment has
+sufficient near-distance objects for feature tracking, and verify
+the camera calibration is correct.</p></li>
+</ol>
+</li>
+<li><p>Record a rosbag for map creation.</p>
+<ol class="arabic">
+<li><p>Launch the RealSense camera:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>localize_realsense.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>enable_vslam:<span class="o">=</span>False<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>enable_vgl:<span class="o">=</span>False
+</pre></div>
+</div>
+</li>
+<li><p>In a new terminal, activate the Isaac ROS environment</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+<p>Then, start rosbag recording:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>bag<span class="w"> </span>record<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/tf_static<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/realsense/left/camera_info_rect<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/realsense/left/image_rect<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/realsense/right/camera_info_rect<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/realsense/right/image_rect<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--storage<span class="w"> </span>mcap<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-o<span class="w"> </span>&lt;PATH_TO_BAG&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Collect data following the <a class="reference internal" href="#tutorial-map-creation-data-collection"><span class="std std-ref">Data Collection</span></a> guidelines.
+Additionally, follow these recommendations for handheld mapping bags:</p>
+<ul>
+<li><p>Hold the camera in the correct orientation. For the Intel RealSense Depth Camera D435i,
+the screw hole should face downward while recording.</p></li>
+<li><p>Record in areas with sufficient nearby visual features. Avoid scenes dominated by distant
+backgrounds.</p></li>
+<li><p>Avoid sudden or sharp motions. Keep the camera facing forward, and rotate it smoothly when
+looking up, down, or around.</p></li>
+<li><p>Start and stop recording at approximately the same pose to help ensure loop closure.</p></li>
+<li><p>Move the camera close to the objects you want to map, including the ground and surrounding
+structures.</p>
+<p>An example of a recording captured around a cafe table area:</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/voyager_cafe_f3_recording.gif/"><img alt="Cafe Table Area" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/voyager_cafe_f3_recording.gif/" style="width: 800px;" /></a>
+</figure>
+</li>
+</ul>
+</li>
+<li><p>After data collection is finished, use <code class="docutils literal notranslate"><span class="pre">ctrl+c</span></code> to stop the rosbag recording
+and camera driver. Verify the rosbag contains all the topics listed above
+by running the command <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">bag</span> <span class="pre">info</span> <span class="pre">&lt;PATH_TO_BAG&gt;</span></code>.</p></li>
+</ol>
+</li>
+<li><p>(X86 Only) Run GPU memory check to set the environment variable for the FoundationStereo model resolution:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="o">=</span>&lt;high_res<span class="p">|</span>low_res&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Create maps for the RealSense rosbag using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>create_map_offline.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--sensor_data_bag<span class="o">=</span>&lt;PATH_TO_BAG&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base_output_folder<span class="o">=</span>&lt;PATH_TO_OUTPUT_FOLDER&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--camera_topic_config<span class="o">=</span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>--share<span class="k">)</span>/configs/data_converter_realsense.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--base_link_name<span class="o">=</span>camera_link<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--fs_model_res<span class="o">=</span><span class="si">${</span><span class="nv">FOUNDATIONSTEREO_MODEL_RES</span><span class="si">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--base_link_name</span></code> is used to specify the TF frame name in your rosbag.
+The <code class="docutils literal notranslate"><span class="pre">--camera_topic_config</span></code> is used to specify the YAML file for the custom
+camera topic, camera info topic, and camera frame names.</p>
+</li>
+<li><p>Verify the map quality by referring to the
+<a class="reference internal" href="#tutorial-map-creation-map-quality-verification"><span class="std std-ref">Map Quality Verification</span></a>
+section.</p></li>
+<li><p>Export the TensorRT engine file as described in
+<a class="reference internal" href="tutorial_cuvgl_localization.html#export-tensorrt-engine-files"><span class="std std-ref">Export TensorRT Engine Files</span></a>.</p></li>
+<li><p>Run live localization using the maps generated above:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>localize_realsense.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>map_dir:<span class="o">=</span>&lt;PATH_TO_OUTPUT_FOLDER&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>vgl_model_dir:<span class="o">=</span>&lt;PATH_TO_MODEL_DIR&gt;
+</pre></div>
+</div>
+<p>It starts the RealSense camera, cuVSLAM and cuVGL nodes, and an
+occupancy map server.</p>
+<p>The cuVGL node first computes a global localization pose
+for cuVSLAM to bootstrap localization. After cuVSLAM successfully localizes
+in the map, cuVGL stops localization and cuVSLAM continuously tracks features
+and performs optimization with the map.</p>
+</li>
+<li><p>To run localization with a pre-recorded rosbag, specify the rosbag path
+in the launch file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_mapping_ros<span class="w"> </span>localize_realsense.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>map_dir:<span class="o">=</span>&lt;PATH_TO_OUTPUT_FOLDER&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>vgl_model_dir:<span class="o">=</span>&lt;PATH_TO_MODEL_DIR&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>rosbag:<span class="o">=</span>&lt;PATH_TO_BAG&gt;
+</pre></div>
+</div>
+<p>Replay is at real time by default. You can adjust the replay rate by
+<code class="docutils literal notranslate"><span class="pre">replay_rate:=&lt;replay_rate&gt;</span></code>. When running a short localization bag,
+use <code class="docutils literal notranslate"><span class="pre">replay_rate:=0.1</span></code> to slow down the replay, allowing more
+localization triggers and increasing the chances of successful localization.</p>
+</li>
+</ol>
+</section>
+<section id="map-quality-verification">
+<span id="tutorial-map-creation-map-quality-verification"></span><h2>Map Quality Verification<a class="headerlink" href="#map-quality-verification" title="Link to this heading">#</a></h2>
+<section id="pose-plot">
+<h3>Pose Plot<a class="headerlink" href="#pose-plot" title="Link to this heading">#</a></h3>
+<p>Pose trajectory plots are saved under <cite>pose_comparison</cite> folder.</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/optimized_keyframe_pose.png/"><img alt="Pose Comparison" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/optimized_keyframe_pose.png/" style="width: 800px;" /></a>
+</figure>
+<p>The plots show the final poses used for map creation in <code class="docutils literal notranslate"><span class="pre">XY</span></code> and <code class="docutils literal notranslate"><span class="pre">XZ</span></code> planes.
+The green circle represents the start pose, and the
+red square represents the end pose.</p>
+<p>If data collection starts and ends at approximately the same pose, the distance
+between the green circle and the red square represents the pose drifts during mapping.</p>
+<ul class="simple">
+<li><p>If you observe noticeable separation between the start and end poses (loop-closure drift),
+recollect the data in a closed loop and enable multiple passes by setting <code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">cuvslam.repeat=2</span></code>
+in the map creation command.</p></li>
+</ul>
+</section>
+<section id="occupancy-map">
+<h3>Occupancy Map<a class="headerlink" href="#occupancy-map" title="Link to this heading">#</a></h3>
+<p>The 2D occupancy map is saved to <cite>occupancy_map.png</cite> and <cite>occupancy_map.yaml</cite>
+in the output map folder. A good occupancy map should have well-aligned objects
+and walls, for example:</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/good_omap.png/"><img alt="Good OMap" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/good_omap.png/" style="width: 800px;" /></a>
+</figure>
+<p>A <strong>bad</strong> occupancy map can have noisy artifacts or misaligned walls, like this:</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/omap_poor_quality1.png/"><img alt="OMap poor quality" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.2/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/omap_poor_quality1.png/" style="width: 800px;" /></a>
+</figure>
+<ul class="simple">
+<li><p>You can include objects that are farther away in the occupancy map by increasing the
+Nvblox integration distance using the
+<code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">nvblox.projective_integrator_max_integration_distance_m=&lt;MAX_INTEGRATION_DISTANCE&gt;</span></code>
+flag in the map creation command.</p></li>
+</ul>
+</section>
+<section id="overriding-parameters">
+<h3>Overriding Parameters<a class="headerlink" href="#overriding-parameters" title="Link to this heading">#</a></h3>
+<p>The map creation configuration is defined in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_mapping_and_localization/blob/release-4.2/isaac_mapping_ros/configs/map_creation_config.yaml">map_creation_config.yaml</a>.
+You can override the cuVSLAM and Nvblox parameters using one of the following methods:</p>
+<ul class="simple">
+<li><p>Pass the overrides as command line arguments, for example: <code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">cuvslam.repeat=2</span> <span class="pre">-o</span> <span class="pre">nvblox.projective_integrator_max_integration_distance_m=3.5</span></code>.</p></li>
+<li><p>Create a custom config file by copying the default config file from
+<a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_mapping_and_localization/blob/release-4.2/isaac_mapping_ros/configs/map_creation_config.yaml">map_creation_config.yaml</a>
+and modify the parameters you want to change. Then pass it when running map creation with the <code class="docutils literal notranslate"><span class="pre">--map_creation_config=&lt;CUSTOM_CONFIG_FILE&gt;</span></code> flag.</p></li>
+</ul>
+</section>
 </section>
 </section>
 
@@ -886,11 +1310,11 @@ ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_visual_mapping<
       </div>
     </a>
     <a class="right-next"
-       href="tutorial_localization.html"
+       href="tutorial_cuvgl_map_creation.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial: Localization with cuVGL</p>
+        <p class="prev-next-title">Tutorial: cuVGL Map Creation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -915,9 +1339,22 @@ ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_visual_mapping<
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#end-to-end-visual-and-occupancy-map-creation">End-to-End Visual and Occupancy Map Creation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-cuvgl-map-using-your-own-slam-algorithm">Create cuVGL Map Using Your Own SLAM Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-cuvgl-map-from-images">Create cuVGL Map From Images</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map-types">Map Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-collection">Data Collection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#camera-calibration">Camera Calibration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-development-environment">Set Up Development Environment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-gpu-memory-x86-only">Check GPU Memory (x86 Only)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-package-name">Build <code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start-with-an-existing-rosbag">Quick Start with an Existing Rosbag</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map-and-localize-with-a-realsense">Map and Localize with a RealSense</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map-quality-verification">Map Quality Verification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pose-plot">Pose Plot</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#occupancy-map">Occupancy Map</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overriding-parameters">Overriding Parameters</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -1011,7 +1448,7 @@ ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_visual_mapping<
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Feb 03, 2026.
+  Last updated on Feb 19, 2026.
   <br/>
 </p></div>
       

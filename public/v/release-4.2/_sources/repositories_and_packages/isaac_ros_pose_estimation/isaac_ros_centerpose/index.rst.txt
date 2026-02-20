@@ -1,0 +1,387 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_pose_estimation> <isaac_ros_centerpose>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_centerpose> <quickstart.tar.gz>`
+
+#. Download the ``CenterPose`` shoe ONNX file to the models repository directory with version ``1``:
+
+  .. code:: bash
+
+      mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/centerpose_shoe/1 && \
+        cd ${ISAAC_ROS_WS}/isaac_ros_assets/models/centerpose_shoe/1 && \
+        wget --content-disposition 'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/centerpose/deployable_dla34/files?redirect=true&path=shoe_DLA34.onnx' -O model.onnx
+
+#. Move the quickstart model configuration file to the model repository.
+
+   .. code:: bash
+
+      cp ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_centerpose/config.pbtxt ${ISAAC_ROS_WS}/isaac_ros_assets/models/centerpose_shoe/config.pbtxt
+
+   .. warning::
+
+      The name within the configuration file must match the model repository name.
+      Please look at the quickstart configuration file and modify it the goal is to run
+      another model.
+
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-centerpose
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_pose_estimation>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_pose_estimation/isaac_ros_centerpose --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_centerpose --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_pose_estimation/isaac_ros_centerpose
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+#. Continuing inside the Isaac ROS environment, convert the ``onnx`` model to a TensorRT engine plan:
+
+   .. code:: bash
+
+      /usr/src/tensorrt/bin/trtexec --onnx=${ISAAC_ROS_WS}/isaac_ros_assets/models/centerpose_shoe/1/model.onnx --saveEngine=${ISAAC_ROS_WS}/isaac_ros_assets/models/centerpose_shoe/1/model.plan
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples
+
+      #. Run the following launch file to spin up a demo of this package using the quickstart rosbag:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=centerpose,centerpose_visualizer interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_centerpose/quickstart_interface_specs.json model_name:=centerpose_shoe model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+
+      #. Open a **second** terminal inside the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play -l ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_centerpose/quickstart.bag
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the Isaac ROS environment, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-realsense
+
+      #. Run the following launch file to spin up a demo of this package using a RealSense camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_mono_rect,centerpose,centerpose_visualizer model_name:=centerpose_shoe model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models]
+
+   .. tab:: ZED Camera
+
+      #. Ensure that you have already set up your ZED camera using :doc:`ZED setup tutorial </getting_started/sensors/zed_setup>`.
+
+      #. Continuing inside the Isaac ROS environment, install dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-image-proc ros-:ir_ros_distro:-isaac-ros-zed
+
+      #. Run the following launch file to spin up a demo of this package using a ZED Camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
+            launch_fragments:=zed_mono_rect,centerpose,centerpose_visualizer model_name:=centerpose_shoe model_repository_paths:=[${ISAAC_ROS_WS}/isaac_ros_assets/models] \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_centerpose/zed2_quickstart_interface_specs.json
+
+         .. note::
+
+            If you are using the `ZED X` series, replace  `zed2_quickstart_interface_specs.json` with `zedx_quickstart_interface_specs.json` in the above command.
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+#. Open a **new** terminal inside the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Install ``rqt_image_view``:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-rqt-image-view
+
+#. Visualize and validate the output of the package with ``rqt_image_view``:
+
+   .. code:: bash
+
+      ros2 run rqt_image_view rqt_image_view /centerpose/image_visualized
+
+   After **about 1 minute**, your output should like this:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/centerpose_rqt.png>`
+      :alt: RQT showing detected pose of shoes
+      :align: center
+
+
+Use Different Models
+~~~~~~~~~~~~~~~~~~~~
+
+NGC has CenterPose class models that can detect other objects.
+Check them out `here <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/centerpose>`__.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+Deep Learning Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with using DNN models, please check :doc:`here </troubleshooting/deep_learning>`.
+
+
+API
+----
+
+Usage
+~~~~~
+
+Two launch files are provided to use this package. The first launch file launches ``isaac_ros_tensor_rt``, whereas the other one uses ``isaac_ros_triton``, along with
+the necessary components to perform encoding on images and decoding of the ``CenterPose`` network's output.
+
+.. warning::
+   For your specific application, these launch files may need to be modified. Please consult the available components to see
+   the configurable parameters.
+
+============================================ ====================
+Launch File                                  Components Used
+============================================ ====================
+``isaac_ros_centerpose_tensor_rt.launch.py`` :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TensorRTNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_rt/index>`, :doc:`CenterPoseDecoderNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`, :doc:`CenterPoseVisualizerNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`
+``isaac_ros_centerpose_triton.launch.py``    :doc:`DnnImageEncoderNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`, :doc:`TritonNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_triton/index>`, :doc:`CenterPoseDecoderNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`, :doc:`CenterPoseVisualizerNode </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`
+============================================ ====================
+
+CenterPoseDecoderNode
+~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``output_field_size``
+     - ``int list``
+     - ``[128, 128]``
+     - An array of two integers that represent the size of the 2D keypoint decoding from the network output.
+
+   * - ``cuboid_scaling_factor``
+     - ``float``
+     - ``1.0``
+     - This parameter is used to scale the cuboid used for calculating the size of the objects detected.
+
+   * - ``score_threshold``
+     - ``float``
+     - ``0.3``
+     - The threshold for scores values to discard. Any score less than this value will be discarded.
+
+   * - ``object_name``
+     - ``string``
+     - ``shoe``
+     - The name of the category instance / object detected.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``tensor_sub``
+     - :ir_repo:`isaac_ros_tensor_list_interfaces/TensorList <isaac_ros_common> <isaac_ros_tensor_list_interfaces/msg/TensorList.msg>`
+     - The TensorList that contains the outputs of the CenterPose network.
+
+   * - ``camera_info``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+     - The CameraInfo of the original, undistorted image.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``centerpose/detections``
+     - `vision_msgs/Detection3DArray <https://github.com/ros-perception/vision_msgs/blob/ros2/vision_msgs/msg/Detection3DArray.msg>`__
+     -  A ``Detection3DArray`` representing the poses of objects detected by the CenterPose network and interpreted by the CenterPose decoder node.
+
+CenterPoseVisualizerNode
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``show_axes``
+     - ``bool``
+     - ``true``
+     - Whether to draw the axes of the detected pose or not.
+
+   * - ``bounding_box_color``
+     - ``int32_t``
+     - ``0x000000ff``
+     - The color of the bounding box drawn. Only the last 24 bits are used to draw the color.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``image``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - The original, undistorted image.
+
+   * - ``camera_info``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+     - The CameraInfo of the original, undistorted image.
+
+   * - ``centerpose/detections``
+     - `vision_msgs/Detection3DArray <https://github.com/ros-perception/vision_msgs/blob/ros2/vision_msgs/msg/Detection3DArray.msg>`__
+     - The detections made by the CenterPose decoder node.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``centerpose/image_visualized``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - An image containing the detection's bounding box reprojected onto the image and, optionally, the axes of the detected objects.
+
+.. |package_name| replace:: ``isaac_ros_centerpose``

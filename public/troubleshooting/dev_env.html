@@ -62,7 +62,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Feb 03, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 19, 2026"/>
 
 
 <script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
@@ -395,8 +395,9 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../concepts/stereo_dnn/index.html">Stereo DNN</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_localization.html">Tutorial: Localization with cuVGL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/visual_global_localization/tutorials/tutorial_cuvgl_localization.html">Tutorial: Localization with cuVGL</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -511,10 +512,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
-</ul>
-</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../concepts/localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
 </ul>
@@ -681,12 +679,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../v/release-4.1/troubleshooting/dev_env.html">release-4.1</a></dd>
+        <dd><a href="../v/release-4.2/troubleshooting/dev_env.html">release-4.2</a></dd>
         <dd><a href="dev_env.html">latest</a></dd>
         <dd><a href="../v/release-2.1/troubleshooting/dev_env.html">release-2.1</a></dd>
         <dd><a href="../v/release-3.1/troubleshooting/dev_env.html">release-3.1</a></dd>
         <dd><a href="../v/release-3.2/troubleshooting/dev_env.html">release-3.2</a></dd>
         <dd><a href="../v/release-4.0/troubleshooting/dev_env.html">release-4.0</a></dd>
+        <dd><a href="../v/release-4.1/troubleshooting/dev_env.html">release-4.1</a></dd>
     </dl>
   </div>
 </div></div>
@@ -1036,10 +1035,83 @@ ERROR:<span class="w"> </span>failed<span class="w"> </span>to<span class="w"> <
 <p>NITROS nodes already have intraprocess communication enabled by default, with an exception of few publishers and subscribers that does not participate in data transfer. Disabling intraprocess communication by setting the parameter to <code class="docutils literal notranslate"><span class="pre">False</span></code> should resolve the issue and it does not hamper the performance.</p>
 </section>
 </section>
-<section id="linker-error-foo-so-file-format-not-recognized-treating-as-linker-script">
-<h2>Linker Error <code class="docutils literal notranslate"><span class="pre">foo.so:</span> <span class="pre">file</span> <span class="pre">format</span> <span class="pre">not</span> <span class="pre">recognized;</span> <span class="pre">treating</span> <span class="pre">as</span> <span class="pre">linker</span> <span class="pre">script</span></code><a class="headerlink" href="#linker-error-foo-so-file-format-not-recognized-treating-as-linker-script" title="Link to this heading">#</a></h2>
+<section id="rosdep-install-fails-on-dgx-spark-with-package-downgrade-error">
+<span id="spark-rosdep-version-conflicts"></span><h2><code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">install</span></code> fails on DGX Spark with package downgrade error<a class="headerlink" href="#rosdep-install-fails-on-dgx-spark-with-package-downgrade-error" title="Link to this heading">#</a></h2>
+<p>On DGX Spark platforms (bare-metal and virtual environment workflows only),
+<code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">install</span></code> may fail because the system has newer versions of some packages than
+those pinned by Isaac ROS. The Isaac ROS apt preference files in <code class="docutils literal notranslate"><span class="pre">/etc/apt/preferences.d/</span></code>
+pin packages at priority 1001 to enforce tested versions. When <code class="docutils literal notranslate"><span class="pre">apt</span></code> needs to downgrade
+any package to satisfy these pins, it rejects the <strong>entire</strong> transaction—meaning even
+unrelated Isaac ROS packages fail to install.</p>
 <section id="id15">
 <h3>Symptom<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>The<span class="w"> </span>following<span class="w"> </span>packages<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>DOWNGRADED:
+<span class="w">  </span>cuda-toolkit-13-config-common<span class="w"> </span>cuda-toolkit-config-common
+E:<span class="w"> </span>Packages<span class="w"> </span>were<span class="w"> </span>downgraded<span class="w"> </span>and<span class="w"> </span>-y<span class="w"> </span>was<span class="w"> </span>used<span class="w"> </span>without<span class="w"> </span>--allow-downgrades.
+</pre></div>
+</div>
+<p>You may also see errors like the following when trying to launch Isaac ROS nodes, because
+the packages were never installed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Package<span class="w"> </span><span class="s1">&#39;nvblox_examples_bringup&#39;</span><span class="w"> </span>not<span class="w"> </span>found:<span class="w"> </span><span class="s2">&quot;package &#39;nvblox_examples_bringup&#39; not found, searching: [&#39;/opt/ros/jazzy&#39;]&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="id16">
+<h3>Solution<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<p><strong>Option 1: Allow downgrades</strong></p>
+<p>If this is a dedicated Isaac ROS system, you can configure <code class="docutils literal notranslate"><span class="pre">apt</span></code> to allow package
+downgrades system-wide. This ensures the exact package versions tested with Isaac ROS
+are installed, but <strong>may break other software</strong> on the system that depends on the newer
+versions.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;APT::Get::allow-downgrades &quot;true&quot;;&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/apt.conf.d/99allow-downgrades
+</pre></div>
+</div>
+<p>After setting this configuration, re-run the <code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">install</span></code> command. You can remove
+this configuration afterward:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>rm<span class="w"> </span>/etc/apt/apt.conf.d/99allow-downgrades
+</pre></div>
+</div>
+<p><strong>Option 2: Disable version pinning for conflicting packages</strong></p>
+<p>If you have other projects on the system that depend on the newer package versions,
+you can disable the Isaac ROS apt preference files that cause the conflict. This allows
+<code class="docutils literal notranslate"><span class="pre">apt</span></code> to keep the DGX OS package versions instead of forcing a downgrade. These versions
+are <strong>not tested</strong> with Isaac ROS and <strong>may not work correctly</strong>.</p>
+<p>The Isaac ROS apt preference files follow the <code class="docutils literal notranslate"><span class="pre">isaac-ros-*.pref</span></code> naming pattern in
+<code class="docutils literal notranslate"><span class="pre">/etc/apt/preferences.d/</span></code>. Rename the relevant ones to disable them:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># For example, if CUDA packages are conflicting:</span>
+sudo<span class="w"> </span>mv<span class="w"> </span>/etc/apt/preferences.d/isaac-ros-cuda-13-0.pref<span class="w"> </span>/etc/apt/preferences.d/isaac-ros-cuda-13-0.pref.bak
+</pre></div>
+</div>
+<p>After renaming, re-run the <code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">install</span></code> command.</p>
+<p>To restore the original pinning later:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>mv<span class="w"> </span>/etc/apt/preferences.d/isaac-ros-cuda-13-0.pref.bak<span class="w"> </span>/etc/apt/preferences.d/isaac-ros-cuda-13-0.pref
+</pre></div>
+</div>
+</section>
+</section>
+<section id="h-264-encode-decode-may-fail-on-dgx-spark">
+<h2>H.264 Encode/Decode May Fail on DGX Spark<a class="headerlink" href="#h-264-encode-decode-may-fail-on-dgx-spark" title="Link to this heading">#</a></h2>
+<section id="id17">
+<h3>Symptom<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<p>On DGX Spark, the H.264 encoder and decoder nodes may fail to launch with the
+following error:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Error:<span class="w"> </span>libnvbufsurface.so.1.0.0:<span class="w"> </span>cannot<span class="w"> </span>open<span class="w"> </span>shared<span class="w"> </span>object<span class="w"> </span>file:<span class="w"> </span>No<span class="w"> </span>such<span class="w"> </span>file<span class="w"> </span>or<span class="w"> </span>directory
+</pre></div>
+</div>
+</section>
+<section id="id18">
+<h3>Solution<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
+<p>This will be fixed in a future release. As a workaround, set the following
+environment variable before launching the node:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">&quot;/usr/lib/aarch64-linux-gnu/nvidia:</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="linker-error-foo-so-file-format-not-recognized-treating-as-linker-script">
+<h2>Linker Error <code class="docutils literal notranslate"><span class="pre">foo.so:</span> <span class="pre">file</span> <span class="pre">format</span> <span class="pre">not</span> <span class="pre">recognized;</span> <span class="pre">treating</span> <span class="pre">as</span> <span class="pre">linker</span> <span class="pre">script</span></code><a class="headerlink" href="#linker-error-foo-so-file-format-not-recognized-treating-as-linker-script" title="Link to this heading">#</a></h2>
+<section id="id19">
+<h3>Symptom<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
 <p>When attempting to build an Isaac ROS package by running
 <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">build</span></code>, the linker complains with an error that resembles the
 following:</p>
@@ -1055,8 +1127,8 @@ Failed<span class="w">   </span><span class="o">&lt;&lt;&lt;</span><span class="
 </pre></div>
 </div>
 </section>
-<section id="id16">
-<h3>Solution<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<section id="id20">
+<h3>Solution<a class="headerlink" href="#id20" title="Link to this heading">#</a></h3>
 <p>This error typically arises when the local copy of a <code class="docutils literal notranslate"><span class="pre">.so</span></code> binary on
 your machine contains only the Git LFS pointer, instead of the actual
 binary contents.</p>
@@ -1178,9 +1250,19 @@ build and re-pull the binary files using Git LFS.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Solution</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linker-error-foo-so-file-format-not-recognized-treating-as-linker-script">Linker Error <code class="docutils literal notranslate"><span class="pre">foo.so:</span> <span class="pre">file</span> <span class="pre">format</span> <span class="pre">not</span> <span class="pre">recognized;</span> <span class="pre">treating</span> <span class="pre">as</span> <span class="pre">linker</span> <span class="pre">script</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rosdep-install-fails-on-dgx-spark-with-package-downgrade-error"><code class="docutils literal notranslate"><span class="pre">rosdep</span> <span class="pre">install</span></code> fails on DGX Spark with package downgrade error</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Symptom</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Solution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#h-264-encode-decode-may-fail-on-dgx-spark">H.264 Encode/Decode May Fail on DGX Spark</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Symptom</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Solution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linker-error-foo-so-file-format-not-recognized-treating-as-linker-script">Linker Error <code class="docutils literal notranslate"><span class="pre">foo.so:</span> <span class="pre">file</span> <span class="pre">format</span> <span class="pre">not</span> <span class="pre">recognized;</span> <span class="pre">treating</span> <span class="pre">as</span> <span class="pre">linker</span> <span class="pre">script</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Symptom</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Solution</a></li>
 </ul>
 </li>
 </ul>
@@ -1276,7 +1358,7 @@ build and re-pull the binary files using Git LFS.</p>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Feb 03, 2026.
+  Last updated on Feb 19, 2026.
   <br/>
 </p></div>
       

@@ -1,0 +1,625 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_manipulator> <isaac_manipulator_ros_python_utils>`
+
+Overview
+--------
+
+|package_name| is the foundational Python utility package for Isaac for Manipulation that provides core launch logic, configuration management, and integration utilities used across all Isaac for Manipulation workflows. This package works in conjunction with ``isaac_manipulator_bringup`` and contains the essential functions that enable dynamic launch file generation, node creation, and system orchestration.
+
+The package serves as the central library that ``isaac_manipulator_bringup`` calls to instantiate and configure the Isaac for Manipulation system. All workflow types (Pose-to-Pose, Object Following, Pick and Place, Gear Assembly) depend on this package for their runtime configuration and execution.
+
+Key Features
+------------
+
+- **Launch File Utilities**: Dynamic node creation and launch configuration management
+- **Configuration Management**: Type-safe configuration classes with YAML parameter loading
+- **Workflow Orchestration**: High-level functions for creating workflow-specific node graphs
+- **Perception Integration**: Utilities for FoundationPose, RT-DETR, DOPE, and other perception pipelines
+- **Robot Driver Integration**: UR robot and Robotiq gripper configuration and setup
+- **Geometry Utilities**: Comprehensive ROS message geometry conversions and transformations
+- **Type System**: Strongly-typed ``enums`` and dataclasses for manipulator components
+- **Planning Utilities**: Joint space planning and IK solution selection helpers
+
+Package Modules
+---------------
+
+Configuration Module (``config.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Provides configuration classes that encapsulate all parameters needed for Isaac for Manipulation workflows.
+
+**Key Classes**
+
+- ``Config``: Base configuration class tracking ``use_sim_time``
+- ``DriverConfig``: Robot driver configuration (URDF, SRDF, joint limits, kinematics)
+- ``UrRobotiqDriverConfig``: UR robot and Robotiq gripper specific configuration
+- ``CameraConfig``: Camera sensor configuration (RealSense)
+- ``DepthConfig``: Depth estimation configuration (ESS, FoundationStereo)
+- ``PoseEstimationConfig``: Pose estimation configuration (FoundationPose, DOPE)
+- ``ObjectDetectionConfig``: Object detection configuration (RT-DETR)
+- ``ObjectSelectionConfig``: Object selection and filtering configuration
+- ``WorkflowConfig``: Workflow-specific configuration (Pose-to-Pose, Pick and Place, etc.)
+- ``GearAssemblyConfig``: Gear assembly workflow configuration
+- ``OrchestrationConfig``: Behavior tree orchestration configuration
+- ``CoreConfig``: Master configuration aggregating all component ``configs``.
+
+**Key Functions**
+
+.. code:: python
+
+   def load_yaml_params(
+       params_file_path: str,
+       package_name: str = 'isaac_manipulator_bringup'
+   ) -> Dict
+
+Loads and processes YAML configuration files with support for command substitution. This function is called by ``isaac_manipulator_bringup`` to load workflow configurations from YAML files.
+
+Core Module (``core.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Contains core orchestration functions for creating workflow nodes and system containers.
+
+**Key Functions**
+
+.. code:: python
+
+   def get_workflow_nodes(core_config: CoreConfig) -> List[Node]
+
+Returns the appropriate workflow nodes based on the configured workflow type. This is the primary entry point called by ``isaac_manipulator_bringup`` to instantiate workflow-specific nodes.
+
+.. code:: python
+
+   def get_manipulation_container(core_config: CoreConfig) -> Node
+
+Creates a composable node container that runs multiple manipulation nodes in a single process for performance optimization.
+
+.. code:: python
+
+   def get_cumotion_node(
+       core_config: CoreConfig,
+       moveit_config: MoveItConfigsBuilder
+   ) -> Node
+
+Creates the cuMotion planning node with appropriate configuration for GPU-accelerated motion planning.
+
+.. code:: python
+
+   def get_nvblox_node(
+       camera_type: str,
+       use_sim_time: bool,
+       num_cameras: int
+   ) -> Node
+
+Creates nvblox node for real-time 3D reconstruction and ESDF generation.
+
+Workflows Module (``workflows.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Provides workflow-specific node creation functions.
+
+**Key Functions**
+
+.. code:: python
+
+   def get_pose_to_pose() -> List[Node]
+
+Returns nodes for the Pose-to-Pose reference workflow.
+
+.. code:: python
+
+   def get_object_following() -> List[Node]
+
+Returns nodes for the Object Following reference workflow.
+
+.. code:: python
+
+   def get_pick_and_place_orchestrator(
+       workflow_config: GearAssemblyConfig
+   ) -> List[Node]
+
+Returns the Pick and Place orchestrator node with appropriate configuration. Used by Gear Assembly workflow.
+
+.. code:: python
+
+   def get_multi_object_pick_and_place(
+       orchestration_config: OrchestrationConfig
+   ) -> List[Union[ExecuteProcess]]
+
+Returns the multi-object Pick and Place behavior tree orchestration process.
+
+Perception Module (``perception.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Handles perception pipeline setup for object detection and pose estimation.
+
+**Key Functions**
+
+.. code:: python
+
+   def get_foundation_pose_nodes(
+       camera_config: CameraConfig,
+       workflow_type: WorkflowType,
+       pose_estimation_config: PoseEstimationConfig
+   ) -> List[Node]
+
+Creates FoundationPose perception pipeline nodes including tracking and object detection integration.
+
+.. code:: python
+
+   def get_dope_nodes(
+       camera_config: CameraConfig,
+       dope_config: DopeConfig,
+       workflow_type: WorkflowType
+   ) -> List[Node]
+
+Creates DOPE perception pipeline nodes for pose estimation.
+
+.. code:: python
+
+   def get_object_detection_servers(
+       camera_config: CameraConfig,
+       pose_estimation_config: PoseEstimationConfig
+   ) -> List[Node]
+
+Creates object detection server nodes (typically RT-DETR based).
+
+.. code:: python
+
+   def get_object_selection_server(
+       object_selection_config: ObjectSelectionConfig
+   ) -> List[Node]
+
+Creates object selection server node for filtering and selecting detected objects.
+
+Drivers Module (``drivers.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Manages robot driver setup for UR robots and Robotiq grippers.
+
+**Key Functions**
+
+.. code:: python
+
+   def get_ur_drivers(
+       driver_config: UrRobotiqDriverConfig,
+       core_config: CoreConfig
+   ) -> List[Node]
+
+Creates UR robot driver nodes for hardware communication.
+
+.. code:: python
+
+   def get_moveit_group_node(
+       driver_config: UrRobotiqDriverConfig
+   ) -> Tuple[Node, Dict]
+
+Creates MoveIt2 move_group node with appropriate configuration.
+
+.. code:: python
+
+   def get_robot_state_publisher(
+       workflow_config: UrRobotiqDriverConfig
+   ) -> Node
+
+Creates robot state publisher node for TF tree management.
+
+.. code:: python
+
+   def get_robot_control_nodes(
+       driver_config: UrRobotiqDriverConfig
+   ) -> List[Node]
+
+Returns all robot control nodes (drivers or simulation controllers) based on configuration.
+
+.. code:: python
+
+   def get_isaac_sim_joint_parser_node(use_sim_time: bool) -> Node
+
+Creates joint state parser node for Isaac Sim integration.
+
+Sensors Module (``sensors.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Handles sensor setup and calibration.
+
+**Key Functions**
+
+.. code:: python
+
+   def get_calibration_parameters(
+       workflow_type: WorkflowType,
+       camera_type: CameraType,
+       num_cameras: int
+   ) -> List[Dict]
+
+Returns camera calibration parameters for the specified setup.
+
+.. code:: python
+
+   def get_camera_nodes(
+       num_cameras: str,
+       setup: str,
+       camera_config: CameraConfig
+   ) -> List[Node]
+
+Creates camera driver nodes (RealSense) with appropriate configuration.
+
+Robot Description Utilities (``robot_description_utils.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Manages robot URDF/SRDF generation and manipulation.
+
+**Key Functions**
+
+.. code:: python
+
+   def get_robot_description_contents_for_real_robot(
+       workflow_config: UrRobotiqDriverConfig
+   ) -> str
+
+Generates complete robot URDF for real hardware deployment.
+
+.. code:: python
+
+   def get_robot_description_contents_for_sim(
+       workflow_config: UrRobotiqDriverConfig
+   ) -> str
+
+Generates robot URDF for Isaac Sim with appropriate modifications.
+
+.. code:: python
+
+   def get_gripper_collision_links(
+       gripper_name: GripperType = GripperType.ROBOTIQ_2F_140
+   ) -> List[str]
+
+Returns list of gripper collision link names for motion planning.
+
+Geometry Module (``geometry.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Comprehensive geometry utilities for ROS message manipulation and coordinate transformations.
+
+**Key Conversion Functions**
+
+- ``list_to_vector3()``, ``vector3_to_list()``
+- ``list_to_point()``, ``point_to_list()``
+- ``list_to_quaternion()``, ``quaternion_to_list()``
+- ``list_to_pose()``, ``pose_to_list()``
+- ``quaternion_to_rpy()``, ``rpy_to_quaternion()``
+- ``quaternion_to_rotation_matrix()``, ``rotation_matrix_to_quaternion()``
+- ``transform_to_matrix()``, ``matrix_to_transform()``
+
+**Key Transformation Functions**
+
+- ``quaternion_multiply()``: Quaternion composition
+- ``quaternion_difference()``: Relative rotation
+- ``pose_difference()``: Relative pose
+- ``compute_transformation_delta()``: Transformation difference with metrics
+- ``rotate_pose()``: Apply rotation to pose
+
+Planning Utilities (``planning_utils.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Utilities for motion planning and IK solution selection.
+
+**Key Functions**
+
+.. code:: python
+
+   def find_closest_joint_state(
+       target_joint_position: np.ndarray,
+       ik_possible_joint_states: List[JointState]
+   ) -> JointState
+
+Finds the closest joint state to a target configuration from IK solutions.
+
+.. code:: python
+
+   def get_sorted_indexes_of_closest_joint_states(
+       ik_possible_joint_states: List[JointState],
+       target_joint_position: np.ndarray
+   ) -> List[int]
+
+Returns sorted indices of joint states by distance to target.
+
+Launch Utilities (``launch_utils.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Helper functions for launch file processing and type conversions.
+
+**Key Functions**
+
+- ``get_str_variable()``: Extract string from LaunchContext
+- ``get_float_variable()``: Extract float from LaunchContext
+- ``get_bool_variable()``: Extract boolean from LaunchContext
+- ``get_camera_type()``: Parse camera type enum
+- ``get_workflow_type()``: Parse workflow type enum
+- ``get_pose_estimation_type()``: Parse pose estimation type enum
+- ``get_object_detection_type()``: Parse object detection type enum
+- ``extract_pose_from_parameter()``: Convert list to Pose message
+- ``extract_vector3_from_parameter()``: Convert list to Vector3 message
+
+Manipulator Types (``manipulator_types.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Defines strongly-typed ``enums`` and constants used throughout Isaac for Manipulation.
+
+**Key Enums**
+
+- ``WorkflowType``: POSE_TO_POSE, OBJECT_FOLLOWING, PICK_AND_PLACE, GEAR_ASSEMBLY
+- ``CameraType``: REALSENSE
+- ``DepthType``: ESS, FOUNDATION_STEREO, REALSENSE_DEPTH
+- ``PoseEstimationType``: FOUNDATION_POSE, DOPE
+- ``ObjectDetectionType``: RT_DETR, DOPE, GROUNDING_DINO, SEGMENT_ANYTHING, SEGMENT_ANYTHING2
+- ``SegmentationType``: SAM, SEGMENT_ANYTHING_2
+- ``ObjectSelectionType``: POINT_CLOUD_CLUSTERING
+- ``ObjectAttachmentShape``: CUBOID, MESH
+- ``GripperType``: ROBOTIQ_2F_85, ROBOTIQ_2F_140, ROBOTIQ_HAND_E
+- ``TrackingType``: VISUAL_SLAM, REALSENSE_T265
+
+Gear Assembly Module (``gear_assembly.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Specialized utilities for the Gear Assembly reference workflow.
+
+**Key Functions**
+
+.. code:: python
+
+   def get_gear_assembly_nodes(
+       gear_assembly_config: GearAssemblyConfig,
+       use_sim_time: bool
+   ) -> List[Node]
+
+Creates gear assembly support nodes (RL policy server, goal pose publisher, insertion status checker).
+
+.. code:: python
+
+   def get_gear_assembly_orchestrator(
+       gear_assembly_config: GearAssemblyConfig
+   ) -> List[Node]
+
+Creates the gear assembly orchestrator node with complete configuration.
+
+.. code:: python
+
+   def parse_joint_state_from_yaml(
+       yaml_file_path: str,
+       use_sim_time: bool
+   ) -> JointState
+
+Parses joint state configurations from YAML files.
+
+Grasp Reader Module (``grasp_reader.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Utilities for reading and processing grasp configurations.
+
+**Key Functions**
+
+.. code:: python
+
+   def lookup_transform_from_tf(
+       tf_buffer,
+       target_frame: str,
+       source_frame: str
+   ) -> Transform
+
+Looks up transformations from TF tree with timeout handling.
+
+Test Utilities (``test_utils.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Utilities for testing Isaac for Manipulation components.
+
+**Key Functions**
+
+.. code:: python
+
+   def get_params_from_config_file_set_in_env(
+       run_test: bool
+   ) -> Dict
+
+Loads test configuration from environment-specified file.
+
+Constants Module (``constants.py``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Defines system-wide constants including:
+
+- Default file paths
+- Topic names
+- Action server names
+- Frame IDs
+- Timeout values
+- Package resource paths
+
+Integration with ``isaac_manipulator_bringup``
+----------------------------------------------
+
+|package_name| is the core dependency of ``isaac_manipulator_bringup``. The bringup package's launch files follow this pattern:
+
+**1. Load Configuration**
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils.config import load_yaml_params
+   
+   params = load_yaml_params('workflow_config.yaml')
+
+**2. Create Configuration Objects**
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils import CoreConfig
+   
+   core_config = CoreConfig(context)
+
+**3. Generate Nodes**
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils import get_workflow_nodes
+   
+   workflow_nodes = get_workflow_nodes(core_config)
+
+**4. Return Launch Description**
+
+The bringup package orchestrates these utilities to create complete launch descriptions for all supported workflows.
+
+Usage Examples
+--------------
+
+Example 1: Loading Workflow Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils.config import load_yaml_params
+   
+   # Load workflow configuration
+   params = load_yaml_params(
+       params_file_path='pick_and_place_config.yaml',
+       package_name='isaac_manipulator_bringup'
+   )
+   
+   # Access configuration values
+   use_sim_time = params['use_sim_time']
+   workflow_type = params['workflow_type']
+
+Example 2: Creating Workflow Nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils import CoreConfig, get_workflow_nodes
+   from launch import LaunchContext
+   
+   # Create configuration
+   core_config = CoreConfig(launch_context)
+   
+   # Get workflow-specific nodes
+   workflow_nodes = get_workflow_nodes(core_config)
+
+Example 3: Using Geometry Utilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils.geometry import (
+       list_to_pose, pose_to_list, quaternion_to_rpy, rotate_pose
+   )
+   from geometry_msgs.msg import Pose
+   
+   # Convert list to Pose message
+   pose = list_to_pose([0.5, 0.3, 0.2, 0.0, 0.0, 0.0, 1.0])
+   
+   # Rotate pose around Z axis
+   rotated_pose = rotate_pose(pose, angle=1.57, axis='z')
+   
+   # Get RPY from quaternion
+   rpy = quaternion_to_rpy(pose.orientation)
+
+Example 4: Creating Perception Nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils.perception import (
+       get_foundation_pose_nodes, get_object_detection_servers
+   )
+   from isaac_manipulator_ros_python_utils.manipulator_types import WorkflowType
+   
+   # Create FoundationPose nodes
+   fp_nodes = get_foundation_pose_nodes(
+       camera_config=camera_config,
+       workflow_type=WorkflowType.PICK_AND_PLACE,
+       pose_estimation_config=pose_estimation_config
+   )
+   
+   # Create object detection servers
+   detection_nodes = get_object_detection_servers(
+       camera_config=camera_config,
+       pose_estimation_config=pose_estimation_config
+   )
+
+Example 5: Type-Safe Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+   from isaac_manipulator_ros_python_utils.manipulator_types import (
+       CameraType, WorkflowType, PoseEstimationType
+   )
+   from isaac_manipulator_ros_python_utils.config import WorkflowConfig
+   
+   # Use type-safe enums
+   config = WorkflowConfig(launch_context)
+   config.camera_type = CameraType.REALSENSE
+   config.workflow_type = WorkflowType.PICK_AND_PLACE
+   config.pose_estimation_type = PoseEstimationType.FOUNDATION_POSE
+
+Dependencies
+------------
+
+The package depends on several core ROS 2 and Isaac ROS components:
+
+**Core Dependencies**
+
+- ``geometry_msgs``: ROS geometry message definitions
+- ``isaac_ros_launch_utils``: Isaac ROS launch utilities
+- ``isaac_manipulator_interfaces``: Action and service definitions
+
+**Build Dependencies**
+
+- ``isaac_ros_common``: Isaac ROS common infrastructure
+
+**Test Dependencies**
+
+- ``ament_copyright``: Copyright linting
+- ``ament_flake8``: Python style checking
+- ``ament_pep257``: ``Docstring`` linting
+- ``python3-pytest``: Python testing framework
+- ``isaac_ros_test``: Isaac ROS test utilities
+
+Architecture Notes
+------------------
+
+**Design Philosophy**
+
+|package_name| follows a functional programming approach with configuration objects as parameters. This design:
+
+- Enables easy testing with mock configurations
+- Allows dynamic node creation based on runtime parameters
+- Maintains separation of concerns between launch logic and node implementation
+- Provides type safety through Python type hints and ``enums``
+
+**Performance Considerations**
+
+- Configuration parsing is done once at launch time
+- Node creation functions are lightweight and return quickly
+- Heavy computation is delegated to launched ROS nodes
+- The manipulation container allows multiple nodes to run in a single process
+
+**Extensibility**
+
+The modular design makes it easy to:
+
+- Add new workflow types
+- Support additional camera types
+- Integrate new perception algorithms
+- Customize robot configurations
+
+See Also
+--------
+
+- :doc:`Isaac for Manipulation Bringup </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/index>`
+- :doc:`Isaac for Manipulation Servers </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_servers/index>`
+- :doc:`Isaac for Manipulation Pick and Place Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place>`
+- :doc:`Tutorial for deploying policies trained in Isaac Lab </reference_workflows/isaac_for_manipulation/tutorials/tutorial_sim_to_real>`
+
+.. |package_name| replace:: ``isaac_manipulator_ros_python_utils``

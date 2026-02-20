@@ -1,0 +1,105 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_manipulator> <isaac_manipulator_orchestration>`
+
+Overview
+--------
+
+|package_name| helps you coordinate complex robotic manipulation tasks. Instead of writing complex state machines, you compose pre-built behavior components into behavior trees that handle the sequencing, error recovery, and parallel execution automatically.
+
+The package provides pre-built behaviors for common manipulation tasks organized into two main phases: 
+
+- Perception: The perception phase includes object detection, pose estimation, and scene understanding.
+
+- Motion: The motion phase covers motion planning, trajectory execution, and gripper control.
+
+These behaviors are designed to work with the `py_trees <https://py-trees.readthedocs.io/>`__ and `py_trees_ros <https://py-trees-ros.readthedocs.io/>`__ libraries, so you can compose them into hierarchical behavior trees with built-in error handling, retry mechanisms, and concurrent execution capabilities.
+
+For more information about the behavior tree framework and orchestration concepts, refer to :doc:`Manipulation Orchestration </concepts/manipulation/orchestration>`.
+
+Quickstart
+----------
+
+The following examples demonstrate how to use the orchestration components to build custom manipulation workflows.
+
+Basic Usage
+^^^^^^^^^^^
+
+Create a simple behavior tree for manipulation tasks:
+
+.. code-block:: python
+
+   from isaac_manipulator_orchestration.behaviors.motion_behaviors.plan_to_pose import PlanToPose
+   from isaac_manipulator_orchestration.behaviors.motion_behaviors.close_gripper import CloseGripper
+   import py_trees
+   
+   # Create individual behaviors
+   # PlanToPose: Plans and executes robot arm motion to reach a target pose
+   plan_behavior = PlanToPose(name="Plan Motion", action_server_name="cumotion/motion_plan")
+   # CloseGripper: Closes the robot gripper to grasp an object
+   gripper_behavior = CloseGripper(name="Close Gripper", action_server_name="gripper_action")
+   
+   # Compose into a sequence
+   root = py_trees.composites.Sequence('Pick Workflow', memory=True)
+   root.add_children([plan_behavior, gripper_behavior])
+
+Behavior Tree Framework
+------------------------
+
+The package uses `py_trees <https://py-trees.readthedocs.io/>`__ to implement behavior trees with the following key concepts:
+
+Behavior Components
+^^^^^^^^^^^^^^^^^^^
+
+Individual behaviors that perform specific actions (for example, ``PlanToGrasp``, ``DetectObject``, ``ExecuteTrajectory``)
+
+Composite Nodes
+^^^^^^^^^^^^^^^
+
+Organizational nodes that control execution flow:
+
+* ``Sequence``: Execute children in order until one fails
+* ``Selector``: Execute children until one succeeds  
+* ``Parallel``: Execute multiple children simultaneously
+
+Decorators
+^^^^^^^^^^
+
+Modify child behavior execution to add robustness and control flow:
+
+* ``EternalGuard`` - Continuously checks a condition and only runs the child when the condition is true. Enables conditional execution based on blackboard state.
+* ``FailureIsRunning`` - Converts child ``FAILURE`` status to ``RUNNING`` to keep workflows active. Prevents individual behavior failures from stopping the entire workflow.
+* ``Inverter`` - Flips ``SUCCESS`` to ``FAILURE`` and vice versa. Useful for creating "until" conditions or handling negative logic flows.
+* ``OneShot`` - Ensures child behavior executes only once, then always returns ``SUCCESS``. Ideal for initialization tasks that should not repeat.
+* ``Retry`` - Automatically retries a failed child behavior up to ``N`` times before giving up. Essential for handling temporary service failures or network issues.
+* ``RunningIsFailure`` - Converts ``RUNNING`` status to ``FAILURE``, forcing immediate decisions. Forces behaviors to complete quickly rather than remain in progress.
+* ``Timeout`` - Limits how long a child behavior can run before being terminated. Prevents behaviors from hanging when external systems are unresponsive.
+
+Blackboard
+^^^^^^^^^^
+
+Shared memory system for inter-behavior communication that stores workflow state and object information. The blackboard enables behaviors to coordinate by reading and writing shared variables such as object tracking IDs, pose data, and configuration parameters.
+
+For detailed information about blackboard variables and their usage, refer to the :doc:`Blackboard Reference <blackboard_reference>`.
+
+API
+---
+
+The orchestration framework provides a comprehensive library of behavior tree components organized into three main categories:
+
+* **Motion Behaviors**: Handle robot movement, trajectory execution, and gripper control
+* **Perception Behaviors**: Manage object detection, pose estimation, and scene understanding  
+* **Utility Behaviors**: Handle blackboard data management, workflow status monitoring, and inter-behavior communication
+
+For detailed descriptions of all available behaviors, refer to the :doc:`Behavior Reference <behavior_reference>`.
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+   behavior_reference
+   blackboard_reference
+
+.. |package_name| replace:: ``isaac_manipulator_orchestration``

@@ -1,0 +1,70 @@
+Tutorial for ESS with Isaac Sim
+=======================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/ess/Rviz.png>`
+    :align: center
+    :width: 800px
+
+Overview
+------------
+
+This tutorial walks you through a graph to :ir_repo:`estimate depth <isaac_ros_dnn_stereo_depth>`
+with stereo images from Isaac Sim.
+
+Tutorial Walkthrough
+--------------------
+
+1. Install and launch Isaac Sim following the steps in the :ref:`Isaac ROS Isaac Sim Setup Guide <gs_isaac_sim>`.
+
+2. Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 800px
+
+3. Complete the ``isaac_ros_ess``
+   :ref:`quickstart <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_ess/index:quickstart>`.
+
+.. note::
+
+    Use the ``ess model`` and **not** the ``ess_light model`` for the quickstart.
+
+4. Open a new terminal and attach to the container:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+5. Install ``rviz2`` (required for the launch file visualization):
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+
+   Source the setup file.
+
+   .. code:: bash
+      
+      source /opt/ros/:ir_ros_distro:/setup.bash
+
+6. In the terminal, start the ``isaac_ros_ess`` node using the launch files:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_ess isaac_ros_ess_isaac_sim.launch.py \
+         engine_file_path:=${ISAAC_ROS_WS:?}/isaac_ros_assets/models/dnn_stereo_disparity/dnn_stereo_disparity_v4.1.0_onnx_trt10.13/ess.engine \
+         threshold:=0.4
+
+   The launch file will automatically open RViz configured to display:
+
+   - The 3D point cloud generated from the disparity output (``/points2``)
+   - The left and right stereo camera images
+
+7. Optionally, you can run the visualizer script to visualize the disparity image.
+
+   .. code:: bash
+
+      ros2 run isaac_ros_ess isaac_ros_ess_visualizer.py
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/ess/Visualizer_isaac_sim.png>`
+      :align: center
