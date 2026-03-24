@@ -1,0 +1,176 @@
+==================
+Behavior Reference
+==================
+
+This page provides a comprehensive catalog of all behavior tree components available in the orchestration framework. These behaviors are organized into three main categories: Motion, Perception, and Utility behaviors.
+
+For more details and usage examples, refer to the main :doc:`isaac_manipulator_orchestration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index>` documentation.
+
+Motion Behaviors
+----------------
+
+Motion behaviors handle robot movement, trajectory execution, and gripper control operations.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Behavior
+     - Purpose
+     - Interface/Package
+     - Key Features
+
+   * - **AttachObject**
+     - Attaches objects to robot's collision geometry for safe motion planning while carrying objects
+     - :doc:`Isaac ROS cuMotion Object Attachment </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index>`
+     - Supports multiple object representations (``SPHERE``, ``CUBOID``, ``CUSTOM_MESH``) with configurable scaling.
+
+   * - **CloseGripper**
+     - Controls gripper closing and grasping operations
+     - ``control_msgs.action.GripperCommand``
+     - Configures target position and maximum effort for gripper closing.
+
+   * - **DetachObject**
+     - Removes attached objects from robot's collision geometry after successful placement
+     - :doc:`Isaac ROS cuMotion Object Attachment </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index>`
+     - Sends a detach command to clean up object collision geometry from the robot's collision geometry and reset attachment state.
+
+   * - **ExecuteTrajectory**
+     - Executes planned trajectories on robot controllers
+     - ``moveit_msgs.action.ExecuteTrajectory``
+     - Retrieves trajectories from the blackboard and sends them to the ``execute_trajectory`` action server for execution.
+
+   * - **OpenGripper**
+     - Controls gripper opening and release operations
+     - ``control_msgs.action.GripperCommand``
+     - Configures target position and maximum effort for gripper opening.
+
+   * - **PlanToGrasp**
+     - Plans grasp approach and retract trajectories with collision avoidance
+     - :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>`
+     - Plans multi-waypoint trajectories (approach → grasp → retract). Supports multiple grasp candidates.
+
+   * - **PlanToPose**
+     - Plans robot motion to target poses
+     - :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>`
+     - Supports Cartesian target specification with collision avoidance.
+
+   * - **ReadDropPose**
+     - Reads drop pose from object info cache for motion planning, extracting target placement poses from the active object's cached information
+     - Blackboard data access
+     - Supports both static drop poses and dynamically updated poses from RViz interactions or action call parameters. Updates blackboard with pose data for downstream motion behaviors.
+
+   * - **ReadGraspPoses**
+     - Loads and transforms pre-computed grasp poses using ``GraspReaderManager``
+     - YAML file parsing with cached pose transformation
+     - Loads grasp poses for the active object's class ID and transforms them from object-relative to world coordinates using cached estimated object poses. Optionally publishes grasp poses as TF frames for visualization. Enables object-specific grasping strategies.
+
+   * - **SwitchControllers**
+     - Activates and deactivates robot controllers
+     - ``controller_manager/switch_controller`` service
+     - Takes lists of controllers to activate/deactivate and a strictness parameter such as ``BEST_EFFORT``, ``STRICT``, or ``AUTO`` to control switching behavior.
+
+   * - **UpdateDropPoseToHome**
+     - Updates drop pose to home position for recovery scenarios when manipulation fails or workflow needs to reset
+     - Blackboard data update
+     - Retrieves home pose from blackboard configuration and sets it as the target drop pose for the active object.
+
+Perception Behaviors
+--------------------
+
+Perception behaviors manage object detection, pose estimation, and scene understanding operations.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Behavior
+     - Purpose
+     - Interface/Package
+     - Key Features
+
+   * - **AssignObjectName**
+     - Assigns unique frame names to detected objects
+     - :ir_repo:`AssignNameToObject <isaac_manipulator> <isaac_manipulator_interfaces\srv\AssignNameToObject.srv>` service
+     - Retrieves the ``object_frame_name`` from the object info cache and updates the server so ``FoundationPose`` can publish poses in the correct coordinate frame. Essential for multi-object workflows where each object needs a distinct TF frame. Requires :doc:`ObjectInfoServer </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_servers/index>`
+
+   * - **DetectObject**
+     - Requests object detection from perception servers
+     - :doc:`Isaac ROS Object Detection </repositories_and_packages/isaac_ros_object_detection/index>` (``RT-DETR``)
+     - Filters detections by confidence threshold and updates the ``object_info_cache`` with detected objects, setting their initial status to ``NOT_READY``. Forms the foundation of perception-driven workflows.
+
+   * - **FilterDetections**
+     - Filters detected objects based on supported class IDs from the ``supported_objects_config`` blackboard variable
+     - Blackboard data filtering
+     - Removes objects with unsupported class IDs or missing ``class_id`` information. Updates ``object_info_cache`` with only valid, manipulable objects to prevent workflow failures on unsupported targets.
+
+   * - **MeshAssigner**
+     - Assigns collision meshes to detected objects based on class IDs
+     - :ir_repo:`AddMeshToObject <isaac_manipulator> <isaac_manipulator_interfaces\srv\AddMeshToObject.srv>` service
+     - Looks up mesh file paths from the ``mesh_file_paths`` blackboard variable using the object's ``class_id``, then associates the mesh with the object for accurate collision detection and pose estimation. Critical for ``FoundationPose`` workflows that require object mesh models. Requires :doc:`ObjectInfoServer </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_servers/index>` and mesh file paths configuration
+
+   * - **ObjectSelector**
+     - Selects objects from detected candidates using configurable selection policies (``FIRST``, ``RANDOM``, ``HIGHEST_SCORE``)
+     - :ir_repo:`GetSelectedObject <isaac_manipulator> <isaac_manipulator_interfaces\action\GetSelectedObject.action>`
+     - Evaluates filtered detections and chooses the best candidate based on the configured strategy. Updates ``selected_object_id`` in blackboard and transitions the chosen object status to ``SELECTED`` for subsequent pose estimation.
+
+   * - **PoseEstimation**
+     - Estimates 6DOF poses of detected objects
+     - :doc:`Isaac ROS Pose Estimation </repositories_and_packages/isaac_ros_pose_estimation/index>` (``FoundationPose``)
+     - Estimates object poses in camera frame, transforms them to base frame coordinates, and updates the object cache.
+
+   * - **PublishStaticPlanningSceneBehavior**
+     - Loads and publishes static workspace obstacles to the motion planning system
+     - MoveIt scene file loading
+     - This behavior reads MoveIt scene files (``.scene`` format) that define fixed obstacles in the robot's workspace - such as tables, walls, support structures, and equipment - as geometric shapes (boxes, cylinders, meshes). These obstacle definitions are then loaded into the :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>` motion planner's collision avoidance system, ensuring the robot generates safe paths that navigate around these known static obstacles during Pick and Place operations. Requires :doc:`Isaac ROS cuMotion </repositories_and_packages/isaac_ros_cumotion/index>` and ``.scene`` files
+
+Utility Behaviors
+-----------------
+
+Utility behaviors provide workflow coordination, state management, and system integration functions.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Behavior
+     - Purpose
+     - Interface/Package
+     - Key Features
+
+   * - **InteractiveMarker**
+     - Creates a visual gripper model in RViz that users can directly manipulate to specify where objects should be dropped
+     - RViz interactive markers
+     - The interactive marker displays as a 3D gripper mesh with colored control handles that allow users to drag the gripper to different positions (move along X, Y, Z axes) and rotate it around all three axes (X, Y, Z rotations). As users move these controls, the system continuously updates the target drop pose, enabling real-time visual feedback and precise placement specification during manipulation workflows.
+
+   * - **MarkObjectAsActive**
+     - Transitions objects from the ``next_object_id`` queue to active motion status
+     - Blackboard data management
+     - Pops from the ``next_object_id`` ``deque``, sets ``active_obj_id``, and updates object status to ``IN_MOTION`` in the ``object_info_cache``. Essential for coordinating multi-object workflows and preventing concurrent motion attempts.
+
+   * - **MarkObjectAsDone**
+     - Marks completed objects as ``DONE`` and clears the active motion status
+     - Blackboard data management
+     - Updates object status in ``object_info_cache``, resets ``active_obj_id`` to ``None``, and adds completion message to ``workflow_feedback_queue`` for real-time feedback. Enables the workflow to proceed to the next object in multi-object scenarios and provides completion tracking for monitoring and debugging.
+
+   * - **MarkObjectAsFailed**
+     - Marks failed objects as ``FAILED`` and clears the active motion status
+     - Blackboard data management
+     - Updates object status in ``object_info_cache``, resets ``active_obj_id`` to ``None``, and adds failure message to ``workflow_feedback_queue`` for real-time feedback. Enables error recovery by preventing repeated attempts on problematic objects and allows workflows to continue with remaining objects.
+
+   * - **UpdateDropPoseFromRViz**
+     - Updates drop poses for all objects that have not been completed or failed
+     - Blackboard data synchronization
+     - Reads ``rviz_drop_pose`` (``PoseStamped``) from blackboard and sets the ``goal_drop_pose`` field for objects with status not ``DONE`` or ``FAILED``. Enables dynamic pose adjustment during manipulation workflows and supports interactive workflow debugging and refinement.
+
+   * - **UpdateDropPoseFromTargets**
+     - Sets object drop poses based on target poses provided in action call parameters
+     - Blackboard data management
+     - In ``SINGLE_BIN`` mode, assigns the single target pose to all objects with status not ``DONE`` or ``FAILED``. In ``MULTI_BIN`` mode, maps target poses to objects based on their ``class_ids``, requiring unique ``class_ids`` and matching array lengths. Essential for programmatic workflow control and automated multi-object manipulation scenarios.
+
+   * - **ReportGeneration**
+     - Generates comprehensive human-readable status reports from object processing outcomes
+     - Blackboard data analysis
+     - Analyzes ``object_info_cache`` to count objects by status (``DONE``, ``FAILED``, ``IN_MOTION``, etc.). Creates detailed tabular reports showing object IDs, class IDs, statuses, and drop pose coordinates. Updates ``workflow_summary`` blackboard variable for action feedback and logging.
+
+   * - **UpdateWorkflowStatus**
+     - Determines overall workflow completion status based on individual object outcomes
+     - Blackboard data analysis and MultiObjectPickAndPlace.Result enum
+     - Examines all objects to determine final workflow outcome. Maps individual object statuses to overall result: all completed → ``SUCCESS``, all failed → ``FAILED``, mixed outcomes → ``PARTIAL_SUCCESS``, processing ongoing → ``UNKNOWN``. Sets ``workflow_status`` for action server result determination and workflow termination logic.

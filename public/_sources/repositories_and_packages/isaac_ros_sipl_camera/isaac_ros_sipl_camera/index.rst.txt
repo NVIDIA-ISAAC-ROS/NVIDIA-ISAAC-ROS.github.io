@@ -1,0 +1,758 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_sipl_camera> <isaac_ros_sipl_camera>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+The SIPL headers are expected to be installed on the host with NVIDIA SDK Manager when flashing the JetPack BSP.
+When installing with SDK Manager, select all available optional packages.
+For installation instructions, see the `JetPack Installation Guide <https://developer.nvidia.com/embedded/jetpack/downloads>`__.
+
+If JetPack 7.1 was installed using an ISO image or with OTA updates, set CUDA environment variables and install the SIPL and Multimedia APIs:
+
+.. code:: bash
+
+   wget https://developer.nvidia.com/downloads/embedded/L4T/r38_Release_v4.0/release/Jetson_SIPL_API_R38.4.0_aarch64.tbz2
+   wget https://developer.nvidia.com/downloads/embedded/L4T/r38_Release_v4.0/release/Jetson_Multimedia_API_R38.4.0_aarch64.tbz2
+   sudo tar xjf Jetson_SIPL_API_R38.4.0_aarch64.tbz2 -C /
+   sudo tar xjf Jetson_Multimedia_API_R38.4.0_aarch64.tbz2 -C /
+
+Supported Cameras
+-----------------
+
+As of JetPack 7.1 release, SIPL supports only the Camera-over-Ethernet (CoE)
+`Leopard Imaging Eagle VB1940 <https://leopardimaging.com/product/depth-sensing/stereoscopic-cameras/li-vb1940-stxxx-10gige/li-vb1940-vcl-st80-10gige-120h-poe/>`__
+stereo camera (2560x1984 at 30 fps).
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         .. conditional_render:: internal
+
+           .. note::
+
+               Only the **Jetson Thor (JetPack)** platform is supported for this package. Select the corresponding tab.
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-sipl-camera
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_sipl_camera>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_sipl_camera/isaac_ros_sipl_camera --ignore-src -y
+
+      #. (Optional) Replace the mock calibration files if you have the camera's calibration data. See section on `Camera Calibration Overrides`_ for more details. The configuration uses mock calibration files by default.
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_sipl_camera --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_sipl_camera/isaac_ros_sipl_camera
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Monocular Camera
+
+      #. Launch the monocular camera node with default native NV12 output:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_sipl_camera sipl_camera.launch.py
+
+   .. tab:: Stereo Camera
+
+      #. Launch the stereo camera with default native NV12 output:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_sipl_camera sipl_stereo_camera.launch.py
+
+   .. tab:: Stereo Camera with RGB8 Conversion and Rectification
+
+      #. Launch the stereo camera with RGB8 format conversion and image rectification:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_sipl_camera sipl_stereo_camera.launch.py \
+                encoding_desired:=rgb8 enable_rectify:=true
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Verify that the camera topics are publishing:
+
+   .. code:: bash
+
+      ros2 topic list
+      ros2 topic hz /left/camera_info
+
+   Example output for stereo with format conversion and rectification enabled:
+
+   .. code:: text
+
+    /left/camera_info
+    /left/camera_info/nitros
+    /left/camera_info_rect
+    /left/camera_info_rect/nitros
+    /left/image_converted
+    /left/image_converted/nitros
+    /left/image_raw
+    /left/image_raw/nitros
+    /left/image_rect
+    /left/image_rect/nitros
+    /right/camera_info
+    /right/camera_info/nitros
+    /right/camera_info_rect
+    /right/camera_info_rect/nitros
+    /right/image_converted
+    /right/image_converted/nitros
+    /right/image_raw
+    /right/image_raw/nitros
+    /right/image_rect
+    /right/image_rect/nitros
+    /tf_static
+    average rate: 28.127
+    min: 0.000s max: 0.334s std dev: 0.05718s window: 30
+    ...
+
+
+#. Visualize the stereo camera streams with your preferred tool:
+
+   .. tab-set::
+
+      .. tab-item:: rqt_image_view
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-rqt-image-view
+            ros2 run rqt_image_view rqt_image_view /left/image_raw
+
+
+      .. tab-item:: Foxglove Studio
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-foxglove-bridge
+            ros2 run foxglove_bridge foxglove_bridge --ros-args \
+              -p port:=9090 \
+              -p send_buffer_limit:=10000000 \
+              -p max_qos_depth:=5 \
+              -p use_compression:=false
+
+         This configuration is recommended for high-rate camera streams:
+         ``max_qos_depth`` bounds per-topic queue growth, and ``send_buffer_limit`` helps avoid dropped
+         messages under burst load.
+
+         Open `Foxglove Studio <https://foxglove.dev/>`__, connect to your ROS 2 bridge,
+         and add Image panels for ``/left/image_raw`` and ``/right/image_raw``.
+
+      .. tab-item:: RViz2
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+            rviz2
+
+         In RViz2, add **Image** displays and set the topics to
+         ``/left/image_raw`` and ``/right/image_raw``.
+
+Data Flow
+---------
+
+.. mermaid::
+
+   flowchart TD
+      CoECamera["CoE Camera (VB1940)"] -->|"Ethernet (CoE)"| ISP["HW accelerated ISP"]
+      ISP -->|"NvSciBuf (NVMM buffer)"| SiplCameraNode["SiplCameraNode"]
+      SiplCameraNode -->|"NITROS (CUDA buffer)"| Converter["ImageFormatConverter"]
+      Converter -->|"NITROS (CUDA buffer)"| Downstream["Downstream Nodes<br/>(SLAM, Rectify, ESS, etc.)"]
+
+Package Architecture
+--------------------
+
+Nodes
+^^^^^
+
+``SiplCameraNode``
+""""""""""""""""""
+
+Base node for monocular cameras. See `ROS Topics Published`_ and `ROS Parameters`_
+for the full interface specification.
+
+``SiplStereoCameraNode``
+""""""""""""""""""""""""
+
+Stereo camera node that extends ``SiplCameraNode``. See `ROS Topics Published`_ and
+`ROS Parameters`_ for the full interface specification.
+
+When running launch files, additional topics may be published depending on the launch arguments.
+See the launch files section below for more details.
+
+Launch Files
+^^^^^^^^^^^^
+
+The ``sipl_camera.launch.py`` and ``sipl_stereo_camera.launch.py`` launch files
+conditionally add format conversion and rectification nodes based on launch
+arguments. These nodes are from the :doc:`isaac_ros_image_proc </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>` package.
+
+When ``encoding_desired`` is set to a non-native format (anything other than
+``nv12`` or ``nv24``), the launch file adds an ``ImageFormatConverterNode`` to
+convert the output.
+
+When ``enable_rectify`` is set to ``true``, the launch file adds a
+``RectifyNode`` and automatically forces ``encoding_desired`` to ``rgb8`` if a
+native format (``nv12``/``nv24``) was specified, because ``RectifyNode``
+requires a standard image encoding.
+
+``sipl_camera.launch.py``
+"""""""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - Launch Argument
+      - Default
+      - Description
+    * - ``param_file``
+      - ``eagle_mono.yaml``
+      - Path to the YAML parameter file
+    * - ``encoding_desired``
+      - ``""`` (native)
+      - Output encoding: ``nv12``/``nv24`` (native) or ``rgb8``, ``mono8``, etc. (converted)
+    * - ``target_container``
+      - ``sipl_camera_container``
+      - Component container name
+    * - ``enable_rectify``
+      - ``false``
+      - Enable image rectification through ``RectifyNode``
+
+**Pipeline variants**:
+
+- **Native output** (default): ``SiplCameraNode``
+- **Format conversion**: ``SiplCameraNode`` → ``ImageFormatConverterNode``
+- **Rectification**: ``SiplCameraNode`` → ``ImageFormatConverterNode`` → ``RectifyNode``
+
+``sipl_stereo_camera.launch.py``
+""""""""""""""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - Launch Argument
+      - Default
+      - Description
+    * - ``param_file``
+      - ``eagle_stereo.yaml``
+      - Path to the YAML parameter file
+    * - ``encoding_desired``
+      - ``""`` (native)
+      - Output encoding: ``nv12``/``nv24`` (native) or ``rgb8``, ``mono8``, etc. (converted)
+    * - ``target_container``
+      - ``sipl_camera_container``
+      - Component container name
+    * - ``enable_rectify``
+      - ``false``
+      - Enable image rectification through ``RectifyNode``
+
+**Pipeline variants**:
+
+- **Native output** (default): ``SiplStereoCameraNode``
+- **Format conversion**: ``SiplStereoCameraNode`` → ``ImageFormatConverterNode`` (left and right)
+- **Rectification**: ``SiplStereoCameraNode`` → ``ImageFormatConverterNode`` (left and right) → ``RectifyNode`` (left and right)
+
+TF Frame Tree
+--------------
+
+The default frame names produce the following tree structures.
+
+.. mermaid::
+
+   flowchart TD
+      Camera["camera"] --> CameraOptical["camera_optical"]
+      StereoCamera["stereo_camera"] --> LeftCamera["stereo_camera_left"]
+      LeftCamera --> LeftOptical["stereo_camera_left_optical"]
+      StereoCamera --> RightCamera["stereo_camera_right"]
+      RightCamera --> RightOptical["stereo_camera_right_optical"]
+
+Verifying Stereo Camera Calibration
+------------------------------------
+
+Given the camera's calibration data, you may use the epipolar test :ir_repo:`isaac_ros_rectify_stereo_epipolar_test.py <isaac_ros_image_pipeline> <isaac_ros_image_proc/test/isaac_ros_rectify_stereo_epipolar_test.py>` in
+:doc:`isaac_ros_image_proc </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>`
+package to validate that your stereo camera calibration produces accurately rectified
+images based on epipolar line tests.
+
+Several files are required to run the test and should be placed in the ``rectify_stereo`` test cases directory of the ``isaac_ros_image_proc`` package.
+
+.. code-block:: text
+
+    ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/
+
+
+#. Refer to the quickstart section for the :doc:`isaac_ros_image_proc </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>` package on how to clone and build the package.
+
+#. Capture one left/right raw image pair of PNG files that contains a visible checkerboard pattern. For example, :ir_repo:`image_raw_right.png <isaac_ros_image_pipeline> <isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/image_raw_right.png>`
+
+#. Create test configuration JSON files for the left and right camera respectively: ``image_raw_left.json`` and ``image_raw_right.json``. These files should reference the PNG files and include the checkerboard inner-corner grid size (rows x columns). For example, :ir_repo:`image_raw_right.json <isaac_ros_image_pipeline> <isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/image_raw_right.json>`
+
+   .. note::
+
+      The checkerboard size must use inner-corner counts (for example, a 10x7
+      square grid uses a 9x6 inner-corner size).
+
+#. Create camera info JSON files for left and right camera respectively: ``camera_info_left.json`` and ``camera_info_right.json``. For example, :ir_repo:`camera_info_right.json <isaac_ros_image_pipeline> <isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/camera_info_right.json>`
+
+#. Place all the PNG and JSON files in the ``rectify_stereo`` test cases directory of the ``isaac_ros_image_proc``
+   package:
+
+   .. code-block:: bash
+
+       # From the workspace root
+       mkdir ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/sipl_stereo_camera
+       cp <your_files> ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/sipl_stereo_camera
+
+#. Build the ``isaac_ros_image_proc`` package after placing all the files:
+
+   .. code-block:: bash
+
+       colcon build --packages-up-to isaac_ros_image_proc
+       source install/setup.bash
+
+#. Run the test:
+
+   .. code-block:: bash
+
+       colcon test --packages-select isaac_ros_image_proc \
+           --event-handlers console_direct+ \
+           --ctest-args -R isaac_ros_rectify_stereo_epipolar_test
+
+#. Verify the test results. Passing the test indicates that the calibration accuracy is satisfactory. If the test fails, downstream packages that consume the rectified images may still function, but with degraded performance depending on your application's requirements.
+
+.. note::
+
+    A well-rectified pair has horizontal epipolar lines with sub-pixel mean error (less than 0.5 px) and max error under
+    approximately 1-2 px.
+
+Below are example outputs of the test with the epipolar lines drawn.
+
+.. grid:: 2
+
+    .. grid-item::
+
+        .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/left_image_rect.jpg>`
+            :align: center
+
+            Left Rectified
+
+    .. grid-item::
+
+        .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/right_image_rect.jpg>`
+            :align: center
+
+            Right Rectified
+
+API
+---
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_sipl_camera sipl_camera.launch.py param_file:=<path_to_yaml> encoding_desired:=<encoding>
+
+.. code:: bash
+
+   ros2 launch isaac_ros_sipl_camera sipl_stereo_camera.launch.py param_file:=<path_to_yaml> encoding_desired:=<encoding> enable_rectify:=<true|false>
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+``SiplCameraNode``
+""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Topic
+      - Interface
+      - Description
+    * - ``image_raw``
+      - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+      - Raw camera image in ``nv12`` or ``nv24`` encoding.
+    * - ``camera_info``
+      - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+      - Camera intrinsic calibration data.
+    * - ``/tf_static``
+      - `tf2_msgs/TFMessage <https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg>`__
+      - Static transform from camera link to optical frame.
+
+``SiplStereoCameraNode``
+""""""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Topic
+      - Interface
+      - Description
+    * - ``left/image_raw``
+      - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+      - Left camera raw image in ``nv12`` or ``nv24`` encoding.
+    * - ``right/image_raw``
+      - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+      - Right camera raw image in ``nv12`` or ``nv24`` encoding.
+    * - ``left/camera_info``
+      - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+      - Left camera intrinsic calibration data.
+    * - ``right/camera_info``
+      - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+      - Right camera intrinsic calibration data.
+    * - ``/tf_static``
+      - `tf2_msgs/TFMessage <https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg>`__
+      - Static transforms from stereo rig base to left/right optical frames.
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+Common Parameters
+"""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``platform_config``
+      - ``string``
+      - ``VB1940_Camera``
+      - SIPL platform configuration name
+    * - ``hsb_name``
+      - ``string``
+      - ``hsb_0``
+      - Holoscan Sensor Bridge (HSB) name
+    * - ``hsb_id``
+      - ``int``
+      - ``0``
+      - Holoscan Sensor Bridge ID
+    * - ``interface_name``
+      - ``string``
+      - ``mgbe0_0``
+      - Network interface for the CoE camera
+    * - ``ip_address``
+      - ``string``
+      - ``""``
+      - Camera IP override (empty uses the platform default)
+    * - ``mac_address``
+      - ``string``
+      - ``""``
+      - Camera MAC override (empty uses the platform default)
+    * - ``encoding_desired``
+      - ``string``
+      - ``nv12``
+      - Native ISP output encoding: ``nv12`` or ``nv24``
+    * - ``use_hw_timestamp``
+      - ``bool``
+      - ``true``
+      - Use hardware TSC timestamps
+    * - ``camera_info_url``
+      - ``string``
+      - ``""``
+      - Path to camera calibration file (left camera in stereo mode)
+
+Monocular Parameters
+""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``camera_link_frame_name``
+      - ``string``
+      - ``camera``
+      - Camera link frame name
+
+Stereo Parameters
+"""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``camera_link_frame_name``
+      - ``string``
+      - ``stereo_camera``
+      - Stereo rig base frame
+    * - ``left_camera_frame_name``
+      - ``string``
+      - ``stereo_camera_left``
+      - Left camera frame
+    * - ``right_camera_frame_name``
+      - ``string``
+      - ``stereo_camera_right``
+      - Right camera frame
+    * - ``right_camera_info_url``
+      - ``string``
+      - ``""``
+      - Path to right camera calibration file
+
+Camera Calibration Overrides
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Provide calibration files using ``package://`` or ``file://`` URLs. Example
+calibration files are available in the package ``config/`` directory for quick
+testing.
+
+The following example shows how to set the calibration file in a YAML
+parameter file:
+
+.. code-block:: yaml
+
+    sipl_camera:
+      ros__parameters:
+        camera_info_url: "package://isaac_ros_sipl_camera/config/mock_mono_camera_info.yaml"
+
+Prerequisites
+^^^^^^^^^^^^^
+
+Environment
+"""""""""""
+
+When you use ``isaac-ros activate``, the environment for SIPL development will be prepared automatically.
+
+If you need to build on the host directly, you may need to also install the SIPL headers ``/usr/src/jetson_sipl_api``. For installation instructions, see the 
+`SIPL Application Development Guide <https://docs.nvidia.com/jetson/archives/r38.4/DeveloperGuide/SD/CameraDevelopment/CoECameraDevelopment/SIPL-for-L4T/SIPL-App-Development-Guide.html#installation>`__.
+
+The following paths and libraries are necessary for building and running SIPL.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Path
+      - Contents
+      - Needed For
+    * - ``/usr/lib/aarch64-linux-gnu/nvidia``
+      - Core SIPL runtime libraries (``libnvsipl*.so``, ``libnvsci*.so``)
+      - Runtime libraries for SIPL
+    * - ``/usr/src/jetson_sipl_api``
+      - SIPL development headers
+      - Compilation
+    * - ``/usr/lib/nvsipl_drv``
+      - Camera sensor driver plugins
+      - Runtime (camera detection)
+    * - ``/usr/lib/nvsipl_uddf``
+      - UDDF driver libraries
+      - Runtime
+    * - ``/var/nvidia/nvcam``
+      - NITO platform configuration files (``.nito`` files)
+      - Runtime (camera ISP initialization)
+    * - ``/dev/coe-chan-*``
+      - CoE device nodes
+      - Runtime (camera device files)
+
+.. list-table::
+    :header-rows: 1
+
+    * - Library
+      - Description
+      - Location (Jetson Thor)
+    * - ``libnvsipl.so``
+      - SIPL camera API
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvsipl_query.so``
+      - SIPL query API
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvsipl_pipeline.so``
+      - SIPL pipeline API
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvscibuf.so``
+      - NvSci buffer
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvscisync.so``
+      - NvSci sync
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvscicommon.so``
+      - NvSci common
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+SIPL CoE Camera Not Found
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For any issues with CoE camera detection, see the
+:doc:`Eagle CoE Stereo Camera Setup </getting_started/sensors/eagle_setup>` guide.
+
+HSB fails to initialize with error "Address already in use"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+Unable to bind to initialize HSB and configure the HSB transport driver. You see the following error message:
+
+.. code:: bash
+
+   [HSB] Error configuring driver: bind failed with errno=98: "Address already in use"
+
+Solution
+""""""""
+
+Another Holoscan instance may still be running. Check and stop it:
+
+.. code:: bash
+
+    ps aux | grep hololink
+
+If there is output, kill the process if it is safe to do so:
+
+.. code:: bash
+
+    kill -9 <pid>
+
+SIPL Headers or Libraries Not Found
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+You see the following error message when building the package:
+
+.. code-block:: text
+
+    CMake Error: SIPL headers not found at: /usr/src/jetson_sipl_api/sipl/include
+
+Solution
+""""""""
+
+1. Install the SIPL libraries through NVIDIA SDK Manager.
+
+2. Verify that the SIPL libraries and headers are present:
+
+   .. code-block:: bash
+
+       ls /usr/lib/aarch64-linux-gnu/nvidia/libnvsipl*
+       ls /usr/src/jetson_sipl_api/sipl/include/
+
+Invalid MAC or IP Address Format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+.. code-block:: text
+
+    Invalid MAC address format, expected XX:XX:XX:XX:XX:XX
+    Invalid IP address format, expected XXX.XXX.XXX.XXX
+
+Solution
+""""""""
+
+- Make sure to retrieve the CoE camera's specific MAC and IP addresses. Refer to the :doc:`Eagle CoE Stereo Camera Setup </getting_started/sensors/eagle_setup>` guide for instructions.
+- Use colon-separated hex format for MAC addresses: ``8c:1f:64:6d:70:03``
+- Use dotted decimal format for IP addresses: ``192.168.1.2``
+- Verify that the addresses match the camera documentation or EEPROM data.
+
+HSB ID Mismatch
+^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+.. code-block:: text
+
+    No matching transport found for override: hsb_id=X
+    No matching camera found for override: hsb_id=X
+
+Solution
+""""""""
+
+1. Verify that the ``hsb_id`` parameter matches the platform configuration.
+2. Check the HSB ID in the camera system config.
+3. For VB1940, the default HSB ID is typically ``0``.
+4. Verify that the HSB ID matches across transport and camera configuration.
+
+.. |package_name| replace:: ``isaac_ros_sipl_camera``

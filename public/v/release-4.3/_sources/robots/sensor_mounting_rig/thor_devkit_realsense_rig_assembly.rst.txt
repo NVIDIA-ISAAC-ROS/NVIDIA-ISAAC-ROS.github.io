@@ -1,0 +1,149 @@
+Multi-Camera RealSense Hardware Assembly Guide for Jetson Thor Developer Kit
+----------------------------------------------------------------------------
+
+Introduction
+^^^^^^^^^^^^
+
+**Hardware Assembly Description**
+
+This guide shows how to assemble a hardware-synchronized, multi-camera system using
+three RealSense D435/D455 cameras with a Jetson Thor Developer Kit. This will require soldering a few components.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_3rs.png>`
+
+This configuration follows the approach described in RealSense's official `Multicamera Configuration page <https://simplecore.intel.com/realsensehub/wp-content/uploads/sites/63/Multiple_Camera_WhitePaper04.pdf>`__,
+which explains the additional connections used to enable hardware synchronization where one camera is designated
+as the primary device that provides a sync pulse to the secondary cameras for precise synchronized capture.
+
+Preliminary Preparation
+^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Required materials assuming 3 cameras:
+
+   ============================================================== ======================
+   Component Required                                             Quantity                                        
+   ============================================================== ======================
+   Jetson Thor Developer Kit                                       1
+   3D-printed mounting frame                                       1
+   USB 3 type A Powered hub                                        1
+   RealSense D435 or D455 cameras                                  3
+   JST SHR-09V-S connectors                                        3
+   20kΩ resistors                                                  3
+   22nF capacitors                                                 3
+   ASSHSSH28K51 2" JST Pre-crimped Wires                           6
+   28 AWG Wire                                                     1
+   M4x6 screws or M3x6 for D435                                    6
+   ============================================================== ======================
+
+2. Print the camera rig frame.
+
+   Use the STL file :ir_repo:`thor_devkit_realsense_rig_frame.stl <sensor_mounting_rig> <thor_devkit_realsense_rig_description/meshes/thor_devkit_realsense_rig_frame.stl>`
+   to 3D-print the frame:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3d_printed_rig.png>`
+
+   The nominal positions for the center, left, and right cameras in the rig coordinate system are provided below:
+
+      **D455 configuration**
+
+      .. list-table::
+         :header-rows: 1
+
+         * - Camera
+           - X [mm]
+           - Y [mm]
+           - Z [mm]
+           - Yaw [deg]
+           - Pitch [deg]
+           - Roll [deg]
+         * - D455 - Front
+           - 0
+           - 47.5
+           - 19
+           - 0
+           - 0
+           - 0
+         * - D455 - Left
+           - -122.5
+           - 60.1
+           - 19
+           - 90
+           - 0
+           - 0
+         * - D455 - Right
+           - -27.5
+           - -60.1
+           - 19
+           - -90
+           - 0
+           - 0
+
+      **D435 configuration**
+
+      .. list-table::
+         :header-rows: 1
+
+         * - Camera
+           - X [mm]
+           - Y [mm]
+           - Z [mm]
+           - Yaw [deg]
+           - Pitch [deg]
+           - Roll [deg]
+         * - D435 - Front
+           - 0
+           - 25
+           - 19
+           - 0
+           - 0
+           - 0
+         * - D435 - Left
+           - -100
+           - 60.1
+           - 19
+           - 90
+           - 0
+           - 0
+         * - D435 - Right
+           - -50
+           - -60.1
+           - 19
+           - -90
+           - 0
+           - 0
+
+3. Connect the two wires to JST connectors and create a twisted pair.
+
+   Gently connect the wires to pins 5 and 9 of the JST connectors. Avoid loose wires and twist the wires immediately after the connector across the entire length between connections. The pins are labeled as shown below:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/rs_connector.png>`
+
+   .. Note::  Insert the JST connectors into the RealSense cameras only at the final step, 
+            after mounting them on the 3D-printed frame.
+
+4. Assemble the synchronization circuit
+
+   Follow the circuit diagram below and create the camera connections with (recommended) filtering components soldered close to the cameras to minimize noise. Extend the wires with the 28 AWG wire to connect between the cameras as needed.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/sync_module.png>`
+
+
+   The wiring should look similar to:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3rs_hw_sync_cable.png>`
+
+
+Hardware Assembly
+^^^^^^^^^^^^^^^^^
+
+Follow the steps below to assemble all prepared components with the Jetson Thor Developer Kit.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_guide.png>`
+
+After assembly is complete, connect USB 3.x cables to the RealSense cameras and
+the Jetson Thor Developer Kit. For three cameras, use a high-quality wall powered USB 3.x type A hub.
+
+URDF Files
+^^^^^^^^^^
+
+URDF files are provided in the :ir_repo:`thor_devkit_realsense_rig_description <sensor_mounting_rig> <thor_devkit_realsense_rig_description>` package with the camera nominal positions on the rig. The respective launch file to publish the camera's transformations is :ir_repo:`thor_devkit_realsense_rig_description.launch.py <sensor_mounting_rig> <thor_devkit_realsense_rig_description/launch/thor_devkit_realsense_rig_description.launch.py>`.

@@ -6,4 +6,4 @@ Tools for inspecting and validating data sent through graphs containing Isaac RO
 
 ## Latest
 
-Update 2026-02-19: Support for DGX Spark and JetPack 7.1
+Update 2026-03-23: Introduced early-stage support for SIPL camera framework and LI Eagle stereo CoE/HSB camera with ROS

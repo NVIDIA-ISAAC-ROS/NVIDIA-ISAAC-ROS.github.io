@@ -1,0 +1,297 @@
+===================================================================================
+Tutorial for Obstacle Avoidance and Object Following Using cuMotion with Perception
+===================================================================================
+
+Overview
+--------
+
+This tutorial walks through the process of planning trajectories for a real robot.
+It leverages the cuMotion plugin for MoveIt 2 provided by :ir_repo:`Isaac ROS cuMotion <isaac_ros_cumotion>` on a Jetson AGX Orin.
+This tutorial demonstrates obstacle-aware planning using cuMotion in two different scenarios. The first moves the robot end effector
+between two predetermined poses, alternating between them while avoiding obstacles detected in the workspace. The second scenario
+goes further by having the robot end effector follow an object at a fixed offset distance, also while avoiding obstacles. For pose
+estimation, we provide the option to use either FoundationPose or Deep Object Pose Estimation (DOPE).
+
+FoundationPose leverages a foundation model for object pose estimation and generalizes to
+objects not seen during training.  It does, however, require either a segmentation mask or a 2D
+bounding box for the object.  In this tutorial, RT-DETR is used to detect and return a 2D bounding box
+for the object of interest.  If the SyntheticaDETR v1.0.0 model file is used, this object must be one of 27
+household items for which the model was trained.
+
+As an alternative, DOPE may be used to both detect the object and estimate the object's pose, so long
+as a DOPE model has been trained for the object.  In most scenarios, poses returned by DOPE are
+somewhat less accurate than those returned by FoundationPose, but DOPE incurs lower runtime overhead.
+On Jetson AGX Orin, DOPE runs at up to 5 FPS, while the combination of RT-DETR and FoundationPose
+more typically runs at approximately 1 FPS.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/manipulator_object_following_workflow.png>`
+   :width: 100%
+   :align: center
+
+   High-level architecture of the Isaac for Manipulation "object following" reference workflow
+
+The pose-to-pose tutorial uses:
+
+- Stereo cameras for perception
+- :ir_repo:`Isaac ROS ESS <isaac_ros_dnn_stereo_depth> <isaac_ros_ess>` for depth estimation
+- :ir_repo:`Isaac ROS Nvblox <isaac_ros_nvblox>` to produce a voxelized representation of the scene
+
+The object-following tutorial uses the above and adds:
+
+.. tabs::
+
+   .. tab:: FoundationPose
+
+      - :ir_repo:`Isaac ROS RT-DETR <isaac_ros_object_detection> <isaac_ros_rtdetr>` to detect an object of interest
+      - :ir_repo:`Isaac ROS FoundationPose <isaac_ros_pose_estimation> <isaac_ros_foundationpose>` to estimate the 6 DoF pose of the desired object to approach
+      - `Drop <https://github.com/ros-tooling/topic_tools/tree/:ir_ros_distro:?tab=readme-ov-file#drop>`_ nodes to reduce the input frame rate for RT-DETR, in order to more closely match the achievable frame rate for FoundationPose and thus limit unnecessary system load.
+
+   .. tab:: DOPE
+
+      - :ir_repo:`Isaac ROS DOPE <isaac_ros_pose_estimation> <isaac_ros_dope>` to detect an object of interest and estimate its 6 DoF pose
+      - `Drop <https://github.com/ros-tooling/topic_tools/tree/:ir_ros_distro:?tab=readme-ov-file#drop>`_ nodes to reduce the input frame rate for DOPE, in order to limit GPU utilization and avoid starvation of cuMotion and nvblox.
+
+
+For each tutorial, the following number of stereo cameras are supported:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Number of Cameras per Tutorial
+     - RealSense
+
+   * - Pose-to-pose
+     - 2
+
+   * - Object following
+     - 2
+
+Use of multiple cameras is recommended.
+Multiple cameras can help reduce occlusion and noise in the scene and therefore increase the quality and completeness of the 3D reconstruction used for collision avoidance.
+The object following tutorial with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras. Testing has been done with configurations of 2 RealSense cameras.
+
+Object detection and pose estimation are only enabled on the camera with the lowest index.
+
+Reflective or smooth, featureless surfaces in the environment may increase noise in the depth estimation.
+
+Mixing different types has not been tested but may work with modifications to the launch files.
+
+.. warning::
+
+   The obstacle avoidance behavior demonstrated in this tutorial is not a safety function and does not
+   comply with any national or international functional safety standards. When testing obstacle avoidance
+   behavior, do not use human limbs or other living entities.
+
+The examples use `RViz <https://github.com/ros2/rviz>`__ or `Foxglove <https://foxglove.dev>`__ for visualization.
+RViz is the default visualization tool when Isaac for Manipulation is running on the same computer
+that is displaying the visualization.
+Foxglove is recommended when visualizing a reconstruction streamed from a remote machine.
+
+
+
+Requirements
+------------
+
+The reference workflows have been tested on Jetson AGX Orin (64 GB).
+
+Ensure that you have the following available:
+
+- A `Universal Robots <https://www.universal-robots.com/>`__ manipulator. This tutorial was validated on a UR5e and UR10e.
+
+- Two `RealSense cameras <https://www.realsenseai.com/>`__.
+
+- One of the objects that :ir_ngc:`sdetr_grasp <teams/isaac/models/synthetica_detr>` or `DOPE <https://github.com/NVlabs/Deep_Object_Pose>`__ was trained on. In this tutorial, we are going to use the Mac and Cheese Box for FoundationPose and the Tomato Soup Can for DOPE.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/soup_can.png>`
+   :width: 234px
+   :align: center
+   :alt: Soup Can object
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/mac_and_cheese.png>`
+   :width: 286px
+   :align: center
+   :alt: Mac and Cheese object
+
+
+If you are using FoundationPose for an object, ensure that you have a mesh and a texture file available for it. To prepare an object, consult the FoundationPose documentation:
+
+   :doc:`isaac_ros_foundationpose </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`
+
+Tutorial
+--------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Set up your development environment by following the instructions in :doc:`getting started </getting_started/index>`.
+
+2. Complete the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>` if using RealSense cameras.
+
+3. It is recommended to use a PREEMPT_RT kernel on Jetson. Follow the :doc:`PREEMPT_RT for Jetson guide </getting_started/compute/preempt_setup>`
+   **outside** of the container.
+
+4. Follow the setup instructions in :doc:`Setup Hardware and Software for Real Robot </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper>`.
+
+.. _run-launch-files:
+
+Run Launch Files and Deploy to Robot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We recommend setting a ``ROS_DOMAIN_ID`` via ``export ROS_DOMAIN_ID=<ID_NUMBER>`` for every new terminal where you run ROS commands, to avoid interference with other computers on the same network (see `ROS Guide <https://docs.ros.org/en/:ir_ros_distro:/Concepts/Intermediate/About-Domain-ID.html>`__).
+
+#. On the UR teach pendant, ensure that the robot's **remote program** is loaded and that the robot is **paused** or **stopped** for safety purposes.
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Source the ROS workspace:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS} && \
+         source install/setup.bash
+
+
+#. Some important parameters for this workflow are documented in the :ref:`Manipulator Configuration File section<create-manipulator-configuration-file>`.
+
+   * ``gripper_type``: Type of the gripper `robotiq_2f_85` or `robotiq_2f_140`.
+   * ``setup``: Setup of the robot, the setup will reference the camera calibration and sensor information.
+   * ``robot_ip``: IP address of the robot.
+   * ``moveit_collision_objects_scene_file``: Path to the MoveIt collision objects scene file. This file will be used by cuMotion to understand where the collision objects are in the workspace and avoid them.
+   * ``cumotion_urdf_file_path``: Path to the cuMotion URDF file.
+   * ``cumotion_xrdf_file_path``: Path to the cuMotion XRDF file.
+   * ``workflow_type``: Type of the workflow. ``OBJECT_FOLLOWING`` or ``POSE_TO_POSE`` for the purposes of this tutorial.
+   * ``ur_type``: Type of the robot. ``UR5e`` or ``UR10e``.
+
+#. Launch the desired Isaac for Manipulation example:
+
+   The ``cumotion_xrdf_file_path`` corresponds to the ``robot`` parameter found :ref:`here <repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index:API>`.
+
+   This tutorial has been tested with UR5e and UR10e robots, using URDF and XRDF files that incorporate the Robotiq 2F-140 gripper.
+
+   The files can be found in the ``share`` directory of the ``isaac_ros_cumotion_robot_description`` package, with the following names:
+
+      * **UR5e**: ``ur5e_robotiq_2f_140.urdf`` and ``ur5e_robotiq_2f_140.xrdf``
+      * **UR10e**: ``ur10e_robotiq_2f_140.urdf``and ``ur10e_robotiq_2f_140.xrdf``
+
+   To launch the example without robot arm control, that is, with perception only, you can add the ``no_robot_mode:=True`` flag to any of the launch commands below.
+
+   .. tabs::
+      .. tab:: Object following using an object detection model
+
+         #. Change the ``workflow_type`` to ``OBJECT_FOLLOWING`` and ``segmentation_type`` to ``NONE`` in the manipulator configuration file.
+
+         #. Modify the ``object_detection_type`` and ``pose_estimation_type`` parameters in the manipulator configuration file based on the desired models.
+
+            The following table shows the supported combinations of object detection, segmentation, and pose estimation models for the Object Following workflow:
+
+            .. include:: tables/object_following_support.rst
+
+            .. note::
+
+               When using the ``GROUNDING_DINO`` object detection model, please set the parameters of ``grounding_dino_*`` correctly in the :ref:`Manipulator Configuration File section<create-manipulator-configuration-file>`. You will need to set a text prompt as the model takes in a text query as input (due to it's grounding in the language modality).
+
+         #. Launch the object following example:
+
+            .. tabs::
+               .. tab:: RealSense
+
+                  .. code:: bash
+
+                     ros2 launch isaac_manipulator_bringup workflows.launch.py \
+                        manipulator_workflow_config:=<WORKFLOW_CONFIG_FILE_PATH>
+
+            The ``manipulator_workflow_config`` parameter points to the manipulator configuration file. Please refer to the section on how to :ref:`Create Manipulator Configuration File <create-manipulator-configuration-file>`.
+            The robot end effector will move to match the pose of the object at a fixed offset. If that pose would bring the robot into collision (for example, with a table surface), cuMotion will report a planning failure and the robot will remain stationary until the object is repositioned.
+
+         .. note::
+
+            When using the DOPE model, the ``Pose Estimate`` tab in RViz must be set to ``detections`` to see the pose estimation results in the 3D viewport.
+
+      .. tab:: Object following using SAM as the object detection backend
+
+         #. Change the ``workflow_type`` to ``OBJECT_FOLLOWING`` in the manipulator configuration file.
+
+         #. Modify the ``object_detection_type``, ``segmentation_type``, and ``pose_estimation_type`` parameters in the manipulator configuration file based on the desired models.
+
+            The following table shows the supported combinations of object detection, segmentation, and pose estimation models for the Object Following workflow:
+
+            .. include:: tables/object_following_support.rst
+
+         #. Launch the object following example:
+
+            .. tabs::
+               .. tab:: RealSense
+
+                  .. code:: bash
+
+                     ros2 launch isaac_manipulator_bringup workflows.launch.py \
+                        manipulator_workflow_config:=<WORKFLOW_CONFIG_FILE_PATH>
+
+            The ``manipulator_workflow_config`` parameter points to the manipulator configuration file. Please refer to the section on how to :ref:`Create Manipulator Configuration File <create-manipulator-configuration-file>`.
+            The robot end effector will move to match the pose of the object at a fixed offset. If that pose would bring the robot into collision (for example, with a table surface), cuMotion will report a planning failure and the robot will remain stationary until the object is repositioned.
+
+         #. Once the ``rqt_image_view`` window opens, modify the location topic to ``/segment_anything/input_points`` for SAM1 or ``/segment_anything2/input_points`` for SAM2, and click on the desired object to follow. This location topic corresponds to the ``segment_anything_input_points_topic`` parameter in the manipulator configuration file.
+
+      .. tab:: Pose-to-pose workflow
+
+         #. Change the ``workflow_type`` to ``POSE_TO_POSE`` in the manipulator configuration file before launching this file.
+
+            .. tabs::
+
+               .. tab:: RealSense
+
+                  .. code:: bash
+
+                     ros2 launch isaac_manipulator_bringup workflows.launch.py \
+                     manipulator_workflow_config:=<WORKFLOW_CONFIG_FILE_PATH>
+
+            The ``manipulator_workflow_config`` parameter points to the manipulator configuration file. Please refer to the section on how to :ref:`Create Manipulator Configuration File <create-manipulator-configuration-file>`.
+
+   .. note::
+
+      Sometimes the robot might fail to plan a trajectory. This could be due to ghost voxels in the scene being added due to poor depth estimation. To experiment with better depth estimation, please try the ``ESS_FULL`` or ``FOUNDATION_STEREO`` models by changing the ``depth_type`` and ``enable_dnn_depth_in_realsense`` parameters in the manipulator configuration file.
+
+
+#. On the UR teach pendant, press **play** to enable the robot.
+
+   .. warning::
+
+         To prevent potential collisions, ensure that all obstacles are either fully in view of the camera or are added manually
+         to the MoveIt planning scene.  In MoveIt's RViz interface, obstacles may be added in the "Scene Objects" tab, as described
+         in the :doc:`Quickstart </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index>`.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/ur5e_pose_to_pose.gif>`
+   :width: 576px
+   :align: center
+
+   "Pose-to-pose" example with obstacle avoidance via cuMotion and nvblox on a UR5e robot.
+
+For additional details about the launch files, consult the
+:doc:`documentation </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_bringup/index>`
+for the ``isaac_manipulator_bringup`` package.
+
+Visualizing in Foxglove
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To visualize a reconstruction streamed from a remote machine, for example a robot, we recommend using
+`Foxglove <https://foxglove.dev/>`__.
+
+   * When running Isaac for Manipulation on Jetson AGX Thor, it is recommended to display the visualization on a remote machine instead of on the Jetson directly. This will free up compute resources for the Isaac for Manipulation pipeline.
+
+   * When visualizing from a remote machine over WiFi, bandwidth is limited and easily exceeded. Exceeding this bandwidth can lead to poor visualization results. For best results we recommend visualizing a limited number of topics, and to avoiding visualizing high-bandwidth topics for example images.
+
+
+To visualize with Foxglove, complete the following steps on your remote visualization machine:
+
+#. Complete the :ref:`Foxglove setup <foxglove-setup>` guide.
+
+#. For the RealSense pose-to-pose tutorial, see the
+   :ir_repo:`realsense_foxglove.json <isaac_manipulator> <isaac_manipulator_bringup/config/visualization/realsense_foxglove.json>`
+   Foxglove layout configuration as an example.
+
+#. Launch any Isaac for Manipulation tutorial with the commands shown :ref:`here <run-launch-files>`
+   and append the ``run_foxglove:=True`` flag.

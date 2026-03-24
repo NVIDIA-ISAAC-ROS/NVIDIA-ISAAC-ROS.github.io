@@ -1,0 +1,99 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_cumotion> <isaac_ros_esdf_visualizer>`
+
+Overview
+--------
+
+The ``isaac_ros_esdf_visualizer`` package offers functionality for visualizing ESDFs received from
+nvblox. This package can be useful for debugging and observing cuMotion's world.
+
+API
+---
+
+ESDFVisualizer
+~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``workspace_file_path``
+     - ``string``
+     - ``''``
+     - Path to a workspace file that defines the grid boundaries. See ``isaac_manipulator_bringup/config/nvblox/workspace_bounds/zurich_test_bench.yaml`` for an example.
+
+   * - ``grid_size_m``
+     - ``float array``
+     - ``[2.0, 2.0, 2.0]``
+     - Size of the grid in meters. Only used when ``workspace_file_path`` is not set.
+
+   * - ``grid_center_m``
+     - ``float array``
+     - ``[0.0, 0.0, 0.0]``
+     - Grid center position at which to place the visualized voxels. Only used when ``workspace_file_path`` is not set.
+
+   * - ``voxel_size``
+     - ``float``
+     - ``0.05``
+     - Size of a voxel in meters
+
+   * - ``publish_voxel_size``
+     - ``float``
+     - ``0.025``
+     - Size of a published voxel in meters
+
+   * - ``max_publish_voxels``
+     - ``int``
+     - ``50000``
+     - Maximum number of voxels to publish
+
+   * - ``esdf_service_name``
+     - ``string``
+     - ``/nvblox_node/get_esdf_and_gradient``
+     - Service to query for the ESDF and gradients
+
+   * - ``robot_base_frame``
+     - ``string``
+     - ``base_link``
+     - Base frame of the robot
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``/curobo/voxels``
+     - `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/visualization_msgs/msg/Marker.msg>`__
+     - Voxels published for visualization
+
+ROS Services Requested
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+
+   * - ``esdf_service_name``
+     - :ir_repo:`nvblox_msgs/EsdfAndGradients <isaac_ros_nvblox> <nvblox_msgs/srv/EsdfAndGradients.srv>`
+     - Service that takes an axis-aligned bounding box (AABB) for the region of interest and returns a dense ESDF and gradient field for that region.
+
+.. |package_name| replace:: ``isaac_ros_esdf_visualizer``
+

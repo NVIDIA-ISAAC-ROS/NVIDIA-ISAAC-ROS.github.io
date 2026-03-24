@@ -1,0 +1,73 @@
+==========================
+Manipulation Orchestration
+==========================
+
+Overview
+--------
+
+Manipulation orchestration provides a behavior tree-based framework for coordinating complex robotic manipulation tasks. Instead of writing rigid finite state machines, you compose reusable behavior components into hierarchical trees that automatically handle sequencing, error recovery, and parallel execution.
+
+Why Behavior Trees?
+^^^^^^^^^^^^^^^^^^^
+
+Traditional manipulation systems often use finite state machines (FSMs) to coordinate tasks, but behavior trees offer significant advantages for complex robotic systems [1]_ [2]_.
+
+
+**FSM vs Behavior Tree Comparison**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 35 40
+
+   * - Aspect
+     - Finite State Machines
+     - Behavior Trees
+   * - **Scalability**
+     - State explosion: transitions often grow combinatorially [2]_
+     - Near-linear growth under common Behavior Tree designs [2]_
+   * - **Modularity**
+     - Tightly coupled states with explicit transitions make component reuse difficult [2]_
+     - Highly modular: reusable sub-trees can be independently developed and tested [1]_ [2]_
+   * - **Control Flow**
+     - Explicit state transitions must be manually defined for all paths
+     - Implicit flow through ``Sequence``, ``Selector``, and ``Parallel`` nodes [1]_
+   * - **Error Handling**
+     - Recovery logic must be explicitly coded for each state transition
+     - Systematic patterns via decorators (e.g., ``Inverter``, ``Repeat/max-N-tries``, ``Timeout/max-T-sec``) applied consistently [1]_
+   * - **Reactivity**
+     - Requires manual implementation of interruption and preemption logic
+     - Dynamic reactivity: trees re-evaluate from the root on each tick/input, enabling immediate responses [2]_
+   * - **Concurrency**
+     - Parallelism via hierarchical/parallel composition leads to combinatorial growth in states [2]_
+     - Natural concurrency: ``Parallel`` nodes with configurable success/failure policies [1]_
+   * - **Programming Effort**
+     - Significant code modification needed when adapting to new tasks [2]_
+     - Minimal modifications: compose existing sub-trees into new configurations [1]_ [2]_
+
+.. _1:
+.. _2:
+
+**References**
+
+| [1] "Behavior Trees in Robotics and AI: An Introduction" (2022). `arXiv:1709.00084 <https://arxiv.org/abs/1709.00084>`__
+| [2] "Comparison between Behavior Trees and Finite State Machines" (2024). `arXiv:2405.16137 <https://arxiv.org/abs/2405.16137>`__
+
+Core Concepts
+^^^^^^^^^^^^^
+
+**Behavior Tree Structure**
+
+The orchestration system uses `py_trees <https://py-trees.readthedocs.io/>`__ to implement:
+
+* **Leaf Behaviors**: Atomic actions (move robot, detect objects, grasp)
+* **Composite Nodes**: Control flow (``Sequence``, ``Selector``, ``Parallel`` execution)
+* **Decorator Nodes**: Add robustness (``Retry``, ``Timeout``, rate limiting)
+* **Blackboard**: Shared memory for inter-behavior communication
+
+Implementation Resources
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* **Orchestration Documentation**: :doc:`isaac_manipulator_orchestration </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/index>`
+* **Workflow Example**: :doc:`Multi-Object Pick and Place </concepts/manipulation/pick_and_place>`
+* **Behavior Catalog**: :doc:`Complete library of reusable manipulation behaviors </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/behavior_reference>`
+* **Blackboard Reference**: :doc:`Shared memory system for inter-behavior communication </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/blackboard_reference>`

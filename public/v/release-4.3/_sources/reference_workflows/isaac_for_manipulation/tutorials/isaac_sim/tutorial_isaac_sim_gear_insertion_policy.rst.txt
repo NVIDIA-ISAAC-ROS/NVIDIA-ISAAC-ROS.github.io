@@ -1,0 +1,100 @@
+=====================
+Gear Insertion Policy
+=====================
+Overview
+--------
+
+This tutorial demonstrates a learning-based gear insertion policy using Isaac for Manipulation in Isaac Sim. 
+The robot uses a trained policy to precisely insert a gear into a peg stand, demonstrating advanced 
+manipulation with contact-rich tasks.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/gear_assembly_sim.gif>`
+    :width: 100%
+    :alt: Isaac Sim scene used for gear insertion policy with the gear and peg stand objects
+
+Prerequisites
+-------------
+
+- Follow the setup instructions in :doc:`Setup for Simulated Robot with Isaac for Manipulation in Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim>`.
+
+
+Tutorial
+--------
+
+.. include:: _snippets/isaac_sim_launch.rst
+
+Configure the Gear Assembly Workflow
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Open the ``sim_launch_params.yaml`` file and set the ``grasps_file_path`` to the path to the grasps file you want to use.
+
+   .. code:: yaml
+
+      grasps_file_path: $(ros2 pkg prefix --share isaac_manipulator_robot_description)/config/robotiq_2f_140_grasps_large_gear.yaml
+      segmentation_type: SEGMENT_ANYTHING
+      object_detection_type: SEGMENT_ANYTHING
+      enable_nvblox: 'false'
+      workflow_type: GEAR_ASSEMBLY
+
+Run Gear Insertion Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Once you hit **Play** on the scene in Isaac Sim, go to the Window tab and select Script Editor.
+
+#. Once the robot is in the gear insertion position, you can run the gear insertion workflow as described below.
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Run the gripper driver:
+
+   .. code:: bash
+
+      ros2 run isaac_manipulator_isaac_sim_utils isaac_sim_gripper_driver.py
+
+#. In a **new** terminal, run the following command to open the gripper:
+
+   .. code:: bash
+
+      ros2 action send_goal \
+      /robotiq_gripper_controller/gripper_cmd \
+      control_msgs/action/GripperCommand "command: {position: 0.0, max_effort: 100.0}"
+
+#. Paste contents of the script from ``isaac_manipulator_bringup/test/isaac_sim_script_editor_scripts/place_robot_in_gear_insertion_position.py`` in the Isaac Sim Script Editor.
+
+#. Run it and wait until the robot is in the gear insertion position.
+
+#. Run the script again to make sure gear is in correct position.
+
+#. Close the gripper via this call:
+
+   .. code:: bash
+
+    ros2 action send_goal \
+    /robotiq_gripper_controller/gripper_cmd \
+    control_msgs/action/GripperCommand "command: {position: 0.50, max_effort: 100.0}"
+
+#. Launch the gear insertion workflow:
+
+   .. code:: bash
+
+      export ENABLE_MANIPULATOR_TESTING=manual_isaac_sim
+      launch_test $(ros2 pkg prefix --share isaac_manipulator_bringup)/test/gear_insertion_pol_test_sim.py
+
+#. Wait for user input prompt to start the insertion process. Once prompted, run this command:
+
+   .. code:: bash
+
+      ros2 topic pub /input_points_debug geometry_msgs/msg/Point "{x: 0.0, y: 0.0, z: 0.0}"
+
+#. The robot should insert the gear into the peg stand.
+
+Next Steps
+----------
+
+- Try the :doc:`Gear Assembly tutorial <tutorial_isaac_sim_gear_assembly>` for the full assembly workflow
+- Try the :doc:`Pick and Place tutorial <tutorial_isaac_sim_pick_and_place>` for general manipulation workflows
+- Learn more about :doc:`Isaac for Manipulation Reference Architecture </reference_workflows/isaac_for_manipulation/reference_architecture>`

@@ -1,0 +1,112 @@
+Troubleshooting
+===============
+
+How do I Pair the Bluetooth Joystick with the Nova Carter Robot?
+----------------------------------------------------------------
+
+Refer to the :ref:`pairing the controller section<nova-carter-joystick-setup>`.
+
+Jetson Won't Connect to the Monitor Unless Ethernet Is Connected
+----------------------------------------------------------------
+
+This is a known bug. We'd recommend that you have the Nova Carter robot
+connected to Ethernet during the initial SW setup procedure in the
+documentation.
+
+Robot Does Not Move
+-------------------
+
+1. In a terminal inside the Docker container, run ``ros topic echo /cmd_vel``.
+
+Ensure that when you press the buttons or move the joysticks, the values on the
+topic change. If it does not show any data move to the next step.  2. If you can
+see the expected values in the above command when pressing the joystick, check
+if the horizontal indicator light next to the power button on the robot is
+green. If it is not green, then the Segway ROS driver has gone into "locked
+state".
+
+You can fix this by running
+`ros2 service call /reset_chassis std_srvs/srv/Empty {}`
+in a new terminal that is attached to the Isaac ROS Docker container. The
+Segway driver has to be running to reset the chassis. Restarting the teleop,
+Nav2, or mapping launch files also resets the Segway driver.
+
+
+``/cmd_vel`` Shows No Data when the Joystick Enable Button is Pressed
+---------------------------------------------------------------------
+
+1.  In a terminal inside the Docker container run ``ls /dev/input/js0``.  If the
+    connection was successful it prints out ``/dev/input/js0``. If the connection
+    was **not** successful the command prints out ``ls: cannot access
+    '/dev/input/js0': No such file or directory``.  2. In a terminal inside the
+    Docker container run ``ros topic echo /joy``. Ensure that when you press the
+    buttons or move the joysticks, the values on the topic change.  3. Ensure your
+    joystick is connected by following the joystick pairing steps in this document.
+
+
+``ros2 topic hz`` Shows a Lower than Expected Value
+----------------------------------------------------
+
+.. note::
+
+    ``ros2 topic hz`` is known to cause 100% CPU load for the first ~6 seconds
+    after running the command. The frame rate measured during this period is
+    inaccurate compared to when the command is not running. Use the ``--window``
+    flag as shown below and wait for ~6 seconds to get a more accurate measurement.
+
+.. note:: ``ros2 topic hz`` also triggers the type adaptation NITROS nodes.
+
+1. Run the following command to get a list of all the topics:
+
+.. code:: bash
+
+    ros2 topic list
+
+2. Run the ``ros2 topic hz`` command of the required topic:
+
+.. code:: bash
+
+    ros2 topic hz <topic_name> --window 30
+
+``ros2 topic list`` on a remote system does not show all topics on robot
+------------------------------------------------------------------------
+
+.. note:: We use Cyclone DDS as our ROS 2 middleware interface
+
+.. note::
+
+    When using the below Cyclone DDS configuration file, replace
+    ``your_network_interface``, ``robot_ip`` and ``remote_system_ip`` with
+    appropriate values.
+
+1. Check if your system allows multicast communication by following the steps in
+   `this medium post <https://medium.com/@arshad.mehmood/setting-up-node-discovery-across-multiple-systems-in-ros2-infrastructure-a1a5c25f052f>`__
+
+2. If it does not, disable multicast and set the peer IPs manually as shown in
+   `this medium post <https://medium.com/@arshad.mehmood/setting-up-node-discovery-across-multiple-systems-in-ros2-infrastructure-a1a5c25f052f>`__.
+   An example of the cyclone DDS config file is also given below:
+
+.. code:: xml
+
+    <CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+    <Domain id="any">
+        <General>
+            <Interfaces>
+                <!-- Replace <your_network_interface> with the value corresponding to your setup. -->
+                <NetworkInterface name="<your_network_interface_name>"  multicast="false" />
+            </Interfaces>
+            <AllowMulticast>false</AllowMulticast>
+            <EnableMulticastLoopback>false</EnableMulticastLoopback>
+        </General>
+
+        <Discovery>
+            <Peers>
+                <!-- Replace <robot_ip> and <remote_system_ip> with the IP addresses corresponding to your setup. -->
+                <Peer address="<robot_ip>"/>
+                <Peer address="<remote_system_ip>"/>
+            </Peers>
+            <ParticipantIndex>auto</ParticipantIndex>
+            <MaxAutoParticipantIndex>200</MaxAutoParticipantIndex>
+        </Discovery>
+    </Domain>
+    </CycloneDDS>

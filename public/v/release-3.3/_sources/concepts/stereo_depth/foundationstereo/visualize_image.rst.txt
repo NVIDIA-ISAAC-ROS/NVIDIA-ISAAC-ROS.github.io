@@ -1,0 +1,55 @@
+Instructions to Generate Disparity Maps for Stereo Images
+=========================================================
+
+These are instructions for generating a disparity map for a given stereo
+image pair using FoundationStereo.
+
+The ``isaac_ros_foundationstereo_visualizer.py`` script supports:
+
+* Raw input images
+* Camera info files
+
+
+To generate a disparity estimation from raw inputs:
+
+1. Complete the :ref:`Quickstart <repositories_and_packages/isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index:Quickstart>` guide.
+
+2. Launch the FoundationStereo pipeline using the following command:
+
+   .. tabs::
+
+      .. tab:: High Resolution (high_res)
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_foundationstereo isaac_ros_foundationstereo.launch.py \
+               engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_576x960.engine
+
+      .. tab:: Low Resolution (low_res)
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_foundationstereo isaac_ros_foundationstereo.launch.py \
+               engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/foundationstereo/deployable_foundation_stereo_small_v1.0/foundationstereo_320x736.engine \
+               model_input_width:=736 model_input_height:=320
+
+3. Visualize and validate the output of the package:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_foundationstereo isaac_ros_foundationstereo_visualizer.py --raw_inputs
+
+
+   Verify that you see:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/stereo_depth/foundationstereo/foundationstereo_output.png>`
+      :align: center
+
+4. Try your own examples:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_foundationstereo isaac_ros_foundationstereo_visualizer.py --raw_inputs \
+              --left_image_path '<Absolute path to your left image>' \
+              --right_image_path '<Absolute path to your right image>' \
+              --camera_info_path '<Absolute path your camera info json file>'

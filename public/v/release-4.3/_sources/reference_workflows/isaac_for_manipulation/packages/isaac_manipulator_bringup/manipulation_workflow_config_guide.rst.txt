@@ -1,0 +1,201 @@
+=========================================
+Manipulation Workflow Configuration Guide
+=========================================
+
+This is a quick reference for configuring the manipulation workflow YAML files used with ``workflows.launch.py``. For a complete parameters reference, refer to the :ref:`Create Manipulator Configuration File section <create-manipulator-configuration-file>`.
+
+.. note::
+
+   **Sample Configuration Files**: You can find examples in the ``isaac_manipulator_bringup`` package's ``params`` directory. These sample files contain valid parameter combinations for different robot setups:
+   
+   .. tabs::
+
+      .. tab:: UR5e with Robotiq 2F-85
+
+         :ir_repo:`ur5e_robotiq_85_mac_and_cheese.yaml <isaac_manipulator> <isaac_manipulator_bringup/params/ur5e_robotiq_85_mac_and_cheese.yaml>`
+
+      .. tab:: UR10e with Robotiq 2F-140
+
+         :ir_repo:`ur10e_robotiq_2f_140_mac_and_cheese.yaml <isaac_manipulator> <isaac_manipulator_bringup/params/ur10e_robotiq_2f_140_mac_and_cheese.yaml>`
+
+Required Parameters
+-------------------
+
+.. note::
+
+   **Editing Configuration Files:**
+   
+   - **Binary (Debian) Installation**: Configuration files are read-only. Copy reference files before editing.
+   - **Source Installation**: Edit in place or copy to a separate location.
+   
+   Refer to :ref:`Configure Your Workflow <configure-workflow>` in the :doc:`Pick and Place Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place>` for complete copy-and-edit instructions.
+
+These parameters must be explicitly set in your configuration file:
+
+.. list-table:: Required Configuration Parameters
+   :header-rows: 1
+
+   * - Parameter
+     - Options
+     - Description
+
+   * - ``workflow_type``
+     - ``PICK_AND_PLACE``, ``POSE_TO_POSE``, ``OBJECT_FOLLOWING``, ``GEAR_ASSEMBLY``
+     - Defines the manipulation workflow to execute
+
+   * - ``camera_type``
+     - ``REALSENSE``, ``ISAAC_SIM``
+     - Selects camera driver and configuration
+
+Configuration Example
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: yaml
+
+   # Required Parameters (defaults shown)
+   workflow_type: PICK_AND_PLACE
+   camera_type: REALSENSE
+
+Optional Parameters
+-------------------
+
+Perception workflow
+^^^^^^^^^^^^^^^^^^^
+
+Configure the perception workflow, which provides depth estimation and object detection, segmentation, and pose estimation capabilities. Defaults are provided but can be customized:
+
+.. list-table:: Perception Workflow Parameters
+   :header-rows: 1
+
+   * - Parameter
+     - Options
+     - Default
+     - Description
+
+   * - ``depth_type``
+     - ``ESS_FULL``, ``ESS_LIGHT``, ``REALSENSE``, ``FOUNDATION_STEREO``, ``ISAAC_SIM``
+     - ``ESS_FULL``
+     - Depth estimation method. Actual depth source varies by camera type and configuration. See `Depth Configuration Compatibility`_ for supported combinations
+
+   * - ``object_detection_type``
+     - ``RTDETR``, ``GROUNDING_DINO``, ``DOPE``, ``SEGMENT_ANYTHING``, ``SEGMENT_ANYTHING2``
+     - ``RTDETR``
+     - Object detection network for locating objects in the scene
+
+   * - ``segmentation_type``
+     - ``SEGMENT_ANYTHING``, ``SEGMENT_ANYTHING2``, ``NONE``
+     - ``NONE``
+     - Segmentation network for extracting object masks
+
+   * - ``pose_estimation_type``
+     - ``FOUNDATION_POSE``, ``DOPE``
+     - ``FOUNDATION_POSE``
+     - 6DOF pose estimation network for determining object poses
+
+Configuration Example
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: yaml
+
+   # Perception Workflow (optional - defaults shown)
+   object_detection_type: RTDETR
+   segmentation_type: NONE
+   pose_estimation_type: FOUNDATION_POSE
+   depth_type: ESS_FULL
+
+Supported Model Combinations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Not all model combinations are compatible. The following table lists valid combinations for the perception workflow:
+
+.. include:: ../../tutorials/tables/pick_and_place_support.rst
+
+Depth Configuration Compatibility
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The actual depth source depends on your camera type and configuration. Each camera type supports different depth methods:
+
+.. include:: ../../tutorials/tables/depth_configuration_support.rst
+
+Workspace Configuration
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table:: Workspace Configuration Parameters
+   :header-rows: 1
+
+   * - Parameter
+     - Default
+     - Description
+
+   * - ``moveit_collision_objects_scene_file``
+     - None
+     - File path to a ``.scene`` file defining static obstacles not visible to cameras for collision avoidance during motion planning
+
+Configuration Example
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: yaml
+
+   # Static Obstacles (for collision avoidance)
+   moveit_collision_objects_scene_file: /path/to/scene.scene
+
+.. warning::
+
+   Include any workspace obstacles not visible to cameras to prevent collisions. Refer to :doc:`cuMotion docs </repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index>` for creating ``.scene`` files.
+
+Advanced Parameters
+-------------------
+
+These parameters are only needed in specific scenarios:
+
+.. list-table:: Advanced Configuration Parameters
+   :header-rows: 1
+
+   * - Parameter
+     - When Required
+     - Default
+     - Description
+
+   * - ``time_sync_slop``
+     - For :ref:`robot segmentation <robot-segmentation-quickstart>` synchronization
+     - ``0.1``
+     - Synchronization threshold to sync joint states and depth images for :ref:`robot segmentation <robot-segmentation-quickstart>` to produce segmented depth. Small values prevent synchronization and large values cause segmented images that don't accurately capture the robot's state.
+
+   * - ``enable_nvblox``
+     - To reduce system load or disable collision avoidance
+     - ``true``
+     - Enable/disable nvblox for 3D scene reconstruction and dynamic collision avoidance. Setting to ``false`` reduces system load and allows running without :ref:`robot segmentation <robot-segmentation-quickstart>`
+
+   * - ``enable_dnn_depth_in_realsense``
+     - For neural network-based depth estimation with RealSense cameras
+     - ``false``
+     - Enable DNN-based depth estimation for RealSense cameras. See `Depth Configuration Compatibility`_ for camera-specific behavior and supported combinations
+
+Configuration Example
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: yaml
+
+   # Advanced Parameters
+   time_sync_slop: 0.1                   # Sync tolerance for joint states and depth images
+   enable_nvblox: false                  # Reduce system load
+   enable_dnn_depth_in_realsense: true   # Better depth quality for RealSense
+
+.. note::
+
+   **FoundationStereo Timing Consideration:** FoundationStereo can take around 2 seconds to generate a depth image. To synchronize depth images and joint states from the robot driver, use a ``time_sync_slop`` value close to 3 seconds for proper synchronization.
+
+   **System Performance:** Disabling ``enable_nvblox`` reduces computational load but eliminates dynamic collision avoidance and :ref:`robot segmentation <robot-segmentation-quickstart>` capabilities.
+
+Usage
+-----
+
+.. code-block:: bash
+
+   ros2 launch isaac_manipulator_bringup workflows.launch.py \
+      manipulator_workflow_config:=/path/to/your/config.yaml
+
+More Information
+----------------
+
+- :doc:`index` - Launch file parameter details

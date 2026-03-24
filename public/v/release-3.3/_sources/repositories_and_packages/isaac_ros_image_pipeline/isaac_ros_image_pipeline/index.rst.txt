@@ -1,0 +1,41 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_pipeline> <isaac_ros_image_pipeline>`
+
+Replacing ``image_pipeline`` with ``isaac_ros_image_pipeline``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Add a dependency on ``isaac_ros_image_pipeline`` to
+   ``your_package/package.xml`` and ``your_package/CMakeLists.txt``. If
+   all desired packages under an existing ``image_pipeline`` dependency
+   have Isaac ROS alternatives (see **Supported Packages**), then the
+   original ``image_pipeline`` dependency may be removed entirely.
+2. Change the package and plugin names in any ``*.launch.py`` launch
+   files to use ``[package name]`` and
+   ``nvidia::isaac_ros::image_proc::[component_name]`` respectively. For
+   a list of all packages, see **Supported Packages**. For a list of all
+   ROS 2 Components made available, see the per-package detailed
+   documentation below.
+
+Supported Packages
+----------------------
+
+At this time, the packages under the standard ``image_pipeline`` have
+the following support:
+
+====================== ===================================
+Existing Package       Isaac ROS Alternative
+====================== ===================================
+``image_pipeline``     See ``isaac_ros_image_pipeline``
+``image_proc``         See ``isaac_ros_image_proc``
+``stereo_image_proc``  See ``isaac_ros_stereo_image_proc``
+``depth_image_proc``   See ``isaac_ros_depth_image_proc``
+``camera_calibration`` Continue using existing package
+``image_publisher``    Continue using existing package
+``image_view``         Continue using existing package
+``image_rotate``       Continue using existing package
+====================== ===================================
+
+.. |package_name| replace:: ``isaac_ros_image_pipeline``

@@ -1,0 +1,416 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_pipeline> <isaac_ros_stereo_image_proc>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Download quickstart data from NGC:
+
+   :ir_assets:`<isaac_ros_stereo_image_proc> <quickstart.tar.gz>`
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y  ros-:ir_ros_distro:-isaac-ros-image-proc ros-:ir_ros_distro:-isaac-ros-stereo-image-proc
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_image_pipeline>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_stereo_image_proc --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_stereo_image_proc --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_stereo_image_proc
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: RealSense Camera
+
+      #. Ensure that you have already set up your RealSense camera using the :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`. If you have not, please set up the sensor and then restart this quickstart from the beginning.
+
+      #. Continuing inside the container, install the following dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-realsense ros-:ir_ros_distro:-isaac-ros-depth-image-proc ros-:ir_ros_distro:-isaac-ros-image-proc
+
+      #. Run the launch file, which launches the example, and wait for 10
+         seconds.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py launch_fragments:=realsense_stereo_rect,disparity,disparity_to_depth,point_cloud_xyz
+
+      #. Observe point cloud output ``/points`` on a
+         separate terminal with the command:
+
+         .. code:: bash
+
+            ros2 topic echo /points
+
+   .. tab:: ZED Camera
+
+      #. Ensure that you have already set up your ZED camera using :doc:`ZED setup tutorial </getting_started/sensors/zed_setup>`.
+
+      #. Continuing inside the Isaac ROS environment, install dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-examples ros-:ir_ros_distro:-isaac-ros-depth-image-proc ros-:ir_ros_distro:-isaac-ros-image-proc ros-:ir_ros_distro:-isaac-ros-zed
+
+      #. Run the following launch file to spin up a demo of this package using a ZED Camera:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_examples isaac_ros_examples.launch.py \
+            launch_fragments:=zed_stereo_rect,disparity,disparity_to_depth,point_cloud_xyz \
+            interface_specs_file:=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_stereo_image_proc/zed2_quickstart_interface_specs.json
+
+         .. note::
+
+            If you are using the `ZED X` series, replace  `zed2_quickstart_interface_specs.json` with `zedx_quickstart_interface_specs.json` in the above command.
+
+      #. Observe point cloud output ``/points`` on a
+         separate terminal with the command:
+
+         .. code:: bash
+
+            ros2 topic echo /points
+
+
+Try More Examples
+-----------------
+
+To continue your exploration, check out the following suggested examples:
+
+.. toctree::
+   :maxdepth: 1
+
+   Tutorial with Isaac Sim </concepts/stereo_depth/sgm/tutorial_isaac_sim>
+
+API
+----
+
+Overview
+^^^^^^^^
+
+The ``isaac_ros_stereo_image_proc`` package offers functionality for
+handling image pairs from a binocular/stereo camera setup, calculating
+the disparity between the two images, and producing a point cloud with
+depth information. It largely replaces the ``stereo_image_proc``
+package.
+
+
+Available Components
+^^^^^^^^^^^^^^^^^^^^
+
+DisparityNode
+~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``backend``
+     - ``string``
+     - ``CUDA``
+     - The VPI backend to use. Choices are: ``CUDA``, ``JETSON``.
+
+   * - ``max_disparity``
+     - ``float``
+     - ``256``
+     - The maximum disparity value per pixel. With JETSON backend, this value must be ``128`` or ``256``.
+
+   * - ``confidence_threshold``
+     - ``int``
+     - ``65023``
+     - Confidence threshold for the VPI SGM algorithm.
+
+   * - ``confidence_type``
+     - ``int``
+     - ``0``
+     - Confidence type used by the VPI SGM algorithm. Valid values: ``0`` (absolute), ``1`` (relative), ``2`` (inference).
+
+   * - ``window_size``
+     - ``int``
+     - ``7``
+     - Window size for SGM disparity calculation.
+
+   * - ``num_passes``
+     - ``int``
+     - ``2``
+     - Number of SGM passes to compute the result.
+
+   * - ``p1``
+     - ``int``
+     - ``8``
+     - Penalty on disparity changes of +/- 1 between neighboring pixels.
+
+   * - ``p2``
+     - ``int``
+     - ``120``
+     - Penalty on disparity changes of more than 1 between neighboring pixels.
+
+   * - ``p2_alpha``
+     - ``int``
+     - ``1``
+     - Alpha used to scale ``p2``.
+
+   * - ``quality``
+     - ``int``
+     - ``1``
+     - Quality of disparity output.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``left/image_rect``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`
+     - Left rectified image.
+
+   * - ``left/camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`
+     - Left camera info.
+
+   * - ``right/image_rect``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`
+     - Right rectified image.
+
+   * - ``right/camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`
+     - Right camera info.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``disparity``
+     - :ir_repo:`NitrosDisparityImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_disparity_image_type/include/isaac_ros_nitros_disparity_image_type/nitros_disparity_image.hpp>`
+     - Disparity image.
+
+.. note::
+
+   ``DisparityNode`` with the ``JETSON`` backend requires a ``max_disparity`` value of 128 or 256.
+   In addition, the ``JETSON`` backend requires ``nv12`` input image format. You can use the ``ImageFormatConverterNode`` to convert the input to ``nv12``.
+
+.. note::
+
+   For optimal performance on NVIDIA Thor using the ``JETSON`` backend by configuring ``DisparityNode`` parameters to:
+
+   - ``backend``: ``JETSON``
+   - ``max_disparity``: ``256`` (``128`` also supported depending on your range)
+   - ``confidence_threshold``: ``32767``
+   - ``confidence_type``: ``2`` (inference)
+   - ``window_size``: ``5``
+   - ``num_passes``: ``3``
+   - ``p1``: ``3``
+   - ``p2``: ``48``
+   - ``p2_alpha``: ``0``
+   - ``quality``: ``6``
+
+PointCloudNode
+~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``use_color``
+     - ``bool``
+     - ``false``
+     - Whether the output point cloud should be colorized.
+
+   * - ``unit_scaling``
+     - ``float``
+     - ``1.0``
+     - Scale applied to the XYZ values of the point cloud.
+
+   * - ``output_height``
+     - ``uint16_t``
+     - ``1200``
+     - Height used to size internal buffers for the output point cloud.
+
+   * - ``output_width``
+     - ``uint16_t``
+     - ``1920``
+     - Width used to size internal buffers for the output point cloud.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``left/image_rect_color``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`
+     - Left rectified image used for color.
+
+   * - ``left/camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`
+     - Left camera info.
+
+   * - ``right/camera_info``
+     - :ir_repo:`NitrosCameraInfo <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_camera_info_type/include/isaac_ros_nitros_camera_info_type/nitros_camera_info.hpp>`
+     - Right camera info.
+
+   * - ``disparity``
+     - :ir_repo:`NitrosDisparityImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_disparity_image_type/include/isaac_ros_nitros_disparity_image_type/nitros_disparity_image.hpp>`
+     - Disparity image input.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``points2``
+     - :ir_repo:`NitrosPointCloud <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_point_cloud_type/include/isaac_ros_nitros_point_cloud_type/nitros_point_cloud.hpp>`
+     - Output point cloud.
+
+DisparityToDepthNode
+~~~~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+This component has no ROS parameters.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``disparity``
+     - :ir_repo:`NitrosDisparityImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_disparity_image_type/include/isaac_ros_nitros_disparity_image_type/nitros_disparity_image.hpp>`
+     - Disparity image input.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``depth``
+     - :ir_repo:`NitrosImage <isaac_ros_nitros> <isaac_ros_nitros_type/isaac_ros_nitros_image_type/include/isaac_ros_nitros_image_type/nitros_image.hpp>`
+     - Depth image output.
+
+
+
+.. |package_name| replace:: ``isaac_ros_stereo_image_proc``

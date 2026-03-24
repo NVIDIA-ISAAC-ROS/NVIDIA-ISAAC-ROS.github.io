@@ -1,0 +1,104 @@
+Tutorial: Run all Sensors on the `Nova Orin Developer Kit`
+=============================================================
+
+This tutorial walks you through visualizing all sensors on your `Nova Orin Developer Kit`.
+
+For this tutorial, you must have successfully set up your `Nova Orin Developer Kit`
+using the setup instructions :doc:`here </robots/nova_developer_kit/getting_started>`,
+and you must be familiar with the Isaac ROS development environment.
+
+Run the Application
+-------------------
+
+1. SSH into your `Nova Orin Developer Kit` (:ref:`instructions<nova-developer-kit-ssh-setup>`).
+
+2. Build/install the required packages and run the app:
+
+.. run_ros_app::
+    :repo_setup: <nova-developer-kit-dev-setup>
+    :repo: nova_developer_kit
+    :image: isaac/nova_developer_kit_bringup:release_3.2-aarch64
+    :package: nova_developer_kit_bringup
+    :app: sensors.launch.py
+    :skip_packages: isaac_ros_ess_models_install:isaac_ros_peoplesemseg_models_install
+
+
+Visualizing the Sensor Outputs
+------------------------------
+
+1. Make sure you complete :ref:`visualization-setup-devkit`.
+
+2. In Foxglove open the ``nova_developer_kit_sensors.json`` layout file
+   downloaded in the previous step.
+
+3. Validate that you can see a visualization of the dev kit and the enabled
+   sensors. Per default, only the front stereo camera is enabled.
+   You are encouraged not to stay too close to cameras. Verify that you receive a visualization similar to the following:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/robots/nova_developer_kit/foxglove_sensors.png>`
+    :width: 800px
+    :alt: Foxglove visualization of the sensors
+    :align: center
+
+.. note::
+
+    The example streams the camera images in their full resolution to
+    Foxglove. This requires a substantial amount of bandwidth and is only done
+    here for exemplary purposes. Most likely the image stream will be fairly
+    choppy due to the large bandwidth. For a better visualization experience, we
+    recommend that you only visualize resized images or h264 streams.
+
+.. note::
+
+    The fisheye cameras use the ``equidistant`` distortion model which is not
+    yet supported in Foxglove. For this reason, it is not possible to visualize a
+    fisheye camera in the 3D panel in Foxglove. You can however add an
+    additional `Image` panel and use this to visualize the fisheye camera. In
+    the `Image` panel's settings set `Topic` to the fisheye camera's image
+    topic and set `Calibration` to ``None``.
+    
+
+
+Enabling More Sensors
+---------------------
+
+By default, as specified in the launch file ``sensors.launch.py``, only the front
+stereo camera and front fisheye camera are enabled.
+You can, however, pass additional launch arguments to enable more sensors.
+
+To see all available launch arguments use the ``--show-args`` argument, for example:
+
+.. code:: bash
+
+    ros2 launch nova_developer_kit_bringup sensors.launch.py --show-args
+
+You can run this command directly on host or just append it to your ``docker
+run`` command from above.
+
+You can enable more stereo or fisheye cameras with the launch arguments
+``enabled_stereo_cameras`` and ``enabled_fisheye_cameras``.
+
+For example to enable all stereo cameras you could run the following launch
+command:
+
+.. code:: bash
+
+    ros2 launch nova_developer_kit_bringup sensors.launch.py \
+        enabled_stereo_cameras:=front_stereo_camera,left_stereo_camera,right_stereo_camera
+
+In the same fashion, you can also enable the fisheye cameras.
+
+.. code:: bash
+
+    ros2 launch nova_developer_kit_bringup sensors.launch.py \
+        enabled_fisheye_cameras:=front_fisheye_camera,left_fisheye_camera,right_fisheye_camera
+
+To visualize the sensors in Foxglove follow the same setup as before.
+
+.. note::
+
+    Streaming higher bandwidth data to Foxglove causes higher latency. You can
+    choose an appropriate value for the
+    `send_buffer_limit <https://github.com/foxglove/ros-foxglove-bridge#configuration>`__
+    parameter in Foxglove bridge to control latency vs. high bandwidth data visualization.

@@ -1,0 +1,312 @@
+==============
+Hardware Setup
+==============
+
+RealSense camera not found
+--------------------------
+
+Symptom
+~~~~~~~
+
+If no RealSense cameras are detected and you observe any of the following:
+
+1. Running ``rs-enumerate-devices`` (without ``sudo``) produces permission errors and the output below but succeeds when run as ``sudo rs-enumerate-devices``.
+
+   .. code:: bash
+
+      11/07 11:46:28,226 ERROR [281473607321792] (handle-libusb.h:53) failed to open usb interface: 0, error: RS2_USB_STATUS_ACCESS
+      11/07 11:46:28,226 ERROR [281473657886912] (uvc-sensor.cpp:428) acquire_power failed: failed to set power state
+      11/07 11:46:28,226 ERROR [281473657886912] (rs.cpp:256) [rs2_create_device( info_list:0xaaaae89398e0, index:0 ) UNKNOWN] failed to set power state
+      11/07 11:46:28,226 ERROR [281473657886912] (rs.cpp:256) [rs2_delete_device( device:nullptr ) UNKNOWN] null pointer passed for argument "device"
+      Could not create device - failed to set power state . Check SDK logs for details
+      No device detected. Is it plugged in?
+
+2. Launching the RealSense ROS node via ``ros2 launch realsense2_camera rs_launch.py`` produces the following error messages:
+
+   .. code:: bash
+
+      [realsense2_camera_node-1]  29/06 01:10:27,431 WARNING [140061797918464] (rs.cpp:310) null pointer passed for argument "device"
+      [realsense2_camera_node-1] [WARN] [1656465033.464454660] [camera.camera]: Device 1/1 failed with exception: failed to set power state
+      [realsense2_camera_node-1] [ERROR] [1656465033.464505994] [camera.camera]: The requested device with  is NOT found. Will Try again.
+      [realsense2_camera_node-1]  29/06 01:10:33,463 ERROR [140061781133056] (handle-libusb.h:51) failed to open usb interface: 0, error: RS2_USB_STATUS_NO_DEVICE
+      [realsense2_camera_node-1]  29/06 01:10:33,463 ERROR [140061797918464] (sensor.cpp:572) acquire_power failed: failed to set power state
+
+3. No RealSense cameras detected when running ``realsense-viewer``.
+
+.. _realsense-version-check:
+
+Solution 1
+~~~~~~~~~~
+
+Ensure that you follow the :doc:`RealSense setup instructions </getting_started/sensors/realsense_setup>` and installed the correct versions for ``librealsense``, ``realsense2_camera``, and the camera firmware.
+If you're running from inside the Isaac ROS environment, the recommended RealSense SW will already be installed but you may need to update your camera firmware.
+
+To confirm this, run ``ros2 launch realsense2_camera rs_launch.py`` inside the Isaac ROS environment.
+Below are example outputs, verify that you observe the expected SW versions as described in the :doc:`RealSense setup instructions </getting_started/sensors/realsense_setup>`:
+
+.. code:: bash
+
+   [realsense2_camera_node-1] [INFO] [1715878272.636553721] [camera.camera]: RealSense ROS v4.56.1
+   [realsense2_camera_node-1] [INFO] [1715878272.636742684] [camera.camera]: Built with LibRealSense v2.56.3
+   [realsense2_camera_node-1] [INFO] [1715878272.636772605] [camera.camera]: Running with LibRealSense v2.56.3
+
+Run ``rs-enumerate-devices`` to determine the camera firmware version.
+
+.. code:: bash
+
+   rs-enumerate-devices
+   Device info:
+      Name                          : 	Intel RealSense D455
+      Serial Number                 : 	1234567890
+      Firmware Version              : 	5.16.0.1
+      Recommended Firmware Version  : 	5.16.0.1
+      ...
+
+To upgrade the camera firmware:
+
+1. Download the recommended firmware
+   binary (for example: ``Signed_Image_UVC_5_16_0_1.bin``) from `Firmware releases D400 <https://dev.realsenseai.com/docs/firmware-releases-d400>`__.
+2. Extract the binary from the .zip file.
+3. Run the following command, being sure to replace ``<binary_filename>`` with the name of the binary you
+   downloaded:
+
+.. code:: bash
+
+   rs-fw-update -f <binary_filename>
+
+.. note::
+
+   For more information refer to the `RealSense update tool <https://dev.realsenseai.com/docs/firmware-update-tool>`__.
+
+Solution 2
+~~~~~~~~~~
+
+1. Verify that the file ``99-realsense-libusb.rules`` exists in ``/etc/udev/rules.d/``.
+
+2. If not, run the following commands **on your host machine before** activating the Isaac ROS environment:
+
+.. code:: bash
+
+   wget https://raw.githubusercontent.com/IntelRealSense/librealsense/v2.56.3/config/99-realsense-libusb.rules && \
+   sudo mv 99-realsense-libusb.rules /etc/udev/rules.d/ && \
+   sudo udevadm control --reload-rules && sudo udevadm trigger && echo "Successfully added udev rules"
+
+Verify that you receive a ``Successfully added udev rules`` in the output, which indicates that all commands were successful.
+
+Input Images Must Have an Even Height and Width
+------------------------------------------------
+
+Symptom
+~~~~~~~
+
+Isaac ROS nodes terminate when given images that have an odd width or
+height:
+
+.. code:: bash
+
+   [component_container_mt-1] [INFO] [1655745951.986574909] [NitrosContext]: [NitrosContext] Loading application: '/workspaces/isaac_ros-dev/ros_ws/install/isaac_ros_nitros/share/isaac_ros_nitros/config/type_adapter_nitros_context_graph.yaml'
+   [component_container_mt-1] [ERROR] [1655747175.384136779] [NitrosImage]: [convert_to_custom] Image width/height must be even for creation of gxf::VideoBuffer
+   [component_container_mt-1] terminate called after throwing an instance of 'std::runtime_error'
+   [component_container_mt-1]   what():  [convert_to_custom] Odd Image width or height.
+   [ERROR] [component_container_mt-1]: process has died [pid 28538, exit code -6, cmd '/opt/ros/:ir_ros_distro:/install/lib/rclcpp_components/component_container_mt --ros-args -r __node:=apriltag_container -r __ns:=/'].
+
+
+Solution
+~~~~~~~~
+
+Replace the input image source with one that produces images that have
+even width and height.
+
+RealSense Does Not Stream IR Stereo Images
+---------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+**Within the Isaac ROS environment**: Cannot see any IR images in
+``realsense-viewer``, but depth images can be streamed.
+
+**Outside the Isaac ROS environment**: No metadata containing projector
+status attached to the IR frames.
+
+
+Solution
+~~~~~~~~
+
+1. Download and install the ``dkms`` for Kernel 5.15 from
+   `GitHub <https://github.com/mengyui/librealsense2-dkms/releases/tag/initial-support-for-kernel-5.15>`__:
+
+   1. Download the .deb file named
+      ``librealsense2-dkms-dkms_1.3.14_amd64.deb``.
+   2. In the directory where you downloaded the file run:
+      ``sudo apt install ./librealsense2-dkms-dkms_1.3.14_amd64.deb``
+
+2. Build ``librealsense`` within the Isaac ROS environment without CUDA. Run
+   the following commands within the Isaac ROS environment:
+
+   -  ``git clone https://github.com/JetsonHacksNano/installLibrealsense``
+   -  ``cd installLibrealsense``
+   -  ``./installLibrealsense.sh``
+   -  ``./buildLibrealsense.sh --no_cuda``
+
+   .. note::
+
+      For more details on this issue, refer to the
+      :doc:`nvblox troubleshooting section </repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense>`
+
+RealSense Error ``Failed to resolve the request``
+-------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+When any RealSense tutorial is launched, no images are streamed and the
+following error is found in the terminal logs:
+
+.. code:: bash
+
+   [component_container_mt-1] [ERROR] [1665684669.343408502] [camera]: /workspaces/isaac_ros-dev/ros_ws/src/third_party/realsense-ros/realsense2_camera/src/rs_node_setup.cpp:344:An exception has been thrown:
+   [component_container_mt-1] Failed to resolve the request:
+   [component_container_mt-1]  Format: Y8, width: 640, height: 480
+   [component_container_mt-1]  Format: Y8, width: 640, height: 480
+   [component_container_mt-1]
+   [component_container_mt-1] Into:
+   [component_container_mt-1]  Formats:
+   [component_container_mt-1]   Y8I
+   [component_container_mt-1]
+   [component_container_mt-1]
+   [component_container_mt-1] [ERROR] [1665684669.343506391] [camera]: Error starting device:
+   [component_container_mt-1] Failed to resolve the request:
+   [component_container_mt-1]  Format: Y8, width: 640, height: 480
+   [component_container_mt-1]  Format: Y8, width: 640, height: 480
+   [component_container_mt-1]
+   [component_container_mt-1] Into:
+   [component_container_mt-1]  Formats:
+   [component_container_mt-1]   Y8I
+   [component_container_mt-1]
+
+
+Solution
+~~~~~~~~
+
+Ensure that you are using the correct camera firmware. Refer to the :ref:`above section <realsense-version-check>` for checking and updating the camera firmware.
+
+RealSense ``incompatible QoS Policy`` Error
+-------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+When any RealSense tutorial is launched, the output topic from RealSense
+is not subscribed and the following warning is found in the terminal
+logs:
+
+.. code:: bash
+
+   [component_container_mt-2] [WARN] [1666117836.386565040] [left_encoder_node]: New publisher discovered on topic '/color/image_raw', offering incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+   [component_container_mt-2] [WARN] [1666117836.392021093] [camera]: New subscription discovered on topic '/color/image_raw', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+
+
+Solution
+~~~~~~~~
+
+Change the QoS policy in ``realsense.yaml`` file from the launched
+package. Take ``isaac_ros_h264_encoder`` as an example, change
+:ir_repo:`policy <isaac_ros_compression> <isaac_ros_h264_encoder/config/realsense.yaml#L7>`
+from ``SENSOR_DATA`` to ``SYSTEM_DEFAULT`` could make the RealSense
+``rgb_camera`` publisher compatible with the subscriber of
+``isaac_ros_h264_encoder``.
+
+.. note::
+
+   For more information on Quality of Service compatibilities, refer to `Quality of Service settings <https://docs.ros.org/en/:ir_ros_distro:/Concepts/About-Quality-of-Service-Settings.html>`__.
+
+Intel RealSense Camera Accidentally Enables Laser Emitter
+---------------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+Despite ``emitter_enabled`` set to ``0``, the laser emitter on Intel
+RealSense comes on.
+
+
+Solution
+~~~~~~~~
+
+Run the following command in the run time:
+
+.. code:: bash
+
+   ros2 param set /camera/camera depth_module.emitter_enabled 0
+
+Intel RealSense D455's Infra Camera Capped at 15fps
+---------------------------------------------------
+
+
+Symptom
+~~~~~~~
+
+Even though it's specified to run at 90fps, Intel RealSense D455's
+infra camera capped at 15fps.
+
+
+Solution
+~~~~~~~~
+
+Due to a `known
+issue <https://github.com/IntelRealSense/realsense-ros/issues/2507#issuecomment-1411214372>`__,
+the initial frame rate might be capped around 15fps.
+
+If that is the case, you need to issue this command:
+
+.. code:: bash
+
+   ros2 param set /camera/camera depth_module.enable_auto_exposure true
+
+.. include:: /../shared/_snippets/troubleshooting/jetson_recovery_mode.rst
+
+System Throttled Due to Over-Current
+------------------------------------
+
+
+Symptom
+~~~~~~~
+
+You receive the message on the display "System throttled due to over-current" (if you have attached a display to the compute unit).
+
+Solution
+~~~~~~~~
+
+This is a warning message and indicates that the hardware is throttled due to over-current.
+This reduces performance of the system and can lead to jitters in the robotics pipeline and non deterministic behavior.
+
+To get around this, you can do one of the following:
+
+1. Modify your software to reduce system load (for example, lowering resolutions and frame rates)
+2. Disable the over-current throttle by running the following command:
+
+   .. code:: bash
+
+      sudo su
+      source <(awk '/^function config_hwmon *\(\)/ {flag=1} flag; /^}/ && flag {flag=0}' /etc/systemd/nvpower.sh)
+      config_hwmon ina3221 curr4_crit 81900 VDD_GPU_SOC
+
+
+   This does not persist across reboots.
+
+   Also, check how many times the system was throttled, due to over-current, since the last boot, you can run the following command:
+
+   .. code:: bash
+
+      cat "$(find /sys/devices -name oc3_event_cnt -print -quit)"
+
+   If either of the above commands return a non-zero value, then the system was throttled due to over-current. The number indicates the number of times the system was throttled.
+
+   .. note::
+
+      If the system OC limits are off then the system may overheat. The hardware should thermal throttle in that case but it is not advisable for the silicon health, generally testing things out without limits, and then if needed finding new limits is the best practice.
