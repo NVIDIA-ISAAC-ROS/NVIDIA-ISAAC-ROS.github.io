@@ -1,0 +1,28 @@
+====================
+Jetson Setup for VPI
+====================
+
+The following instructions are for running compute on Jetson device's PVA accelerator.
+The steps are required to run on Jetson device outside a Docker container.
+
+1.  Generate CDI Spec for GPU/PVA:
+
+    Ensure NVIDIA Container Toolkit is installed on the Jetson device.
+    Use the following command to generate the CDI spec:
+
+    .. code:: bash      
+
+        sudo nvidia-ctk cdi generate --mode=csv --output=/etc/cdi/nvidia.yaml 
+
+
+2.  Install ``pva-allow-2`` package:
+    
+    .. code:: bash
+
+        # Add Jetson public APT repository  
+        sudo apt-get update 
+        sudo apt-get install software-properties-common 
+        sudo apt-key adv --fetch-key https://repo.download.nvidia.com/jetson/jetson-ota-public.asc  
+        sudo add-apt-repository 'deb https://repo.download.nvidia.com/jetson/common r36.4 main' 
+        sudo apt-get update 
+        sudo apt-get install -y pva-allow-2 

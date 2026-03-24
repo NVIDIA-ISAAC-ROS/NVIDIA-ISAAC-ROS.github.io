@@ -1,0 +1,104 @@
+=================
+Object Following
+=================
+
+Overview
+--------
+
+This tutorial demonstrates how to use Isaac for Manipulation to have the robot end effector follow an object 
+at a fixed offset distance while avoiding obstacles detected in the workspace.
+
+For pose estimation, this tutorial provides options to use either FoundationPose or DOPE. This tutorial 
+leverages the cuMotion plugin for MoveIt 2 provided by :ir_repo:`Isaac ROS cuMotion <isaac_ros_cumotion>`.
+
+This object-following tutorial supports the same perception models as the one on the real robot.
+
+We use rectified image streams from simulation and do not need to perform lens distortion and rectification 
+that would need to be performed on a real robot.
+
+We use perfect ground truth depth from the simulation which drives up accuracy and allows one to focus on 
+the software stack in a perfect albeit unrealistic environment.
+
+.. warning::
+
+   The obstacle avoidance behavior demonstrated in this tutorial is not a safety function and does not
+   comply with any national or international functional safety standards. When testing obstacle avoidance
+   behavior, do not use human limbs or other living entities.
+
+The example uses `RViz <https://github.com/ros2/rviz>`__ for visualization.
+RViz is the default visualization tool when Isaac for Manipulation is running on the same computer
+that is displaying the visualization.
+`Foxglove <https://foxglove.dev/>`__ is recommended when visualizing a reconstruction streamed from 
+a remote machine. However, that is not officially supported for the sim workflows.
+
+Prerequisites
+-------------
+
+- Follow the setup instructions in :doc:`Setup for Simulated Robot with Isaac for Manipulation in Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim>`.
+- For improved performance in the scene execution, follow the instructions in :ref:`Optimization for Physics Scene in Isaac for Manipulation <isaac_sim_scene_speed_up>`.
+
+
+Tutorial
+--------
+
+.. include:: _snippets/isaac_sim_launch.rst
+
+Run the Object Following Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Configure the workflow based on your chosen perception model:
+
+   .. tabs::
+      .. tab:: Object Following using FoundationPose
+
+         #. Change ``workflow_type`` in the configuration file to ``OBJECT_FOLLOWING``. The configuration file path is:
+
+            .. code:: bash
+
+               ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params/sim_launch_params.yaml
+
+            The ``manipulator_workflow_config`` parameter points to the manipulator configuration file. 
+            Please refer to :ref:`Create Manipulator Configuration File section <create-manipulator-configuration-file>`.
+
+         #. Change ``pose_estimation_type`` in the configuration file to ``FOUNDATION_POSE``
+
+      .. tab:: Object Following using DOPE
+
+         #. Change ``workflow_type`` in the configuration file to ``OBJECT_FOLLOWING``. The configuration file path is:
+
+            .. code:: bash
+
+               ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params/sim_launch_params.yaml
+
+            The ``manipulator_workflow_config`` parameter points to the manipulator configuration file. 
+            Please refer to :ref:`Create Manipulator Configuration File section <create-manipulator-configuration-file>`.
+
+         #. Change ``pose_estimation_type`` in the configuration file to ``DOPE``
+
+         #. Select the ``detections`` topic in the ``Pose Estimate`` tab in RViz to see the DOPE pose estimation results in the 3D viewport.
+
+            * If your output path is different from the default, run the command in the next step with the appropriate paths to override the paths to DOPE assets.
+            * The DOPE-specific parameters are prefixed by ``dope_``.
+
+#. Launch the object following example:
+
+   .. code:: bash
+
+      ros2 launch isaac_manipulator_bringup workflows.launch.py \
+         manipulator_workflow_config:=$(ros2 pkg prefix --share isaac_manipulator_bringup)/params/sim_launch_params.yaml
+
+   The ``manipulator_workflow_config`` parameter points to the manipulator configuration file. 
+   Please refer to :ref:`Create Manipulator Configuration File section <create-manipulator-configuration-file>`.
+
+Next Steps
+----------
+
+- Try the :doc:`Pick and Place tutorial <tutorial_isaac_sim_pick_and_place>` for complete manipulation workflows
+- Try the :doc:`Pose to Pose tutorial <tutorial_isaac_sim_pose_to_pose>` for simpler motion planning
+- Learn more about :doc:`Isaac for Manipulation Reference Architecture </reference_workflows/isaac_for_manipulation/reference_architecture>`

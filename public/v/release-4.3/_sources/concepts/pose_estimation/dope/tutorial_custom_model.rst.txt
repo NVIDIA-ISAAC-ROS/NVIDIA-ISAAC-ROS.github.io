@@ -1,0 +1,53 @@
+Training your own DOPE model
+============================
+
+Overview
+------------
+
+The DOPE network architecture is intended to be trained on objects of a
+specific class, which means that using DOPE for pose estimation of a
+custom object class requires training a custom model for that class.
+
+`NVIDIA Isaac Sim <https://developer.nvidia.com/isaac-sim>`__ offers a
+convenient workflow for training a custom DOPE model using synthetic
+data generation (SDG).
+
+Tutorial Walkthrough
+--------------------
+
+#. Clone the `Isaac Sim DOPE Training
+   repository <https://github.com/NVlabs/Deep_Object_Pose/tree/master/train>`__
+   and follow the training instructions to prepare a custom DOPE model.
+#. Using the `Isaac Sim DOPE inference
+   script <https://github.com/NVlabs/Deep_Object_Pose/tree/master/inference>`__,
+   test the custom DOPE model's inference capability and ensure that the
+   quality is acceptable for your use case.
+
+#. Complete until ``Run Launch File`` of the quickstart :doc:`here </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`.
+
+#. Move the prepared ``.pth`` model output from the Isaac Sim
+   DOPE Training script into the ``${ISAAC_ROS_WS}/isaac_ros_assets/models/dope`` path inside the Isaac ROS environment.
+
+   .. code:: bash
+      
+      docker cp custom_model.pth isaac_ros_dev-x86_64-container:${ISAAC_ROS_WS}/isaac_ros_assets/models/dope
+
+#. Continuing with the DOPE quickstart's ``Run Launch File`` section, run the ``dope_converter.py`` script with the custom
+   model instead:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_dope dope_converter.py --format onnx \
+         --input ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/custom_model.pth --output ${ISAAC_ROS_WS}/models/dope/custom_model.onnx --row 720 --col 1280
+
+#. Next, launch the ROS 2 launch file with the custom model.
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_dope isaac_ros_dope_tensor_rt.launch.py model_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/custom_model.onnx engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/custom_model.plan
+
+#. Bring up a data source containing your custom object class, such as a camera feed or a rosbag with the custom object.
+
+   The data source should publish to the ``/image`` and ``/camera_info`` topics, and it should provide the appropriate ``tf`` frame representing the optical frame of the camera.
+
+#. Continue with the rest of the quickstart. You should now be able to detect poses of custom objects.

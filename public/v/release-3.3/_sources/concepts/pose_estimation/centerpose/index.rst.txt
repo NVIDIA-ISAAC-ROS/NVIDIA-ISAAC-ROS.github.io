@@ -1,0 +1,26 @@
+CenterPose
+=========================
+
+The `CenterPose <https://github.com/NVlabs/CenterPose>`__ DNN performs
+object detection on the image, generates 2D keypoints for the object,
+estimates the 6-DoF pose up to a scale, and regresses relative 3D bounding cuboid
+dimensions. This is performed on a known object class without knowing
+the instance-for example, detecting a chair without having trained on
+images of all chairs. NVLabs has provided pre-trained models for the
+CenterPose model; however, as with the DOPE model, it needs to be
+trained with another dataset targeting objects that are specific to your
+application.
+
+Pose estimation is a compute-intensive task and not performed at the
+frame rate of an input camera. To make efficient use of resources,
+object pose is estimated for a single frame and used as an input to
+navigation. Additional object pose estimates are computed to further
+refine navigation in progress at a lower frequency than the input rate
+of a typical camera.
+
+Repositories and Packages
+-------------------------
+
+The Isaac ROS implementations of this technology are available here:
+
+* :doc:`Isaac ROS Pose Estimation using Centerpose </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index>`

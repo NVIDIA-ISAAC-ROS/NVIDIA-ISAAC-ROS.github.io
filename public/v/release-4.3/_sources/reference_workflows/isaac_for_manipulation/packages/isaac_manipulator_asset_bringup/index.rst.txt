@@ -1,0 +1,500 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_manipulator> <isaac_manipulator_asset_bringup>`
+
+Overview
+--------
+
+|package_name| is an asset management and model setup utility package for Isaac for Manipulation that automates the download, conversion, and configuration of deep learning models and test assets required for perception-based manipulation workflows. This package simplifies the setup process by providing a unified interface for preparing all necessary models and sample objects.
+
+The package is automatically invoked during the build process when the ``MANIPULATOR_INSTALL_ASSETS`` environment variable is set, ensuring that all required perception models and assets are ready for use in Isaac for Manipulation tutorials and workflows.
+
+Key Features
+------------
+
+- **Automated Model Download**: Downloads deep learning models from NGC, Google Drive, and other sources
+- **Model Conversion**: Converts PyTorch models to ONNX format for inference on x86 platforms
+- **Asset Management**: Organizes downloaded models and assets in the Isaac ROS workspace
+- **Multi-Model Support**: Handles setup for FoundationPose, DOPE, Segment Anything, and Gear Assembly models
+- **Selective Setup**: Allows users to download specific models or all models at once
+- **Force Re-download**: Option to force re-download and overwrite existing models
+- **Directory Structure**: Automatically creates and organizes the ``isaac_ros_assets`` directory structure
+
+Supported Models and Assets
+----------------------------
+
+The package supports setup for the following model types:
+
+FoundationPose
+~~~~~~~~~~~~~~
+
+**Purpose**: 6DOF object pose estimation for manipulation tasks
+
+**Downloads**:
+
+- Mac and Cheese sample object assets (mesh and texture files)
+- Test assets for FoundationPose quickstart
+
+**Requirements**:
+
+- FoundationPose models (``refine_trt_engine.plan``, ``score_trt_engine.plan``)
+- SyntheticaDETR models (``sdetr_grasp.plan``)
+
+**Location**: ``${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/``
+
+DOPE
+~~~~
+
+**Purpose**: Deep Object Pose Estimation for object tracking
+
+**Downloads**:
+
+- ``soup_60.pth``: Pre-trained DOPE model for soup can detection
+
+**Source**: Google Drive (via ``gdown``)
+
+**Location**: ``${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/``
+
+Segment Anything (SAM)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+**Purpose**: Object segmentation for Pick and Place workflows
+
+**Downloads**:
+
+- ``vit_b.pth``: ``ViT-B`` SAM model checkpoint from Meta AI
+- SAM quickstart assets and configuration files
+
+**Conversion**: Converts PyTorch model to ONNX format on x86 platforms
+
+**Location**: 
+
+- Assets: ``${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything/``
+- Model: ``${ISAAC_ROS_WS}/isaac_ros_assets/models/segment_anything/``
+
+Gear Assembly (UR DNN Policy)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Purpose**: Reinforcement learning policy for precision gear insertion
+
+**Downloads**:
+
+- UR DNN Policy assets for Gear Assembly tutorial
+- Pre-trained RL models for gear insertion tasks
+
+**Location**: ``${ISAAC_ROS_WS}/isaac_ros_assets/isaac_manipulator_ur_dnn_policy/``
+
+Package Components
+------------------
+
+Script: ``setup_perception_models.py``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The main executable script that handles all model setup operations.
+
+**Key Classes**
+
+``ModelType`` ``Enum``
+^^^^^^^^^^^^^^^^^^^^^^
+
+Defines supported model types:
+
+- ``FOUNDATIONPOSE``: FoundationPose model assets
+- ``DOPE``: DOPE model for pose estimation
+- ``SEGMENT_ANYTHING``: Segment Anything model and assets
+- ``GEAR_ASSEMBLY``: UR DNN Policy assets for gear assembly
+- ``ALL``: All available models
+
+``ModelSetup`` Class
+^^^^^^^^^^^^^^^^^^^^
+
+Main class that orchestrates model download, extraction, and conversion.
+
+**Key Methods**:
+
+.. code:: python
+
+   def __init__(
+       self,
+       workspace_path: str,
+       verbose: bool = False,
+       force: bool = False
+   )
+
+Initializes the model setup tool with workspace path and creates necessary directories.
+
+.. code:: python
+
+   def setup_foundation_pose() -> bool
+
+Downloads FoundationPose quickstart assets including Mac and Cheese sample object.
+
+.. code:: python
+
+   def setup_dope() -> bool
+
+Downloads DOPE model weights using ``gdown`` from Google Drive.
+
+.. code:: python
+
+   def setup_segment_anything() -> bool
+
+Downloads SAM model and converts to ONNX format on x86 platforms.
+
+.. code:: python
+
+   def setup_sam_model() -> bool
+
+Handles SAM model download and ONNX conversion with platform detection.
+
+.. code:: python
+
+   def setup_gear_assembly() -> bool
+
+Downloads UR DNN Policy assets for gear assembly workflows.
+
+.. code:: python
+
+   def setup_models(model_types: List[ModelType]) -> bool
+
+Main entry point that processes all requested model types.
+
+Command-Line Interface
+----------------------
+
+The script provides a comprehensive CLI for model setup:
+
+.. code:: bash
+
+   ros2 run isaac_manipulator_asset_bringup setup_perception_models.py [OPTIONS]
+
+Command-Line Arguments
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Argument
+     - Type
+     - Default
+     - Description
+
+   * - ``--workspace``
+     - string
+     - ``$ISAAC_ROS_WS``
+     - Path to the Isaac ROS workspace
+
+   * - ``--models``
+     - string[]
+     - ``['all']``
+     - Models to set up (``foundationpose``, ``dope``, ``segment_anything``, ``gear_assembly``, ``all``)
+
+   * - ``--skip-conversion``
+     - flag
+     - ``False``
+     - Skip TensorRT conversion steps
+
+   * - ``--verbose``
+     - flag
+     - ``False``
+     - Enable verbose output
+
+   * - ``--show-structure``
+     - flag
+     - ``False``
+     - Show the directory structure after setup
+
+   * - ``--force``
+     - flag
+     - ``False``
+     - Force re-download of models
+
+Environment Variables
+---------------------
+
+.. list-table::
+   :header-rows: 1
+
+   * - Variable
+     - Description
+     - Default
+
+   * - ``MANIPULATOR_INSTALL_ASSETS``
+     - Enable asset installation during build
+     - Not set
+
+   * - ``ISAAC_ROS_WS``
+     - Isaac ROS workspace path
+     - Required
+
+   * - ``ISAAC_ROS_ASSET_MODEL_PATH``
+     - Alternative path for determining workspace location
+     - Optional
+
+Directory Structure
+-------------------
+
+The package creates and manages the following directory structure:
+
+.. code:: text
+
+   ${ISAAC_ROS_WS}/
+   └── isaac_ros_assets/
+       ├── isaac_ros_foundationpose/
+       │   └── Mac_and_cheese_0_1/
+       │       ├── Mac_and_cheese_0_1.obj
+       │       └── texture_map.png
+       ├── isaac_ros_segment_anything/
+       │   ├── vit_b.pth
+       │   └── sam_config_onnx.pbtxt
+       ├── isaac_manipulator_ur_dnn_policy/
+       │   └── [RL policy assets]
+       └── models/
+           ├── foundationpose/
+           │   ├── refine_trt_engine.plan
+           │   └── score_trt_engine.plan
+           ├── synthetica_detr/
+           │   └── sdetr_grasp.plan
+           ├── dope/
+           │   └── soup_60.pth
+           └── segment_anything/
+               ├── 1/
+               │   └── model.onnx
+               └── config.pbtxt
+
+Usage Examples
+--------------
+
+Example 1: Automatic Setup During Build
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The most common usage is during the build process:
+
+.. code:: bash
+
+   # Enable asset installation
+   export MANIPULATOR_INSTALL_ASSETS=1
+   
+   # Build the package (automatically downloads models)
+   cd ${ISAAC_ROS_WS}
+   colcon build --packages-up-to isaac_manipulator_asset_bringup
+
+Example 2: Manual Setup for All Models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+   # Set the environment variable
+   export MANIPULATOR_INSTALL_ASSETS=1
+   
+   # Run the setup script for all models
+   ros2 run isaac_manipulator_asset_bringup setup_perception_models.py \
+      --models all \
+      --show-structure
+
+Example 3: Setup Specific Models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+   # Download only FoundationPose and Segment Anything models
+   export MANIPULATOR_INSTALL_ASSETS=1
+   ros2 run isaac_manipulator_asset_bringup setup_perception_models.py \
+      --models foundationpose segment_anything \
+      --verbose
+
+Example 4: Force Re-download
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+   # Force re-download and overwrite existing models
+   export MANIPULATOR_INSTALL_ASSETS=1
+   ros2 run isaac_manipulator_asset_bringup setup_perception_models.py \
+      --models all \
+      --force
+
+Example 5: Setup for Gear Assembly
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+   # Download only gear assembly assets
+   export MANIPULATOR_INSTALL_ASSETS=1
+   ros2 run isaac_manipulator_asset_bringup setup_perception_models.py \
+      --models gear_assembly segment_anything
+
+Integration with Isaac for Manipulation Tutorials
+--------------------------------------------------
+
+This package is referenced in all Isaac for Manipulation tutorials that require perception models:
+
+Pick and Place Tutorial
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The Pick and Place tutorial requires FoundationPose and SyntheticaDETR models:
+
+.. code:: bash
+
+   export MANIPULATOR_INSTALL_ASSETS=1
+   colcon build --packages-up-to isaac_manipulator_asset_bringup
+
+This downloads the Mac and Cheese sample object and verifies that perception models are available.
+
+Gear Assembly Tutorial
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The Gear Assembly tutorial additionally requires UR DNN Policy assets:
+
+.. code:: bash
+
+   export MANIPULATOR_INSTALL_ASSETS=1
+   colcon build --packages-up-to isaac_manipulator_asset_bringup
+
+This ensures all models including reinforcement learning policies are available.
+
+Isaac Sim Tutorials
+~~~~~~~~~~~~~~~~~~~~
+
+Isaac Sim tutorials use the same setup process to ensure consistent model availability:
+
+.. code:: bash
+
+   export MANIPULATOR_INSTALL_ASSETS=1
+   export FOUNDATIONSTEREO_MODEL_RES=low_res
+   colcon build --packages-up-to isaac_manipulator_asset_bringup
+
+Platform-Specific Behavior
+---------------------------
+
+x86 Platforms
+~~~~~~~~~~~~~
+
+On x86 platforms (x86_64, AMD64), the script performs ONNX conversion for SAM models:
+
+- Downloads PyTorch checkpoint
+- Converts to ONNX format using ``ros2 run isaac_ros_segment_anything torch_to_onnx.py``
+- Saves ONNX model for TensorRT inference
+
+ARM Platforms (Jetson)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+On ARM platforms (Jetson devices):
+
+- Downloads PyTorch checkpoint for reference
+- Skips ONNX conversion (handled differently for Jetson)- this is **not** supported for Jetson, the user is expected to do the manual ``onnx`` conversion using documentation specific to each package and then copy over their model assets to the correct folders. The ONNX conversion is required for the ``GROUNDING_DINO``, ``SEGMENT_ANYTHING`` and ``SEGMENT_ANYTHING2`` models.
+- Uses platform-optimized inference paths
+
+Troubleshooting
+---------------
+
+Models Not Found After Build
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Issue**: Models are not downloaded during build.
+
+**Solution**: Ensure ``MANIPULATOR_INSTALL_ASSETS=1`` is set before building:
+
+.. code:: bash
+
+   export MANIPULATOR_INSTALL_ASSETS=1
+   colcon build --packages-up-to isaac_manipulator_asset_bringup
+
+Download Failures
+~~~~~~~~~~~~~~~~~
+
+**Issue**: Network errors or download failures.
+
+**Solution**: Use ``--force`` to retry downloads:
+
+.. code:: bash
+
+   export MANIPULATOR_INSTALL_ASSETS=1
+   ros2 run isaac_manipulator_asset_bringup setup_perception_models.py \
+      --force --verbose
+
+ONNX Conversion Fails
+~~~~~~~~~~~~~~~~~~~~~
+
+**Issue**: SAM model conversion to ONNX fails.
+
+**Solution**: Ensure ``segment_anything`` package is installed:
+
+.. code:: bash
+
+   pip install --break-system-packages git+https://github.com/facebookresearch/segment-anything.git
+
+Missing ``gdown`` Package
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Issue**: DOPE model download fails due to missing ``gdown``.
+
+**Solution**: The script automatically installs ``gdown``, but if it fails:
+
+.. code:: bash
+
+   pip install --break-system-packages gdown
+
+Dependencies
+------------
+
+**Runtime Dependencies**
+
+- ``isaac_ros_dope``: DOPE perception pipeline
+- ``isaac_common_py``: Isaac common Python utilities
+- ``python3-gdown``: Google Drive file download utility
+
+**Build Dependencies**
+
+- ``isaac_ros_common``: Isaac ROS common infrastructure
+- ``isaac_ros_ess_models_install``: ESS depth estimation models
+- ``isaac_ros_foundationpose_models_install``: FoundationPose models
+- ``isaac_ros_foundationstereo_models_install``: FoundationStereo models
+- ``isaac_ros_grounding_dino_models_install``: Grounding DINO models
+- ``isaac_ros_rtdetr_models_install``: RT-DETR models
+- ``isaac_ros_segment_anything``: Segment Anything model management
+
+**Python Dependencies** (via ``requirements.txt``)
+
+- ``torchvision==0.16.1+cu121``: PyTorch vision utilities
+- ``gdown==5.2.0``: Google Drive download utility
+
+Implementation Notes
+--------------------
+
+**Design Philosophy**
+
+The package follows these design principles:
+
+- **Idempotent Operations**: Re-running setup is safe and skips existing files
+- **Logging and Verbosity**: Clear logging with optional verbose mode for debugging
+- **Error Handling**: Graceful failure handling with informative error messages
+- **Platform Detection**: Automatic platform detection for optimal setup paths
+
+**Performance Considerations**
+
+- Large files are downloaded with progress tracking
+- Extraction happens in-place to minimize disk usage
+- Tarballs are removed after extraction to save space
+- Existing files are skipped unless ``--force`` is used
+
+**Extensibility**
+
+To add new model types:
+
+1. Add new enum value to ``ModelType``
+2. Implement setup method (e.g., ``setup_new_model()``)
+3. Add case in ``setup_models()`` method
+4. Update documentation and CLI help
+
+See Also
+--------
+
+- :doc:`Isaac for Manipulation Pick and Place Tutorial </reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place>`
+- :doc:`Tutorial for deploying policies trained in Isaac Lab </reference_workflows/isaac_for_manipulation/tutorials/tutorial_sim_to_real>`
+- :doc:`Isaac ROS FoundationPose </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index>`
+- :doc:`Isaac ROS Segment Anything </repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_segment_anything/index>`
+
+.. |package_name| replace:: ``isaac_manipulator_asset_bringup``

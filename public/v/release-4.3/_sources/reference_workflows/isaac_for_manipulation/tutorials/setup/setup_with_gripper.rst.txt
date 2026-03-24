@@ -1,0 +1,105 @@
+===========================================
+Set Up Hardware and Software for Real Robot
+===========================================
+
+Overview
+--------
+
+This tutorial walks through the process of setting up the hardware and software for a real robot with Isaac for Manipulation.
+
+
+Set Up UR Robot
+~~~~~~~~~~~~~~~
+
+#. Refer to the :doc:`Set Up UR Robot section </robots/universal_robots/index>`.
+
+Set Up Cameras for Robot
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Refer to the :ref:`Set Up Cameras for Robot section <set-up-cameras-for-robot>`.
+
+.. note::
+
+   Multiple cameras can help reduce occlusion and noise in the scene and therefore increase the quality and completeness of the 3D reconstruction used for collision avoidance.
+
+   While the Pick and Place workflow with multiple cameras runs scene reconstruction for obstacle-aware planning on all cameras, object detection and pose estimation are only enabled on the camera with the lowest index.
+
+   Reflective or smooth, featureless surfaces in the environment may increase noise in the depth estimation.
+
+   Use of multiple cameras is recommended.
+
+   Mixing stereo camera types is untested but may work with modifications to the launch files.
+
+.. warning::
+
+   The obstacle avoidance behavior demonstrated in this tutorial is not a safety function and does not
+   comply with any national or international functional safety standards. When testing obstacle avoidance
+   behavior, do not use human limbs or other living entities.
+
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build Isaac for Manipulation Packages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../_snippets/isaac_manipulator_build_instructions.rst
+
+.. _set-up-perception-deep-learning-models:
+
+Set Up Perception Deep Learning Models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../_snippets/isaac_manipulator_perception_models.rst
+
+Build UR Drivers from source
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../_snippets/isaac_manipulator_ur_drivers.rst
+
+Build Robotiq Gripper Dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../_snippets/isaac_manipulator_robotiq_gripper.rst
+
+Configure Robotiq Gripper
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Before running the gear assembly or pick and place workflow, please make sure to follow the instructions in setting up the ``UR`` robot and the gripper.
+
+#. You will have to tweak the Tool I/O settings to ``User`` mode as shown below- especially if you see this error message:
+
+   .. code:: bash
+
+      Failed to communicate with the Robotiq gripper
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/polyscope_2.jpg>`
+   :align: center
+
+.. note::
+
+   If there are any issues with communication of the robot with the Jetson unit, please take a look at :ref:`this section <why-does-my-robot-driver-not-launch-correctly>`.
+   Please run the :ref:`Driver and Hardware Tests <driver_and_hardware_tests>` to make sure your robot drivers are in a good state.
+
+
+Run Pre-Flight Tests on Real Robot (Optional but highly recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To verify that you have setup Isaac for Manipulation correctly, run the following command:
+
+.. code:: bash
+
+   export ENABLE_MANIPULATOR_TESTING=on_robot
+   export ISAAC_MANIPULATOR_TEST_CONFIG=<config_file_path_for_your_robot>
+   python3 -m pytest ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/test
+
+.. note::
+
+   One can also use ``colcon test --packages-select isaac_manipulator_bringup`` to run the tests.
+   However, ``pytest`` has a better output and makes it easier to view status and progress of the tests.
+   If these tests fail, please look at :doc:`Isaac for Manipulation Testing Guide </reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator>` for more information.
+   It is recommended to run the tests manually using ``launch_test`` and then manually inspecting the results.
+
+This will run a series of tests to verify that Isaac for Manipulation is working correctly.

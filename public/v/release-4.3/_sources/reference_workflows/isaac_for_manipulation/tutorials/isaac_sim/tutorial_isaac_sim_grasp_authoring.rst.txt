@@ -1,0 +1,90 @@
+===============
+Grasp Authoring
+===============
+
+Overview
+--------
+
+This tutorial demonstrates how to author custom grasps for objects using Isaac Sim's Grasp Editor. 
+Custom grasps allow you to define specific grasp poses that are optimized for your gripper and objects, 
+improving the reliability and success rate of pick and place operations.
+
+The Grasp Editor provides a visual interface for defining and testing grasps directly in Isaac Sim, 
+which can then be used with Isaac for Manipulation workflows.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/grasp_author_scene.png>`
+    :width: 100%
+    :alt: Isaac Sim scene used for authoring grasps for the Robotiq 2F-140 or 2F-85 grippers with the "soup can" or "mac and cheese" objects
+
+
+Author Custom Grasps
+^^^^^^^^^^^^^^^^^^^^^
+#. Set up your development environment by following the instructions in :doc:`getting started </getting_started/index>`.
+
+#. Load the grasp authoring scene in Isaac Sim and hit **Play**.
+
+   .. code:: bash
+      
+      https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Samples/ROS2/Scenario/isaac_manipulator_grasp_authoring.usd
+
+   This scene provides a setup for authoring grasps with the Robotiq 2F-140 or 2F-85 grippers 
+   for objects like the "soup can" or "mac and cheese" box.
+
+#. Follow the official `Isaac Sim Grasp Editor tutorial <https://docs.isaacsim.omniverse.nvidia.com/4.5.0/robot_setup/grasp_editor.html>`__ 
+   to create and test grasps using the Grasp Editor interface.
+
+   When configuring the Grasp Editor:
+
+   * **Gripper frame**: Set to ``robotiq_base_link``
+   * **Rigid body frame**: Set to ``soup_can`` (for the soup can object) or the appropriate object name for your target object
+
+#. Save the generated grasp file. The Grasp Editor will export the grasps in a format compatible with Isaac for Manipulation.
+
+#. Note the path to your saved grasp file, as you will need to reference it in the configuration file.
+
+Use Custom Grasps in Pick and Place
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+After authoring your grasps, you can use them in pick and place workflows:
+
+#. Open the Isaac for Manipulation configuration file:
+
+   .. code:: bash
+
+      ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params/sim_launch_params.yaml
+
+#. Override the ``grasp_file_path`` parameter in the configuration file to point to your custom grasp file:
+
+   .. code:: yaml
+
+      grasp_file_path: /path/to/your/custom_grasps.yaml
+
+#. Launch your pick and place workflow as described in the :doc:`Pick and Place tutorial <tutorial_isaac_sim_pick_and_place>`.
+
+   The system will now use your custom grasps instead of the default ones.
+
+Tips for Grasp Authoring
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* **Test multiple grasps**: Author several grasp poses for each object to provide fallback options if one grasp fails
+* **Consider approach angles**: Define grasps from different approach angles to handle various object orientations
+* **Validate in simulation**: Test your grasps thoroughly in simulation before deploying to a real robot
+* **Account for gripper constraints**: Ensure grasps respect the gripper's physical constraints and workspace limits
+* **Object-specific grasps**: Create separate grasp files for different objects to optimize for each object's geometry
+
+Supported Grippers
+~~~~~~~~~~~~~~~~~~
+
+This tutorial supports the following grippers:
+
+* Robotiq 2F-140
+* Robotiq 2F-85
+
+The grasp authoring scene can be adapted for other grippers by modifying the gripper model in the USD file.
+
+Next Steps
+----------
+
+- Apply your custom grasps in the :doc:`Pick and Place tutorial <tutorial_isaac_sim_pick_and_place>`
+- Learn more about :doc:`Isaac for Manipulation Reference Architecture </reference_workflows/isaac_for_manipulation/reference_architecture>`
+- Explore the official `Isaac Sim Grasp Editor documentation <https://docs.isaacsim.omniverse.nvidia.com/4.5.0/robot_setup/grasp_editor.html>`__

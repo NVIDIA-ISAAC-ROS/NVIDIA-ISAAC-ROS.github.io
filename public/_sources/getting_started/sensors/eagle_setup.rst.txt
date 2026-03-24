@@ -1,0 +1,156 @@
+========================================
+Isaac ROS Eagle CoE Stereo Camera Setup
+========================================
+
+The `Leopard Imaging Eagle VB1940 <https://leopardimaging.com/product-category/depth-sensing/stereoscopic-cameras/li-vb1940-stxxx-10gige/>`__
+is a stereo Camera-over-Ethernet (CoE) camera supported by NVIDIA's Sensor Interface Processing Library (SIPL) framework.
+
+For more information on the CoE connectivity and the SIPL framework, see the
+`Camera-over-Ethernet Overview <https://docs.nvidia.com/jetson/archives/r38.4/DeveloperGuide/SD/CameraDevelopment/CoECameraDevelopment/SIPL-for-L4T/CoE-Solution-Overview.html>`__.
+
+Host System Compatibility
+--------------------------
+
+Only **Jetson AGX Thor** on **JetPack 7.1.0** (R38.4.0) with the **Leopard Imaging Eagle VB1940** camera is validated.
+
+Other host systems supported by Holoscan Sensor Bridge may also be compatible but are not validated.
+To find a list of other supported systems, see the `Holoscan Sensor Bridge setup <https://docs.nvidia.com/holoscan/sensor-bridge/latest/setup.html>`__ page.
+
+Hardware Requirements
+---------------------
+
+* **Jetson AGX Thor Developer Kit** with JetPack 7.1 installed.
+* **Leopard Imaging Eagle VB1940 stereo camera** (``LI-VB1940-STXXX-10GIGE``):
+  See `Leopard Imaging website <https://leopardimaging.com/product-category/depth-sensing/stereoscopic-cameras/li-vb1940-stxxx-10gige/>`__ for available models.
+* **RJ45 Ethernet cable**: Cat 6 or better.
+* **QSFP+ to SFP+ adapter (QSA)**: Mellanox MAM1Q00A-QSA-SP or compatible adapters.
+* **10GBASE-T SFP+ transceiver** (copper RJ45 to SFP+): NVIDIA/Mellanox compatible transceiver.
+
+.. note::
+
+  Power over Ethernet (PoE) models of the camera require an external power supply because the Thor MGBE port does not provide PoE.
+  Use a PoE++ injector to bridge the Thor MGBE port to the camera's PoE port and provide power and data over Ethernet.
+
+Setup Instructions
+------------------
+
+This tutorial assumes you have completed the instructions in
+:doc:`Developer Environment Setup </getting_started/index>`.
+
+#. Assemble and connect the hardware:
+
+   a. Insert the QSA adapter into the MGBE QSFP28 port on the Thor AGX board until it clicks into place.
+   b. Insert the RJ45 to SFP+ transceiver into the QSA adapter.
+   c. If using a PoE camera variant: Connect the RJ45 Ethernet cable from the transceiver's RJ45 port to
+      the PoE++ injector data port, then from the PoE++ injector PoE port to the PoE camera.
+
+#. Enable the network interface (assumes camera IP address ``192.168.0.2``):
+
+   .. code:: bash
+
+      export EN0=mgbe0_0
+      sudo nmcli con add con-name hololink-$EN0 ifname $EN0 type ethernet ip4 192.168.0.101/24
+      sudo nmcli connection modify hololink-$EN0 +ipv4.routes 192.168.0.2/32
+      sudo nmcli connection up hololink-$EN0
+
+   Ensure the network interface is up and the speed is 10000 Mb/s:
+
+   .. code:: bash
+
+      ip addr show $EN0
+      ethtool $EN0 | grep Speed
+      ethtool $EN0 | grep Link
+
+#. Clone the `Holoscan Sensor Bridge <https://github.com/nvidia-holoscan/holoscan-sensor-bridge>`__ repository.
+   For JetPack 7.1.0, use the ``release-2.5.0`` branch.
+
+   .. code:: bash
+
+      export HOLOSCAN_BRANCH=2.5.0
+      git clone --branch release-2.5.0 --depth 1 https://github.com/nvidia-holoscan/holoscan-sensor-bridge.git
+      cd holoscan-sensor-bridge
+
+#. Build the demo container with the ``--igpu`` flag. This is the only valid
+   Hololink container GPU configuration for Thor AGX hardware:
+
+   .. code:: bash
+
+      sh docker/build.sh --igpu
+
+   This creates the Docker image ``hololink-demo:<branch_name>``.
+
+   .. note::
+
+      * **First build:** 5--10 minutes (downloads Holoscan container from NGC).
+      * **Subsequent builds:** Approximately 30 seconds (uses Docker layer caching).
+
+#. Retrieve the MAC address (``mac_id``) and IP address (``ip_address``) from the
+   ``hololink-enumerate`` output. These values are required to target the camera.
+
+   Run the enumerate tool:
+
+   .. code:: bash
+
+      docker run --rm --net host --privileged \
+        hololink-demo:$HOLOSCAN_BRANCH \
+        timeout 3 hololink-enumerate -i $EN0
+
+   Example expected output:
+
+   .. code:: text
+
+      mac_id=8C:1F:64:6D:70:9B hsb_ip_version=0x2510 fpga_crc=0x0 ip_address=192.168.0.2 fpga_uuid=f1627640-b4dc-48af-a360-c55b09b3d230 serial_number=ffffffffffffff interface=mgbe0_0 board=Leopard Eagle
+
+   This confirms the camera is reachable through the ``mgbe0_0`` network interface at ``192.168.0.2``.
+
+#. Verify that the HSB board is running the latest firmware. Check the ``hsb_ip_version`` field in the
+   ``hololink-enumerate`` output in the previous step. The expected version for the Eagle camera with JetPack 7.1.0 is ``0x2510``.
+
+   If a firmware update is required, follow the instructions at
+   `Holoscan Sensor Bridge FPGA Firmware Update — Leopard Imaging VB1940 Eagle Camera
+   <https://docs.nvidia.com/holoscan/sensor-bridge/latest/sensor_bridge_firmware_setup.html#leopard-imaging-vb1940-eagle-camera>`__.
+
+#. Extract factory calibration data from the camera's EEPROM. This data populates
+   the ``camera_info`` topics published by the SIPL ROS camera node and is required by
+   downstream perception tasks such as image rectification and stereo depth estimation.
+   The calibration data is unique to each camera and should be extracted for each camera.
+
+   .. include:: _snippets/eagle_eeprom_calibration.rst
+
+Visualize the Camera Streams
+----------------------------
+
+Use the ``isaac_ros_sipl_camera`` package to publish camera streams over ROS 2.
+Refer to the :doc:`Isaac ROS SIPL Camera </repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index>` documentation for instructions on how to install, launch the camera driver nodes, and visualize the camera streams.
+
+
+Troubleshooting
+---------------
+
+Camera Not Detected
+^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+Running ``hololink-enumerate`` returns nothing or times out.
+
+Solution
+""""""""
+
+#. If using a PoE camera variant, make sure you used a PoE++ injector, verify that it is powered on, and check that all physical cable connections are secure.
+
+#. Confirm the network interface ``mgbe0_0`` is configured correctly, the speed is 10 Gbps, and the link is up:
+
+   .. code:: bash
+
+      ip addr show mgbe0_0
+      ethtool mgbe0_0 | grep Speed
+      ethtool mgbe0_0 | grep Link
+
+   If any of these values are incorrect, check the transceiver and QSA adapter seating, and check all physical connections are secure.
+
+#. If the issue persists, try powering off and on the camera or the Jetson.
+
+#. If the issue persists, see the `Holoscan Sensor Bridge Troubleshooting guide
+   <https://docs.nvidia.com/holoscan/sensor-bridge/latest/troubleshooting.html>`__ for additional diagnostics.

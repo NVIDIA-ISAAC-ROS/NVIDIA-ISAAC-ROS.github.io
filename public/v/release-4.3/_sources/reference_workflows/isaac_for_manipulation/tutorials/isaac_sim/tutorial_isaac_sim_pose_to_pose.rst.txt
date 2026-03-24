@@ -1,0 +1,74 @@
+=====================
+Pose to Pose Planning
+=====================
+
+Overview
+--------
+
+This tutorial demonstrates obstacle-aware trajectory planning using Isaac for Manipulation and cuMotion in Isaac Sim. 
+The robot end effector moves between two predetermined poses, alternating between them while avoiding obstacles 
+detected in the workspace.
+
+This tutorial leverages the cuMotion plugin for MoveIt 2 provided by :ir_repo:`Isaac ROS cuMotion <isaac_ros_cumotion>`.
+
+We use rectified image streams from simulation and do not need to perform lens distortion and rectification 
+that would need to be performed on a real robot.
+
+We use perfect ground truth depth from the simulation which drives up accuracy and allows one to focus on 
+the software stack in a perfect albeit unrealistic environment.
+
+.. warning::
+
+   The obstacle avoidance behavior demonstrated in this tutorial is not a safety function and does not
+   comply with any national or international functional safety standards. When testing obstacle avoidance
+   behavior, do not use human limbs or other living entities.
+
+The example uses `RViz <https://github.com/ros2/rviz>`__ for visualization.
+RViz is the default visualization tool when Isaac for Manipulation is running on the same computer
+that is displaying the visualization.
+`Foxglove <https://foxglove.dev/>`__ is recommended when visualizing a reconstruction streamed from 
+a remote machine. However, that is not officially supported for the sim workflows.
+
+Prerequisites
+-------------
+
+- Follow the setup instructions in :doc:`Setup for Simulated Robot with Isaac for Manipulation in Isaac Sim </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim>`.
+- For improved performance in the scene execution, follow the instructions in :ref:`Optimization for Physics Scene in Isaac for Manipulation <isaac_sim_scene_speed_up>`.
+
+
+Tutorial
+--------
+
+.. include:: _snippets/isaac_sim_launch.rst
+
+Run the Pose to Pose Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Change ``workflow_type`` in the configuration file to ``POSE_TO_POSE``. The configuration file path is:
+
+   .. code:: bash
+
+      ${ISAAC_ROS_WS}/src/isaac_manipulator/isaac_manipulator_bringup/params/sim_launch_params.yaml
+
+   The ``manipulator_workflow_config`` parameter points to the manipulator configuration file. 
+   Please refer to :ref:`Create Manipulator Configuration File section <create-manipulator-configuration-file>`.
+
+#. Launch the pose to pose example with the following configuration file:
+
+   .. code:: bash
+
+      ros2 launch isaac_manipulator_bringup workflows.launch.py \
+         manipulator_workflow_config:=$(ros2 pkg prefix --share isaac_manipulator_bringup)/params/sim_launch_params.yaml
+
+Next Steps
+----------
+
+- Try the :doc:`Object Following tutorial <tutorial_isaac_sim_object_following>` to track moving objects
+- Try the :doc:`Pick and Place tutorial <tutorial_isaac_sim_pick_and_place>` for complete manipulation workflows
+- Learn more about :doc:`Isaac for Manipulation Reference Architecture </reference_workflows/isaac_for_manipulation/reference_architecture>`

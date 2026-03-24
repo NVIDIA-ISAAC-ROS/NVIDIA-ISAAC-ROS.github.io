@@ -1,0 +1,249 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_cumotion> <isaac_ros_cumotion>`
+
+Motion Generation
+=================
+
+The cuMotion motion generation workflow is exposed to MoveIt 2 via the
+``isaac_ros_cumotion_moveit`` planning plugin. See the corresponding
+:ref:`quickstart <repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index:Quickstart>`.
+In addition, this package also exposes motion generation and inverse kinematics capabilities via
+ROS 2 actions/services as documented below.
+
+Launching the cuMotion action server
+------------------------------------
+
+The action server is provided by the component
+``nvidia::isaac_ros::cumotion::CumotionPlanner`` and can be launched with:
+
+.. code:: bash
+
+   ros2 launch isaac_ros_cumotion isaac_ros_cumotion.launch.py \
+     cumotion_action_server.xrdf_file_path:=/path/to/ROBOT.xrdf \
+     cumotion_action_server.urdf_file_path:=/path/to/ROBOT.urdf
+
+API
+===
+
+CumotionActionServer
+--------------------
+
+ROS Parameters
+~~~~~~~~~~~~~~
+
+.. note::
+
+   The package ships a reference configuration in
+   ``isaac_ros_cumotion/params/isaac_ros_cumotion_params.yaml``. When launching via
+   ``isaac_ros_cumotion.launch.py``, those values are used as the default launch arguments.
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+   * - ``urdf_file_path``
+     - ``string``
+     - ``''``
+     - Path to the URDF file used to build the robot model.
+   * - ``xrdf_file_path``
+     - ``string``
+     - ``''``
+     - Path to the XRDF file used to configure cuMotion (e.g., joint limits, default configuration).
+   * - ``time_dilation_factor``
+     - ``double``
+     - ``0.5``
+     - Speed scaling factor used when re-timing planned trajectories.
+   * - ``interpolation_dt``
+     - ``double``
+     - ``0.025``
+     - Interpolation time step (seconds) used when sampling planned trajectories.
+   * - ``read_esdf_world``
+     - ``bool``
+     - ``false``
+     - If true, query an ESDF from :doc:`nvblox </repositories_and_packages/isaac_ros_nvblox/index>`.
+   * - ``update_esdf_on_request``
+     - ``bool``
+     - ``true``
+     - Whether ESDF updates are requested when planning (in addition to initial grid setup).
+   * - ``esdf_service_name``
+     - ``string``
+     - ``/nvblox_node/get_esdf_and_gradient``
+     - nvblox ESDF query service name.
+   * - ``publish_world_collision_spheres``
+     - ``bool``
+     - ``true``
+     - If true, publish world-collision spheres on the ``cumotion/collision_spheres`` topic. These spheres represent the robot body used for checking collisions against the environment.
+   * - ``publish_self_collision_spheres``
+     - ``bool``
+     - ``false``
+     - If true, publish self-collision spheres on the ``cumotion/collision_spheres`` topic. These spheres represent the robot body used for checking collisions between the robot's own links.
+   * - ``publish_cumotion_world_as_voxels``
+     - ``bool``
+     - ``false``
+     - If true, publish occupancy voxels for visualization.
+   * - ``publish_voxel_size``
+     - ``double``
+     - ``0.05``
+     - Voxel size (meters) used for voxel visualization.
+   * - ``max_publish_voxels``
+     - ``int``
+     - ``500000``
+     - Maximum number of voxels published for visualization.
+   * - ``add_ground_plane``
+     - ``bool``
+     - ``false``
+     - If true, add an implicit ground plane obstacle to the world.
+   * - ``ground_plane_size_x``
+     - ``double``
+     - ``2.0``
+     - Ground plane X dimension (meters).
+   * - ``ground_plane_size_y``
+     - ``double``
+     - ``2.0``
+     - Ground plane Y dimension (meters).
+   * - ``ground_plane_thickness``
+     - ``double``
+     - ``0.1``
+     - Ground plane thickness (meters).
+   * - ``ground_plane_z_offset``
+     - ``double``
+     - ``-0.05``
+     - Z offset below the robot base frame (meters).
+   * - ``joint_states_topic``
+     - ``string``
+     - ``/joint_states``
+     - Joint state topic used as the default start state.
+   * - ``enable_cumotion_debug_mode``
+     - ``bool``
+     - ``false``
+     - Enable more verbose cuMotion library logging.
+   * - ``override_moveit_scaling_factors``
+     - ``bool``
+     - ``false``
+     - If false, the node respects MoveIt's velocity/acceleration scaling factors in the request.
+
+   * - ``enable_cuda_mps``
+     - ``bool``
+     - ``false``
+     - Enable CUDA Multi-Process Service (MPS) configuration for the cuMotion process.
+   * - ``cuda_mps_pipe_directory``
+     - ``string``
+     - ``/workspaces/isaac_ros-dev/ros_ws/mps_pipe_dir``
+     - CUDA MPS pipe directory used when ``enable_cuda_mps`` is true.
+   * - ``cuda_mps_client_priority``
+     - ``int``
+     - ``0``
+     - CUDA MPS client priority used when ``enable_cuda_mps`` is true.
+   * - ``cuda_mps_active_thread_percentage``
+     - ``int``
+     - ``100``
+     - CUDA MPS active thread percentage used when ``enable_cuda_mps`` is true.
+
+   * - ``moveit_collision_objects_scene_file``
+     - ``string``
+     - ``''``
+     - Optional MoveIt scene file used by the static planning scene workflow.
+
+   * - ``static_scene_service_max_wait_attempts``
+     - ``int``
+     - ``30``
+     - Maximum number of 1-second wait attempts for the static planning scene service to become available.
+
+   * - ``static_planning_scene_service_name``
+     - ``string``
+     - ``publish_static_planning_scene``
+     - Service name the node calls at startup to request static collision objects.
+
+ROS Actions Advertised
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Action
+     - Interface
+     - Description
+   * - ``cumotion/move_group``
+     - `moveit_msgs/MoveGroup <https://github.com/moveit/moveit_msgs/blob/ros2/action/MoveGroup.action>`__
+     - MoveIt-compatible planning action used by the MoveIt cuMotion plugin.
+   * - ``cumotion/motion_plan``
+     - :ir_repo:`isaac_ros_cumotion_interfaces/MotionPlan <isaac_ros_cumotion> <isaac_ros_cumotion_interfaces/action/MotionPlan.action>`
+     - cuMotion-native goal-set motion planning action.
+   * - ``cumotion/ik``
+     - :ir_repo:`isaac_ros_cumotion_interfaces/IKSolution <isaac_ros_cumotion> <isaac_ros_cumotion_interfaces/action/IKSolution.action>`
+     - Collision-free IK action (optionally using ESDF updates / AABB clearing).
+
+ROS Services Advertised
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+   * - ``cumotion/get_robot_description``
+     - :ir_repo:`isaac_ros_cumotion_interfaces/GetRobotDescription <isaac_ros_cumotion> <isaac_ros_cumotion_interfaces/srv/GetRobotDescription.srv>`
+     - Returns the currently loaded URDF/XRDF.
+   * - ``cumotion/set_robot_description``
+     - :ir_repo:`isaac_ros_cumotion_interfaces/SetRobotDescription <isaac_ros_cumotion> <isaac_ros_cumotion_interfaces/srv/SetRobotDescription.srv>`
+     - Updates the URDF/XRDF at runtime and re-initializes dependent components.
+
+ROS Topics Subscribed
+~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``joint_states_topic`` (default: ``/joint_states``)
+     - `sensor_msgs/JointState <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/JointState.msg>`__
+     - Robot joint state used as the default start state.
+
+ROS Topics Published
+~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``cumotion/collision_spheres``
+     - `visualization_msgs/MarkerArray <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/visualization_msgs/msg/MarkerArray.msg>`__
+     - Robot collision sphere visualization. Controlled by ``publish_world_collision_spheres`` and ``publish_self_collision_spheres``.
+   * - ``cumotion/display_trajectory``
+     - `moveit_msgs/DisplayTrajectory <https://github.com/moveit/moveit_msgs/blob/ros2/msg/DisplayTrajectory.msg>`__
+     - Planned trajectories for RViz visualization.
+   * - ``cumotion/robot_description_updated``
+     - `std_msgs/UInt64 <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/std_msgs/msg/UInt64.msg>`__
+     - Event-style notification when the robot description is updated.
+   * - ``cumotion/voxels`` (optional)
+     - `visualization_msgs/Marker <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/visualization_msgs/msg/Marker.msg>`__
+     - World occupancy voxels for visualization (enabled via ``publish_cumotion_world_as_voxels``).
+
+ROS Services Requested
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+   * - ``static_planning_scene_service_name`` (default: ``publish_static_planning_scene``)
+     - :ir_repo:`isaac_ros_cumotion_interfaces/PublishStaticPlanningScene <isaac_ros_cumotion> <isaac_ros_cumotion_interfaces/srv/PublishStaticPlanningScene.srv>`
+     - Loads collision objects from a static scene source and provides them as MoveIt collision objects.
+   * - ``esdf_service_name`` (default: ``/nvblox_node/get_esdf_and_gradient``)
+     - :ir_repo:`nvblox_msgs/EsdfAndGradients <isaac_ros_nvblox> <nvblox_msgs/srv/EsdfAndGradients.srv>`
+     - ESDF query service used when ``read_esdf_world`` is enabled.
+
+.. |package_name| replace:: ``isaac_ros_cumotion``

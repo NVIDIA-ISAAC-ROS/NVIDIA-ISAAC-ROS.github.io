@@ -1,0 +1,114 @@
+=========================================
+Use Mission Dispatch MCP Server in Cursor
+=========================================
+
+Overview
+--------
+
+This tutorial explains how to run the `Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch>`_ MCP server and connect it to Cursor.
+This allows you to control robot missions using natural language prompts in Cursor's AI chat.
+
+It uses direct MCP configuration in ``~/.cursor/mcp.json`` and does not require a ``.env`` file.
+
+Tutorial Walkthrough
+--------------------
+
+#. Confirm prerequisites:
+
+   - Ubuntu/Linux environment (validated on Ubuntu 24.04)
+   - Python 3.10+
+   - Cursor installed (v2.4+ recommended)
+   - Install and launch Isaac Sim using the
+     :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/index>`
+   - Mission Control services already launched using:
+     `Mission Control Tutorial <https://github.com/nvidia-isaac/isaac_mission_control/blob/main/docs/tutorial/tutorial.md>`_
+     (this bringup starts both Mission Control and Mission Dispatch)
+   - The Isaac Sim setup and Mission Control tutorial bringup can be done in parallel.
+
+#. Verify Mission Dispatch health:
+
+   .. code:: bash
+
+      curl http://localhost:5002/health
+
+#. Set up the MCP package from the ``mission_dispatch`` repository root:
+
+   .. code:: bash
+
+      cd packages/agentic-utilities/mission-dispatch-mcp
+      python3 -m venv venv
+      ./venv/bin/python -m pip install -U pip
+      ./venv/bin/python -m pip install -e .
+
+#. Configure Cursor MCP directly in ``~/.cursor/mcp.json`` (or use Cursor Settings -> Tools & MCP, which writes this file).
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/cloud_control/cursor-settings-location.png>`
+      :width: 60%
+      :align: center
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/cloud_control/cursor-mcp-settings.png>`
+      :width: 60%
+      :align: center
+
+   Add or update this server entry with your real local paths:
+
+   .. code:: json
+
+      {
+        "mcpServers": {
+          "mission-dispatch": {
+            "command": "bash",
+            "args": [
+              "-lc",
+              "set -euo pipefail; cd \"/ABS/PATH/TO/mission_dispatch/packages/agentic-utilities/mission-dispatch-mcp\" && exec \"/ABS/PATH/TO/mission_dispatch/packages/agentic-utilities/mission-dispatch-mcp/venv/bin/python\" -m mission_dispatch_mcp.server"
+            ],
+            "env": {
+              "MISSION_DISPATCH_URL": "http://localhost:5002"
+            }
+          }
+        }
+      }
+
+   .. note::
+
+      Replace ``/ABS/PATH/TO/mission_dispatch`` with your actual path.
+      If your Mission Dispatch API runs on a different host/port, update ``MISSION_DISPATCH_URL``.
+
+#. Enable the ``mission-dispatch`` server in Cursor Settings -> Tools & MCP.
+
+#. Start a new chat and ask:
+
+   ``Use Mission Dispatch MCP to test the connection.``
+
+   If configured correctly, the server responds with a successful connection result.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/cloud_control/connection-demo-dispatch.gif>`
+      :width: 70%
+      :align: center
+
+Troubleshooting
+---------------
+
+Connection Refused
+~~~~~~~~~~~~~~~~~~
+
+- Confirm Mission Dispatch API is reachable at the configured ``MISSION_DISPATCH_URL``.
+
+Tools Do Not Appear
+~~~~~~~~~~~~~~~~~~~
+
+- Disable/re-enable the MCP server in Cursor settings.
+- Start a new chat.
+- Restart Cursor.
+
+Check Server Logs
+~~~~~~~~~~~~~~~~~
+
+- ``/tmp/mission_dispatch_mcp.log``
+
+Implementation References
+-------------------------
+
+- MCP server tools: ``packages/agentic-utilities/mission-dispatch-mcp/src/server.py``
+- Mission Dispatch API client used by MCP: ``packages/agentic-utilities/mission-dispatch-mcp/src/queries.py``
+

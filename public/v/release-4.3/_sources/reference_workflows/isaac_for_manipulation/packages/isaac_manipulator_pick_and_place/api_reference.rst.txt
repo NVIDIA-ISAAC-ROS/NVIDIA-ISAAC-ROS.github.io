@@ -1,0 +1,693 @@
+===============================
+API Reference and Configuration
+===============================
+
+This page provides comprehensive API documentation and configuration parameter reference for the multi-object Pick and Place workflow. For step-by-step configuration instructions, refer to the :doc:`Configuration Guide </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_pick_and_place/configuration_guide>`.
+
+Action Interface
+----------------
+
+**Action Server**: ``/multi_object_pick_and_place``
+
+**Action Type**: ``isaac_manipulator_interfaces/action/MultiObjectPickAndPlace``
+
+Goal Parameters
+~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Description
+
+   * - ``target_poses``
+     - ``geometry_msgs/PoseArray``
+     - Target drop poses in the robot's base frame. For ``mode=0``: exactly one pose required. For ``mode=1``: multiple poses corresponding to class IDs.
+
+   * - ``class_ids``
+     - ``string[]``
+     - Array of object class IDs to pick and place. For ``mode=0``: must be empty array (``[]``). For ``mode=1``: must correspond one-to-one with ``target_poses`` array.
+
+   * - ``mode``
+     - ``uint8``
+     - Execution mode: ``0`` = ``SINGLE_BIN`` (all objects to single pose), ``1`` = ``MULTI_BIN`` (objects distributed by class ID).
+
+Result Values
+~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Value
+     - Description
+
+   * - ``SUCCESS``
+     - All specified objects were successfully picked and placed
+
+   * - ``PARTIAL_SUCCESS``
+     - Some objects were successfully processed, others failed
+
+   * - ``FAILED``
+     - All objects failed to be processed successfully
+
+   * - ``INCOMPLETE``
+     - Operation was canceled, interrupted by stale detection timeout, or failed before completion
+
+   * - ``UNKNOWN``
+     - Workflow still in progress
+
+Parameter Validation Rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Mode
+     - ``target_poses`` Requirements
+     - ``class_ids`` Requirements
+     - Validation
+
+   * - ``0`` (``SINGLE_BIN``)
+     - Exactly 1 pose
+     - Must be empty array ``[]``
+     - All detected objects go to single location
+
+   * - ``1`` (``MULTI_BIN``)
+     - 1+ poses (equal to ``class_ids`` length)
+     - 1+ class IDs (equal to ``target_poses`` length)
+     - Objects sorted by class to corresponding poses
+
+Usage Examples
+~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Single Bin Mode
+
+      All objects to one location:
+
+      .. code-block:: bash
+
+         ros2 action send_goal /multi_object_pick_and_place isaac_manipulator_interfaces/action/MultiObjectPickAndPlace \
+           '{target_poses: {header: {frame_id: "base_link"}, poses: [{position: {x: -0.25, y: 0.45, z: 0.50}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: [], mode: 0}'
+
+   .. tab:: Multi-Bin Mode (2 Classes)
+
+      Objects sorted by class to different locations:
+
+      .. code-block:: bash
+
+         ros2 action send_goal /multi_object_pick_and_place isaac_manipulator_interfaces/action/MultiObjectPickAndPlace \
+           '{target_poses: {header: {frame_id: "base_link"}, poses: [{position: {x: -0.25, y: 0.50, z: 0.70}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}, {position: {x: -0.25, y: 0.40, z: 0.40}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: ["22", "3"], mode: 1}'
+
+   .. tab:: Multi-Bin Mode (3 Classes)
+
+      Multi-bin mode with three object types:
+
+      .. code-block:: bash
+
+         ros2 action send_goal /multi_object_pick_and_place isaac_manipulator_interfaces/action/MultiObjectPickAndPlace \
+           '{target_poses: {header: {frame_id: "base_link"}, poses: [{position: {x: -0.25, y: 0.50, z: 0.70}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}, {position: {x: -0.25, y: 0.40, z: 0.40}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}, {position: {x: -0.25, y: 0.30, z: 0.60}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: ["22", "3", "15"], mode: 1}'
+
+Launch Interface
+----------------
+
+**Launch File**: ``orchestration.launch.py``
+
+Launch Arguments
+~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Argument
+     - Type
+     - Default
+     - Description
+     - Usage Notes
+
+   * - ``behavior_tree_config_file``
+     - ``string``
+     - ``multi_object_pick_and_place_behavior_tree_params.yaml``
+     - Path to behavior tree configuration file
+     - Contains action server names, retry limits, and behavior-specific parameters
+
+   * - ``blackboard_config_file``
+     - ``string``
+     - ``multi_object_pick_and_place_blackboard_params.yaml``
+     - Path to blackboard configuration file
+     - Contains object definitions, drop poses, and workflow mode settings
+
+   * - ``print_ascii_tree``
+     - ``bool``
+     - ``false``
+     - Enable ASCII tree display on terminal
+     - Useful for debugging behavior tree execution flow
+
+   * - ``manual_mode``
+     - ``bool``
+     - ``false``
+     - Enable manual stepping through behavior tree
+     - Allows step-by-step execution for debugging and development
+
+   * - ``log_level``
+     - ``string``
+     - ``info``
+     - Set logging level (``debug``, ``info``, ``warn``, ``error``)
+     - Use ``debug`` for detailed troubleshooting
+
+Example Launch
+~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   ros2 launch isaac_manipulator_pick_and_place orchestration.launch.py \
+      behavior_tree_config_file:=my_config.yaml \
+      blackboard_config_file:=my_blackboard.yaml \
+      print_ascii_tree:=true \
+      log_level:=debug
+
+Configuration Files
+-------------------
+
+The system uses two main configuration files for behavior tree parameters and blackboard initialization.
+
+.. list-table:: Configuration File Overview
+   :header-rows: 1
+
+   * - File
+     - Purpose
+     - Contains
+
+   * - ``multi_object_pick_and_place_behavior_tree_params.yaml``
+     - Behavior tree node configuration
+     - Action server names, retry limits, timeout settings, motion planning parameters
+
+   * - ``multi_object_pick_and_place_blackboard_params.yaml``
+     - Blackboard variable initialization
+     - Object definitions, drop poses, workflow modes, supported objects configuration
+
+Behavior Tree Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+**File**: ``multi_object_pick_and_place_behavior_tree_params.yaml``
+
+This file configures the behavior tree nodes and their associated action servers, services, and parameters. The configuration follows the structure ``behavior_tree_params.multi_object_pick_and_place.<node_name>``:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``assign_object_name.service_name``
+     - ``string``
+     - ``'assign_name_to_object'``
+     - Service name for assigning names to detected objects
+
+   * - ``attach_object.action_server_name``
+     - ``string``
+     - ``'attach_object'``
+     - Action server name for object attachment operations
+
+   * - ``attach_object.fallback_radius``
+     - ``float``
+     - ``0.09``
+     - Fallback sphere radius for collision detection
+
+   * - ``attach_object.shape``
+     - ``string``
+     - ``'CUBOID'``
+     - Collision shape type for attached objects. Choose between ``'CUSTOM_MESH'``, ``'SPHERE'``, or ``'CUBOID'`` based on object geometry and collision detection requirements
+
+   * - ``attach_object.scale``
+     - ``float[3]``
+     - ``[0.1, 0.1, 0.2]``
+     - Collision shape dimensions [x, y, z] in meters
+
+   * - ``attach_object.gripper_frame``
+     - ``string``
+     - ``'gripper_frame'``
+     - Gripper frame name for object attachment
+
+   * - ``attach_object.grasp_frame``
+     - ``string``
+     - ``'grasp_frame'``
+     - Grasp frame name for object attachment
+
+   * - ``close_gripper.gripper_action_name``
+     - ``string``
+     - ``'/robotiq_gripper_controller/gripper_cmd'``
+     - Action server name for gripper control
+
+   * - ``close_gripper.close_position``
+     - ``float``
+     - ``0.55``
+     - Gripper position for closed/grasping state
+
+   * - ``close_gripper.max_effort``
+     - ``float``
+     - ``10.0``
+     - Maximum effort for gripper closing
+
+   * - ``detach_object.action_server_name``
+     - ``string``
+     - ``'attach_object'``
+     - Action server name for object detachment operations
+
+   * - ``detach_object.fallback_radius``
+     - ``float``
+     - ``0.09``
+     - Fallback sphere radius for collision detection
+
+   * - ``detach_object.shape``
+     - ``string``
+     - ``'CUBOID'``
+     - Collision shape type for detached objects
+
+   * - ``detach_object.scale``
+     - ``float[3]``
+     - ``[0.1, 0.1, 0.2]``
+     - Collision shape dimensions [x, y, z] in meters
+
+   * - ``detach_object.gripper_frame``
+     - ``string``
+     - ``'gripper_frame'``
+     - Gripper frame name for object detachment
+
+   * - ``detach_object.grasp_frame``
+     - ``string``
+     - ``'grasp_frame'``
+     - Grasp frame name for object detachment
+
+   * - ``detect_object.action_server_name``
+     - ``string``
+     - ``'/get_objects'``
+     - Action server name for object detection requests
+
+   * - ``detect_object.detection_confidence_threshold``
+     - ``float``
+     - ``0.5``
+     - Minimum confidence threshold for accepting detected objects. Set higher (closer to 1.0) if your object detection model predicts class IDs with high confidence
+
+   * - ``execute_trajectory.action_server_name``
+     - ``string``
+     - ``'execute_trajectory'``
+     - Action server name for trajectory execution
+
+   * - ``execute_trajectory.index``
+     - ``int``
+     - ``0``
+     - Index of trajectory to execute from planned trajectories
+
+   * - ``interactive_marker.mesh_resource_uri``
+     - ``string``
+     - ``'package://isaac_manipulator_robot_description/meshes/robotiq_2f_85.obj'``
+     - URI for mesh resource used in interactive markers
+
+   * - ``interactive_marker.reference_frame``
+     - ``string``
+     - ``'base_link'``
+     - Reference frame for interactive marker placement
+
+   * - ``interactive_marker.end_effector_frame``
+     - ``string``
+     - ``'gripper_frame'``
+     - End effector frame for interactive marker
+
+   * - ``interactive_marker.user_confirmation_timeout``
+     - ``float``
+     - ``60.0``
+     - User reaction time in seconds. Time allowed for user to adjust the interactive marker in RViz to set the correct drop pose before system proceeds with default marker position
+
+   * - ``mesh_assigner.service_name``
+     - ``string``
+     - ``'add_mesh_to_object'``
+     - Service name for adding mesh to objects
+
+   * - ``object_selector.action_server_name``
+     - ``string``
+     - ``'/get_selected_object'``
+     - Action server name for object selection requests
+
+   * - ``open_gripper.gripper_action_name``
+     - ``string``
+     - ``'/robotiq_gripper_controller/gripper_cmd'``
+     - Action server name for gripper control
+
+   * - ``open_gripper.open_position``
+     - ``float``
+     - ``0.0``
+     - Gripper position for fully open state
+
+   * - ``open_gripper.max_effort``
+     - ``float``
+     - ``10.0``
+     - Maximum effort for gripper opening
+
+   * - ``plan_to_grasp.action_server_name``
+     - ``string``
+     - ``'cumotion/motion_plan'``
+     - Action server name for cuMotion planning requests
+
+   * - ``plan_to_grasp.link_name``
+     - ``string``
+     - ``'base_link'``
+     - Reference frame for motion planning
+
+   * - ``plan_to_grasp.time_dilation_factor``
+     - ``float``
+     - ``0.2``
+     - Time scaling factor for trajectory execution
+
+   * - ``plan_to_grasp.grasp_approach_offset_distance``
+     - ``float[3]``
+     - ``[0.0, 0.0, -0.15]``
+     - Approach offset distance [x, y, z] in meters
+
+   * - ``plan_to_grasp.grasp_approach_path_constraint``
+     - ``float[6]``
+     - ``[0.5, 0.5, 0.5, 0.1, 0.1, 0.0]``
+     - Path constraints for grasp approach [x, y, z, rotation_x, rotation_y, rotation_z]
+
+   * - ``plan_to_grasp.retract_offset_distance``
+     - ``float[3]``
+     - ``[0.0, 0.0, 0.15]``
+     - Retract offset distance [x, y, z] in meters
+
+   * - ``plan_to_grasp.retract_path_constraint``
+     - ``float[6]``
+     - ``[0.1, 0.1, 0.1, 0.1, 0.1, 0.0]``
+     - Path constraints for retract motion [x, y, z, rotation_x, rotation_y, rotation_z]
+
+   * - ``plan_to_grasp.grasp_approach_constraint_in_goal_frame``
+     - ``bool``
+     - ``true``
+     - Whether approach constraints are in goal frame
+
+   * - ``plan_to_grasp.retract_constraint_in_goal_frame``
+     - ``bool``
+     - ``false``
+     - Whether retract constraints are in goal frame
+
+   * - ``plan_to_grasp.disable_collision_links``
+     - ``string[]``
+     - ``[]``
+     - List of links to disable collision checking for
+
+   * - ``plan_to_grasp.update_planning_scene``
+     - ``bool``
+     - ``true``
+     - Whether to update planning scene before planning
+
+   * - ``plan_to_grasp.world_frame``
+     - ``string``
+     - ``'world'``
+     - World reference frame for planning
+
+   * - ``plan_to_grasp.enable_aabb_clearing``
+     - ``bool``
+     - ``true``
+     - Enable axis-aligned bounding box clearing
+
+   * - ``plan_to_grasp.esdf_clearing_padding``
+     - ``float[3]``
+     - ``[0.05, 0.05, 0.05]``
+     - ESDF clearing padding [x, y, z] in meters
+
+   * - ``plan_to_pose.action_server_name``
+     - ``string``
+     - ``'cumotion/motion_plan'``
+     - Action server name for cuMotion planning requests
+
+   * - ``plan_to_pose.link_name``
+     - ``string``
+     - ``'base_link'``
+     - Reference frame for motion planning
+
+   * - ``plan_to_pose.time_dilation_factor``
+     - ``float``
+     - ``0.2``
+     - Time scaling factor for trajectory execution
+
+   * - ``plan_to_pose.update_planning_scene``
+     - ``bool``
+     - ``true``
+     - Whether to update planning scene before planning
+
+   * - ``plan_to_pose.disable_collision_links``
+     - ``string[]``
+     - ``[]``
+     - List of links to disable collision checking for
+
+   * - ``plan_to_pose.aabb_clearing_shape``
+     - ``string``
+     - ``'SPHERE'``
+     - Shape type for AABB clearing
+
+   * - ``plan_to_pose.aabb_clearing_shape_scale``
+     - ``float[3]``
+     - ``[0.1, 0.1, 0.1]``
+     - Scale for AABB clearing shape [x, y, z]
+
+   * - ``plan_to_pose.enable_aabb_clearing``
+     - ``bool``
+     - ``false``
+     - Enable axis-aligned bounding box clearing
+
+   * - ``plan_to_pose.esdf_clearing_padding``
+     - ``float[3]``
+     - ``[0.05, 0.05, 0.05]``
+     - ESDF clearing padding [x, y, z] in meters
+
+   * - ``pose_estimation.action_server_name``
+     - ``string``
+     - ``'/get_object_pose'``
+     - Action server name for object pose estimation requests
+
+   * - ``pose_estimation.base_frame_id``
+     - ``string``
+     - ``'base_link'``
+     - The robot base frame used to express object poses and workspace bounds
+
+   * - ``pose_estimation.camera_frame_id``
+     - ``string``
+     - ``''``
+     - Camera frame ID used by the pose estimation server.
+
+   * - ``pose_estimation.workspace_bounds.diagonal``
+     - ``float[3][]``
+     - ``[]``
+     - Two 3D points defining the diagonal corners of a cuboid workspace bounds [x, y, z] in ``base_link`` frame. Objects outside this cuboid are filtered during pose estimation. Example: ``[[0.3, -0.4, 0.0], [-0.3, 0.4, 0.8]]`` (customize for your robot's workspace). Set to ``[]`` to disable filtering
+
+   * - ``read_grasp_poses.publish_grasp_poses``
+     - ``bool``
+     - ``true``
+     - Whether to publish grasp poses for visualization in RViz. Set to ``true`` if you want to visualize all available grasp poses
+
+   * - ``retry_config.max_planning_retries``
+     - ``int``
+     - ``3``
+     - Maximum retry attempts for motion planning operations. Increase if your motion planning is unreliable or prone to failures
+
+   * - ``retry_config.max_controller_retries``
+     - ``int``
+     - ``3``
+     - Maximum retry attempts for hardware controller access. Set based on confidence in your controller reliability
+
+   * - ``retry_config.max_detection_retries``
+     - ``int``
+     - ``3``
+     - Maximum retry attempts for object detection operations. Set based on confidence in your detection system reliability
+
+   * - ``retry_config.max_pose_estimation_retries``
+     - ``int``
+     - ``3``
+     - Maximum retry attempts for pose estimation operations. Set based on confidence in your pose estimation system reliability
+
+   * - ``retry_config.max_gripper_retries``
+     - ``int``
+     - ``3``
+     - Maximum retry attempts for gripper control operations. Set based on confidence in your gripper system reliability
+
+   * - ``retry_config.max_attachment_retries``
+     - ``int``
+     - ``3``
+     - Maximum retry attempts for object attachment operations. Set based on confidence in your algorithm's ability to attach objects.
+
+   * - ``server_timeout_config.startup_server_timeout_sec``
+     - ``float``
+     - ``120.0``
+     - Maximum time to wait for action/service servers during startup. Set to ``None`` if orchestration will start before action/service servers are available.
+
+   * - ``server_timeout_config.runtime_retry_timeout_sec``
+     - ``float``
+     - ``60.0``
+     - Maximum time to retry servers during execution when temporarily losing access to them
+
+   * - ``server_timeout_config.server_check_interval_sec``
+     - ``float``
+     - ``30.0``
+     - Interval between server availability checks during operation (also determines logging frequency for server status)
+
+   * - ``stale_detection.timeout_duration``
+     - ``float``
+     - ``300.0``
+     - Expected workflow completion time in seconds. If this time is exceeded, current detection data will be discarded after the current object placement completes, and the system will perform new detections before proceeding
+
+   * - ``switch_controllers.arm.controllers_to_activate``
+     - ``string[]``
+     - ``['scaled_joint_trajectory_controller']``
+     - List of arm controllers to activate. Configure to ensure required controllers are in active state during motion execution
+
+   * - ``switch_controllers.arm.controllers_to_deactivate``
+     - ``string[]``
+     - ``['impedance_controller']``
+     - List of arm controllers to deactivate. Configure to ensure conflicting controllers are deactivated during motion execution
+
+   * - ``switch_controllers.arm.strictness``
+     - ``int``
+     - ``4`` (``FORCE_AUTO``)
+     - Strictness for controller switching. Values: ``1``=``BEST_EFFORT``, ``2``=``STRICT``, ``3``=``AUTO``, ``4``=``FORCE_AUTO``. Default uses FORCE_AUTO to auto-deactivate conflicting controllers on ROS 2 Jazzy and later
+
+   * - ``switch_controllers.tool.controllers_to_activate``
+     - ``string[]``
+     - ``['robotiq_activation_controller', 'robotiq_gripper_controller']``
+     - List of tool controllers to activate. Configure to ensure required controllers are in active state during gripper operations
+
+   * - ``switch_controllers.tool.controllers_to_deactivate``
+     - ``string[]``
+     - ``[]``
+     - List of tool controllers to deactivate. Configure to ensure conflicting controllers are deactivated during gripper operations
+
+   * - ``switch_controllers.tool.strictness``
+     - ``int``
+     - ``4`` (``FORCE_AUTO``)
+     - Strictness for controller switching. Values: ``1``=``BEST_EFFORT``, ``2``=``STRICT``, ``3``=``AUTO``, ``4``=``FORCE_AUTO``. Default uses FORCE_AUTO to auto-deactivate conflicting controllers on ROS 2 Jazzy and later
+
+   * - ``publish_static_planning_scene.service_name``
+     - ``string``
+     - ``'publish_static_planning_scene'``
+     - Service name used to publish static planning scene objects at startup
+
+   * - ``publish_static_planning_scene.scene_file_path``
+     - ``string``
+     - ``''``
+     - Path to a MoveIt ``.scene`` file containing static obstacles to be loaded
+
+Blackboard Parameters
+~~~~~~~~~~~~~~~~~~~~~
+
+**File**: ``multi_object_pick_and_place_blackboard_params.yaml``
+
+This file initializes the behavior tree's shared blackboard variables. The configuration follows the structure ``blackboard_params.<parameter_name>``.
+
+For conceptual understanding of how these blackboard variables work together and their relationships in the workflow architecture, refer to the :doc:`Blackboard Reference </reference_workflows/isaac_for_manipulation/packages/isaac_manipulator_orchestration/blackboard_reference>`.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``max_num_next_object``
+     - ``int``
+     - ``2``
+     - Maximum number of objects that can have completed pose estimation. When this limit is reached, the pose estimation sub-tree will be blocked until objects are processed
+
+
+   * - ``use_drop_pose_from_rviz``
+     - ``bool``
+     - ``false``
+     - Enable interactive marker in RViz for drop pose selection. Overrides drop poses from blackboard config or action calls. Updates drop poses for all queued objects when marker changes, allowing real-time pose adjustment. Requires user to be proactive in setting pose
+
+   * - ``abort_motion``
+     - ``bool``
+     - ``false``
+     - Runtime variable for motion termination
+
+   * - ``home_pose``
+     - ``float[7]``
+     - ``[-0.25, 0.45, 0.50, -0.677772, 0.734752, 0.020993, 0.017994]``
+     - Safe home position [x, y, z, quaternion_x, quaternion_y, quaternion_z, quaternion_w]. Used as fallback location when object placement to designated drop pose fails
+
+   * - ``target_poses``
+     - ``float[7][]``
+     - ``[[-0.25, 0.50, 0.70, ...], [-0.25, 0.40, 0.40, ...]]``
+     - Target drop poses where objects will be placed [x, y, z, quaternion_x, quaternion_y, quaternion_z, quaternion_w]. For single bin sorting: provide exactly 1 pose. For multi-bin sorting: provide multiple poses that match the number of ``class_ids``.
+
+   * - ``class_ids``
+     - ``string[]``
+     - ``['22', '3']``
+     - Object class IDs that determine which objects go to which target poses. For single bin sorting: leave empty (all objects go to the same location). For multi-bin sorting: specify class IDs that correspond to each target pose.
+
+   * - ``mode``
+     - ``int``
+     - ``1``
+     - Execution mode: ``0`` = single bin sorting (all objects placed at one location regardless of type), ``1`` = multi-bin sorting (objects sorted by class and placed at different locations)
+
+   * - ``selected_object_id``
+     - ``int``
+     - ``null``
+     - Runtime variable for currently selected object
+
+   * - ``active_obj_id``
+     - ``int``
+     - ``null``
+     - Runtime variable for actively manipulated object
+
+   * - ``goal_drop_pose``
+     - ``geometry_msgs/Pose``
+     - ``null``
+     - Runtime variable for target drop pose
+
+   * - ``rviz_drop_pose``
+     - ``geometry_msgs/Pose``
+     - ``null``
+     - Runtime variable for RViz interactive marker pose
+
+   * - ``object_info_cache``
+     - ``object``
+     - ``null``
+     - Runtime cache for object detection information
+
+   * - ``next_object_id``
+     - ``string[]``
+     - ``[]``
+     - Runtime queue of objects for processing
+
+   * - ``workflow_status``
+     - ``int``
+     - ``4`` (``UNKNOWN``)
+     - Overall workflow completion status using MultiObjectPickAndPlace.Result enum values: ``0`` = ``FAILED``, ``1`` = ``SUCCESS``, ``2`` = ``PARTIAL_SUCCESS``, ``3`` = ``INCOMPLETE``, ``4`` = ``UNKNOWN``
+
+   * - ``workflow_summary``
+     - ``string``
+     - ``""``
+     - Human-readable progress report generated by ``ReportGeneration`` behavior, containing detailed tabular status summary with object IDs, class IDs, statuses, drop pose coordinates, and object counts
+
+   * - ``workflow_feedback_queue``
+     - Runtime queue
+     - Auto-initialized
+     - Real-time queue of individual object completion/failure messages for immediate action feedback (automatically managed by ``MarkObjectAsDone`` and ``MarkObjectAsFailed`` behaviors)
+
+   * - ``supported_objects.<object_name>.class_id``
+     - ``string``
+     - ``Varies by object``
+     - Detection model class ID (RT-DETR class ID or GroundingDINO prompt index). Must be configured carefully based on the specific objects being handled by the system
+
+   * - ``supported_objects.<object_name>.grasp_file_path``
+     - ``string``
+     - ``Varies by object``
+     - Path to YAML file containing pre-computed grasp poses. Must be configured carefully based on the specific objects being handled by the system
+
+   * - ``supported_objects.<object_name>.mesh_file_path``
+     - ``string``
+     - ``Varies by object``
+     - Path to object mesh file for collision planning. Must be configured carefully based on the specific objects being handled by the system
+
