@@ -5,13 +5,21 @@ Use Mission Dispatch MCP Server in Cursor
 Overview
 --------
 
-This tutorial explains how to run the `Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch>`_ MCP server and connect it to Cursor.
+This tutorial explains how to run the ``isaac_mission_dispatch`` MCP server (``mission_dispatch_mcp``) and connect it to Cursor.
 This allows you to control robot missions using natural language prompts in Cursor's AI chat.
 
 It uses direct MCP configuration in ``~/.cursor/mcp.json`` and does not require a ``.env`` file.
 
 Tutorial Walkthrough
 --------------------
+
+#. Clone the `isaac_mission_control <https://github.com/nvidia-isaac/isaac_mission_control>`__ repository.
+   Use this repository for stack bringup: the ``isaac_mission_dispatch`` image runs as part of ``isaac_mission_control`` compose profiles (you do not need a separate ``isaac_mission_dispatch`` image pull for the tutorial stack).
+
+   .. code:: bash
+
+      git clone https://github.com/nvidia-isaac/isaac_mission_control.git
+      cd isaac_mission_control
 
 #. Confirm prerequisites:
 
@@ -20,22 +28,26 @@ Tutorial Walkthrough
    - Cursor installed (v2.4+ recommended)
    - Install and launch Isaac Sim using the
      :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/index>`
-   - Mission Control services already launched using:
-     `Mission Control Tutorial <https://github.com/nvidia-isaac/isaac_mission_control/blob/main/docs/tutorial/tutorial.md>`_
-     (this bringup starts both Mission Control and Mission Dispatch)
-   - The Isaac Sim setup and Mission Control tutorial bringup can be done in parallel.
+   - ``isaac_mission_control`` services already launched using:
+     `Mission Control Tutorial <https://github.com/nvidia-isaac/isaac_mission_control/blob/main/docs/tutorial/tutorial.md>`__
+     (this bringup starts both ``isaac_mission_control`` and ``isaac_mission_dispatch``)
+   - The Isaac Sim setup and ``isaac_mission_control`` tutorial bringup can be done in parallel.
 
-#. Verify Mission Dispatch health:
+#. Verify ``isaac_mission_dispatch`` health:
 
    .. code:: bash
 
       curl http://localhost:5002/health
 
-#. Set up the MCP package from the ``mission_dispatch`` repository root:
+#. Set up the MCP package from the `isaac_mission_dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch>`__ repository (the Mission Dispatch MCP sources live there).
+   Clone it if you do not already have a local copy, then install the package.
+   If your shell is still inside the ``isaac_mission_control`` directory from step 1, run ``cd ..`` first so ``isaac_mission_dispatch`` is cloned as a sibling repository, not nested inside ``isaac_mission_control``.
 
    .. code:: bash
 
-      cd packages/agentic-utilities/mission-dispatch-mcp
+      cd ..
+      git clone https://github.com/nvidia-isaac/isaac_mission_dispatch.git
+      cd isaac_mission_dispatch/packages/agentic-utilities/mission-dispatch-mcp
       python3 -m venv venv
       ./venv/bin/python -m pip install -U pip
       ./venv/bin/python -m pip install -e .
@@ -60,7 +72,7 @@ Tutorial Walkthrough
             "command": "bash",
             "args": [
               "-lc",
-              "set -euo pipefail; cd \"/ABS/PATH/TO/mission_dispatch/packages/agentic-utilities/mission-dispatch-mcp\" && exec \"/ABS/PATH/TO/mission_dispatch/packages/agentic-utilities/mission-dispatch-mcp/venv/bin/python\" -m mission_dispatch_mcp.server"
+              "set -euo pipefail; cd \"/ABS/PATH/TO/isaac_mission_dispatch/packages/agentic-utilities/mission-dispatch-mcp\" && exec \"/ABS/PATH/TO/isaac_mission_dispatch/packages/agentic-utilities/mission-dispatch-mcp/venv/bin/python\" -m mission_dispatch_mcp.server"
             ],
             "env": {
               "MISSION_DISPATCH_URL": "http://localhost:5002"
@@ -71,8 +83,8 @@ Tutorial Walkthrough
 
    .. note::
 
-      Replace ``/ABS/PATH/TO/mission_dispatch`` with your actual path.
-      If your Mission Dispatch API runs on a different host/port, update ``MISSION_DISPATCH_URL``.
+      Replace ``/ABS/PATH/TO/isaac_mission_dispatch`` with your actual path.
+      If your ``isaac_mission_dispatch`` API runs on a different host/port, update ``MISSION_DISPATCH_URL``.
 
 #. Enable the ``mission-dispatch`` server in Cursor Settings -> Tools & MCP.
 
@@ -92,7 +104,7 @@ Troubleshooting
 Connection Refused
 ~~~~~~~~~~~~~~~~~~
 
-- Confirm Mission Dispatch API is reachable at the configured ``MISSION_DISPATCH_URL``.
+- Confirm the ``isaac_mission_dispatch`` API is reachable at the configured ``MISSION_DISPATCH_URL``.
 
 Tools Do Not Appear
 ~~~~~~~~~~~~~~~~~~~
@@ -110,5 +122,5 @@ Implementation References
 -------------------------
 
 - MCP server tools: ``packages/agentic-utilities/mission-dispatch-mcp/src/server.py``
-- Mission Dispatch API client used by MCP: ``packages/agentic-utilities/mission-dispatch-mcp/src/queries.py``
+- ``isaac_mission_dispatch`` API client used by MCP: ``packages/agentic-utilities/mission-dispatch-mcp/src/queries.py``
 
