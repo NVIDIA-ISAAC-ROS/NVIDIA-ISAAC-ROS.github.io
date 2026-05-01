@@ -3,7 +3,7 @@
 ROS 2 camera driver nodes for NVIDIA SIPL cameras with zero-copy GPU-accelerated
 image publishing through NITROS.
 
-<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/eagle_stereo_rectify_foxglove_visual.jpg/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/eagle_stereo_rectify_foxglove_visual.jpg/" width="800px"/></a></div>
+<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/eagle_stereo_rectify_foxglove_visual.jpg/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/eagle_stereo_rectify_foxglove_visual.jpg/" width="800px"/></a></div>
 
 ---
 
@@ -67,7 +67,7 @@ this repository.
 
 ## Latest
 
-Update 2026-03-23: Initial release
+Update 2026-04-30: Compatibility and integration updates for the Isaac ROS 4.4.0 release
 
 ## Supported Platforms
 

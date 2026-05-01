@@ -10,4 +10,4 @@ Please see [the guide](https://nvidia-isaac-ros.github.io/robots/sensor_mounting
 
 ## Latest
 
-Update 2026-03-23: Introduced early-stage support for SIPL camera framework and LI Eagle stereo CoE/HSB camera with ROS
+Update 2026-04-30: Compatibility and integration updates for the Isaac ROS 4.4.0 release

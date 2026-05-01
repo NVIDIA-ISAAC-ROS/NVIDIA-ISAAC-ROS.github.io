@@ -3,7 +3,7 @@
 NVIDIA-accelerated, simultaneous localization and mapping (SLAM) using stereo
 visual inertial odometry (SVIO).
 
-<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/cuvslam_ros_3.gif/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/cuvslam_ros_3.gif/" width="800px"/></a></div>
+<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/cuvslam_ros_3.gif/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/cuvslam_ros_3.gif/" width="800px"/></a></div>
 
 ---
 
@@ -61,7 +61,7 @@ closure. VSLAM uses a statistical approach to loop closure that is more
 compute efficient to provide a real time solution, improving convergence
 in loop closure.
 
-<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/vslam_odometry_nav2_diagram.png/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/vslam_odometry_nav2_diagram.png/" width="880px"/></a></div>
+<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/vslam_odometry_nav2_diagram.png/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/vslam_odometry_nav2_diagram.png/" width="880px"/></a></div>
 
 There are multiple methods for estimating odometry as an input to
 navigation. None of these methods are perfect; each has limitations
@@ -106,7 +106,7 @@ outdoor scenes.
 > Please refer to the [Isaac ROS Visual SLAM](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_visual_slam/index.html) documentation for more details.
 
 > [!Note]
-> This benchmark can only be run on a [Nova Orin](https://developer.nvidia.com/isaac/nova-orin) compatible system.
+> This benchmark can only be run on a [Nova Orin](https://developer.nvidia.com/isaac) compatible system.
 
 ---
 
@@ -129,4 +129,4 @@ this repository.
 
 ## Latest
 
-Update 2026-03-23: Introduced early-stage support for SIPL camera framework and LI Eagle stereo CoE/HSB camera with ROS
+Update 2026-04-30: Compatibility and integration updates for the Isaac ROS 4.4.0 release

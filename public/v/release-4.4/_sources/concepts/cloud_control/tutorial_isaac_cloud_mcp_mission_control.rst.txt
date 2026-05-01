@@ -1,0 +1,157 @@
+========================================
+Use Mission Control MCP Server in Cursor
+========================================
+
+Overview
+--------
+
+This tutorial explains how to run the ``isaac_mission_control`` MCP server (``mission_control_mcp``) and connect it to Cursor.
+This allows you to control robot missions using natural language prompts in Cursor's AI chat.
+
+It uses direct MCP configuration in ``~/.cursor/mcp.json`` and does not require a ``.env`` file.
+
+Tutorial Walkthrough
+--------------------
+
+#. Clone the `isaac_mission_control <https://github.com/nvidia-isaac/isaac_mission_control>`__ repository:
+
+   .. code:: bash
+
+      git clone https://github.com/nvidia-isaac/isaac_mission_control.git
+      cd isaac_mission_control
+
+#. Confirm prerequisites:
+
+   - Ubuntu/Linux environment (validated on Ubuntu 24.04)
+   - Python 3.10+
+   - Cursor installed (v2.4+ recommended)
+   - Install and launch Isaac Sim using the
+     :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/index>`
+   - ``isaac_mission_control`` services already launched using:
+     `Mission Control Tutorial <https://github.com/nvidia-isaac/isaac_mission_control/blob/main/docs/tutorial/tutorial.md>`__
+     (this bringup starts both ``isaac_mission_control`` and ``isaac_mission_dispatch``)
+   - The Isaac Sim setup and ``isaac_mission_control`` tutorial bringup can be done in parallel.
+
+#. Verify ``isaac_mission_control`` health:
+
+   .. code:: bash
+
+      curl http://localhost:8050/api/v1/health
+
+#. Set up the MCP package from your ``isaac_mission_control`` clone:
+
+   .. code:: bash
+
+      cd app/agentic-utilities/mission-control-mcp
+      python3 -m venv venv
+      ./venv/bin/python -m pip install -U pip
+      ./venv/bin/python -m pip install -e .
+
+#. Configure Cursor MCP directly in ``~/.cursor/mcp.json`` (or use Cursor Settings -> Tools & MCP, which writes this file).
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/cloud_control/cursor-settings-location.png>`
+      :width: 60%
+      :align: center
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/cloud_control/cursor-mcp-settings.png>`
+      :width: 60%
+      :align: center
+
+   Add or update this server entry with your real local paths:
+
+   .. code:: json
+
+      {
+        "mcpServers": {
+          "mission-control": {
+            "command": "bash",
+            "args": [
+              "-lc",
+              "set -euo pipefail; cd \"/ABS/PATH/TO/isaac_mission_control/app/agentic-utilities/mission-control-mcp\" && exec \"/ABS/PATH/TO/isaac_mission_control/app/agentic-utilities/mission-control-mcp/venv/bin/python\" -m mission_control_mcp.server"
+            ],
+            "env": {
+              "MISSION_CONTROL_URL": "http://localhost:8050"
+            }
+          }
+        }
+      }
+
+   .. note::
+
+      Replace ``/ABS/PATH/TO/isaac_mission_control`` with your actual path.
+      If ``isaac_mission_control`` is remote or port-forwarded, update ``MISSION_CONTROL_URL`` accordingly.
+
+#. Enable the ``mission-control`` server in Cursor Settings -> Tools & MCP.
+
+
+#. Start a new chat and ask:
+
+   ``Use Mission Control MCP to test the connection.``
+
+   If configured correctly, the server responds with a successful connection result.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/cloud_control/connection-demo.gif>`
+      :width: 35%
+      :align: center
+
+Isaac Mission Control 4.3.0 Limitations
+---------------------------------------
+
+The following ``isaac_mission_control`` MCP tools are not supported in Isaac Mission Control 4.3.0:
+
+.. list-table::
+   :header-rows: 1
+
+   * - MCP Tool
+     - Ready for Isaac Mission Control 4.3.0
+   * - ``submit_charging_mission``
+     - No
+   * - ``submit_undock_mission``
+     - No
+   * - ``get_detected_objects``
+     - No
+   * - ``get_detected_apriltags``
+     - No
+   * - ``visualize_route``
+     - No
+   * - ``get_map_info``
+     - No
+   * - ``list_available_maps``
+     - No
+   * - ``select_map``
+     - No
+   * - ``deploy_map_to_robot``
+     - No
+   * - ``submit_objective``
+     - No
+   * - ``cancel_objective``
+     - No
+   * - ``submit_pick_and_place``
+     - No
+
+Troubleshooting
+---------------
+
+Connection Refused
+~~~~~~~~~~~~~~~~~~
+
+- Confirm ``isaac_mission_control`` is reachable at the configured ``MISSION_CONTROL_URL``.
+
+Tools Do Not Appear
+~~~~~~~~~~~~~~~~~~~
+
+- Disable/re-enable the MCP server in Cursor settings.
+- Start a new chat.
+- Restart Cursor.
+
+Check Server Logs
+~~~~~~~~~~~~~~~~~
+
+- ``/tmp/mission_control_mcp.log``
+
+Implementation References
+-------------------------
+
+- MCP server tools: ``app/agentic-utilities/mission-control-mcp/src/server.py``
+- ``isaac_mission_control`` API client used by MCP: ``app/agentic-utilities/mission-control-mcp/src/queries.py``
+

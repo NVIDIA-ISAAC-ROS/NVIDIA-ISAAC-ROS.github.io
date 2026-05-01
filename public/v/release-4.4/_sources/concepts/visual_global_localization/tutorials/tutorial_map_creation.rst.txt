@@ -1,0 +1,629 @@
+.. _tutorial_map_creation:
+
+Tutorial: End-to-End Visual and Occupancy Map Creation
+======================================================
+
+This tutorial describes how to create maps for visual localization including
+visual global (cuVGL) localization map creation, cuVSLAM map creation, and
+occupancy grid map creation. The three types of maps share the same coordinate
+system. The poses from cuVGL and cuVSLAM localization align with the occupancy map.
+
+Before starting the steps of the tutorial, read the sections as directed to learn more about concepts for your particular situation:
+
+- To understand the different types of maps generated from the workflow, read the :ref:`Map Types <tutorial_map_creation_map_types>` section.
+
+- If you collect your own rosbag for map creation, read the following sections:
+
+  - :ref:`Data Collection <tutorial_map_creation_data_collection>`
+  - :ref:`Camera Calibration <tutorial_map_creation_camera_calibration>`
+
+
+You can use this tutorial to:
+
+- Create maps from an existing rosbag in the :ref:`Quick Start with an Existing Rosbag <tutorial_map_creation_quick_start_existing_rosbag>` section.
+
+- Use a RealSense camera for map creation and localization, in the :ref:`Map and Localize with a RealSense <tutorial_map_creation_map_and_localize_with_a_realsense>` section.
+
+- Verify the map quality in the :ref:`Map Quality Verification <tutorial_map_creation_map_quality_verification>` section.
+
+.. _tutorial_map_creation_map_types:
+
+Map Types
+---------
+The following list provides examples of some of the different types of maps that are generated with
+rosbags when running the :code:`create_map_offline.py` script:
+
+**cuVSLAM Map**
+
+cuVSLAM is able to create a map and load a saved map of an environment. It can then use that map to
+improve localization performance and maintain a consistent global frame of reference.
+
+
+**Visual Global Localization Map**
+
+During startup or after losing localization, the visual global localization map can be
+used to globally localize on a previously created map and operate in a shared
+global frame.
+
+For more info about visual global localization, refer to: :doc:`Concepts: Visual Global Localization </concepts/visual_global_localization/index>`
+
+**Occupancy Grid Map**
+
+Navigation packages such as `nav2 <https://docs.nav2.org/>`_ use an occupancy
+grid map to represent the obstacles in a map. We use :doc:`cuVSLAM </concepts/visual_slam/cuvslam/index>`,
+:doc:`Stereo Depth </concepts/stereo_depth/index>` and :doc:`Nvblox </concepts/scene_reconstruction/nvblox/index>` to build an occupancy grid map from images.
+
+.. note::
+
+    - The generated occupancy map is only intended to be used for global path planning. Specifically it is not intended to be used for 2D Lidar localization. The generated map may contain slight artifacts and imprecisions and therefore is expected to be used with a planner that inflates obstacles.
+
+    - Because the ROS2 rosbag replay is nondeterministic, each run of the occupancy map creation can produce a slightly different map.
+
+.. _tutorial_map_creation_data_collection:
+
+Data Collection
+---------------
+
+- Closed Loop Segments: Build mapping trajectories in loops or segments of around 5-10 meters.
+  This ensures that the same area is captured from different angles, which improves
+  map detail and reduces drift.
+
+- Avoid Long Straight Paths: Long drives in unexplored areas accumulate drift risk.
+  Use short, closed loops instead.
+
+- Vary Camera Angles: Capturing locations from multiple angles makes the visual map
+  more reliable for future localization.
+
+The following schematic examples show efficient mapping paths in both narrow corridors and open
+spaces. They demonstrate optimal patterns for capturing comprehensive visual data
+and reducing tracking drift:
+
+.. note::
+    For optimal pose correction and map accuracy, Loop Closing must
+    be effectively exploited. This mechanism corrects the robot's pose when
+    the robot revisits a previously mapped location.
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Mapping_thincorridor.gif>`
+    :width: 800px
+    :alt: Visualization of the mapping trajectory in corridor
+    :align: center
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/concepts/visual_slam/cuvslam/Mapping_openspace.gif>`
+    :width: 800px
+    :alt: Visualization of the mapping trajectory in open space
+    :align: center
+
+.. _tutorial_map_creation_camera_calibration:
+
+Camera Calibration
+------------------
+
+In this tutorial, "raw" means original images with distortion, and "rectified" means stereo rectified images
+without distortion.
+
+Ensure the following topics are recorded in the rosbag:
+
+- static transform between base frame and camera frame.
+- raw or rectified images.
+- camera parameters.
+
+Here is an example of the left camera topic names being given image types and compression:
+
+.. list-table:: Left Camera Topic Names
+   :widths: 21 21 28 28
+   :header-rows: 1
+
+   * - Image Type
+     - Camera Info
+     - Image
+     - Compressed Image
+   * - Raw
+     - `/<camera_name>/left/camera_info`
+     - `/<camera_name>/left/image_raw`
+     - `/<camera_name>/left/image_raw/compressed`
+   * - Rectified
+     - `/<camera_name>/left/camera_info_rect`
+     - `/<camera_name>/left/image_rect`
+     - `/<camera_name>/left/image_rect/compressed`
+
+Change the camera info and image topic names for the right camera by replacing "left" with "right" in the above table.
+
+If your rosbag topic names are different from the default ones, create a camera topic config that
+matches with your rosbag recording and use it in the map creation step. For example:
+
+    .. code-block:: yaml
+
+      stereo_cameras:
+        - name: <camera_name>
+          left: /<camera_name>/left/image_raw
+          left_frame_id: <camera_name>_left_optical_frame
+          left_camera_info: /<camera_name>/left/camera_info
+          right: /<camera_name>/right/image_raw
+          right_camera_info: /<camera_name>/right/camera_info
+          right_frame_id: <camera_name>_right_optical_frame
+
+You must either provide stereo-rectified images or supply the stereo rectification parameters in the camera info when using raw images.
+
+You can use the following checks to verify that the calibration is configured correctly.
+
+.. tabs::
+
+    .. tab:: Raw Images
+
+        - `k` and `d` correspond to the raw images.
+        - `r` is typically not an identity matrix, since rectification is still required.
+        - `k` (raw intrinsics) is typically different from the first 3x3 block in `p`, because `p` contains the rectified intrinsics.
+        - The first 3x3 block in `p` is the same for both left and right images, because both are projected to the same rectified image plane.
+
+    .. tab:: Rectified Images
+
+        - `d` is an empty or all zeros (no distortion remains after rectification).
+        - `k` is typically matches the first 3x3 block of `p`, since both describe the same rectified intrinsics.
+        - `r` depends on the `frame_id`:
+
+          - If `frame_id` refers to rectified optical frame, `r` should be identity (no transform needed).
+          - If `frame_id` refers to raw optical frame, `r` is typically not identity (a transform from raw to rectified is needed).
+
+.. _tutorial_map_creation_set_up_development_environment:
+
+Set Up Development Environment
+------------------------------
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+.. _tutorial_map_creation_check_gpu_memory:
+
+Check GPU Memory (x86 Only)
+----------------------------
+
+.. warning::
+
+   - Map creation only works with x86 laptops with NVIDIA GPU (compute_capability >= 8.0 and 8 GB RAM or higher).
+
+   - Map Creation will use all the CPU and GPU resources, make sure you do not have anything important running at the same time.
+
+#. Activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Check GPU memory:
+
+   Install the tool to check GPU memory inside the container:
+
+   .. code:: bash
+
+      pip install gpustat --break-system-packages
+
+   Run the command to check the GPU memory:
+
+   .. code:: bash
+
+      gpustat
+
+   The output will show GPU information. For example:
+
+   .. code::
+
+      [0] NVIDIA RTX A6000 | 44°C,   0 % |    15 / 49140 MB |
+
+   In this example, the GPU has 49140 MB (approximately 49 GB) of total memory.
+
+#. Set the model resolution environment variable based on your GPU memory:
+
+   - For above 16 GB, set:
+
+     .. code:: bash
+
+        export FOUNDATIONSTEREO_MODEL_RES=high_res
+
+   - For less than 16 GB, set:
+
+     .. code:: bash
+
+        export FOUNDATIONSTEREO_MODEL_RES=low_res
+
+.. _tutorial_map_creation_build_isaac_mapping_ros_package:
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. (X86 Only) Run GPU memory check to set the environment variable for the FoundationStereo model resolution:
+
+         .. code:: bash
+
+            export FOUNDATIONSTEREO_MODEL_RES=<high_res|low_res>
+
+      #. Install the prebuilt Debian packages:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-mapping-ros && \
+               sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-foundationstereo-models-install
+
+      #. Download and install the FoundationStereo model files:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_foundationstereo_models_install install_foundationstereo_models.sh --eula \
+               --model_res ${FOUNDATIONSTEREO_MODEL_RES}
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_mapping_and_localization>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. (X86 Only) Run GPU memory check to set the environment variable for the FoundationStereo model resolution:
+
+         .. code:: bash
+
+            export FOUNDATIONSTEREO_MODEL_RES=<high_res|low_res>
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_mapping_and_localization/isaac_mapping_ros --ignore-src -y
+
+      #. Download and install the FoundationStereo model files:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-foundationstereo-models-install && \
+               ros2 run isaac_ros_foundationstereo_models_install install_foundationstereo_models.sh --eula \
+               --model_res ${FOUNDATIONSTEREO_MODEL_RES}
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_mapping_ros --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_mapping_and_localization/isaac_mapping_ros
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+
+.. |package_name| replace:: ``isaac_mapping_ros``
+
+.. _tutorial_map_creation_quick_start_existing_rosbag:
+
+Quick Start with an Existing Rosbag
+-----------------------------------
+
+.. note::
+   Make sure that the rosbag and output map folder path are mounted to the Isaac ROS environment.
+   You can add them in ``~/.isaac_ros_dev-dockerargs`` then restart the Isaac ROS environment.
+
+#. Download the ``r2b_galileo`` dataset from the
+   `r2b 2024 dataset on NGC <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/isaac/resources/r2bdataset2024>`__.
+   It is a 20-second rosbag containing synchronized images from four stereo camera pairs.
+
+#. Open a terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. (X86 Only) Run GPU memory check to set the environment variable for the FoundationStereo model resolution:
+
+   .. code:: bash
+
+      export FOUNDATIONSTEREO_MODEL_RES=<high_res|low_res>
+
+#. Create the maps mentioned above using the following command:
+
+   .. code:: bash
+
+      ros2 run isaac_mapping_ros create_map_offline.py \
+         --sensor_data_bag=<PATH_TO_BAG> \
+         --base_output_folder=<PATH_TO_OUTPUT_FOLDER> \
+         --fs_model_res=${FOUNDATIONSTEREO_MODEL_RES}
+
+After successful completion, verify that you see a message confirming that maps have
+been created. The full logs for each step are stored in the outputs. All steps include:
+
+- `Extract edex` step extracts RGB images and metadata from rosbag.
+- `Create cuVSLAM map` step computes the cuVSLAM pose and map.
+- `Optimize odometry pose with keyframe pose` step processes the odometry pose and loop closures computed by cuVSLAM and outputs more accurate odometry poses.
+- `Update frame metadata pose` step updates the image metadata with the computed poses.
+- `Select map frames` step samples key frames using a translation and rotation distance from all images.
+- `Copy map frames` step copies the sampled keyframes to a keyframe folder.
+- `Run Foundation Stereo inference` step runs Foundation Stereo inference on keyframes and outputs depth images.
+- `Run Nvblox` step creates a 2D occupancy map from keyframes using RGB+depth images and poses.
+- `Extract features` step extracts ``ALIKED`` image features for keyframes.
+- `Build vocabulary` step builds a visual vocabulary from extracted features.
+- `Build BoW index` step builds a bag-of-words image retrieval database from extracted features, which together with vocabulary form the global localization map.
+
+Verify `occupancy_map.png` file in the output map folder:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/r2b_galileo_omap.png>`
+    :width: 800px
+    :alt: r2b_galileo_omap
+    :align: center
+
+.. _tutorial_map_creation_map_and_localize_with_a_realsense:
+
+Map and Localize with a RealSense
+---------------------------------
+
+.. warning::
+
+    - Mapping workflow works best in closed, structured indoor spaces with nearby visual features. In more open environments or scenes with far backgrounds, mapping accuracy can degrade due to fewer constraints.
+
+    - Glass and very thin structures such as wires and cable railings cannot be detected by the current stereo networks used for depth estimation. If you have such structures in your environment, you might need to modify the environment so that they are more visible features, to have the unnavigable areas correctly estimated.
+
+    - The quality of the occupancy map is dependent on the disparity data provided to Nvblox. Degraded results can occur for wall corners. Improved results might be achieved with alternative stereo modalities, such as a different stereo camera or other AI/DNNs for stereo disparity estimation.
+
+You can use a RealSense D435i camera for following the steps below.
+
+Activate the Isaac ROS environment for every new terminal created when running the following steps
+by running the command ``isaac-ros activate`` in the terminal.
+
+#. Set up the development environment by following :ref:`Set Up Development Environment <tutorial_map_creation_set_up_development_environment>`
+   instructions.
+
+#. Build the package by following :ref:`Build Isaac Mapping ROS Package <tutorial_map_creation_build_isaac_mapping_ros_package>`
+   instructions.
+
+#. Set up the RealSense camera by following the :doc:`RealSense Setup </getting_started/sensors/realsense_setup>` instructions.
+   Plug in the camera and run the command ``rs-enumerate-devices -S`` in the terminal to check the
+   camera model. For example:
+
+   .. code:: bash
+
+      Device Name                Serial Number       Firmware Version
+      Intel RealSense D435I      337122071493        5.16.0.1
+
+#. Set up visualization.
+
+   #. Follow the :ref:`Foxglove setup <foxglove-setup>` guide to launch Foxglove.
+
+   #. Download Foxglove layout file from
+      :ir_repo:`localize_realsense.json <isaac_ros_mapping_and_localization> <isaac_mapping_ros/foxglove_layouts/localize_realsense.json>`.
+
+   #. Import the downloaded layout file into Foxglove.
+
+#. Run a quick check on cuVSLAM result with RealSense camera.
+
+   #. Open a terminal and activate the Isaac ROS environment:
+
+      .. code-block:: bash
+
+         isaac-ros activate
+
+   #. Launch the RealSense camera with cuVSLAM node.
+
+      .. code-block:: bash
+
+         ros2 launch isaac_mapping_ros localize_realsense.launch.py enable_vgl:=False
+  
+   #. Move the camera forward by 1m, and verify the cuVSLAM reports a translation of
+      around ``[1.0, 0.0, 0.0]`` in the Foxglove panel. If the reported
+      odometry measurement is inaccurate, make sure the environment has
+      sufficient near-distance objects for feature tracking, and verify
+      the camera calibration is correct. 
+
+#. Record a rosbag for map creation.
+
+   #. Launch the RealSense camera:
+
+      .. code-block:: bash
+
+         ros2 launch isaac_mapping_ros localize_realsense.launch.py \
+             enable_vslam:=False \
+             enable_vgl:=False
+
+   #. In a new terminal, activate the Isaac ROS environment
+
+      .. code-block:: bash
+
+         isaac-ros activate
+
+      Then, start rosbag recording:
+
+      .. code-block:: bash
+
+         ros2 bag record \
+             /tf_static \
+             /realsense/left/camera_info_rect \
+             /realsense/left/image_rect \
+             /realsense/right/camera_info_rect \
+             /realsense/right/image_rect \
+             --storage mcap \
+             -o <PATH_TO_BAG>
+
+   #. Collect data following the :ref:`Data Collection <tutorial_map_creation_data_collection>` guidelines.
+      Additionally, follow these recommendations for handheld mapping bags:
+
+      - Hold the camera in the correct orientation. For the Intel RealSense Depth Camera D435i,
+        the screw hole should face downward while recording.
+
+      - Record in areas with sufficient nearby visual features. Avoid scenes dominated by distant
+        backgrounds.
+
+      - Avoid sudden or sharp motions. Keep the camera facing forward, and rotate it smoothly when
+        looking up, down, or around.
+
+      - Start and stop recording at approximately the same pose to help ensure loop closure.
+
+      - Move the camera close to the objects you want to map, including the ground and surrounding
+        structures.
+
+        An example of a recording captured around a cafe table area:
+
+        .. figure::
+            :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/voyager_cafe_f3_recording.gif>`
+            :width: 800px
+            :alt: Cafe Table Area
+            :align: center
+
+   #. After data collection is finished, use ``ctrl+c`` to stop the rosbag recording
+      and camera driver. Verify the rosbag contains all the topics listed above
+      by running the command ``ros2 bag info <PATH_TO_BAG>``.
+
+#. (X86 Only) Run GPU memory check to set the environment variable for the FoundationStereo model resolution:
+
+   .. code:: bash
+
+      export FOUNDATIONSTEREO_MODEL_RES=<high_res|low_res>
+
+#. Create maps for the RealSense rosbag using the following command:
+
+   .. code-block:: bash
+
+      ros2 run isaac_mapping_ros create_map_offline.py \
+          --sensor_data_bag=<PATH_TO_BAG> \
+          --base_output_folder=<PATH_TO_OUTPUT_FOLDER> \
+          --camera_topic_config=$(ros2 pkg prefix isaac_mapping_ros --share)/configs/data_converter_realsense.yaml \
+          --base_link_name=camera_link \
+          --fs_model_res=${FOUNDATIONSTEREO_MODEL_RES}
+
+   The ``--base_link_name`` is used to specify the TF frame name in your rosbag.
+   The ``--camera_topic_config`` is used to specify the YAML file for the custom
+   camera topic, camera info topic, and camera frame names.
+
+#. Verify the map quality by referring to the
+   :ref:`Map Quality Verification <tutorial_map_creation_map_quality_verification>`
+   section.
+
+#. Export the TensorRT engine file as described in
+   :ref:`Export TensorRT Engine Files <export_tensorrt_engine_files>`.
+
+#. Run live localization using the maps generated above:
+
+   .. code-block:: bash
+
+      ros2 launch isaac_mapping_ros localize_realsense.launch.py \
+          map_dir:=<PATH_TO_OUTPUT_FOLDER> \
+          vgl_model_dir:=<PATH_TO_MODEL_DIR>
+
+   It starts the RealSense camera, cuVSLAM and cuVGL nodes, and an
+   occupancy map server.
+   
+   The cuVGL node first computes a global localization pose
+   for cuVSLAM to bootstrap localization. After cuVSLAM successfully localizes
+   in the map, cuVGL stops localization and cuVSLAM continuously tracks features
+   and performs optimization with the map.
+
+#. To run localization with a pre-recorded rosbag, specify the rosbag path
+   in the launch file:
+
+   .. code-block:: bash
+
+      ros2 launch isaac_mapping_ros localize_realsense.launch.py \
+          map_dir:=<PATH_TO_OUTPUT_FOLDER> \
+          vgl_model_dir:=<PATH_TO_MODEL_DIR> \
+          rosbag:=<PATH_TO_BAG>
+
+   Replay is at real time by default. You can adjust the replay rate by
+   ``replay_rate:=<replay_rate>``. When running a short localization bag,
+   use ``replay_rate:=0.1`` to slow down the replay, allowing more
+   localization triggers and increasing the chances of successful localization.
+
+.. _tutorial_map_creation_map_quality_verification:
+
+Map Quality Verification
+------------------------
+
+Pose Plot
+~~~~~~~~~
+
+Pose trajectory plots are saved under `pose_comparison` folder.
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/optimized_keyframe_pose.png>`
+    :width: 800px
+    :alt: Pose Comparison
+    :align: center
+
+The plots show the final poses used for map creation in ``XY`` and ``XZ`` planes.
+The green circle represents the start pose, and the
+red square represents the end pose.
+
+If data collection starts and ends at approximately the same pose, the distance
+between the green circle and the red square represents the pose drifts during mapping.
+
+- If you observe noticeable separation between the start and end poses (loop-closure drift),
+  recollect the data in a closed loop and enable multiple passes by setting ``-o cuvslam.repeat=2``
+  in the map creation command.
+
+Occupancy Map
+~~~~~~~~~~~~~
+
+The 2D occupancy map is saved to `occupancy_map.png` and `occupancy_map.yaml`
+in the output map folder. A good occupancy map should have well-aligned objects
+and walls, for example:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/good_omap.png>`
+    :width: 800px
+    :alt: Good OMap
+    :align: center
+
+A **bad** occupancy map can have noisy artifacts or misaligned walls, like this:
+
+.. figure::
+    :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/omap_poor_quality1.png>`
+    :width: 800px
+    :alt: OMap poor quality
+    :align: center
+
+
+- You can include objects that are farther away in the occupancy map by increasing the
+  Nvblox integration distance using the
+  ``-o nvblox.projective_integrator_max_integration_distance_m=<MAX_INTEGRATION_DISTANCE>``
+  flag in the map creation command.
+
+Overriding Parameters
+~~~~~~~~~~~~~~~~~~~~~
+
+The map creation configuration is defined in :ir_repo:`map_creation_config.yaml <isaac_ros_mapping_and_localization> <isaac_mapping_ros/configs/map_creation_config.yaml>`.
+You can override the cuVSLAM and Nvblox parameters using one of the following methods:
+
+- Pass the overrides as command line arguments, for example: ``-o cuvslam.repeat=2 -o nvblox.projective_integrator_max_integration_distance_m=3.5``.
+
+- Create a custom config file by copying the default config file from
+  :ir_repo:`map_creation_config.yaml <isaac_ros_mapping_and_localization> <isaac_mapping_ros/configs/map_creation_config.yaml>`
+  and modify the parameters you want to change. Then pass it when running map creation with the ``--map_creation_config=<CUSTOM_CONFIG_FILE>`` flag.

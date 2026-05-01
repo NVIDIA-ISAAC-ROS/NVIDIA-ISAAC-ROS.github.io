@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Pick and Place &#8212; Isaac ROS</title>
+    <title>Pick and Place with Isaac ROS Manipulation in Isaac Sim &#8212; Isaac ROS</title>
   
   
   
@@ -28,8 +28,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
@@ -39,10 +39,10 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/isaac.css?v=177ef1d8" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
@@ -65,7 +65,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Apr 07, 2026"/>
+    <meta name="docbuild:last-update" content="Apr 30, 2026"/>
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -87,7 +87,9 @@
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -284,9 +286,9 @@
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html">Isaac for Manipulation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../../reference_architecture.html">Isaac for Manipulation Reference Architecture</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../setup/setup_with_gripper.html">Set Up Hardware and Software for Real Robot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../setup/setup_with_gripper.html">Setup Hardware and Software for Real Robot with Isaac ROS Manipulation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../setup/setup_guide_isaac_sim.html">Setup for Simulated Robot in Isaac Sim</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../setup/testing_manipulator.html">Run Tests for various components of Isaac for Manipulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../setup/testing_manipulator.html">Guide for the Various Tests Inside of Isaac ROS Manipulation</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="../tutorials.html">Isaac for Manipulation Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -304,7 +306,7 @@
 <li class="toctree-l4 current active has-children"><a class="reference internal" href="../tutorial_isaac_sim.html">Isaac for Manipulation Tutorials with Isaac Sim</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="tutorial_isaac_sim_pose_to_pose.html">Pose to Pose Planning</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorial_isaac_sim_object_following.html">Object Following</a></li>
-<li class="toctree-l5 current active"><a class="current reference internal" href="#">Pick and Place</a></li>
+<li class="toctree-l5 current active"><a class="current reference internal" href="#">Pick and Place with Isaac ROS Manipulation in Isaac Sim</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorial_isaac_sim_grasp_authoring.html">Grasp Authoring</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorial_isaac_sim_gear_insertion_policy.html">Gear Insertion Policy</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorial_isaac_sim_gear_assembly.html">Gear Assembly Workflow</a></li>
@@ -312,25 +314,27 @@
 </details></li>
 </ul>
 </details></li>
-<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_manipulator_asset_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_asset_bringup</span></code></a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../packages/isaac_manipulator_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_bringup</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_manipulator_bringup/manipulation_workflow_config_guide.html">Manipulation Workflow Configuration Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_ros_manipulation_asset_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_asset_bringup</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../packages/isaac_ros_manipulation_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_bringup</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_ros_manipulation_bringup/manipulation_workflow_config_guide.html">Manipulation Workflow Configuration Guide</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_manipulator_gear_assembly/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_gear_assembly</span></code></a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../packages/isaac_manipulator_orchestration/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_orchestration</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_manipulator_orchestration/behavior_reference.html">Behavior Reference</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_manipulator_orchestration/blackboard_reference.html">Blackboard Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_ros_manipulation_gear_assembly/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_gear_assembly</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../packages/isaac_ros_manipulation_orchestration/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_orchestration</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_ros_manipulation_orchestration/behavior_reference.html">Behavior Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_ros_manipulation_orchestration/blackboard_reference.html">Blackboard Reference</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../packages/isaac_manipulator_pick_and_place/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_pick_and_place</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_manipulator_pick_and_place/api_reference.html">API Reference and Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_manipulator_pick_and_place/configuration_guide.html">Configuration Guide</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../packages/isaac_ros_manipulation_pick_and_place/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_pick_and_place</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_ros_manipulation_pick_and_place/api_reference.html">API Reference and Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../packages/isaac_ros_manipulation_pick_and_place/configuration_guide.html">Configuration Guide</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_manipulator_ros_python_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ros_python_utils</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_manipulator_servers/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_servers</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_manipulator_ur_dnn_policy/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_manipulator_ur_dnn_policy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_ros_manipulation_ros_python_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_ros_python_utils</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_ros_manipulation_servers/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_servers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../packages/isaac_ros_manipulation_ur_dnn_policy/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_ur_dnn_policy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../isaac_ros_manipulation/packages/isaac_ros_manipulation_object_following/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_object_following</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../isaac_ros_manipulation/packages/isaac_ros_manipulation_pose_to_pose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_pose_to_pose</span></code></a></li>
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../isaac_for_mobility/index.html">Isaac for Mobility</a></li>
@@ -407,6 +411,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../concepts/stereo_dnn/index.html">Stereo DNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../concepts/teleop/index.html">Teleoperation</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../concepts/visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../concepts/visual_global_localization/tutorials/tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
@@ -467,10 +472,8 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_cumotion/index.html">Isaac ROS cuMotion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_moveit</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_esdf_visualizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_esdf_visualizer</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_moveit_goal_setter/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_moveit_goal_setter</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_goal_setter_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_goal_setter_interfaces</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_object_attachment</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_robot_segmenter/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_robot_segmenter</span></code></a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_dnn_inference/index.html">Isaac ROS DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -590,6 +593,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_yolov8</span></code></a></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_physical_ai/index.html">Isaac ROS Physical AI</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unitree_g1_teleop_bringup</span></code></a></li>
+</ul>
+</details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/index.html">Isaac ROS Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dope</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -613,6 +620,10 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_sipl_camera/index.html">Isaac ROS SIPL Camera</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_sipl_camera</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_teleop/index.html">Isaac ROS Teleop</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_teleop/isaac_ros_teleop/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_teleop</span></code></a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../repositories_and_packages/isaac_ros_visual_slam/index.html">Isaac ROS Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -699,6 +710,7 @@
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
         <dd><a href="../../../../v/release-4.3/reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pick_and_place.html">release-4.3</a></dd>
+        <dd><a href="../../../../v/release-4.4/reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pick_and_place.html">release-4.4</a></dd>
         <dd><a href="tutorial_isaac_sim_pick_and_place.html">latest</a></dd>
         <dd><a href="../../../../v/release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../../v/release-3.1/index.html">release-3.1</a></dd>
@@ -748,7 +760,7 @@
     
     <li class="breadcrumb-item"><a href="../tutorial_isaac_sim.html" class="nav-link">Isaac for Manipulation Tutorials with Isaac Sim</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Pick and Place</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Pick and Place with Isaac ROS Manipulation in Isaac Sim</span></li>
   </ul>
 </nav>
 </div>
@@ -765,17 +777,17 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="pick-and-place">
-<h1>Pick and Place<a class="headerlink" href="#pick-and-place" title="Link to this heading">#</a></h1>
+  <section id="pick-and-place-with-isaac-ros-manipulation-in-isaac-sim">
+<h1>Pick and Place with Isaac ROS Manipulation in Isaac Sim<a class="headerlink" href="#pick-and-place-with-isaac-ros-manipulation-in-isaac-sim" title="Link to this heading">#</a></h1>
 <figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place.gif/"><img alt="Demonstration of Isaac for Manipulation pick and place for a robot simulated in Isaac Sim" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place.gif/" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place.gif/"><img alt="Demonstration of Isaac ROS Manipulation pick and place for a robot simulated in Isaac Sim" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place.gif/" style="width: 600px;" /></a>
 </figure>
 <figure class="align-center">
-<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place_in_rviz.gif/"><img alt="RViz visualization of Isaac for Manipulation pick and place for a robot simulated in Isaac Sim" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.3/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place_in_rviz.gif/" style="width: 750px;" /></a>
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place_in_rviz.gif/"><img alt="RViz visualization of Isaac ROS Manipulation pick and place for a robot simulated in Isaac Sim" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.4/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/isaac_sim_pick_and_place_in_rviz.gif/" style="width: 750px;" /></a>
 </figure>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
-<p>This tutorial demonstrates a complete pick and place workflow using Isaac for Manipulation in Isaac Sim.
+<p>This tutorial demonstrates a complete pick and place workflow using Isaac ROS Manipulation in Isaac Sim.
 The workflow combines obstacle-aware planning, object perception, and grasping to enable the robot
 to pick up objects and place them at desired locations.</p>
 <p>This tutorial leverages the cuMotion planner node provided by <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion" rel="noreferrer" target="_blank">Isaac ROS cuMotion</a></p>
@@ -790,7 +802,7 @@ comply with any national or international functional safety standards. When test
 behavior, do not use human limbs or other living entities.</p>
 </div>
 <p>The example uses <a class="reference external" href="https://github.com/ros2/rviz" rel="noreferrer" target="_blank">RViz</a> for visualization.
-RViz is the default visualization tool when Isaac for Manipulation is running on the same computer
+RViz is the default visualization tool when Isaac ROS Manipulation is running on the same computer
 that is displaying the visualization.
 <a class="reference external" href="https://foxglove.dev/" rel="noreferrer" target="_blank">Foxglove</a> is recommended when visualizing a reconstruction streamed from
 a remote machine. However, that is not officially supported for the sim workflows.</p>
@@ -798,8 +810,8 @@ a remote machine. However, that is not officially supported for the sim workflow
 <section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Follow the setup instructions in <a class="reference internal" href="../setup/setup_guide_isaac_sim.html"><span class="doc">Setup for Simulated Robot with Isaac for Manipulation in Isaac Sim</span></a>.</p></li>
-<li><p>For improved performance in the scene execution, follow the instructions in <a class="reference internal" href="../setup/setup_guide_isaac_sim.html#isaac-sim-scene-speed-up"><span class="std std-ref">Optimization for Physics Scene in Isaac for Manipulation</span></a>.</p></li>
+<li><p>Follow the setup instructions in <a class="reference internal" href="../setup/setup_guide_isaac_sim.html"><span class="doc">Setup for Simulated Robot with Isaac ROS Manipulation in Isaac Sim</span></a>.</p></li>
+<li><p>For improved performance in the scene execution, follow the instructions in <a class="reference internal" href="../setup/setup_guide_isaac_sim.html#isaac-sim-scene-speed-up"><span class="std std-ref">Optimization for Physics Scene in Isaac ROS Manipulation</span></a>.</p></li>
 </ul>
 </section>
 <section id="tutorial">
@@ -813,46 +825,46 @@ a remote machine. However, that is not officially supported for the sim workflow
 Binary Package</label><div class="sd-tab-content docutils">
 <p>Binary installations have read-only configuration files in system directories. Copy all necessary files to a writable location:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a directory for your custom configuration</span>
-mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_manipulator_config
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config
 </pre></div>
 </div>
 <p>Copy the workflow configuration file:</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_manipulator_bringup<span class="k">)</span>/params/sim_launch_params.yaml<span class="w"> </span><span class="se">\</span>
-<span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_manipulator_config/sim_launch_params.yaml
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_bringup<span class="k">)</span>/params/sim_launch_params.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/sim_launch_params.yaml
 </pre></div>
 </div>
 </div></blockquote>
 <p>Copy behavior tree and blackboard parameter files:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_manipulator_pick_and_place<span class="k">)</span>/params/multi_object_pick_and_place_behavior_tree_params.yaml<span class="w"> </span><span class="se">\</span>
-<span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_manipulator_config/multi_object_pick_and_place_behavior_tree_params.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_pick_and_place<span class="k">)</span>/params/multi_object_pick_and_place_behavior_tree_params.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/multi_object_pick_and_place_behavior_tree_params.yaml
 
-cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_manipulator_pick_and_place<span class="k">)</span>/params/multi_object_pick_and_place_blackboard_params.yaml<span class="w"> </span><span class="se">\</span>
-<span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_manipulator_config/multi_object_pick_and_place_blackboard_params.yaml
+cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_pick_and_place<span class="k">)</span>/params/multi_object_pick_and_place_blackboard_params.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/multi_object_pick_and_place_blackboard_params.yaml
 </pre></div>
 </div>
 <p><strong>Files you’ll edit:</strong></p>
 <ul>
 <li><p><strong>Workflow configuration</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_manipulator_config/sim_launch_params.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/sim_launch_params.yaml
 </pre></div>
 </div>
 </li>
 <li><p><strong>Behavior tree parameters</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_manipulator_config/multi_object_pick_and_place_behavior_tree_params.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/multi_object_pick_and_place_behavior_tree_params.yaml
 </pre></div>
 </div>
 </li>
 <li><p><strong>Blackboard parameters</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_manipulator_config/multi_object_pick_and_place_blackboard_params.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/multi_object_pick_and_place_blackboard_params.yaml
 </pre></div>
 </div>
 </li>
 </ul>
 <p>Set up environment variables:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Point to the directory containing your configuration files</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/isaac_manipulator_config&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/isaac_manipulator_config&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/isaac_ros_manipulation_config&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_PICK_AND_PLACE_CONFIG_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/isaac_ros_manipulation_config&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -863,25 +875,25 @@ Build from Source</label><div class="sd-tab-content docutils">
 <p><strong>Files you’ll edit:</strong></p>
 <ul>
 <li><p><strong>Workflow configuration</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_manipulator/isaac_manipulator_bringup/params/sim_launch_params.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_bringup/params/sim_launch_params.yaml
 </pre></div>
 </div>
 </li>
 <li><p><strong>Behavior tree parameters</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_manipulator/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml
 </pre></div>
 </div>
 </li>
 <li><p><strong>Blackboard parameters</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_manipulator/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml
 </pre></div>
 </div>
 </li>
 </ul>
 <p>Set up environment variables:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Point to the source directories containing the configuration files</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/src/isaac_manipulator/isaac_manipulator_bringup/params&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_MANIPULATOR_PICK_AND_PLACE_CONFIG_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/src/isaac_manipulator/isaac_manipulator_pick_and_place/params&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/src/isaac_ros_manipulation/isaac_ros_manipulation_bringup/params&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_PICK_AND_PLACE_CONFIG_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/src/isaac_ros_manipulation/isaac_ros_manipulation_pick_and_place/params&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -892,7 +904,7 @@ Build from Source</label><div class="sd-tab-content docutils">
 <p>Edit the workflow configuration file to work with Isaac Sim.</p>
 <p><strong>Reference Configuration File:</strong></p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.3/isaac_manipulator_bringup/params/sim_launch_params.yaml" rel="noreferrer" target="_blank">sim_launch_params.yaml</a></p></li>
+<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.4/isaac_ros_manipulation_bringup/params/sim_launch_params.yaml" rel="noreferrer" target="_blank">sim_launch_params.yaml</a></p></li>
 </ul>
 <ol class="arabic">
 <li><p>Open the <code class="docutils literal notranslate"><span class="pre">sim_launch_params.yaml</span></code> file and set the following parameters:</p>
@@ -901,17 +913,13 @@ Build from Source</label><div class="sd-tab-content docutils">
 <span class="nt">object_detection_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RTDETR</span>
 <span class="nt">enable_nvblox</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;false&#39;</span>
 <span class="nt">use_ground_truth_pose_in_sim</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;false&#39;</span>
-<span class="c1">#</span>
-<span class="c1"># Other parameters...</span>
-<span class="c1">#</span>
-<span class="nt">moveit_collision_objects_scene_file</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;$(ros2</span><span class="nv"> </span><span class="s">pkg</span><span class="nv"> </span><span class="s">prefix</span><span class="nv"> </span><span class="s">--share</span><span class="nv"> </span><span class="s">isaac_manipulator_bringup)/config/scene_objects/sim_test_bench/sim_test_scene_objects.scene&#39;</span>
 </pre></div>
 </div>
 </li>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For parameter details and model combinations, refer to the <a class="reference internal" href="../../packages/isaac_manipulator_bringup/manipulation_workflow_config_guide.html"><span class="doc">Manipulation Workflow Configuration Guide</span></a>.</p>
+<p>For parameter details and model combinations, refer to the <a class="reference internal" href="../../packages/isaac_ros_manipulation_bringup/manipulation_workflow_config_guide.html"><span class="doc">Manipulation Workflow Configuration Guide</span></a>.</p>
 </div>
 </section>
 <section id="configure-objects-and-workspace">
@@ -919,19 +927,21 @@ Build from Source</label><div class="sd-tab-content docutils">
 <p>Edit the behavior tree and blackboard parameter files (prepared in <a class="reference internal" href="#prepare-configuration-files-and-environment-variables">Prepare Configuration Files and Environment Variables</a>) to configure the objects your robot will manipulate and define workspace parameters.</p>
 <p><strong>Reference Configuration Files:</strong></p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.3/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml" rel="noreferrer" target="_blank">Behavior Tree Parameters</a></p></li>
-<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_manipulator/blob/release-4.3/isaac_manipulator_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml" rel="noreferrer" target="_blank">Blackboard Parameters</a></p></li>
+<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.4/isaac_ros_manipulation_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml" rel="noreferrer" target="_blank">Behavior Tree Parameters</a></p></li>
+<li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.4/isaac_ros_manipulation_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml" rel="noreferrer" target="_blank">Blackboard Parameters</a></p></li>
 </ul>
 <ol class="arabic">
-<li><p>Modify the following parameters in the behavior tree parameter file:</p>
+<li><p>Modify the behavior tree parameter file:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">interactive_marker</span><span class="p">:</span>
-<span class="w">   </span><span class="nt">mesh_resource_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;package://isaac_manipulator_robot_description/meshes/robotiq_2f_140.obj&#39;</span>
+<span class="w">   </span><span class="nt">mesh_resource_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;package://isaac_ros_manipulation_ur_robot_description/meshes/robotiq_2f_140_gripper.obj&#39;</span>
 <span class="w">   </span><span class="nt">reference_frame</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;base_link&#39;</span>
 <span class="w">   </span><span class="nt">end_effector_frame</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;gripper_frame&#39;</span>
-<span class="w">   </span><span class="nt">user_confirmation_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60.0</span><span class="w">  </span><span class="c1"># seconds to wait for user to adjust drop pose</span>
+<span class="w">   </span><span class="nt">user_confirmation_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60.0</span>
+
+<span class="nt">plan_to_grasp</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">time_dilation_factor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.6</span>
 
 <span class="nt">pose_estimation</span><span class="p">:</span>
-<span class="w">   </span><span class="nt">action_server_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;/get_object_pose&#39;</span>
 <span class="w">   </span><span class="nt">base_frame_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;base_link&#39;</span>
 <span class="w">   </span><span class="nt">camera_frame_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;front_stereo_camera_left&#39;</span><span class="w"> </span><span class="c1"># for Isaac Sim</span>
 <span class="w">   </span><span class="nt">workspace_bounds</span><span class="p">:</span>
@@ -953,12 +963,12 @@ Build from Source</label><div class="sd-tab-content docutils">
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">supported_objects</span><span class="p">:</span>
 <span class="w">   </span><span class="nt">mac_and_cheese</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">class_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;22&#39;</span>
-<span class="w">      </span><span class="nt">grasp_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(ros2 pkg prefix --share isaac_manipulator_robot_description)/config/robotiq_2f_140_grasps_mac_and_cheese.yaml</span>
+<span class="w">      </span><span class="nt">grasp_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(ros2 pkg prefix --share isaac_ros_manipulation_robot_description)/config/robotiq_2f_140_grasps_mac_and_cheese.yaml</span>
 <span class="w">      </span><span class="nt">mesh_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/Mac_and_cheese_0_1/Mac_and_cheese_0_1.obj</span>
 
 <span class="w">   </span><span class="nt">soup_can</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">class_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3&#39;</span>
-<span class="w">      </span><span class="nt">grasp_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(ros2 pkg prefix --share isaac_manipulator_robot_description)/config/robotiq_2f_140_grasps_soup_can.yaml</span>
+<span class="w">      </span><span class="nt">grasp_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(ros2 pkg prefix --share isaac_ros_manipulation_robot_description)/config/robotiq_2f_140_grasps_soup_can.yaml</span>
 <span class="w">      </span><span class="nt">mesh_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_foundationpose/soup_can/soup_can.obj</span>
 </pre></div>
 </div>
@@ -968,7 +978,7 @@ Build from Source</label><div class="sd-tab-content docutils">
 <p class="admonition-title">Note</p>
 <p>The example configurations are pre-configured for SyntheticaDETR v1.0.0 with specific class IDs: Mac and Cheese box (<code class="docutils literal notranslate"><span class="pre">'22'</span></code>) and Soup can (<code class="docutils literal notranslate"><span class="pre">'3'</span></code>). If you’re using a different detection model or objects, you’ll need to update these class IDs to match your model’s output.</p>
 </div>
-<p>For detailed configuration instructions covering object setup, workspace locations, and system parameters, refer to the <a class="reference internal" href="../../packages/isaac_manipulator_pick_and_place/configuration_guide.html"><span class="doc">Pick and Place Configuration Guide</span></a>.</p>
+<p>For detailed configuration instructions covering object setup, workspace locations, and system parameters, refer to the <a class="reference internal" href="../../packages/isaac_ros_manipulation_pick_and_place/configuration_guide.html"><span class="doc">Pick and Place Configuration Guide</span></a>.</p>
 <p><strong>Configuration Checklist</strong></p>
 <p>Verify these settings in your behavior tree and blackboard parameter files before launching:</p>
 <ul class="simple">
@@ -984,11 +994,11 @@ Build from Source</label><div class="sd-tab-content docutils">
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p><strong>Testing Configuration Without Hardware</strong>: If you want to verify your configuration setup before proceeding to hardware, refer to the standalone quickstart in <a class="reference internal" href="../../packages/isaac_manipulator_pick_and_place/index.html"><span class="doc">isaac_manipulator_pick_and_place</span></a>. This uses dummy servers to test that your behavior tree logic and configuration files work correctly.</p>
+<p><strong>Testing Configuration Without Hardware</strong>: If you want to verify your configuration setup before proceeding to hardware, refer to the standalone quickstart in <a class="reference internal" href="../../packages/isaac_ros_manipulation_pick_and_place/index.html"><span class="doc">isaac_ros_manipulation_pick_and_place</span></a>. This uses dummy servers to test that your behavior tree logic and configuration files work correctly.</p>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>Configure <code class="docutils literal notranslate"><span class="pre">pose_estimation.base_frame_id</span></code> and <code class="docutils literal notranslate"><span class="pre">pose_estimation.camera_frame_id</span></code> in the behavior tree parameters. For Isaac Sim, use <code class="docutils literal notranslate"><span class="pre">front_stereo_camera_left</span></code> by default; see the <a class="reference internal" href="../../packages/isaac_manipulator_pick_and_place/configuration_guide.html"><span class="doc">Configuration Guide</span></a> for details and alternatives.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Set <code class="docutils literal notranslate"><span class="pre">pose_estimation.camera_frame_id</span></code> in the behavior tree parameters to match your camera. For Isaac Sim, use <code class="docutils literal notranslate"><span class="pre">front_stereo_camera_left</span></code>. See <a class="reference internal" href="../../packages/isaac_ros_manipulation_pick_and_place/configuration_guide.html#pose-estimation-frame-ids"><span class="std std-ref">Pose Estimation Frame IDs</span></a> in the Configuration Guide for all supported values.</p>
 </div>
 </section>
 <section id="launch-isaac-sim">
@@ -1008,15 +1018,26 @@ Build from Source</label><div class="sd-tab-content docutils">
 </section>
 <section id="run-pick-and-place">
 <h3>Run Pick and Place<a class="headerlink" href="#run-pick-and-place" title="Link to this heading">#</a></h3>
+<p>The pick and place workflow uses Cyclone DDS instead of the default <code class="docutils literal notranslate"><span class="pre">rmw_fastrtps_cpp</span></code>.</p>
 <ol class="arabic">
+<li><p>Install Cyclone DDS (one-time setup):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-rmw-cyclonedds-cpp
+</pre></div>
+</div>
+</li>
 <li><p>Open a <strong>new</strong> terminal and activate the Isaac ROS environment:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
 </pre></div>
 </div>
 </li>
+<li><p>Set the Cyclone DDS environment variable (required in <strong>every</strong> terminal):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_cyclonedds_cpp
+</pre></div>
+</div>
+</li>
 <li><p>Launch the pick and place example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_manipulator_bringup<span class="w"> </span>workflows.launch.py<span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>manipulator_workflow_config:<span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_MANIPULATOR_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/sim_launch_params.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_manipulation_bringup<span class="w"> </span>workflows.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>manipulator_workflow_config:<span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/sim_launch_params.yaml
 </pre></div>
 </div>
 <p>The launch command uses environment variables set in the <a class="reference internal" href="#prepare-configuration-files-and-environment-variables">Prepare Configuration Files and Environment Variables</a> section to point to your configuration files.</p>
@@ -1025,15 +1046,25 @@ Build from Source</label><div class="sd-tab-content docutils">
 <section id="execute-pick-and-place">
 <h4>Execute Pick and Place<a class="headerlink" href="#execute-pick-and-place" title="Link to this heading">#</a></h4>
 <ol class="arabic">
-<li><p>After you run the launch file, in a new terminal trigger the workflow with an action goal:</p>
+<li><p>After you run the launch file, open a <strong>new</strong> terminal and activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Set the Cyclone DDS environment variable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_cyclonedds_cpp
+</pre></div>
+</div>
+</li>
+<li><p>Trigger the workflow with an action goal:</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Single Bin Mode</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Multi-Bin Mode</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p>All objects to one location:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>send_goal<span class="w"> </span>--feedback<span class="w"> </span>/multi_object_pick_and_place<span class="w"> </span>isaac_manipulator_interfaces/action/MultiObjectPickAndPlace<span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>send_goal<span class="w"> </span>--feedback<span class="w"> </span>/multi_object_pick_and_place<span class="w"> </span>isaac_ros_manipulation_interfaces/action/MultiObjectPickAndPlace<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span><span class="s1">&#39;{target_poses: {header: {frame_id: &quot;base_link&quot;}, poses: [{position: {x: -0.25, y: -0.35, z: 0.50}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: [], mode: 0}&#39;</span>
 </pre></div>
 </div>
 </div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p>Objects sorted by class:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>send_goal<span class="w"> </span>--feedback<span class="w"> </span>/multi_object_pick_and_place<span class="w"> </span>isaac_manipulator_interfaces/action/MultiObjectPickAndPlace<span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>send_goal<span class="w"> </span>--feedback<span class="w"> </span>/multi_object_pick_and_place<span class="w"> </span>isaac_ros_manipulation_interfaces/action/MultiObjectPickAndPlace<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span><span class="s1">&#39;{target_poses: {header: {frame_id: &quot;base_link&quot;}, poses: [{position: {x: -0.25, y: -0.35, z: 0.50}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}, {position: {x: -0.25, y: 0.40, z: 0.40}, orientation: {w: 0.017994, x: -0.677772, y: 0.734752, z: 0.020993}}]}, class_ids: [&quot;22&quot;, &quot;3&quot;], mode: 1}&#39;</span>
 </pre></div>
 </div>
@@ -1042,7 +1073,7 @@ Build from Source</label><div class="sd-tab-content docutils">
 <p class="admonition-title">Warning</p>
 <p>Update these example poses with positions safe and reachable in your robot’s workspace.</p>
 </div>
-<p>Refer to <a class="reference internal" href="../../packages/isaac_manipulator_pick_and_place/api_reference.html"><span class="doc">API Reference</span></a> for complete action interface documentation.</p>
+<p>Refer to <a class="reference internal" href="../../packages/isaac_ros_manipulation_pick_and_place/api_reference.html"><span class="doc">API Reference</span></a> for complete action interface documentation.</p>
 </li>
 </ol>
 </section>
@@ -1073,7 +1104,7 @@ following command:</p>
 <ul class="simple">
 <li><p>Try the <a class="reference internal" href="tutorial_isaac_sim_object_following.html"><span class="doc">Object Following tutorial</span></a> to track moving objects</p></li>
 <li><p>Try the <a class="reference internal" href="tutorial_isaac_sim_gear_assembly.html"><span class="doc">Gear Assembly tutorial</span></a> for complex assembly tasks</p></li>
-<li><p>Learn more about <a class="reference internal" href="../../reference_architecture.html"><span class="doc">Isaac for Manipulation Reference Architecture</span></a></p></li>
+<li><p>Learn more about <a class="reference internal" href="../../reference_architecture.html"><span class="doc">Isaac ROS Manipulation Reference Architecture</span></a></p></li>
 </ul>
 </section>
 </section>
@@ -1163,8 +1194,8 @@ following command:</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
 
   <footer class="bd-footer">
@@ -1239,7 +1270,7 @@ following command:</p>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Apr 07, 2026.
+  Last updated on Apr 30, 2026.
   <br/>
 </p></div>
       
