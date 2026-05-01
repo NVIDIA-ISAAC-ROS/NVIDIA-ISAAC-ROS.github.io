@@ -1,0 +1,405 @@
+Multi-RealSense Camera Examples
+===============================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/multi_realsense_galileo.gif>`
+    :width: 600px
+    :align: center
+
+
+This page contains tutorials for running :doc:`Isaac ROS Nvblox </repositories_and_packages/isaac_ros_nvblox/index>`
+together with :doc:`Isaac ROS Visual SLAM </repositories_and_packages/isaac_ros_visual_slam/isaac_ros_visual_slam/index>`
+on multiple `Intel RealSense <https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html>`__
+cameras.
+
+.. note::
+
+   This tutorial only uses the first camera (``camera0``) for Visual SLAM due to additional camera synchronization requirements
+   not required for Nvblox.
+
+.. note::
+
+   For a rig to mount up to 3 RealSense cameras on the Thor Developer Kit in fixed positions, see the :doc:`Thor Developer Kit RealSense Rig Assembly Guide </robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly>` where you'll also find an STL file for the rig and URDF files.
+
+Install
+-------
+
+1. Complete the installation instructions from the :ref:`single RealSense tutorial <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Install>`.
+
+
+Multi-RealSense Camera Setup
+----------------------------
+
+1. Activate the Isaac ROS environment (if not started in the install step)
+
+    .. code:: bash
+
+        isaac-ros activate
+
+
+2. For each RealSense camera, plug in one RealSense and unplug all other RealSense cameras.
+
+    .. code:: bash
+
+        rs-enumerate-devices
+
+    Up top it will list the device type, Serial Number, and Firmware Version.
+    Write down the Serial Number for this RealSense. Example:
+
+    .. code:: bash
+
+        Device info:
+            Name                          : 	Intel RealSense D455
+            Serial Number                 : 	151422250659
+            Firmware Version              : 	5.16.0.1
+
+3. Add a calibration URDF file to specify the transformation between ``base_link`` and each RealSense camera.
+The calibration example file is stored in a default location
+:ir_repo:`URDF file <isaac_ros_nvblox> <nvblox_examples/nvblox_examples_bringup/config/urdf/4_realsense_carter_example_calibration.urdf.xacro>`.
+Nvblox will use it without requiring any additional arguments. Alternatively, you could create a
+camera calibration URDF file, which can then be passed with ``multicam_urdf_path`` as,
+
+    .. code:: bash
+
+        ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+        multicam_urdf_path:=<"urdf_nominals_file_path">
+
+
+RealSense Example
+------------------
+
+This example runs nvblox-based reconstruction from multiple RealSense cameras,
+either from live data coming directly off RealSense cameras, or from recorded
+data coming from a ROSbag.
+
+1. Activate the Isaac ROS environment (if not started in the install step)
+
+    .. code:: bash
+
+        isaac-ros activate
+
+2. Navigate (inside the Isaac ROS environment) to the workspace folder, and source the workspace
+
+    .. code:: bash
+
+        cd /workspaces/isaac_ros-dev
+        source install/setup.bash
+
+3. Run the RealSense example, either live from cameras or from a recorded ROSbag.
+
+    .. tabs::
+
+        .. tab:: Live from cameras
+
+            1. Start cameras. Provide the serial numbers identified above as a list separated
+               by comma (``camera_serial_numbers``), and the number of cameras identified as an
+               integer (``num_cameras``), for example:
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense.launch.py \
+                run_standalone:=True \
+                camera_serial_numbers:='211523062311,151223061441,151422251043,215122256933' \
+                container_name:='nvblox_container' \
+                num_cameras:=4
+
+            2. Switch to another terminal and start the Isaac ROS environment.
+               For each camera (identified by the index of the camera ``INDEX``), ensure it publishing topics at expected
+               frequency. 15Hz for color, and 60Hz for the first camera's depth (identified by
+               the order of ``camera_serial_numbers`` input in the previous step), and 30Hz for other camera's
+               depth. Otherwise restart the cameras in the last step until they meet the expected rates.
+
+            .. code:: bash
+
+                ros2 topic hz /camera${INDEX}/color/image_raw
+                ros2 topic hz /camera${INDEX}/depth/image_rect_raw
+
+            3. Switch to another terminal and start the Isaac ROS environment. Provide
+               the number of cameras identified as an integer (``num_cameras``) and launch nvblox as,
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                num_cameras:=4 \
+                mode:=static attach_to_container:=True \
+                container_name:='nvblox_container' \
+                run_realsense:=False
+
+        .. tab:: On a ROSbag
+
+            1. Use the rosbag ``galileo_static_3_2`` from ::ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`
+               or :ref:`record your own bag. <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Recording Data With RealSense>`
+
+            2. Provide the number of cameras identified as an integer (`num_cameras`),
+               and launch nvblox thru rosbag replay:
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                num_cameras:=4 \
+                mode:=static \
+                attach_to_container:=False \
+                run_realsense:=False \
+                rosbag:=<YOUR_ROSBAG_PATH>
+
+
+.. note::
+
+   If you want to restrict odometry to a 2D plane
+   (for example, to run a robot in a flat environment),
+   you can use the ``enable_ground_constraint_in_odometry`` argument.
+
+
+.. note::
+
+   Based on how RealSense cameras are mounted to the platform and calibrated, users are expected to
+   tune ESDF slice height specified in
+   :ir_repo:`nvblox config file <isaac_ros_nvblox> <nvblox_examples/nvblox_examples_bringup/config/nvblox/specializations/nvblox_multi_realsense.yaml>`.
+   Details about nvblox mapping parameters could be found at :ref:`mapper parameters <nvblox_mapper_parameters>`.
+
+.. warning::
+
+   The RealSense camera emitter state might be invalid and the splitter will filter the opposite images to cuVSLAM and nvblox.
+   This may lead to poor tracking and reconstruction.
+   See the :ref:`RealSense troubleshooting section <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense:Symptom: Multi-RealSense has poor tracking and reconstruction>` for more details.
+
+
+Recording Data with RealSense
+-----------------------------
+
+To record RealSense data for nvblox:
+
+1. Connect the camera, activate the Isaac ROS environment and source the
+   workspace as explained in :doc:`tutorial_realsense`.
+
+2. Start the cameras. Provide the serial numbers identified above as a list separated
+   by comma (``camera_serial_numbers``), and the number of cameras identified as an
+   integer (``num_cameras```), for example:
+
+    .. code:: bash
+
+        ros2 launch nvblox_examples_bringup realsense.launch.py \
+        run_standalone:=True \
+        camera_serial_numbers:='211523062311,151223061441,151422251043,215122256933' \
+        container_name:='nvblox_container' \
+        num_cameras:=4
+
+3. Switch to another terminal and start the Isaac ROS environment.
+   For each camera (identified by the index of the camera ``INDEX``), ensure it publishing topics at expected
+   frequency. 15Hz for color, and 60Hz for the first camera's depth (identified by
+   the order of ``camera_serial_numbers`` in the previous step), and 30Hz for other camera's
+   depth. Otherwise restart the cameras in the last step until they meet the expected rates.
+
+   .. code:: bash
+
+       ros2 topic hz /camera${INDEX}/color/image_raw
+       ros2 topic hz /camera${INDEX}/depth/image_rect_raw
+
+4. Switch to another terminal and start the Isaac ROS environment. Provide the serial
+   numbers identified above as a list separated by comma (``camera_serial_numbers``), and the number
+   of cameras identified as an integer (``num_cameras```). Start recording as,
+
+   .. code:: bash
+
+      ros2 launch nvblox_examples_bringup record_realsense.launch.py \
+      num_cameras:=4 \
+      camera_serial_numbers:='211523062311,151223061441,151422251043,215122256933' \
+      run_rqt:=False \
+      run_realsense:=False
+
+5. Stop the recording and cameras when done.
+
+6. The resulting ROSbag can be run using the `instructions above <#realsense-example>`_.
+
+
+Reconstruction With People Segmentation
+---------------------------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/4realsense_segmentation_galileo.gif>`
+    :width: 600px
+    :align: center
+
+This tutorial demonstrates how to perform dynamic people reconstruction using people segmentation
+models for systems with multiple RealSense cameras. For more information see the
+:ref:`single realsense tutorial <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Reconstruction With People Segmentation>`.
+
+.. note::
+
+   If you are on a desktop machine, we recommend using the
+   ``PeopleSemSegNet_Vanilla``.
+   On Jetson platforms we recommend the lighter ``PeopleSemSegNet_ShuffleSeg``
+   model that is provided in :ir_repo:`Isaac ROS Image Segmentation <isaac_ros_image_segmentation>`
+   for better segmentation performance.
+
+.. note::
+    Provide the number of cameras identified as an integer (``num_cameras``) when launching nvblox as followings.
+
+1. Download and install the segmentation models as described in the single RealSense with people segmentation example.
+
+2. Multi-RealSense launch commands are provided below.
+   Live from RealSense cameras assumes cameras are started successfully as `instructions above <#realsense-example>`_.
+
+    .. tabs::
+
+        .. tab:: PeopleSemSegNet_Vanilla (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people_segmentation \
+                num_cameras:=4 \
+                attach_to_container:=True \
+                container_name:='nvblox_container' \
+                run_realsense:=False
+
+
+        .. tab:: PeopleSemSegNet_ShuffleSeg (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people_segmentation \
+                people_segmentation:=peoplesemsegnet_shuffleseg \
+                num_cameras:=4 \
+                attach_to_container:=True \
+                container_name:='nvblox_container' \
+                run_realsense:=False
+
+
+        .. tab:: PeopleSemSegNet_Vanilla (ROSbag)
+
+            1. Use the rosbag ``galileo_people_3_2`` from ::ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`
+               or :ref:`record your own bag. <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Recording Data With RealSense>`
+
+            2. Launch the rosbag:
+
+                .. code:: bash
+
+                    ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                    mode:=people_segmentation \
+                    rosbag:=<YOUR_ROSBAG_PATH> \
+                    num_cameras:=4 \
+                    attach_to_container:=False \
+                    run_realsense:=False
+
+
+        .. tab:: PeopleSemSegNet_ShuffleSeg (ROSbag)
+
+            1. Use the rosbag ``galileo_people_3_2`` from ::ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`
+               or :ref:`record your own bag. <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Recording Data With RealSense>`
+
+            2. Launch the rosbag:
+
+                .. code:: bash
+
+                    ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                    mode:=people_segmentation \
+                    people_segmentation:=peoplesemsegnet_shuffleseg \
+                    rosbag:=<YOUR_ROSBAG_PATH> \
+                    num_cameras:=4 \
+                    attach_to_container:=False \
+                    run_realsense:=False
+
+
+Reconstruction With People Detection
+------------------------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/4realsense_detection_galileo.gif>`
+    :width: 600px
+    :align: center
+
+This tutorial demonstrates how to perform dynamic people reconstruction using a detection model
+for systems with multiple RealSense cameras. For more information see the
+:ref:`single RealSense tutorial <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Reconstruction With People Detection>`.
+
+.. note::
+    Provide the number of cameras identified as an integer (``num_cameras``) when launching nvblox as followings.
+
+
+1. Download and install the detection models as described in the single RealSense with people detection example.
+
+2. Multi-RealSense launch commands are provided below.
+   Live from RealSense cameras assumes cameras are started successfully as `instructions above <#realsense-example>`_.
+
+    .. tabs::
+
+        .. tab:: PeopleNet (Live)
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=people_detection \
+                num_cameras:=4 \
+                attach_to_container:=True \
+                container_name:='nvblox_container' \
+                run_realsense:=False
+
+
+        .. tab:: PeopleNet (ROSbag)
+
+            1. Use the rosbag ``galileo_people_3_2`` from ::ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`
+               or :ref:`record your own bag. <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Recording Data With RealSense>`
+
+            2. Launch the rosbag:
+
+                .. code:: bash
+
+                    ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                    mode:=people_detection \
+                    rosbag:=<YOUR_ROSBAG_PATH> \
+                    num_cameras:=4 \
+                    attach_to_container:=False \
+                    run_realsense:=False
+
+
+Reconstruction With Dynamic Scene Elements
+------------------------------------------
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nvblox/4realsense_dynamic_galileo.gif>`
+    :width: 600px
+    :align: center
+
+This tutorial demonstrates how to perform dynamic people reconstruction using a dynamic detection
+for systems with multiple RealSense cameras. For more information see the
+:ref:`single RealSense tutorial <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Reconstruction With Dynamic Scene Elements>`.
+
+.. note::
+    Provide the number of cameras identified as an integer (``num_cameras``) when launching nvblox as followings.
+
+1. Multi-RealSense launch commands are provided below.
+   Live from RealSense cameras assumes cameras are started successfully as `instructions above <#realsense-example>`_.
+
+    .. tabs::
+
+        .. tab:: Live from a sensor
+
+            .. code:: bash
+
+                ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                mode:=dynamic \
+                num_cameras:=4 \
+                attach_to_container:=True \
+                container_name:='nvblox_container' \
+                run_realsense:=False
+
+        .. tab:: On a ROSbag
+
+            1. Use the rosbag ``galileo_people_3_2`` from ::ref:`nvblox quickstart <repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/index:Quickstart>`
+               or :ref:`record your own bag. <concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense:Recording Data With RealSense>`
+
+            2. Launch the rosbag:
+
+                .. code:: bash
+
+                    ros2 launch nvblox_examples_bringup realsense_example.launch.py \
+                    mode:=dynamic \
+                    rosbag:=<YOUR_ROSBAG_PATH> \
+                    num_cameras:=4 \
+                    attach_to_container:=False \
+                    run_realsense:=False
+
+
+Troubleshooting
+---------------
+
+See
+:doc:`/repositories_and_packages/isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense`.

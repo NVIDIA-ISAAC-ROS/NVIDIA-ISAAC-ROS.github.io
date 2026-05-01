@@ -1,0 +1,259 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_teleop> <isaac_ros_teleop>`
+
+Quickstart
+----------
+
+Prerequisites
+^^^^^^^^^^^^^
+
+.. note::
+
+   This quickstart has been tested and qualified on **Jetson AGX Thor** and **x86_64**.
+
+- `PICO 4 Ultra <https://www.picoxr.com/global/products/pico4-ultra>`__  headset (if no XR headset is available, the emulator provided by
+  `Isaac Teleop Core <https://nvidia.github.io/IsaacTeleop>`__ can be used instead)
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+#. If using the Isaac ROS Environment in Docker mode, open a **new** terminal and mount
+   ``~/.cloudxr``:
+
+   .. code:: bash
+
+      mkdir -p ~/.cloudxr && grep -qxF -- '-v `realpath ~/.cloudxr`:/home/admin/.cloudxr' ~/.isaac_ros_dev-dockerargs 2>/dev/null || echo "-v `realpath ~/.cloudxr`:/home/admin/.cloudxr" >> ~/.isaac_ros_dev-dockerargs
+
+#. Install and build |package_name|:
+
+   .. tabs::
+
+      .. tab:: Binary Package
+
+         #. Activate the Isaac ROS environment:
+
+            .. code:: bash
+
+               isaac-ros activate
+
+         #. Install the prebuilt Debian package:
+
+            :ir_apt:
+
+            .. code:: bash
+
+               sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-teleop
+
+      .. tab:: Build from Source
+
+         #. Install Git LFS:
+
+            .. code:: bash
+
+               sudo apt-get install -y git-lfs && git lfs install
+
+         #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS}/src && \
+                  git clone --recurse-submodules :ir_clone:`<isaac_ros_teleop>`
+
+         #. Activate the Isaac ROS environment:
+
+            .. code:: bash
+
+               isaac-ros activate
+
+         #. Use ``rosdep`` to install the package's dependencies:
+
+            :ir_apt:
+
+            .. code:: bash
+
+               rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_teleop/isaac_ros_teleop --ignore-src -y
+
+         #. Build the package from source:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS}/ && \
+                  colcon build --symlink-install --packages-up-to isaac_ros_teleop --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_teleop/isaac_ros_teleop
+
+         #. Source the ROS workspace:
+
+            .. note::
+
+               Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment. Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+            .. code:: bash
+
+               source install/setup.bash
+
+Run CloudXR
+^^^^^^^^^^^
+
+#. If not already done, clone ``isaac_ros_teleop``:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone --recurse-submodules :ir_clone:`<isaac_ros_teleop>`
+
+#. In a **new** terminal, run CloudXR Runtime via the CloudXR Docker Container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_teleop/isaac_teleop_core/IsaacTeleop && \
+         ./scripts/run_cloudxr_via_docker.sh
+
+#. Connect the XR headset to the teleop server. Follow the
+   `headset connection guide <https://nvidia.github.io/IsaacTeleop/main/getting_started/quick_start.html#connect-an-xr-headset>`__.
+
+   .. note::
+
+      If you are running this on Thor, make sure to set the ``Video Codec`` to ``H.264``, otherwise
+      the headset will fail to connect.
+
+   .. important::
+
+      The world frame of the headset is defined as the position of the headset and controllers
+      at the moment of connection. To reset the world frame, disconnect and reconnect the headset
+      while stationary. If teleoperation with a robot is performed, stand still and face the robot
+      before connecting to establish a consistent world frame.
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+#. Now, in the **original** terminal, run the following launch file to spin up a demo of this package:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_teleop isaac_ros_teleop.launch.py
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Observe the controller output ``/xr_teleop/ee_poses`` on a separate terminal with the command:
+
+   .. code:: bash
+
+      ros2 topic echo /xr_teleop/ee_poses
+
+.. include:: /repositories_and_packages/isaac_ros_teleop/_snippets/controller_reference.rst
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+----
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_teleop isaac_ros_teleop.launch.py
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Type
+     - Default
+     - Description
+
+   * - ``ee_pose_topic``
+     - ``string``
+     - ``xr_teleop/ee_poses``
+     - Topic name for published end-effector poses (``geometry_msgs/PoseArray``)
+   
+   * - ``root_twist_topic``
+     - ``string``
+     - ``xr_teleop/root_twist``
+     - Topic name for published root velocity command (``geometry_msgs/TwistStamped``)
+
+   * - ``root_pose_topic``
+     - ``string``
+     - ``xr_teleop/root_pose``
+     - Topic name for published root pose command (``geometry_msgs/PoseStamped``)
+
+   * - ``finger_joints_topic``
+     - ``string``
+     - ``xr_teleop/finger_joints``
+     - Topic name for the retargeted finger joints (``sensor_msgs/JointState``)
+
+   * - ``rate_hz``
+     - ``double``
+     - ``60.0``
+     - The publishing rate in Hz
+
+   * - ``world_frame``
+     - ``string``
+     - ``world``
+     - World frame for message headers and TF parent frame
+
+   * - ``right_wrist_frame``
+     - ``string``
+     - ``right_wrist``
+     - TF child frame name for the right wrist
+
+   * - ``left_wrist_frame``
+     - ``string``
+     - ``left_wrist``
+     - TF child frame name for the left wrist
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``ee_pose_topic``
+     - `geometry_msgs/PoseArray <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseArray.msg>`__
+     - The poses of the wrists/end-effector; given in order of right wrist and then left wrist.
+
+   * - ``root_twist_topic``
+     - `geometry_msgs/TwistStamped <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/TwistStamped.msg>`__
+     - The root twist command.
+
+   * - ``root_pose_topic``
+     - `geometry_msgs/PoseStamped <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseStamped.msg>`__
+     - The root pose command.
+
+   * - ``finger_joints_topic``
+     - `sensor_msgs/JointState <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/JointState.msg>`__
+     - The retargeted finger joint angles for the robot.
+
+   * - ``tf``
+     - `tf2_msgs/TFMessage <https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg>`__
+     - Poses of the wrists w.r.t to the world frame ``world_frame``.
+
+.. |package_name| replace:: ``isaac_ros_teleop``
+

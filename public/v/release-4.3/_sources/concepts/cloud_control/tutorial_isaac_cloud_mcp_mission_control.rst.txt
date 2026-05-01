@@ -5,20 +5,13 @@ Use Mission Control MCP Server in Cursor
 Overview
 --------
 
-This tutorial explains how to run the ``isaac_mission_control`` MCP server (``mission_control_mcp``) and connect it to Cursor.
+This tutorial explains how to run the `Mission Control <https://github.com/nvidia-isaac/isaac_mission_control>`_ MCP server and connect it to Cursor.
 This allows you to control robot missions using natural language prompts in Cursor's AI chat.
 
 It uses direct MCP configuration in ``~/.cursor/mcp.json`` and does not require a ``.env`` file.
 
 Tutorial Walkthrough
 --------------------
-
-#. Clone the `isaac_mission_control <https://github.com/nvidia-isaac/isaac_mission_control>`__ repository:
-
-   .. code:: bash
-
-      git clone https://github.com/nvidia-isaac/isaac_mission_control.git
-      cd isaac_mission_control
 
 #. Confirm prerequisites:
 
@@ -27,18 +20,18 @@ Tutorial Walkthrough
    - Cursor installed (v2.4+ recommended)
    - Install and launch Isaac Sim using the
      :doc:`Isaac ROS Isaac Sim Setup Guide </getting_started/index>`
-   - ``isaac_mission_control`` services already launched using:
-     `Mission Control Tutorial <https://github.com/nvidia-isaac/isaac_mission_control/blob/main/docs/tutorial/tutorial.md>`__
-     (this bringup starts both ``isaac_mission_control`` and ``isaac_mission_dispatch``)
-   - The Isaac Sim setup and ``isaac_mission_control`` tutorial bringup can be done in parallel.
+   - Mission Control services already launched using:
+     `Mission Control Tutorial <https://github.com/nvidia-isaac/isaac_mission_control/blob/main/docs/tutorial/tutorial.md>`_
+     (this bringup starts both Mission Control and Mission Dispatch)
+   - The Isaac Sim setup and Mission Control tutorial bringup can be done in parallel.
 
-#. Verify ``isaac_mission_control`` health:
+#. Verify Mission Control health:
 
    .. code:: bash
 
       curl http://localhost:8050/api/v1/health
 
-#. Set up the MCP package from your ``isaac_mission_control`` clone:
+#. Set up the MCP package from the ``mission-control`` repository root:
 
    .. code:: bash
 
@@ -67,7 +60,7 @@ Tutorial Walkthrough
             "command": "bash",
             "args": [
               "-lc",
-              "set -euo pipefail; cd \"/ABS/PATH/TO/isaac_mission_control/app/agentic-utilities/mission-control-mcp\" && exec \"/ABS/PATH/TO/isaac_mission_control/app/agentic-utilities/mission-control-mcp/venv/bin/python\" -m mission_control_mcp.server"
+              "set -euo pipefail; cd \"/ABS/PATH/TO/mission-control/app/agentic-utilities/mission-control-mcp\" && exec \"/ABS/PATH/TO/mission-control/app/agentic-utilities/mission-control-mcp/venv/bin/python\" -m mission_control_mcp.server"
             ],
             "env": {
               "MISSION_CONTROL_URL": "http://localhost:8050"
@@ -78,8 +71,8 @@ Tutorial Walkthrough
 
    .. note::
 
-      Replace ``/ABS/PATH/TO/isaac_mission_control`` with your actual path.
-      If ``isaac_mission_control`` is remote or port-forwarded, update ``MISSION_CONTROL_URL`` accordingly.
+      Replace ``/ABS/PATH/TO/mission-control`` with your actual path.
+      If Mission Control is remote or port-forwarded, update ``MISSION_CONTROL_URL`` accordingly.
 
 #. Enable the ``mission-control`` server in Cursor Settings -> Tools & MCP.
 
@@ -97,7 +90,7 @@ Tutorial Walkthrough
 Isaac Mission Control 4.3.0 Limitations
 ---------------------------------------
 
-The following ``isaac_mission_control`` MCP tools are not supported in Isaac Mission Control 4.3.0:
+The following Mission Control MCP tools are not supported in Isaac Mission Control 4.3.0:
 
 .. list-table::
    :header-rows: 1
@@ -135,7 +128,7 @@ Troubleshooting
 Connection Refused
 ~~~~~~~~~~~~~~~~~~
 
-- Confirm ``isaac_mission_control`` is reachable at the configured ``MISSION_CONTROL_URL``.
+- Confirm Mission Control is reachable at the configured ``MISSION_CONTROL_URL``.
 
 Tools Do Not Appear
 ~~~~~~~~~~~~~~~~~~~
@@ -153,5 +146,5 @@ Implementation References
 -------------------------
 
 - MCP server tools: ``app/agentic-utilities/mission-control-mcp/src/server.py``
-- ``isaac_mission_control`` API client used by MCP: ``app/agentic-utilities/mission-control-mcp/src/queries.py``
+- Mission Control API client used by MCP: ``app/agentic-utilities/mission-control-mcp/src/queries.py``
 

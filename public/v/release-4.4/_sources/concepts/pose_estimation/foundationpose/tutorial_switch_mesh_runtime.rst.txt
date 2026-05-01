@@ -1,0 +1,45 @@
+Tutorial to Switch Mesh during Runtime
+======================================
+
+Overview
+--------
+
+This tutorial walks you through the steps to switch the mesh for a different object for ``FoundationPose`` during runtime.
+
+.. note::
+
+    The runtime switching of the mesh is only supported for the pose estimation node. It may lead to unexpected behavior if used with the tracking node.
+
+Tutorial Walkthrough
+--------------------
+1.  Complete the
+    :ref:`Isaac ROS FoundationPose Quickstart Guide <repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_foundationpose/index:quickstart>`.
+
+
+2.  Keep FoundationPose running, and open a new terminal and activate the Isaac ROS environment:
+
+    .. code:: bash
+
+       isaac-ros activate
+
+3.  Run the following command to switch the mesh during runtime:
+
+    .. code:: bash
+
+       ros2 param set /foundationpose mesh_file_path "<path_to_new_object_mesh>"
+
+4. (Optional) If you have multiple parameters associated with the mesh, you can create a `YAML file <https://roboticsbackend.com/ros2-yaml-params>`_ with the parameters and run the following command to switch the mesh during runtime:
+
+    .. code:: bash
+
+       ros2 param load /foundationpose "<path_to_new_mesh_parameters>"
+
+   The following parameters associated with the mesh are supported to be switched during runtime:
+
+   - ``mesh_file_path``
+   - ``symmetry_axes``
+   - ``symmetry_planes``
+   - ``fixed_translations``
+   - ``fixed_axis_angles``
+   - ``rot_normalizer``
+   - ``score_crop_ratio``
