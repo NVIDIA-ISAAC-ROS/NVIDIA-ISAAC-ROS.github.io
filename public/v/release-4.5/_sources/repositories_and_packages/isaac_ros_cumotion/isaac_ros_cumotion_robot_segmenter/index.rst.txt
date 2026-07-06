@@ -1,0 +1,481 @@
+==========================
+|package_name|
+==========================
+
+:ir_github:`<isaac_ros_cumotion> <isaac_ros_cumotion_robot_segmenter>`
+
+Overview
+========
+
+The ``isaac_ros_cumotion_robot_segmenter`` package provides a ROS 2 node that segments robot parts from depth images to prevent self-collision in perception pipelines. This is essential for manipulation scenarios where the robot's own structure should not interfere with obstacle detection or object pose estimation.
+
+The node takes depth images and robot joint states as input, and produces segmented depth images where pixels occupied by the robot are masked out. This enables downstream perception algorithms (such as Nvblox or Foundation Pose) to ignore the robot's own geometry.
+
+Key features:
+
+* Support for multiple cameras
+* Dynamic robot description reloading
+* Support for both ``32FC1`` (float, in meters) and ``16UC1`` (``uint16``, millimeters) depth image encodings
+
+Quickstart
+==========
+
+.. _robot-segmenter-quickstart:
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-cumotion-robot-segmenter
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone --recurse-submodules :ir_clone:`<isaac_ros_cumotion>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_cumotion/isaac_ros_cumotion_robot_segmenter --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_cumotion_robot_segmenter --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_cumotion/isaac_ros_cumotion_robot_segmenter
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able
+            to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Run this script to download the ``r2b_robotarm`` dataset from NGC to ``${ISAAC_ROS_WS}/isaac_ros_assets/r2b_2024/r2b_robotarm``:
+
+.. code:: bash
+
+   bash $(ros2 pkg prefix --share isaac_ros_cumotion_robot_segmenter)/test/download_rosbag.sh
+
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Rosbag
+
+      #. Continuing inside the Isaac ROS environment, run the following launch file to spin up the node:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_cumotion_robot_segmenter robot_segmenter.launch.py \
+                robot_segmenter.urdf_path:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_segmenter)/test/test_data/robot.urdf \
+                robot_segmenter.xrdf_path:=$(ros2 pkg prefix --share isaac_ros_cumotion_robot_segmenter)/test/test_data/robot.xrdf
+      
+      #. Open a **second** terminal inside the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Run the rosbag file to simulate an image stream:
+
+         .. code:: bash
+
+            ros2 bag play --clock -l ${ISAAC_ROS_WS}/isaac_ros_assets/r2b_2024/r2b_robotarm \
+            --remap /camera_1/aligned_depth_to_color/image_raw:=/depth_image \
+            camera_1/color/camera_info:=/rgb/camera_info
+
+      #. Open a **third** terminal inside the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Run a static transform publisher to set up the camera-to-robot transform:
+
+         .. code:: bash
+
+            ros2 run tf2_ros static_transform_publisher --frame-id base_link --child-frame-id camera_1_infra1_optical_frame \
+                --x -0.686 --y 0.595 --z 0.996 \
+                --qx -0.007 --qy 0.901 --qz -0.427 --qw 0.074
+
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+#. Open a **new** terminal inside the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Visualize the robot mask in ``RViz``:
+
+   .. code:: bash
+
+      rviz2
+
+   Then click on the ``Add`` button and select ``By topic``. In the ``By topic`` window, select the topic
+   ``/cumotion/camera_1/robot_mask``.
+
+   Please set the ``Fixed Frame`` to ``base_link`` in the ``RViz`` window.
+
+   Optionally, you can also add the original depth image to the RViz window to compare the segmented output
+   with the original input.
+
+   .. note::
+
+      Due to initial warm-up time, the visualization may take up to 1 minute to appear.
+
+
+
+Running Tests
+=============
+
+The package includes integration tests that verify the robot segmentation functionality. Follow these steps
+to run the tests with quickstart assets downloaded earlier.
+
+
+#. Run all the tests with ``pytest``:
+
+   .. code:: bash
+
+      export RUN_ROBOT_SEGMENTOR_POL_TEST=true  # this will run a test that plays the ROSbag as well.
+      python3 -m pytest $(ros2 pkg prefix --share isaac_ros_cumotion_robot_segmenter)/test
+
+#. Alternatively, you can run a specific test using ``launch_test``, for example:
+
+   .. code:: bash
+    
+      launch_test $(ros2 pkg prefix --share isaac_ros_cumotion_robot_segmenter)/test/test_robot_segmenter_float16.py
+
+
+The test suite includes:
+
+* ``test_robot_segmenter_uint16.py``: Tests segmentation with 16-bit unsigned integer depth images
+* ``test_robot_segmenter_float16.py``: Tests segmentation with 32-bit floating point depth images
+* ``test_robot_segmenter_reload.py``: Tests dynamic robot description reloading functionality
+* ``test_robot_segmenter_pol.py``: Tests segmentation with a rosbag playing.
+
+
+Troubleshooting
+===============
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+
+Common Issues
+~~~~~~~~~~~~~
+
+**No output published**
+
+* Verify that all input topics are being published:
+
+  .. code:: bash
+
+     ros2 topic list
+     ros2 topic hz /depth_image
+     ros2 topic hz /joint_states
+
+* Ensure the TF tree is complete from the camera optical frame to the robot base frame.
+
+* Check that joint states contain all required joints for your robot URDF.
+
+**Robot not properly masked**
+
+* Verify the camera-to-robot transform is correct:
+
+  .. code:: bash
+
+     ros2 run tf2_ros tf2_echo base_link camera_optical_frame
+
+* Check that ``urdf_path`` and ``xrdf_path`` parameters point to valid files.
+
+* Increase the ``distance_threshold`` parameter to expand the masking buffer around robot geometry.
+
+**Launch file not supported when running as a standalone node**
+
+* When running the launch file as a standalone node, the node will not be able to find the composable container.
+* To fix this, you can either run the launch file from a higher-level bringup that owns the container, such as ``cumotion.launch.py``, or you can run a modified launch file that creates the composable container itself.
+
+
+API
+===
+
+RobotSegmenter
+~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``urdf_path``
+     - ``string``
+     - ``""``
+     - Path to the robot's URDF file (required)
+
+   * - ``xrdf_path``
+     - ``string``
+     - ``""``
+     - Path to the robot's XRDF file (required)
+
+   * - ``robot_base_frame``
+     - ``string``
+     - ``base_link``
+     - Name of the robot's base frame in the TF tree
+
+   * - ``distance_threshold``
+     - ``float``
+     - ``0.05``
+     - Additional buffer distance (in meters) around robot geometry for masking
+
+   * - ``sync_queue_size``
+     - ``int``
+     - ``10``
+     - Size of the message synchronization queue
+
+   * - ``input_qos``
+     - ``string``
+     - ``DEFAULT``
+     - QoS profile for input topic subscriptions. Options: ``DEFAULT``, ``SENSOR_DATA``, ``SYSTEM_DEFAULT``
+
+   * - ``output_qos``
+     - ``string``
+     - ``DEFAULT``
+     - QoS profile for output topic publications. Options: ``DEFAULT``, ``SENSOR_DATA``, ``SYSTEM_DEFAULT``
+
+   * - ``enable_performance_logging``
+     - ``bool``
+     - ``false``
+     - Enable performance metrics logging for debugging and optimization
+
+   * - ``reload_robot_description_topic``
+     - ``string``
+     - ``/cumotion/reload_robot_description``
+     - Topic to listen for robot description reload signals
+
+   * - ``robot_description_service_name``
+     - ``string``
+     - ``/cumotion/get_robot_description``
+     - Service name for fetching updated robot description
+
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``depth_image``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - Input depth image. Supported encodings: ``32FC1`` (float, meters) or ``16UC1`` (``uint16``, millimeters)
+
+   * - ``camera_info_depth``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+     - Camera intrinsics for the depth camera. Used to project robot model into image space
+
+   * - ``joint_states``
+     - `sensor_msgs/JointState <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/JointState.msg>`__
+     - Current joint positions of the robot. Used to determine the robot's pose for segmentation
+
+   * - ``reload_robot_description``
+     - `std_msgs/Bool <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/std_msgs/msg/Bool.msg>`__
+     - Signal to trigger robot description reload from service
+
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+
+   * - ``robot_mask``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - Binary mask indicating robot pixels. Same dimensions as input. Robot pixels are marked as 0, background as max value
+
+   * - ``robot_depth``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - Segmented depth image with robot pixels removed (set to 0). Same dimensions and encoding as input
+
+
+ROS Services Requested
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+
+   * - ``robot_description_service_name``
+     - :ir_repo:`isaac_ros_cumotion_interfaces/GetRobotDescription <isaac_ros_cumotion> <isaac_ros_cumotion_interfaces/srv/GetRobotDescription.srv>`
+     - Service to fetch updated URDF and XRDF when robot description reload is triggered
+
+
+Launch File Parameters
+~~~~~~~~~~~~~~~~~~~~~~
+
+``robot_segmenter.launch.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Default
+     - Description
+
+   * - ``robot_segmenter.urdf_path``
+     - ``""``
+     - Path to the robot's URDF file
+
+   * - ``robot_segmenter.xrdf_path``
+     - ``""``
+     - Path to the robot's XRDF file
+
+   * - ``robot_segmenter.num_cameras``
+     - ``1``
+     - Number of cameras to process
+
+   * - ``robot_segmenter.depth_image_topics``
+     - ``[/depth_image]``
+     - List of input depth image topics (one per camera)
+
+   * - ``robot_segmenter.depth_camera_infos``
+     - ``[/rgb/camera_info]``
+     - List of camera info topics (one per camera)
+
+   * - ``robot_segmenter.robot_mask_publish_topics``
+     - ``[/cumotion/camera_1/robot_mask]``
+     - List of output robot mask topics (one per camera)
+
+   * - ``robot_segmenter.world_depth_publish_topics``
+     - ``[/cumotion/camera_1/world_depth]``
+     - List of output segmented depth topics (one per camera)
+
+   * - ``robot_segmenter.joint_states_topic``
+     - ``/joint_states``
+     - Topic for robot joint states
+
+   * - ``robot_segmenter.robot_base_frame``
+     - ``base_link``
+     - Robot base frame name
+
+   * - ``robot_segmenter.distance_threshold``
+     - ``0.05``
+     - Buffer distance around robot geometry (meters)
+
+   * - ``robot_segmenter.container_name``
+     - ``manipulator_container``
+     - Name of the composable node container to load into
+
+   * - ``robot_segmenter.input_qos``
+     - ``DEFAULT``
+     - QoS profile for input topic subscriptions. Options: ``DEFAULT``, ``SENSOR_DATA``, ``SYSTEM_DEFAULT``
+
+   * - ``robot_segmenter.output_qos``
+     - ``DEFAULT``
+     - QoS profile for output topic publications. Options: ``DEFAULT``, ``SENSOR_DATA``, ``SYSTEM_DEFAULT``
+
+   * - ``robot_segmenter.enable_performance_logging``
+     - ``False``
+     - Enable performance metrics logging for debugging and optimization
+
+   * - ``robot_segmenter.reload_robot_description_topic``
+     - ``/cumotion/reload_robot_description``
+     - Topic to listen for robot description reload signals
+
+   * - ``robot_segmenter.robot_description_service_name``
+     - ``/cumotion/get_robot_description``
+     - Service name for fetching updated robot description
+
+   * - ``robot_segmenter.enable_cuda_mps``
+     - ``False``
+     - Enable CUDA MPS Service for improved GPU utilization
+
+   * - ``robot_segmenter.cuda_mps_pipe_directory``
+     - ``/tmp/mps_pipe_dir``
+     - Directory for CUDA MPS pipe (only used when ``enable_cuda_mps`` is ``True``)
+
+   * - ``robot_segmenter.cuda_mps_client_priority``
+     - ``1``
+     - CUDA MPS client priority (only used when ``enable_cuda_mps`` is ``True``)
+
+   * - ``robot_segmenter.cuda_mps_active_thread_percentage``
+     - ``100``
+     - CUDA MPS active thread percentage (only used when ``enable_cuda_mps`` is ``True``)
+
+
+.. |package_name| replace:: ``isaac_ros_cumotion_robot_segmenter``

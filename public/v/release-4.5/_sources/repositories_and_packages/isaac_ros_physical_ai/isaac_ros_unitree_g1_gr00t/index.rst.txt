@@ -1,0 +1,594 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_physical_ai> <isaac_ros_unitree_g1_gr00t>`
+
+Overview
+--------
+
+Deploy launch for running a fine-tuned GR00T N policy on the Unitree G1.
+The user-facing entry point is ``unitree_g1_gr00t_agile.launch.py`` in this
+package. It wraps the generic ``unitree_g1_inference_graph.launch.py`` from
+``unitree_g1_bringup`` with the ``gr00t_n17_apple_to_plate`` controller
+group preselected (unless overridden), exposes ``gr00t_leapp_yaml_path`` to
+point at any LEAPP export without copying into ROS package ``data`` trees,
+and adds two GR00T-specific pieces:
+
+* A diffusion-policy **initial-noise publisher** that seeds GR00T's
+  diffusion sampler.
+* On real hardware, the **RealSense D435 composable node** loaded into the
+  inference pipeline container so frames stay in-process with
+  ``InputBuilder`` and Triton.
+
+For a narrative walk-through of deploying a fine-tuned policy, see
+:doc:`/reference_workflows/isaac_for_physical_ai/tutorials/tutorial_deploy`.
+
+Tutorial: Deploy a Fine-Tuned GR00T Policy
+------------------------------------------
+
+This tutorial walks through deploying a LEAPP-exported fine-tuned GR00T
+policy on the Unitree G1, both in MuJoCo simulation and on real hardware.
+
+Prerequisites
+^^^^^^^^^^^^^
+
+For real-hardware deployment on Jetson AGX Thor, complete the host-level
+setup in `Real-Hardware Prerequisite Details`_ before you start the Isaac
+ROS environment with ``isaac-ros activate``. The setup enables CUDA MPS
+(Multi-Process Service), mounts the MPS directories into the container, and
+adds ``--ulimit rtprio=99`` for the 200 Hz controller. MuJoCo simulation
+does not require these steps.
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build ``isaac_ros_unitree_g1_gr00t``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*If your container was built with the* ``gr00t_workflow`` *Docker layer, you can skip step 1*
+
+#. Install and build ``isaac_ros_unitree_g1_gr00t``:
+
+   .. tabs::
+
+      .. tab:: Binary Package
+
+         #. Activate the Isaac ROS environment:
+
+            .. code:: bash
+
+               isaac-ros activate
+
+         #. Install the prebuilt Isaac ROS Debian package.
+            ``ros-:ir_ros_distro:-isaac-ros-unitree-g1-gr00t`` pulls in
+            the deploy stack (``isaac-ros-deploy``,
+            ``unitree-g1-bringup``, etc.) transitively:
+
+            :ir_apt:
+
+            .. code:: bash
+
+               sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-unitree-g1-gr00t
+
+         #. Install the ROS build-farm dependencies —
+            ``ros-:ir_ros_distro:-mujoco-ros2-control`` for simulation,
+            ``ros-:ir_ros_distro:-realsense2-camera`` and
+            ``ros-:ir_ros_distro:-realsense2-camera-msgs`` (same
+            version, install together) for real hardware:
+
+            .. code:: bash
+
+               sudo apt-get install -y \
+                   ros-:ir_ros_distro:-mujoco-ros2-control \
+                   ros-:ir_ros_distro:-realsense2-camera \
+                   ros-:ir_ros_distro:-realsense2-camera-msgs
+               source /opt/ros/:ir_ros_distro:/setup.bash
+
+      .. tab:: Build from Source
+
+         #. Install Git LFS:
+
+            .. code:: bash
+
+               sudo apt-get install -y git-lfs && git lfs install
+
+         #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS}/src && \
+                  git clone :ir_clone:`<isaac_ros_physical_ai>`
+
+         #. Activate the Isaac ROS environment:
+
+            .. code:: bash
+
+               isaac-ros activate
+
+         #. Use ``rosdep`` to install the package's dependencies:
+
+            :ir_apt:
+
+            .. code:: bash
+
+               rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t --ignore-src -y
+
+         #. Build the package from source:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS}/ && \
+                  colcon build --symlink-install --packages-up-to isaac_ros_unitree_g1_gr00t --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t
+
+         #. Source the ROS workspace:
+
+            .. note::
+
+               Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment. Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+            .. code:: bash
+
+               source install/setup.bash
+
+#. Inside the Isaac ROS environment, download and install the bundled GR00T
+   Unitree G1 policy assets:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_gr00t_unitree_g1_install install_gr00t_unitree_g1.sh --eula
+
+   This stores the model files and LEAPP YAML under
+   ``${ISAAC_ROS_WS}/isaac_ros_assets/models/gr00t_unitree_g1/``. The default
+   launch path uses these installed assets when present. Run this command in
+   the same container/workspace used for launch so the asset paths and file
+   permissions match the runtime environment.
+
+Launch
+^^^^^^
+
+.. tabs::
+
+   .. tab:: MuJoCo Simulation
+
+      .. code-block:: bash
+
+         ros2 launch isaac_ros_unitree_g1_gr00t unitree_g1_gr00t_agile.launch.py \
+             hardware_type:=mujoco
+
+      We have separate blend ratios for the lower and upper body. The lower body
+      blend ratio controls the AGILE locomotion policy and defaults to 1.0 in sim
+      such that the robot will start balancing immediately.
+
+      The upper body blend ratio controls the GR00T policy and defaults to ``0.0``.
+      You can enable the upper body by setting the blend ratio to 1.0.
+
+      .. code-block:: bash
+
+         ros2 param set /safety_controller_upper_body blend_ratio 1.0
+
+   .. tab:: Real Robot
+
+      We have separate blend ratios for the lower and upper body. The lower body
+      blend ratio controls the AGILE locomotion policy, the upper body blend ratio
+      controls the GR00T policy. Both default to ``0.0``. This allows us to
+      individually enable the policies.
+
+      .. warning::
+
+         Before operating on real hardware:
+
+         #. Clear the work area of persons and hazards.
+         #. Both safety controllers default to ``blend_ratio=0.0`` on
+            real hardware — do not raise either until you are ready.
+         #. Have the disable commands ready in your shell history (see
+            **Disable** below).
+
+      #. **Position the robot at the table.** Stand G1 directly in front of
+         the workspace with the table in reach, and **rest the hands flat on
+         top of the table** before enabling any controller. Keep the hands
+         above the tabletop while you enable the lower-body controller first
+         and then the upper-body controller — if they're below the table at
+         any point, they catch on the edge.
+
+      #. Run the network setup as described on
+         :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index`
+         if you have not already.
+
+      #. Launch the deploy stack:
+
+         .. code-block:: bash
+
+            ros2 launch isaac_ros_unitree_g1_gr00t unitree_g1_gr00t_agile.launch.py \
+                hardware_type:=real \
+                network_interface:=<your_interface>
+
+      #. **Bring up balance** — enable AGILE legs first:
+
+         .. code-block:: bash
+
+            ros2 param set /safety_controller_lower_body blend_ratio 1.0
+
+         Confirm the robot is stably balancing before proceeding.
+         This is a good time to verify the camera, see
+         `Verify the Camera View`_ below.
+
+      #. **Enable the upper-body policy** once balance is stable and
+         the work area is clear:
+
+         .. code-block:: bash
+
+            ros2 param set /safety_controller_upper_body blend_ratio 1.0
+
+      #. **Disable arms** while keeping legs balancing (recommended
+         abort):
+
+         .. code-block:: bash
+
+            ros2 param set /safety_controller_upper_body blend_ratio 0.0
+
+         To disable everything (full stop, robot will fall without
+         external support):
+
+         .. code-block:: bash
+
+            ros2 param set /safety_controller_lower_body blend_ratio 0.0
+
+         .. tip::
+
+            Keep both disable commands in your shell history so you can
+            execute them quickly if something goes wrong.
+
+.. _isaac-ros-unitree-g1-gr00t-verify-camera:
+
+Verify the Camera View
+^^^^^^^^^^^^^^^^^^^^^^
+
+The deploy launch publishes ``/realsense_d435_rgb/color/image_raw``
+itself (via the RealSense composable node), so verify the camera
+**after launching** while both safety controllers are still at
+``blend_ratio=0.0`` (the robot is idle). In a separate container
+terminal:
+
+.. code:: bash
+
+   rviz2
+
+**Add** → **By topic** → ``/realsense_d435_rgb/color/image_raw/Image``
+→ **OK**. Confirm the live frame shows the apple, plate, and table
+within reach. Adjust the camera mount or scene as needed before
+ramping up the safety controllers.
+
+.. _isaac-ros-unitree-g1-gr00t-expected-results:
+
+Expected Results
+^^^^^^^^^^^^^^^^
+
+The bundled apple-to-plate GR00T N1.7 policy is provided as a reference for the
+end-to-end fine-tuning and deployment workflow, not as a production-grade
+manipulation policy. On the reference Unitree G1 setup it completes the
+apple-to-plate task with a success rate of approximately 60%–70%. To obtain 
+a higher success rate, fine-tune a policy on your own data and deploy it as 
+described in `Use Your Own Policy`_.
+
+.. note::
+
+   After completing the apple-to-plate task, the G1 may move its hands into an
+   unusual backward position rather than returning to a clean neutral posture,
+   and the upper-body safety controller must be set back to ``blend_ratio=0.0``
+   before the next run. This is a known limitation of the current bundled GR00T
+   N1.7 policy and does not affect task completion.
+
+.. _isaac-ros-unitree-g1-gr00t-use-your-own-policy:
+
+Use Your Own Policy
+^^^^^^^^^^^^^^^^^^^
+
+The launch commands above use a pre-trained GR00T policy that is fine-tuned for
+the apple-to-plate task by default. To deploy your own exported LEAPP bundle,
+place the export in a directory that is mounted into the container. Keep the
+LEAPP YAML and ONNX files in the same directory.
+
+Make the bundle world-readable inside the runtime environment. Some exports
+ship ``*.onnx.data`` as mode ``600``, which causes ONNX Runtime permission
+errors:
+
+.. code:: bash
+
+   chmod -R a+rX /path/to/your/leapp_export_dir
+
+Then append ``gr00t_leapp_yaml_path`` to the launch command to override the
+default policy:
+
+.. code-block:: bash
+
+   gr00t_leapp_yaml_path:=/path/to/leapp_export/your_policy.yaml
+
+For full staging details — copying LEAPP bundles, permissions, semantics of
+``gr00t_leapp_yaml_path``, and advanced ``controller_groups.yaml`` overrides —
+see `Stage Your Own Policy`_ below.
+
+Stage Your Own Policy
+^^^^^^^^^^^^^^^^^^^^^
+
+To deploy your LEAPP export instead of the bundled apple-to-plate policy,
+prefer ``gr00t_leapp_yaml_path`` so you never copy ONNX weights into ROS
+install trees or edit ``controller_groups.yaml`` purely to change the YAML
+location.
+
+**Recommended: pass the YAML path**
+
+#. Place your export anywhere the container can read — for example
+   under ``<ISAAC_ROS_WS>/policies/`` on the deploy machine, which is
+   bind-mounted into the container by default. Copy the bundle from
+   your workstation, replacing ``<ISAAC_ROS_WS>`` with the path to your
+   Isaac ROS workspace on the deploy machine:
+
+   .. code:: bash
+
+      scp -r /path/to/exported_bundle <deploy-user>@<deploy-host>:<ISAAC_ROS_WS>/policies/
+
+   .. note::
+
+      Keep the whole bundle together — every ``.onnx`` plus its matching
+      ``.onnx.data`` weight file must sit next to the YAML, or Triton
+      fails to load.
+
+#. Make bundles world-readable inside the runtime environment (exports often
+   ship ``*.onnx.data`` as mode ``600``, which causes ONNX Runtime
+   permission errors):
+
+   .. code:: bash
+
+      chmod -R a+rX /path/to/your/leapp_export_dir
+
+#. Launch with ``gr00t_leapp_yaml_path`` set to **the YAML file** itself
+   (``.yaml`` suffix), ``~`` expands to the invoking user's home dir:
+
+   .. tabs::
+
+      .. tab:: MuJoCo Simulation (smoke test)
+
+         .. code-block:: bash
+
+            ros2 launch isaac_ros_unitree_g1_gr00t unitree_g1_gr00t_agile.launch.py \
+                hardware_type:=mujoco \
+                gr00t_leapp_yaml_path:=/path/to/leapp_export/your_policy.yaml \
+                publish_rate:=5.0
+
+         The MuJoCo scene has no manipulation objects — the pipeline loads
+         but has nothing coherent to manipulate.
+
+      .. tab:: Real Robot
+
+         .. code-block:: bash
+
+            ros2 launch isaac_ros_unitree_g1_gr00t unitree_g1_gr00t_agile.launch.py \
+                hardware_type:=real \
+                network_interface:=<your_interface> \
+                gr00t_leapp_yaml_path:=/path/to/leapp_export/your_policy.yaml \
+                publish_rate:=5.0
+
+         Replace ``<your_interface>`` with the actual interface name (e.g.
+         ``eno1``). Don't paste literal angle brackets — bash treats ``<``
+         oddly.
+
+**Semantics:**
+
+* Leaving ``gr00t_leapp_yaml_path`` **empty** (default) uses the YAML from the
+  installed GR00T asset directory when present, otherwise the package
+  ``data/`` YAML from ``controller_groups.yaml`` for whichever
+  ``initial_controller_group`` is active.
+* The argument drives the **deploy inference graph**
+  (``InputBuilder``, Triton, ``OutputBuilder``) plus the diffusion
+  **initial_noise** publisher. When the selected group combines AGILE legs
+  with GR00T (split blend + ``agile_config`` present), ROS 2 Control's
+  ``inference_controller`` **continues loading the AGILE ONNX** YAML; GR00T
+  comes only from the graph. For ``*_no_agile`` groups where the controller
+  group points ``inference_controller`` at GR00T, ``gr00t_leapp_yaml_path``
+  replaces that ROS 2 YAML as well — keep YAML and ONNX co-located either way.
+
+``publish_rate`` ticks InputBuilder/Triton inputs (Hz); default ``5.0`` for
+these launches to leave headroom beside AGILE. Raise toward ``10.0`` when the GPU
+budget allows fresher observations; lower if the inference graph overruns next to
+balanced walking.
+
+If you need **non-default** ``source_to_topic`` mappings or a forked controller
+list, maintain a workspace overlay of ``unitree_g1_bringup`` and change
+``controller_groups.yaml`` there, then set ``initial_controller_group`` at launch.
+The policy graph still points at ``gr00t_leapp_yaml_path`` when set (or at the
+built-in ``config:`` path in that entry).
+
+Real-Hardware Prerequisite Details
+----------------------------------
+
+Real-hardware deployment requires two host-level prerequisites on the
+Jetson AGX Thor.
+
+CUDA MPS (Multi-Process Service)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When GR00T runs alongside the real-time AGILE balancing policy (200 Hz),
+both compete for GPU resources. Without isolation, the heavy GR00T
+inference starves AGILE, causing controller overruns and the robot
+falling. CUDA MPS partitions GPU threads between the processes;
+``CUDA_MPS_ACTIVE_THREAD_PERCENTAGE=20`` is set automatically by the
+launch file for the AGILE controller.
+
+**One-time setup (on the Thor host, outside the container):**
+
+Install a systemd unit so MPS starts on boot:
+
+.. code-block:: bash
+
+   sudo tee /etc/systemd/system/nvidia-cuda-mps.service << 'EOF'
+   [Unit]
+   Description=NVIDIA CUDA MPS Daemon
+   After=nvidia-persistenced.service
+   Requires=nvidia-persistenced.service
+
+   [Service]
+   Type=forking
+   Environment=CUDA_MPS_PIPE_DIRECTORY=/tmp/nvidia-mps
+   Environment=CUDA_MPS_LOG_DIRECTORY=/tmp/nvidia-log
+   ExecStartPre=/bin/mkdir -p /tmp/nvidia-mps /tmp/nvidia-log
+   ExecStart=/usr/bin/nvidia-cuda-mps-control -d
+   ExecStop=/bin/bash -c "echo quit | /usr/bin/nvidia-cuda-mps-control"
+
+   [Install]
+   WantedBy=multi-user.target
+   EOF
+
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now nvidia-cuda-mps.service
+
+Mount the MPS socket into the Isaac ROS dev container by adding the
+following lines to ``~/.isaac_ros_dev-dockerargs`` on the Thor host:
+
+.. code-block:: text
+
+   -v /tmp/nvidia-mps:/tmp/nvidia-mps
+   -v /tmp/nvidia-log:/tmp/nvidia-log
+
+Then recreate the container (``isaac-ros activate``).
+
+Real-Time Scheduling for ``ros2_control``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The controller manager needs FIFO scheduling priority to hit 200 Hz without
+jitter. The container's ``rtprio`` ulimit defaults to ``0``, which blocks
+this. Add the following to ``~/.isaac_ros_dev-dockerargs`` on the Thor
+host:
+
+.. code-block:: text
+
+   --ulimit rtprio=99
+
+Then recreate the container. Inside the container, confirm:
+
+.. code-block:: bash
+
+   ulimit -r
+
+The output should be ``99``.
+
+API
+---
+
+Usage
+^^^^^
+
+.. code-block:: bash
+
+   ros2 launch isaac_ros_unitree_g1_gr00t unitree_g1_gr00t_agile.launch.py
+
+Launch Arguments
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Type
+     - Default
+     - Description
+   * - ``gr00t_leapp_yaml_path``
+     - ``string``
+     - ``""``
+     - Absolute path to the LEAPP export YAML (*filename* ending in
+       ``.yaml``). ONNX models must reside alongside that file. Empty string
+       uses the YAML from ``controller_groups.yaml`` for the active controller
+       group (bundled policy for the shipped defaults). Threaded automatically
+       to ``unitree_g1_inference_graph`` and ``unitree_g1_controller_manager``.
+   * - ``initial_controller_group``
+     - ``string``
+     - ``""`` (derived)
+     - Overrides ``controller_groups.yaml`` lookup. Leave empty so
+       ``use_agile:=true|false`` selects ``gr00t_n17_apple_to_plate`` or
+       ``gr00t_n17_apple_to_plate_no_agile``; supply a literal group key when you
+       added a staging block yourself.
+   * - ``use_agile``
+     - ``bool``
+     - ``true``
+     - If ``true``, run AGILE legs alongside GR00T upper body
+       (controller group ``gr00t_n17_apple_to_plate``); otherwise upper
+       body only (group ``gr00t_n17_apple_to_plate_no_agile``). Ignored when
+       ``initial_controller_group`` is non-empty.
+   * - ``hardware_type``
+     - ``string``
+     - ``mujoco``
+     - Hardware platform. Options: ``mujoco`` (simulation), ``real``
+       (physical robot).
+   * - ``enable_viewer``
+     - ``bool``
+     - ``true``
+     - Enable the MuJoCo viewer GUI. Only used when
+       ``hardware_type:=mujoco``.
+   * - ``mujoco_model_path``
+     - ``string``
+     - ``""``
+     - Absolute path to the MuJoCo scene XML. Only used when
+       ``hardware_type:=mujoco``.
+   * - ``use_foxglove``
+     - ``bool``
+     - ``true``
+     - Start Foxglove Studio bridge for visualization.
+   * - ``publish_rate``
+     - ``double``
+     - ``5.0``
+     - Rate at which ``InputBuilderNode`` publishes inputs to Triton (Hz).
+   * - ``visualize_commands``
+     - ``bool``
+     - ``true``
+     - Publish commanded joint positions as a ghost robot.
+   * - ``network_interface``
+     - ``string``
+     - ``eno1``
+     - Network interface for G1 communication. Only used when
+       ``hardware_type:=real``.
+
+Troubleshooting
+---------------
+
+Verify MPS Is Reachable From the Container
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+From inside the Isaac ROS dev container:
+
+.. code-block:: bash
+
+   ls /tmp/nvidia-mps/
+
+You should see ``control``, ``control_lock``, and related files. If the
+directory is empty, the mounts in ``~/.isaac_ros_dev-dockerargs`` were not
+applied, or the MPS daemon is not running on the host.
+
+On the host:
+
+.. code-block:: bash
+
+   echo get_server_list | nvidia-cuda-mps-control
+
+A running daemon responds with a server-list line. If the command fails,
+start MPS manually:
+
+.. code-block:: bash
+
+   export CUDA_MPS_PIPE_DIRECTORY=/tmp/nvidia-mps
+   export CUDA_MPS_LOG_DIRECTORY=/tmp/nvidia-log
+   mkdir -p $CUDA_MPS_PIPE_DIRECTORY $CUDA_MPS_LOG_DIRECTORY
+   sudo -E nvidia-cuda-mps-control -d
+
+Controller Overruns / Robot Falls
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the AGILE controller reports overruns or the robot fails to maintain
+balance under GR00T load on real hardware, verify:
+
+* The CUDA MPS daemon is running on the host and its socket is mounted
+  into the container (see above).
+* ``ulimit -r`` inside the container prints ``99``, not ``0``.
+
+.. |package_name| replace:: ``isaac_ros_unitree_g1_gr00t``
