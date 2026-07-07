@@ -1,0 +1,69 @@
+Reference Architecture
+======================
+
+The ``Isaac for Physical AI`` reference application captures teleoperated
+demonstrations on the Unitree G1, uses them to fine-tune a GR00T N policy, and
+deploys the fine-tuned policy back on the robot. The pipeline spans packages 
+shipped as part of Isaac ROS and also the 
+`nvidia-isaac/gr00t-leapp-export <https://github.com/nvidia-isaac/gr00t-leapp-export/tree/n17-export>`__
+project (branch ``n17-export``) for the
+training steps.
+
+Pipeline
+--------
+
+#. **Teleoperate** the Unitree G1 via an XR headset
+   (package: ``isaac_ros_unitree_g1_teleop_bringup``). See
+   :doc:`tutorials/tutorial_teleop`.
+
+#. **Record** synchronized teleoperation episodes to MCAP rosbags
+   (package: ``isaac_ros_unitree_g1_recorder``). See
+   :doc:`tutorials/tutorial_record`.
+
+#. **Convert** the recorded session into a
+   `LeRobot <https://github.com/huggingface/lerobot>`__ dataset
+   using the ``mcap-to-lerobot`` tool (package:
+   ``isaac_ros_mcap_lerobot_converter``). See
+   :doc:`tutorials/tutorial_convert`.
+
+#. **Fine-tune** GR00T N on the LeRobot dataset *(external —
+   nvidia-isaac/gr00t-leapp-export, branch ``n17-export``)*. See :doc:`tutorials/tutorial_finetune`.
+
+#. **Export** the fine-tuned policy using LEAPP *(external —
+   nvidia-isaac/gr00t-leapp-export, branch ``n17-export``)*. See :doc:`tutorials/tutorial_leapp_export`.
+
+#. **Deploy** the exported policy on the robot
+   (package: ``isaac_ros_unitree_g1_gr00t``). See
+   :doc:`tutorials/tutorial_deploy`.
+
+Component Map
+-------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 20 50
+
+   * - Component
+     - Role
+     - Reference
+   * - ``isaac_ros_unitree_g1_teleop_bringup``
+     - Whole-body teleoperation for the robot
+     - :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index`
+   * - ``isaac_ros_unitree_g1_recorder``
+     - Data recording
+     - :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder/index`
+   * - ``isaac_ros_mcap_lerobot_converter``
+     - Convert MCAP to LeRobot datasets
+     - :ir_repo:`converter README on GitHub <isaac_ros_data_tools> <isaac_ros_mcap_lerobot_converter>`
+   * - ``nvidia-isaac/gr00t-leapp-export``
+     - Fine-tuning and LEAPP export
+     - `finetune_new_embodiment.md <https://github.com/nvidia-isaac/gr00t-leapp-export/blob/n17-export/getting_started/finetune_new_embodiment.md>`__
+   * - ``isaac_ros_unitree_g1_gr00t``
+     - Deploying the fine-tuned GR00T policy
+     - :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index`
+
+Supported Hardware
+------------------
+
+* Unitree G1 humanoid
+* Jetson AGX Thor or x86_64 systems with NVIDIA GPUs

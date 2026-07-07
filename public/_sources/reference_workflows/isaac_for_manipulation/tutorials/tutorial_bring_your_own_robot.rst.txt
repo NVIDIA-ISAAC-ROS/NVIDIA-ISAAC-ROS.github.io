@@ -1,0 +1,267 @@
+====================
+Bring Your Own Robot
+====================
+
+Overview
+--------
+
+This guide walks you through integrating a custom robot arm into Isaac ROS Manipulation.
+Each robot family is **pluggable**: you add a robot description package, a **driver utilities**
+package (Python launch stack and helpers), and point your workflow YAML at your driver
+launch through ``robot_launch_file_path``. The bringup stack routes to your code without
+editing ``drivers.launch.py`` or ``workflows.launch.py``.
+
+At a glance you will:
+
+#. Add URDF, SRDF, MoveIt, and ``ros2_control`` configurations (with ``TopicBasedSystem`` for Isaac Sim).
+#. Implement driver utilities (``DriverConfig`` subclass, launch file, parameters, optional sim nodes).
+#. Set ``robot_launch_file_path`` in workflow YAML and declare your package in bringup ``package.xml``.
+#. Add a launch test and wire cuMotion URDF or XRDF paths.
+#. Use Universal Robots (UR) or Flexiv Rizon in the tree as references.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/pose_to_pose_flexiv.gif>`
+   :width: 100%
+   :alt: Bring your own robot example for Flexiv.
+
+Package structure
+-------------------
+
+Most robots use **two packages**: a robot description package (URDF, SRDF, configurations) and a
+driver utilities package (launch, Python helpers), with both typically living under
+``isaac_ros_manipulation_robots/``.
+
+.. code-block:: text
+
+   isaac_ros_manipulation_robots/
+   ├── isaac_ros_manipulation_robot_utils/                       # RobotControllerBase
+   ├── isaac_ros_manipulation_<robot>_robot_description/         # URDF, SRDF, configurations
+   ├── isaac_ros_manipulation_<robot>_driver_utils/              # Driver launch, config, utilities
+   └── ...                                                       # Additional <robot>_* packages
+
+Two shared base packages define the contract every robot must satisfy:
+
+- ``isaac_ros_manipulation_ros_python_utils`` -- ``DriverConfig`` base class
+  (extended by every robot-specific config such as ``UrRobotiqDriverConfig`` and
+  ``FlexivRizonDriverConfig``).
+- ``isaac_ros_manipulation_robot_utils`` -- ``RobotControllerBase`` abstract class
+  (extended by every robot-specific driver-utilities class such as ``URDriverUtils``
+  and ``FlexivDriverUtils``) that declares the three abstract methods a custom
+  robot must implement.
+
+Step 1: Create the robot description package
+--------------------------------------------
+
+This package holds all model and configuration files needed by MoveIt, ``ros2_control``,
+and ``robot_state_publisher``.
+
+Required contents:
+
+- **URDF** (``urdf/``): Xacro file for your robot. For simulation, include a
+  ``TopicBasedSystem`` ``ros2_control`` hardware interface that maps to Isaac Sim joint
+  command and state topics.
+- **SRDF** (``srdf/``): MoveIt semantic description defining planning groups, home states,
+  passive joints, and collision disable rules.
+- **Config files** (``config/``):
+
+  - ``initial_positions.yaml`` -- starting joint positions
+  - ``joint_limits.yaml`` -- velocity and acceleration limits for MoveIt
+  - ``kinematics_sim.yaml`` -- KDL kinematics solver config
+  - ``moveit_sim_controllers.yaml`` -- MoveIt controller manager config
+  - ``ros2_control_controllers_sim.yaml`` -- ``ros2_control`` controller definitions
+    (for example ``JointTrajectoryController``, ``JointStateBroadcaster``)
+
+- Standard ament packaging (``package.xml``, ``setup.py`` or CMake) that installs the above
+  into the package share directory.
+
+.. note::
+
+   For simulation with Isaac Sim, the ``TopicBasedSystem`` plugin bridges ``ros2_control``
+   to Isaac Sim through ROS 2 topics. Set the ``joint_commands_topic`` and
+   ``joint_states_topic`` parameters to match the topic names configured in your
+   Isaac Sim Action Graph.
+
+Step 2: Create the driver utilities package
+-------------------------------------------
+
+This package provides the Python launch logic and configuration class for your robot.
+
+Required contents:
+
+**Config class** (``config.py``):
+  Extend ``DriverConfig`` from ``isaac_ros_manipulation_ros_python_utils.config``. The
+  base class reads the ``robot_type`` launch argument (``UR`` or ``FLEXIV`` today, matching
+  ``RobotType`` names) and uses it to derive the TF frame prefix (``tf_prefix`` for UR,
+  ``robot_sn`` for Flexiv), arm joint names, and gripper-derived fields (action name,
+  open/close positions, settle time, collision links). Your subclass should call
+  ``super().__init__(context)`` and optionally assert ``self.robot_type`` matches the
+  expected family. Make sure your workflow YAML and driver ``launch`` file declare a
+  ``robot_type`` launch argument (see ``ur_robotiq_driver.launch.py`` or
+  ``flexiv_rizon_sim_driver.launch.py`` for examples). Parse any additional
+  robot-specific launch arguments (for example robot type, log level) and set up joint
+  state topic remapping for simulation.
+
+**Robot description helper** (``robot_description.py``):
+  A function that processes your URDF xacro with the correct mappings and returns the
+  robot description XML string.
+
+**Driver utilities** (``<robot>_driver_utils.py``):
+  A class extending ``RobotControllerBase`` from
+  ``isaac_ros_manipulation_robot_utils.robot_controller_base`` that implements the
+  three abstract methods the framework expects. Each method takes no arguments --
+  everything comes from ``self.driver_config``:
+
+  - ``get_robot_state_publisher()`` -- returns the ``robot_state_publisher`` node that
+    publishes TF and ``robot_description``.
+  - ``get_moveit_group_node()`` -- returns the MoveIt ``move_group`` node (plus the
+    matching ``MoveItConfigsBuilder`` bundle) with cuMotion registered as the default
+    planner.
+  - ``get_robot_control_nodes()`` -- returns the ``ros2_control_node`` and controller
+    spawners (joint trajectory controller, joint state broadcaster, gripper
+    controller, ...).
+
+  Driver launch files instantiate the utility class once and call the methods
+  directly, e.g. ``URDriverUtils(driver_config).get_robot_state_publisher()``.
+  See ``URDriverUtils`` and ``FlexivDriverUtils`` for reference implementations.
+
+  Optional sim-only helpers (not part of the abstract contract):
+
+  - ``get_isaac_sim_joint_parser_node()`` -- filters Isaac Sim joint states to only
+    the arm joints needed by MoveIt and ``robot_state_publisher``.
+
+**Launch file** (``launch/<robot>_driver.launch.py``):
+  Declares robot-specific launch arguments, instantiates the config and utility functions,
+  and returns the combined list of nodes.
+
+**Parameters** (``params/<robot>.yaml``):
+  Default parameter values pointing to files in the robot description package (URDF, SRDF,
+  kinematics, controller configurations).
+
+**Joint parser node** (``src/isaac_sim_joint_parser_node.py``):
+  A lightweight ROS 2 node that subscribes to the raw Isaac Sim joint states topic, filters
+  out gripper mimic and passive joints, and republishes only the arm joints on a parsed topic.
+
+Step 3: Wire up the bringup routing
+-----------------------------------
+
+Isaac ROS Manipulation uses a ``robot_launch_file_path`` parameter to route to the correct
+robot driver at launch time.
+
+The routing flow:
+
+.. code-block:: text
+
+   workflows.launch.py
+       └── drivers.launch.py
+           └── (reads robot_launch_file_path from config YAML)
+               └── <robot>_driver.launch.py
+
+To add your robot:
+
+1. Set ``robot_launch_file_path`` in your workflow config YAML to point to your driver
+   launch file, typically
+   ``$(ros2 pkg prefix --share <your_driver_utils_pkg>)/launch/<robot>_driver.launch.py``.
+2. Add your driver utilities package as a dependency in
+   ``isaac_ros_manipulation_bringup/package.xml``.
+
+No changes to ``drivers.launch.py`` or ``workflows.launch.py`` are needed.
+
+``drivers.launch.py`` includes your launch with ``IncludeLaunchDescription`` and forwards
+the full parameter map from the workflow YAML. Your driver launch should declare launch
+arguments for every key your ``DriverConfig`` and ``CoreConfig`` read from context (see
+existing YAML under ``isaac_ros_manipulation_bringup/params/`` and the UR or Flexiv driver
+parameter files).
+
+Step 4: Add a test
+------------------
+
+Create a launch test that verifies the driver stack starts correctly. A minimal test can:
+
+1. Launch the driver stack with parameters loaded from workflow-style YAML (for example
+   ``isaac_ros_manipulation_bringup/params/sim_launch_params.yaml``) overlaid with your
+   robot-specific defaults, **or** from a small parameter file shipped in your driver utilities
+   package if tests must run when ``isaac_ros_manipulation_bringup`` is not on the path.
+2. Subscribe to the ``ros2_control`` command topic (or another stable topic your stack
+   always publishes) and verify messages use the expected joint names.
+
+This validates the full pipeline: URDF processing, ``ros2_control`` with
+``TopicBasedSystem``, controller spawning, and MoveIt startup.
+
+Hardware-heavy or long-running launch tests are often skipped unless
+``ENABLE_MANIPULATOR_TESTING`` is set appropriately; see
+:doc:`Isaac for Manipulation Testing Guide </reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator>`
+for environment variables used across manipulation tests.
+
+Step 5: Create a cuMotion XRDF file
+-----------------------------------
+
+cuMotion requires an XRDF (Extended Robot Description Format) file for GPU-accelerated
+motion planning. This file defines collision spheres for each link, configuration space
+limits (acceleration, jerk), self-collision ignore rules, and tool frames.
+
+Store the XRDF in your robot description package or in
+``isaac_ros_cumotion_robot_description/xrdf/``.
+
+The XRDF file must define:
+
+- **modifiers**: Base frame and attached object frame definitions
+- **default_joint_positions**: Default and home joint configuration
+- **cspace**: Joint names with acceleration and jerk limits
+- **tool_frames**: End-effector frames used for planning
+- **collision**: Per-link collision sphere geometry and buffer distances for environment
+  collision avoidance
+- **self_collision**: Ignore rules between adjacent or non-colliding link pairs, with
+  per-link buffer distances
+
+Wire the XRDF into your workflow config YAML. Many arms use XRDF files under
+``isaac_ros_cumotion_robot_description/xrdf/`` even when the URDF comes from your own
+description package:
+
+.. code-block:: yaml
+
+   cumotion_xrdf_file_path: $(ros2 pkg prefix --share isaac_ros_cumotion_robot_description)/xrdf/<robot>_gripper.xrdf
+
+Set ``cumotion_urdf_file_path`` in the same YAML so the planner matches your arm. Ensure
+your driver config reads these keys from the launch context so the cuMotion planner plugin
+can load them at runtime.
+
+See existing XRDF files in ``isaac_ros_cumotion_robot_description/xrdf/`` for UR and Flexiv
+examples.
+
+Reference implementations
+---------------------------
+
+Universal Robots (UR + Robotiq)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **Driver utilities**:
+  ``isaac_ros_manipulation_robots/isaac_ros_manipulation_ur_driver_utils/``  
+  Launch: ``launch/ur_robotiq_driver.launch.py``. Defaults: ``params/ur_robotiq_gripper.yaml``.
+- **Robot description**:
+  ``isaac_ros_manipulation_robots/isaac_ros_manipulation_ur_robot_description/``
+  (shared UR + Robotiq meshes and configurations).
+- **Pattern**: Upstream URDF comes from the ``ur_description`` package; Isaac-side xacro and
+  sim controllers are layered in the description package. Simulation uses
+  ``isaac_sim_joint_parser_node`` and gripper helper scripts from driver utilities. Real hardware
+  uses the upstream UR ROS 2 stack.
+
+Flexiv Rizon (Grav gripper)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **Robot description**:
+  ``isaac_ros_manipulation_robots/isaac_ros_manipulation_flexiv_robot_description/``  
+  Rizon + Grav xacro, SRDF, MoveIt and ``ros2_control`` sim YAML.
+- **Driver utilities**:
+  ``isaac_ros_manipulation_robots/isaac_ros_manipulation_flexiv_driver_utils/``  
+  Simulation: ``launch/flexiv_rizon_sim_driver.launch.py`` with ``params/flexiv_rizon_grav.yaml``.  
+  Real hardware: ``launch/flexiv_rizon_real_driver.launch.py`` composes third-party
+  ``flexiv_bringup``, ``flexiv_moveit_config``, and cuMotion (see package docstring).
+- **Pattern**: Simulation uses the same TopicBasedSystem and joint parser pattern as UR.
+  On hardware, the Isaac launch file wraps Flexiv ROS 2 packages instead of re-implementing
+  drivers.
+
+Other pointers
+~~~~~~~~~~~~~~
+
+- **Config base class**: ``isaac_ros_manipulation_ros_python_utils/`` -- ``DriverConfig``
+- **Controller base class**: ``isaac_ros_manipulation_robot_utils/`` -- ``RobotControllerBase``
+- **Driver routing**: ``isaac_ros_manipulation_bringup/launch/drivers.launch.py``

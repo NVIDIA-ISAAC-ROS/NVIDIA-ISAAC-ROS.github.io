@@ -1,0 +1,133 @@
+Fine-Tune GR00T N
+=================
+
+This tutorial explains how to fine-tune a GR00T N policy on the recorded LeRobot dataset.
+
+Run this tutorial on an x86_64 workstation with an L40-class GPU or
+better (40+ GB VRAM). You can find the general instructions for fine-tuning GR00T N directly in the
+`NVIDIA/Isaac-GR00T <https://github.com/NVIDIA/Isaac-GR00T>`__ project.
+
+On this page we cover the customizations needed to fine-tune for a Unitree G1 embodiment.
+Use the `nvidia-isaac/gr00t-leapp-export
+<https://github.com/nvidia-isaac/gr00t-leapp-export/tree/n17-export>`__
+repository (branch ``n17-export``), which also supports the export step in
+:doc:`tutorial_leapp_export`.
+
+
+Prerequisites
+-------------
+
+#. Clone and install ``gr00t-leapp-export`` on the host used for training
+   (branch ``n17-export``). Follow the `repository README
+   <https://github.com/nvidia-isaac/gr00t-leapp-export/blob/n17-export/README.md>`__
+   for environment setup.
+#. Accept the terms for accessing the base weights of the model from Hugging Face.
+   Click **Agree and access repository** on both `nvidia/GR00T-N1.7-3B
+   <https://huggingface.co/nvidia/GR00T-N1.7-3B>`__ and
+   `nvidia/Cosmos-Reason2-2B
+   <https://huggingface.co/nvidia/Cosmos-Reason2-2B>`__. Access is granted
+   per model. Then run ``hf auth login`` from the ``gr00t-leapp-export``
+   checkout. The ``hf`` CLI is installed by ``uv sync`` into the
+   project's virtual environment, not on the host system, so run it via
+   ``uv run hf auth login`` (or after ``source .venv/bin/activate``).
+
+.. note::
+
+   Throughout this page ``<dataset-dir>`` refers to the converter's
+   output directory. If you followed :doc:`tutorial_convert` with the
+   defaults, that's ``${ISAAC_ROS_WS}/recordings/lerobot_output``.
+
+Sanity-Check the Dataset
+------------------------
+
+In ``<dataset-dir>/meta/info.json``:
+
+* ``fps`` matches the recorder's ``sync_rate`` (30 Hz by default).
+* ``total_episodes`` and ``total_frames`` show how much data was
+  collected. Depending on the complexity of the task, more or less
+  data is required.
+
+.. note::
+
+   For the apple-to-plate task we recommend collecting at least 200 episodes.
+
+Modality Config
+---------------
+
+The Python ``ModalityConfig`` is the bridge between the dataset's
+``meta/modality.json`` slice ranges and the trainer's data pipeline.
+For G1 datasets the converter writes a ready-to-use defaults file at
+the top of the dataset directory:
+
+.. code:: text
+
+   <dataset-dir>/new_embodiment_config_defaults.py
+
+It contains:
+
+* The seven G1 ``state`` keys (``left_leg`` … ``right_hand``).
+* ``RELATIVE`` action representation for arms (deltas generalize
+  better for manipulation), ``ABSOLUTE`` for hands, waist, and
+  optional locomotion / effort keys.
+* The model-default 16-step action prediction horizon.
+* Per-body-part ``effort_<group>`` action keys when — and only when —
+  the recorder observed non-zero feed-forward torques. Bags without
+  torque data train a position-only policy.
+
+For the apple-to-plate defaults, **no further action is required** as
+the training command in the next section points directly at this file.
+
+Run the Fine-Tuning
+-------------------
+
+Run the following from the root of the ``gr00t-leapp-export`` repository.
+Here ``<dataset-dir>`` is the output of the converter and
+``<output-dir>`` is where the fine-tuned checkpoint will be stored:
+
+.. code:: bash
+
+   CUDA_HOME=/usr/local/cuda \
+   CUDA_VISIBLE_DEVICES=0 \
+   PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+   uv run python gr00t/experiment/launch_finetune.py \
+       --base-model-path nvidia/GR00T-N1.7-3B \
+       --dataset-path <dataset-dir> \
+       --embodiment-tag NEW_EMBODIMENT \
+       --modality-config-path <dataset-dir>/new_embodiment_config_defaults.py \
+       --num-gpus 1 \
+       --output-dir <output-dir> \
+       --max-steps 10000 \
+       --save-steps 2000 \
+       --global-batch-size 32 \
+       --dataloader-num-workers 4
+
+The ``--max-steps`` / ``--save-steps`` / ``--global-batch-size`` values
+above are reasonable starting points; you may tune them for your
+dataset size and hardware.
+
+.. note::
+
+   Fine-tuning the GR00T N model requires a GPU with at least 40 GB of
+   VRAM, for example L40 / A100 / H100 / RTX 6000 Ada. See the
+   `hardware recommendation documentation
+   <https://github.com/nvidia-isaac/gr00t-leapp-export/blob/n17-export/getting_started/hardware_recommendation.md>`__.
+
+Once the fine-tuning is complete, you will find the checkpoint at
+``<output-dir>/checkpoint-<step>/``.
+
+For more information, see the GR00T N documentation:
+
+.. seealso::
+
+   * `nvidia-isaac/gr00t-leapp-export — Fine-tune on a New Embodiment
+     <https://github.com/nvidia-isaac/gr00t-leapp-export/blob/n17-export/getting_started/finetune_new_embodiment.md>`__
+   * `nvidia-isaac/gr00t-leapp-export — Modality Configuration
+     <https://github.com/nvidia-isaac/gr00t-leapp-export/blob/n17-export/getting_started/data_config.md>`__
+   * `nvidia-isaac/gr00t-leapp-export — Hardware Recommendation
+     <https://github.com/nvidia-isaac/gr00t-leapp-export/blob/n17-export/getting_started/hardware_recommendation.md>`__.
+
+Next
+----
+
+Continue with :doc:`tutorial_leapp_export` to produce a deployable
+policy bundle.

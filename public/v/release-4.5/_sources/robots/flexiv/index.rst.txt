@@ -1,0 +1,76 @@
+
+=============
+Flexiv Robots
+=============
+
+Set Up Flexiv Robot
+~~~~~~~~~~~~~~~~~~~
+
+#. Complete the hardware setup and boot up the robot by following the `Set Up the Robot <https://www.flexiv.com/software/rdk/manual/set_up_the_robot.html>`__ guide in the Flexiv RDK documentation.
+
+#. Connect the UI tablet (teach pendant) and verify you can enable the robot using Flexiv Elements.
+
+#. `Activate the RDK Server <https://www.flexiv.com/software/rdk/manual/activate_rdk_server.html>`__ on the robot.
+
+#. `Enter Remote mode <https://www.flexiv.com/software/rdk/manual/enter_and_exit_remote_mode.html>`__ by setting the robot to ``Auto (Remote)`` mode on the teach pendant.
+
+#. `Connect the user computer <https://www.flexiv.com/software/rdk/manual/connect_user_computer.html>`__ to the same network as the robot and verify connectivity.
+
+#. Note the robot serial number (e.g., ``Rizon4s-062839``). This is required for all launch commands and should be
+   substituted for ``<ROBOT_SN>`` in the instructions below.
+
+.. note::
+
+   The following Flexiv Rizon models have been tested with Isaac ROS Manipulation:
+
+   * **Rizon 4s** with Grav gripper (Flexiv-GN01)
+
+   The following software versions have been tested:
+
+   * **Flexiv Software Package**: v3.10
+   * **Flexiv Elements Studio**: v3.10
+   * **Robot Control App**: v3.10
+   * **Arm Driver**: 2.13.0
+
+   Other versions may work but have not been verified.
+
+Build Flexiv Drivers from Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /reference_workflows/isaac_for_manipulation/tutorials/_snippets/isaac_ros_manipulation_flexiv_drivers.rst
+
+Configure Grav Gripper
+~~~~~~~~~~~~~~~~~~~~~~
+
+The Flexiv Grav gripper is automatically initialized when launching the Flexiv driver with the ``load_gripper:=true`` argument.
+
+#. Verify the gripper is physically attached to the Flexiv Rizon robot.
+
+#. When launching the Flexiv driver, include the gripper:
+
+   .. code:: bash
+
+      ros2 launch flexiv_bringup rizon.launch.py robot_sn:=<ROBOT_SN> load_gripper:=true
+
+   Replace ``<ROBOT_SN>`` with your robot's serial number.
+
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+**The Flexiv driver fails to connect to the robot**
+
+#. Verify that the robot is in ``Auto (Remote)`` mode on the teach pendant.
+#. Ensure the workstation and robot are on the same subnet and the robot can be pinged from the workstation.
+#. Verify the robot serial number is correct and does not contain spaces (e.g., ``Rizon4s-062839``).
+
+**The gripper does not respond**
+
+#. Ensure the gripper is physically connected and the gripper is lighting up.
+#. Check that the gripper model name matches your hardware. The default is ``Flexiv-GN01`` (Grav gripper).
+
+**Joint controller errors during gear insertion**
+
+#. Ensure you are using ``rdk_control_mode:=joint_impedance`` when running the gear insertion workflow.
+   The impedance mode provides the compliant behavior required for contact-rich tasks.
+#. If you see overshooting or unstable behavior, verify that the ``action_scale_joint_space`` in
+   ``isaac_ros_assets/isaac_ros_manipulation_dnn_policy/flexiv/params/env.yaml`` is set to ``0.00625`` for all joints.

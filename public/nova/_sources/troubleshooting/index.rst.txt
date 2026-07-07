@@ -246,3 +246,19 @@ The Jetson AGX Orin fails to boot into rootfs 3 consecutive times and enters the
         .. code-block:: bash
 
             sudo apt remove nova-orin-init
+
+RPLIDAR is not pingable
+-----------------------
+
+If you see the following error during installation that means the RPLIDAR is not pingable.
+
+.. code-block::
+    :class: no-copybutton
+
+    [100%] Built target get_rplidar_scan_rate
+    WARN: rplidars are not configured yet
+    ERROR: default rplidar ip 192.168.11.2 not pingable
+
+.. dropdown:: Solution
+
+    This is a known issue with RPLIDARs where the sensor becomes unresponsive after a long period of time due to a firmware issue in the sensor itself. The current workaround is to hard power cycle the Nova Carter by pressing the power button on its backside for 10 seconds.

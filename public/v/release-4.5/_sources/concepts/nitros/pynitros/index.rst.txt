@@ -1,0 +1,65 @@
+PyNITROS
+========
+
+PyNITROS eliminates the CPU<->GPU data movement across ``rclpy`` ROS nodes by integrating :doc:`NITROS </concepts/nitros/index>`
+for Python.
+
+PyNITROS was developed to bring the benefits of NITROS to Python's large community. The benefits include the
+overall speedup of ROS graphs with heavy GPU utilization while reducing CPU overhead. PyNITROS also enables
+integration with available NITROS nodes through NITROS Bridge, allowing Python users to utilize NVIDIA's hardware accelerated ROS 2 packages
+alongside their ``rclpy`` based nodes.
+
+PyNITROS Publisher
+------------------
+
+``PyNitrosPublisher`` is designed to publish NITROS Bridge messages 
+and it can publish raw ROS messages if the ``enable_ros_publish`` flag is set to True.
+When this flag is enabled, ``PyNitrosPublisher`` publishes both NITROS Bridge messages and raw ROS messages. 
+The ``publish`` function from ``PyNitrosPublisher`` needs to take messages that are created by ``PyNitrosBuilder``.
+
+
+PyNITROS Subscriber
+-------------------
+``PyNitrosSubscriber`` subscribes to NITROS Bridge messages. Developers can opt to fall back to the ROS
+subscriber to subscribe the raw ROS message by setting ``enable_ros_subscribe`` to ``True``. After the 
+flag is enabled, this subscriber exclusively subscribes to the raw ROS message.
+
+The user-defined callback then receives a ``PyNitrosView``.
+
+PyNITROS Message Filter
+-----------------------
+
+``PyNitrosMessageFilter`` is a wrapper of the ROS 2 ``MessageFilter`` class that synchronize incoming messages based on the provided
+synchronizer type. The synchronizer policy can be either ``TimeSynchronizer`` or ``ApproximateTimeSynchronizer``.  The subscribers can be either
+``PyNitrosSubscriber`` or ROS 2 subscribers. If the subscriber is a ``PyNitrosSubscriber``, the message will be converted to a ``PyNitrosView``.
+The user-defined callback will be triggered once receive the synchronized messages.
+
+PyNITROS View
+-------------
+``PyNitrosView`` is a wrapper of the NITROS Bridge message that provides basic access to the GPU pointer and metadata
+that is sent from the publisher. Additionally, ``PyNitrosView`` supports the ``__cuda_array_interfaces__`` attribute,
+allowing developers to convert the view to other types, for example, PyTorch tensor.
+
+The following two NITROS Bridge message types are supported by ``PyNitrosView``:
+
+* ``isaac_ros_nitros_bridge_interfaces/msg/NitrosBridgeImage``
+* ``isaac_ros_nitros_bridge_interfaces/msg/NitrosBridgeTensorList``
+
+PyNITROS Builder
+----------------
+``PyNitrosBuilder`` are a series of utility classes that streamline the
+process of creating a NITROS Bridge message. ``PyNitrosBuilder`` is responsible for
+setting up the CUDA IPC memory pool and returning a NITROS Bridge message that other PyNITROS and NITROS Bridge nodes can receive.
+
+The following two NITROS Bridge message types are supported by ``PyNitrosBuilder``:
+
+* ``isaac_ros_nitros_bridge_interfaces/msg/NitrosBridgeImage``
+* ``isaac_ros_nitros_bridge_interfaces/msg/NitrosBridgeTensorList``
+
+
+Repositories and Packages
+-------------------------
+
+The Isaac ROS implementations of this technology are available here:
+
+* :doc:`Isaac ROS PyNITROS </repositories_and_packages/isaac_ros_nitros/isaac_ros_pynitros/index>`

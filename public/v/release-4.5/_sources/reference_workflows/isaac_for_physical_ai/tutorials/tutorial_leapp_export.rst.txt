@@ -1,0 +1,87 @@
+Export the Policy with LEAPP
+============================
+
+This tutorial explains how to export the fine-tuned policy into a deployable LEAPP bundle.
+
+Exporting the policy with LEAPP lets you deploy the policy from pure C++ without any Python
+involved, even though the policy was originally created in Python.
+
+Deploying policies through pure C++ has the benefit of faster and more deterministic inference
+while using fewer resources than deploying through Python.
+
+Run this tutorial on an x86_64 workstation. LEAPP export for GR00T is not
+supported on Jetson AGX Thor.
+
+Prerequisites
+-------------
+
+If you have not already done so as part of :doc:`tutorial_finetune`, clone the
+repository and set it up.
+
+.. code:: bash
+
+   git clone --branch n17-export --recurse-submodules https://github.com/nvidia-isaac/gr00t-leapp-export.git
+   cd gr00t-leapp-export
+   uv sync --python 3.10
+
+Run the Export
+--------------
+
+.. important::
+
+   For G1 fine-tunes, **always pass** ``--joint_config export/data/g1_joints.json``.
+   Without it, the export auto-generates placeholder element names
+   (``left_leg_0``, ``left_leg_1``, ...) that the deploy stack's
+   joint-state mapping cannot resolve, producing wrong (or silently
+   incorrect) action predictions on hardware.
+
+.. code:: bash
+
+   cd gr00t-leapp-export
+   uv run python export/export_with_leapp.py \
+       --model_path <checkpoint-dir> \
+       --embodiment_tag new_embodiment \
+       --dataset_path <lerobot-dataset-dir> \
+       --joint_config export/data/g1_joints.json \
+       --output_name <export-name>
+
+.. dropdown:: Argument reference
+
+   * ``--model_path`` — path to the ``checkpoint-NNNN/`` directory
+     produced by :doc:`tutorial_finetune`.
+   * ``--embodiment_tag`` — always ``new_embodiment`` for G1
+     fine-tunes.
+   * ``--dataset_path`` — any LeRobot dataset with the same modality
+     keys the model was trained on; used only as a sample input
+     during tracing.
+   * ``--joint_config`` — path to ``g1_joints.json`` shipped in the
+     export repository. Provides the real ROS joint names the deploy
+     stack needs; without it, placeholder names are used (refer to
+     warning above).
+   * ``--output_name`` — directory name for the exported bundle.
+
+Tracing takes 5–15 minutes on a workstation GPU. The script ends
+with ``Export completed: <export-name>``.
+
+Output
+------
+
+A directory at ``<export-name>/`` containing the deployable bundle:
+
+* ``<export-name>.yaml`` — LEAPP graph spec; entry point for deploy.
+* ``<export-name>.png`` — visualization of the export graph.
+* ``backbone.onnx`` + ``backbone.onnx.data`` — VLM backbone.
+* ``action_head.onnx`` + ``action_head.onnx.data`` — diffusion action head.
+* ``preprocess_state.onnx`` — state normalization.
+* ``preprocess_video.onnx`` — image preprocessing.
+* ``decode_action.onnx`` — action decoding.
+* ``log.txt`` — export log.
+
+The ``.yaml`` is what the deploy stack consumes. The ``.onnx`` and
+``.onnx.data`` files must remain co-located with it.
+
+Next
+----
+
+Continue with :doc:`tutorial_deploy` to run the exported policy on
+the Unitree G1.

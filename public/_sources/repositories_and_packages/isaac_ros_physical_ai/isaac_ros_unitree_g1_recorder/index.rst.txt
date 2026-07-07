@@ -1,0 +1,410 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_physical_ai> <isaac_ros_unitree_g1_recorder>`
+
+Overview
+--------
+
+Records synchronized teleoperation demonstrations from the Unitree G1 into
+MCAP rosbags that are compatible with the GR00T training pipeline. Supports
+bulk data collection via keyboard-driven session management (start/stop/cancel
+per episode) and launches an H.264 encoder per episode so each bag embeds
+its own SPS/PPS headers.
+
+For a narrative walk-through of recording episodes end to end, see
+:doc:`/reference_workflows/isaac_for_physical_ai/tutorials/tutorial_record`.
+
+Tutorial: Record Demonstrations
+-------------------------------
+
+This tutorial walks through recording synchronized teleoperation
+demonstrations from the Unitree G1 into MCAP rosbags ready for the
+GR00T training pipeline.
+
+Prerequisites
+^^^^^^^^^^^^^
+
+The teleoperation stack is already running in a first terminal, either
+in MuJoCo simulation or on real hardware. Follow
+:doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index`
+through the **Run CloudXR Server** and **Launch the application** steps
+before continuing here.
+
+An Intel RealSense D435 must be connected to the host (Thor) via USB 3
+and publishing frames — the recorder writes the H.264 camera stream
+into every episode bag, and a missing camera will leave the recorded
+session unusable for fine-tuning.
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build ``isaac_ros_unitree_g1_recorder``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*If your container was built with the* ``gr00t_workflow`` *Docker layer, you can skip step 1*
+
+#. Install and build ``isaac_ros_unitree_g1_recorder``:
+
+   .. tabs::
+
+      .. tab:: Binary Package
+
+         #. Activate the Isaac ROS environment:
+
+            .. code:: bash
+
+               isaac-ros activate
+
+         #. Install the prebuilt Debian package:
+
+            :ir_apt:
+
+            .. code:: bash
+
+               sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-unitree-g1-recorder
+               source /opt/ros/:ir_ros_distro:/setup.bash
+
+      .. tab:: Build from Source
+
+         #. Install Git LFS:
+
+            .. code:: bash
+
+               sudo apt-get install -y git-lfs && git lfs install
+
+         #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS}/src && \
+                  git clone :ir_clone:`<isaac_ros_physical_ai>`
+
+         #. Activate the Isaac ROS environment:
+
+            .. code:: bash
+
+               isaac-ros activate
+
+         #. Use ``rosdep`` to install the package's dependencies:
+
+            :ir_apt:
+
+            .. code:: bash
+
+               rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder --ignore-src -y
+
+         #. Build the package from source:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS}/ && \
+                  colcon build --symlink-install --packages-up-to isaac_ros_unitree_g1_recorder --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder
+
+         #. Source the ROS workspace:
+
+            .. note::
+
+               Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment. Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+            .. code:: bash
+
+               source install/setup.bash
+
+Verify the Camera View
+^^^^^^^^^^^^^^^^^^^^^^
+
+Before recording, confirm that the robot's ego-view camera sees the
+work area you intend to demonstrate. In a new terminal inside the Isaac
+ROS environment:
+
+.. code:: bash
+
+   rviz2
+
+In RViz, click **Add** (bottom-left) → **By topic** →
+``/realsense_d435_rgb/color/image_raw/Image`` → **OK**. Confirm the live
+camera frame shows the workspace. Adjust the camera mount or scene if not.
+
+Run the Recorder
+^^^^^^^^^^^^^^^^
+
+#. Open a **second** terminal (the teleop stack must keep running in the
+   first). Activate the Isaac ROS environment and source the workspace:
+
+   .. code:: bash
+
+      isaac-ros activate
+      source install/setup.bash
+
+#. Launch the recorder:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_unitree_g1_recorder record -- \
+          task_description:="move the apple to the plate"
+
+   The ``--`` separates ``ros2 run`` arguments from the keyboard-controller
+   arguments. A keyboard UI appears in this terminal:
+
+   .. code:: text
+
+      Task: move the apple to the plate
+      Episode: 0 saved | Status: IDLE
+      ────────────────────────────────
+      [Space] Start   [t] Change Task   [q] Quit
+
+   The recorder starts in the **IDLE** state. The UI prints the host
+   path to the new session directory.
+
+Record Episodes
+^^^^^^^^^^^^^^^
+
+.. list-table:: Keyboard controls
+   :header-rows: 1
+
+   * - Key
+     - IDLE
+     - RECORDING
+   * - Space
+     - Start recording
+     - Stop & save
+   * - ``c``
+     - —
+     - Cancel & discard
+   * - ``t``
+     - Change task description
+     - —
+   * - ``q``
+     - Quit
+     - — (prevents accidental data loss)
+
+Bulk-collection loop:
+
+#. Press **Space** to start recording an episode.
+#. Perform the teleoperation demonstration.
+#. Press **Space** to save the episode, or **c** to discard if the demo
+   was bad.
+#. Repeat.
+
+Each session creates a directory under ``output_dir`` (default
+``/workspaces/isaac_ros-dev/recordings/``). The task description is also
+written to ``<episode_dir>/task.txt``.
+
+API
+---
+
+Usage
+^^^^^
+
+Run from a second terminal while the teleop bringup is running:
+
+.. code-block:: bash
+
+   ros2 run isaac_ros_unitree_g1_recorder record -- \
+       task_description:="move the apple to the plate"
+
+The ``--`` separates ``ros2 run`` arguments from recorder launch arguments.
+
+Launch Arguments
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Type
+     - Default
+     - Description
+   * - ``task_description``
+     - ``string``
+     - *(required)*
+     - Initial task description for the session; written to each
+       ``episode_*/task.txt``.
+   * - ``output_dir``
+     - ``string``
+     - ``/workspaces/isaac_ros-dev/recordings``
+     - Session base directory. Keep inside the workspace mount for host
+       persistence.
+   * - ``sync_rate``
+     - ``double``
+     - ``30.0``
+     - ``RecordData`` publish rate in Hz — matches the RealSense D435 RGB
+       rate.
+   * - ``camera_topic``
+     - ``string``
+     - ``/camera/color/image_compressed``
+     - H.264 camera topic (encoder output).
+   * - ``camera_raw_topic``
+     - ``string``
+     - ``/realsense_d435_rgb/color/image_raw``
+     - Raw image topic (encoder input).
+   * - ``camera_info_topic``
+     - ``string``
+     - ``/realsense_d435_rgb/color/camera_info``
+     - Camera intrinsics topic.
+   * - ``camera_width``
+     - ``int``
+     - ``640``
+     - Camera width in pixels.
+   * - ``camera_height``
+     - ``int``
+     - ``480``
+     - Camera height in pixels.
+   * - ``imu_topic``
+     - ``string``
+     - ``/imu_sensor_broadcaster/imu``
+     - IMU topic.
+
+Recorded Topics
+^^^^^^^^^^^^^^^
+
+Each episode bag contains:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Topic
+     - Type
+     - Purpose
+   * - ``/joint_states``
+     - ``sensor_msgs/JointState``
+     - 43-DOF robot observation (200 Hz)
+   * - ``/applied_joint_commands``
+     - ``isaac_ros_deploy_interfaces/JointCommand``
+     - Safety-blended applied joint commands (action, 200 Hz)
+   * - ``/record_data``
+     - ``isaac_ros_data_flywheel/RecordData``
+     - Per-frame sync timestamps (30 Hz)
+   * - ``/camera/color/image_compressed``
+     - ``sensor_msgs/CompressedImage``
+     - H.264 ego-view video (30 Hz)
+   * - ``/realsense_d435_rgb/color/camera_info``
+     - ``sensor_msgs/CameraInfo``
+     - Camera intrinsics + distortion (30 Hz)
+   * - ``/xr_teleop/root_twist``
+     - ``geometry_msgs/TwistStamped``
+     - Locomotion ``navigate_command``
+   * - ``/xr_teleop/root_pose``
+     - ``geometry_msgs/PoseStamped``
+     - Locomotion ``base_height_command``
+   * - ``/xr_teleop/ee_poses``
+     - ``geometry_msgs/PoseArray``
+     - Headset EE pose targets (pre-IK)
+   * - ``/xr_teleop/finger_joints``
+     - ``sensor_msgs/JointState``
+     - Headset finger joint targets (pre-controller)
+   * - ``/imu_sensor_broadcaster/imu``
+     - ``sensor_msgs/Imu``
+     - Body orientation / angular velocity
+   * - ``/tf``
+     - ``tf2_msgs/TFMessage``
+     - Dynamic transforms
+   * - ``/tf_static``
+     - ``tf2_msgs/TFMessage``
+     - Static transforms (latched)
+   * - ``/recording/task_description``
+     - ``std_msgs/String``
+     - Task string (latched, one message per episode)
+   * - ``/robot_description``
+     - ``std_msgs/String``
+     - URDF (latched, one message per episode)
+
+.. note::
+
+   On the real robot, ``/joint_states`` and ``/applied_joint_commands`` are
+   recorded at the full 200 Hz controller rate. In MuJoCo simulation these
+   topics may instead show a sustained ~165 Hz average rate with intermittent
+   inter-message gaps. This is an aliasing artifact between the 200 Hz
+   controller and MuJoCo's internal simulation timestep, not a recording
+   defect. MuJoCo is intended for validating the teleop setup; record full
+   datasets on real hardware to obtain the expected 200 Hz sampling.
+
+ROS Services
+^^^^^^^^^^^^
+
+Exposed by the recorder node for programmatic control:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Service
+     - Type
+     - Purpose
+   * - ``/g1_recorder/start_recording``
+     - ``std_srvs/srv/Trigger``
+     - Begin recording an episode.
+   * - ``/g1_recorder/stop_recording``
+     - ``std_srvs/srv/Trigger``
+     - Stop and save the current episode.
+   * - ``/g1_recorder/cancel_recording``
+     - ``std_srvs/srv/Trigger``
+     - Stop and discard the current episode.
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Node
+     - Type
+     - Default
+     - Description
+   * - ``task_description``
+     - ``/g1_recorder``
+     - ``string``
+     - *(from launch arg)*
+     - Task description for upcoming episodes. Update with
+       ``ros2 param set`` between episodes.
+
+Status Topic
+^^^^^^^^^^^^
+
+The recorder publishes session status on ``/g1_recorder/status`` as a JSON
+string containing state, task, episode count, and episode duration.
+
+Keyboard Controls
+^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Key
+     - IDLE
+     - RECORDING
+   * - Space
+     - Start recording
+     - Stop & save
+   * - ``c``
+     - —
+     - Cancel & discard
+   * - ``t``
+     - Change task description
+     - —
+   * - ``q``
+     - Quit
+     - — (prevents accidental data loss)
+
+Troubleshooting
+---------------
+
+Recorded Bags Show a Frozen Robot (Real Hardware)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If ``/applied_joint_commands`` in the recorded bag does not reflect your
+teleop motion, the AGILE safety controller was almost certainly still at
+``blend_ratio=0.0`` when you recorded. Raise the ratio before recording:
+
+.. code-block:: bash
+
+   ros2 param set /safety_controller blend_ratio 1.0
+
+In MuJoCo simulation ``blend_ratio`` defaults to ``1.0`` and no action is
+needed.
+
+.. |package_name| replace:: ``isaac_ros_unitree_g1_recorder``

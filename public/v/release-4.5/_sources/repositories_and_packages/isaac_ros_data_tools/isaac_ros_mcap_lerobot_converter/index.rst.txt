@@ -1,0 +1,137 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_data_tools> <isaac_ros_mcap_lerobot_converter>`
+
+Overview
+--------
+
+Converts MCAP rosbags produced by
+:doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder/index`
+into a `LeRobot <https://github.com/huggingface/lerobot>`__ dataset that
+the external GR00T N fine-tuning script can consume. The tool is a pure
+Python package — no ROS installation is required — and can be run on
+the host instead of inside the Isaac ROS dev container to avoid PyTorch
+version conflicts with the training environment.
+
+For a narrative walk-through, see
+:doc:`/reference_workflows/isaac_for_physical_ai/tutorials/tutorial_convert`.
+
+Tutorial: Convert MCAP Bags to a LeRobot Dataset
+-------------------------------------------------
+
+Prerequisites
+^^^^^^^^^^^^^
+
+* A recording session produced by
+  :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder/index`.
+* `uv <https://docs.astral.sh/uv/>`__ installed on the host.
+
+Install the Converter
+^^^^^^^^^^^^^^^^^^^^^
+
+#. Clone the repository under ``${ISAAC_ROS_WS}/src``:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_data_tools>`
+
+#. Create a virtual environment and install the converter in editable
+   mode. Run on the **host**, not inside the Isaac ROS dev container:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src/isaac_ros_data_tools/isaac_ros_mcap_lerobot_converter
+      uv venv --python 3.12 .venv
+      source .venv/bin/activate
+      uv pip install -e .
+
+Run the Conversion
+^^^^^^^^^^^^^^^^^^
+
+Point ``--rosbags-dir`` at the recorder session directory. Both flat
+(``rosbags_dir/<episode>/metadata.yaml``) and nested
+(``rosbags_dir/<episode>/bag/metadata.yaml``) layouts are auto-detected:
+
+.. code:: bash
+
+   mcap-to-lerobot \
+       --rosbags-dir ~/workspaces/isaac/recordings/session_<TIMESTAMP> \
+       --output-dir ~/workspaces/isaac/recordings/lerobot_output \
+       --task "move the apple to the plate" \
+       --fps 30 --robot-type unitree_g1
+
+Replace ``<TIMESTAMP>`` with the session you want to convert (the
+recorder printed the host path when it started). The output directory
+contains a standard LeRobot dataset (``meta/``, ``videos/``, ``data/``)
+ready as input to the fine-tuning step.
+
+To merge multiple recording sessions into one dataset, repeat
+``--rosbags-dir`` once per session. Episodes are numbered sequentially
+across the supplied directories in the order given:
+
+.. code:: bash
+
+   mcap-to-lerobot \
+       --rosbags-dir ~/workspaces/isaac/recordings/session_A \
+       --rosbags-dir ~/workspaces/isaac/recordings/session_B \
+       --output-dir ~/workspaces/isaac/recordings/lerobot_output \
+       --task "move the apple to the plate" \
+       --fps 30 --robot-type unitree_g1
+
+When sessions were recorded at different rates, pass ``--fps`` so each
+bag is resampled to the same target rate; otherwise mismatched sessions
+get rejected by the ±5% tolerance check.
+
+API
+---
+
+CLI Arguments
+^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Argument
+     - Required
+     - Description
+   * - ``--rosbags-dir``
+     - yes
+     - Directory of bag folders (each must contain ``metadata.yaml``).
+       Repeat the flag to merge multiple recording sessions into one
+       dataset; episodes are numbered sequentially across the supplied
+       directories in the order given.
+   * - ``--output-dir``
+     - yes
+     - Output directory for the LeRobot dataset.
+   * - ``--task``
+     - yes
+     - Task description label written to the dataset's ``tasks.jsonl``.
+   * - ``--fps``
+     - no
+     - Dataset ``fps`` label, written to ``info.json`` (default ``15``).
+       Should match the recorder's ``sync_rate`` (``30`` for the
+       Unitree G1 recorder default) since the converter does not
+       resample.
+   * - ``--robot-type``
+     - no
+     - Robot type label written to ``info.json`` (default
+       ``unitree_g1``).
+
+Output Layout
+^^^^^^^^^^^^^
+
+.. code-block:: text
+
+   <output-dir>/
+       meta/
+           info.json            # dataset metadata
+           episodes.jsonl       # per-episode length + task
+           tasks.jsonl          # task labels
+           modality.json        # joint-to-modality mapping
+       data/chunk-000/episode_<idx>.parquet   # per-episode tabular data
+       videos/chunk-000/.../episode_<idx>.mp4 # per-episode camera video
+
+.. |package_name| replace:: ``isaac_ros_mcap_lerobot_converter``

@@ -1,0 +1,446 @@
+====================
+|package_name|
+====================
+
+:ir_github:`<isaac_ros_robots> <unitree_g1/unitree_g1_bridge>`
+
+Overview
+--------
+
+.. include:: _snippets/overview.rst
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-unitree-g1-bridge
+
+   .. tab:: Build from Source
+
+      #. Clone the ``isaac_ros_robots`` repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_robots>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_robots/unitree_g1/unitree_g1_bridge --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to unitree_g1_bridge
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the
+            Isaac ROS environment. Because this package was built from source, the
+            enclosing workspace must be sourced for ROS to be able to find the
+            package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Set Up Host Network
+^^^^^^^^^^^^^^^^^^^
+
+This step is required for both **Binary Package** and **Build from
+Source** installs. Run it **on the host machine** (outside the Isaac ROS
+environment).
+
+.. tabs::
+
+   .. tab:: Run the Setup Script
+
+      The script lives in the ``isaac_ros_robots`` repository. If you
+      already cloned the source tree (**Build from Source** path above),
+      run it from there; otherwise clone the repository to a temporary
+      location first.
+
+      .. tabs::
+
+         .. tab:: From source clone
+
+            .. code:: bash
+
+               ${ISAAC_ROS_WS}/src/isaac_ros_robots/isaac_ros_robots_tools/scripts/setup_network.py
+
+         .. tab:: From a temp clone (binary install)
+
+            .. code:: bash
+
+               cd /tmp && git clone :ir_clone:`<isaac_ros_robots>`
+               /tmp/isaac_ros_robots/isaac_ros_robots_tools/scripts/setup_network.py
+
+      The script interactively prompts for the robot type and the
+      network interface that is physically connected to the G1.
+
+The setup performs three actions, regardless of which path you used:
+
+* Assign the static IP ``192.168.123.99/24`` to the selected interface.
+* Add a multicast route (``239.0.0.0/8``) through that interface so that
+  CycloneDDS discovery traffic is routed correctly and not sent through the
+  primary network interface.
+* Open the firewall for incoming UDP from the robot network
+  (``192.168.123.0/24``) on that interface.
+
+.. note::
+
+   These settings are **not persistent** across reboots. Re-run the
+   setup each time the host machine is restarted or the Ethernet adapter
+   is re-plugged.
+
+Verify the Robot Connection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Inside the Isaac ROS environment, verify that the robot is publishing
+   its locomotion state:
+
+   .. note::
+
+      If you built from source and are in a new terminal, re-source the workspace first:
+
+      .. code:: bash
+
+         source ${ISAAC_ROS_WS}/install/setup.bash
+
+   .. code:: bash
+
+      ros2 topic info /sportmodestate
+
+   The output should report at least one publisher, for example:
+
+   .. code:: text
+
+      Type: unitree_hg/msg/SportModeState
+      Publisher count: 1
+      Subscription count: 0
+
+   A non-zero publisher count confirms that DDS discovery is reaching the
+   robot and that the robot is actively publishing its locomotion state.
+   If the command reports ``Publisher count: 0`` or fails with a "topic
+   does not exist" error, the host network is not yet configured
+   correctly; re-run the ``setup_network.py`` step above.
+
+Run the Launch File
+^^^^^^^^^^^^^^^^^^^
+
+.. warning::
+
+   For initial testing, suspend the G1 from a gantry with its feet just
+   touching the ground. The standup sequence drives the legs to full
+   extension and engages the balance controller; if the robot is
+   not supported and the controller loses balance, the robot can topple
+   and damage itself or its surroundings.
+
+#. Launch the bridge node:
+
+   .. code:: bash
+
+      ros2 launch unitree_g1_bridge unitree_g1_bridge.launch.py
+
+   To start the bridge and automatically execute the standup sequence on node
+   startup, pass ``auto_standup:=true``:
+
+   .. code:: bash
+
+      ros2 launch unitree_g1_bridge unitree_g1_bridge.launch.py auto_standup:=true
+
+Stand Up the Robot
+^^^^^^^^^^^^^^^^^^
+
+#. After the node is running, trigger the standup sequence using the service:
+
+   .. code:: bash
+
+      ros2 service call /unitree_bridge_node/standup std_srvs/srv/Trigger
+
+   The standup sequence executes the following finite state machine (FSM) transitions by default:
+
+   #. **Damp** (FSM 1)
+   #. **Stand Up / Lock Stand** (FSM 4)
+   #. **Start** (FSM 200) — activates locomotion
+   #. **Set balance mode** to balance stand (mode 0)
+
+
+Send Velocity Commands
+^^^^^^^^^^^^^^^^^^^^^^
+
+After the robot is standing in balance-walk mode, send velocity commands on
+``/cmd_vel``.
+
+.. tabs::
+
+   .. tab:: Keyboard Teleoperation
+
+      #. Install the keyboard teleoperation package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-teleop-twist-keyboard
+
+      #. Run the keyboard teleoperation node:
+
+         .. code:: bash
+
+            ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+      #. Send velocity twist commands:
+
+         Press the ``i``, ``,``, ``j``, and ``l`` keys to move the robot.
+         Use the ``i`` and ``,`` keys to move the robot forward and backward.
+         Use the ``j`` and ``l`` keys to move the robot left and right.
+
+Emergency Stop
+^^^^^^^^^^^^^^
+
+To immediately damp all motors (safe stop) at any time, call the ``~/damp``
+service:
+
+.. code:: bash
+
+   ros2 service call /unitree_bridge_node/damp std_srvs/srv/Trigger
+
+To cut all motor torque entirely, call the ``~/zero_torque`` service:
+
+.. code:: bash
+
+   ros2 service call /unitree_bridge_node/zero_torque std_srvs/srv/Trigger
+
+.. warning::
+
+   Zero torque cuts all motor power immediately. The robot will collapse
+   under gravity. Only use this when the robot is safely supported.
+
+Troubleshooting
+---------------
+
+Robot Does Not Finish Standing Up
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the robot starts the standup sequence but stops part-way (for example, gets
+to lock-stand but does not reach Start), the firmware likely needs more
+time to finish each motion than the default ``standup_delays`` allows.
+Increase the per-step delays at launch time, for example:
+
+.. code:: bash
+
+   ros2 launch unitree_g1_bridge unitree_g1_bridge.launch.py \
+       standup_delays:='[3.0, 8.0, 3.0]'
+
+The longer second value gives the lock-stand → Start transition extra
+time to complete before the next FSM command is issued.
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, review :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+---
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch unitree_g1_bridge unitree_g1_bridge.launch.py
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 25 15 20 40
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+   * - ``velocity_duration``
+     - ``float``
+     - ``0.5``
+     - Duration in seconds attached to each velocity command.
+   * - ``standup_fsm_sequence``
+     - ``list[int]``
+     - ``[1, 4, 200]``
+     - FSM IDs executed in order during the standup sequence (firmware
+       1.5.x defaults).
+   * - ``standup_delays``
+     - ``list[float]``
+     - ``[3.0, 8.0, 3.0]``
+     - Per-step delay (s) after each FSM command, applied in both
+       acknowledgment-verifying and fire-and-forget modes so the
+       physical motion has time to finish.
+   * - ``balance_mode``
+     - ``int``
+     - ``0``
+     - Balance mode set after standup. ``0`` = stand, ``1`` = walking gait.
+   * - ``auto_standup``
+     - ``bool``
+     - ``false``
+     - If ``true``, run the standup sequence automatically on node startup.
+   * - ``auto_standup_delay``
+     - ``float``
+     - ``2.0``
+     - Seconds to wait after node start before the auto-standup sequence
+       begins. The delay lets DDS discovery converge with the G1 firmware
+       so the first request is not dropped.
+   * - ``qos_depth``
+     - ``int``
+     - ``10``
+     - Quality of Service (QoS) history depth for publishers and subscribers.
+   * - ``require_acks``
+     - ``bool``
+     - ``false``
+     - If ``true``, the bridge verifies each standup step by waiting up
+       to ``step_ack_timeout`` for the firmware acknowledgment and
+       aborts on rejection or timeout. ``standup_delays`` still applies
+       in both modes. Set to ``false`` when the firmware does not
+       publish acknowledgments for some ``api_id`` values.
+   * - ``step_ack_timeout``
+     - ``float``
+     - ``30.0``
+     - Seconds to wait for a firmware acknowledgment on each standup
+       step when ``require_acks`` is ``true``. Has no effect in
+       fire-and-forget mode.
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 30 50 20
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``/cmd_vel``
+     - `geometry_msgs/Twist <https://github.com/ros2/common_interfaces/blob/humble/geometry_msgs/msg/Twist.msg>`__
+     - Velocity commands from Nav2 or a teleoperation node.
+   * - ``/api/sport/response``
+     - ``unitree_api/msg/Response``
+     - Acknowledgments from the G1 firmware, used by the bridge to verify
+       that each FSM or balance request was accepted. Responses are
+       correlated to requests via ``header.identity.id``.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 30 50 20
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``/api/sport/request``
+     - ``unitree_api/msg/Request``
+     - Encoded sport-mode commands forwarded to the G1 robot.
+
+ROS Services
+^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 30 30 40
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+   * - ``~/standup``
+     - `std_srvs/Trigger <https://github.com/ros2/common_interfaces/blob/humble/std_srvs/srv/Trigger.srv>`__
+     - Start the damp → stand → start → balance-walk FSM sequence. The
+       service returns ``success=True`` once the sequence has been
+       scheduled; per-step acceptance is reported in the node logs and the
+       sequence aborts if any step is rejected or times out.
+   * - ``~/damp``
+     - `std_srvs/Trigger <https://github.com/ros2/common_interfaces/blob/humble/std_srvs/srv/Trigger.srv>`__
+     - Send a damp command (FSM ID 1) for emergency stop. Returns
+       ``success=True`` only after the firmware acknowledges the request;
+       ``message`` reflects acceptance, rejection (status code), or
+       timeout.
+   * - ``~/zero_torque``
+     - `std_srvs/Trigger <https://github.com/ros2/common_interfaces/blob/humble/std_srvs/srv/Trigger.srv>`__
+     - Cut all motor torque (FSM ID 0). Same firmware acknowledgment semantics as
+       ``~/damp``. The robot will collapse — only use this service when
+       the robot is safely supported.
+
+G1 FSM Reference
+^^^^^^^^^^^^^^^^
+
+FSM IDs as used by the Unitree G1 sport-mode API. The table reflects
+firmware **1.5.x** unless noted otherwise.
+
+.. list-table::
+   :widths: 15 25 60
+   :header-rows: 1
+
+   * - FSM ID
+     - Name
+     - Description
+   * - ``0``
+     - Zero Torque
+     - Turns off all motors.
+   * - ``1``
+     - Damp
+     - Engages passive damping for a safe stop.
+   * - ``4``
+     - Lock Stand
+     - Drives the robot from damp / squat into a standing pose and locks
+       it there. Labeled "lock stand" in the SDK, but on firmware 1.5.1
+       it still performs the full sit-to-stand rise (equivalent to the
+       legacy "Stand Up" command).
+   * - ``200``
+     - Start
+     - Activates the locomotion controller (Main Operation Control).
+       Required after standing for ``/cmd_vel`` velocity commands to take
+       effect. *Previously FSM 500 on firmware 1.4.x.*
+   * - ``706``
+     - Squat2StandUp
+     - Alternative rise motion from a deep squat or lying pose. Not
+       required when going through FSM 4 from a normal damp pose.
+
+.. |package_name| replace:: ``unitree_g1_bridge``
