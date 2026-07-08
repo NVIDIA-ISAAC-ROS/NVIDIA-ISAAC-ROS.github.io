@@ -8,11 +8,34 @@ Universal Robots
 Set Up UR Robot
 ~~~~~~~~~~~~~~~
 
+#. Clone the Isaac ROS fork of ``Universal_Robots_ROS2_Driver`` under ``${ISAAC_ROS_WS}/src``:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone -b :ir_ros_distro: https://github.com/NVIDIA-ISAAC-ROS/Universal_Robots_ROS2_Driver
+
+#. Install dependencies:
+
+   .. code:: bash
+
+      sudo apt update && \
+         sudo apt install -y ros-:ir_ros_distro:-controller-manager ros-:ir_ros_distro:-controller-interface ros-:ir_ros_distro:-hardware-interface && \
+         rosdep update && \
+         rosdep install --from-paths ${ISAAC_ROS_WS}/src/Universal_Robots_ROS2_Driver --ignore-src -y
+
+#. Build the UR ROS 2 robot driver:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS} && \
+         colcon build --symlink-install --packages-up-to ur_robot_driver && source install/setup.bash
+
 #. Set up the UR robot by following `Setting up a UR robot <https://docs.ros.org/en/:ir_ros_distro:/p/ur_robot_driver/doc/installation/robot_setup.html>`__.
 
-.. TODO(jaiveers): Update this with a Jazzy link instead
-
 #. Create a program for external control by following `Installing a URCap <https://docs.ros.org/en/humble/p/ur_robot_driver/doc/installation/install_urcap_e_series.html>`__.
+
+   .. TODO(jaiveers): Update this with a Jazzy link instead
 
    .. warning::
 

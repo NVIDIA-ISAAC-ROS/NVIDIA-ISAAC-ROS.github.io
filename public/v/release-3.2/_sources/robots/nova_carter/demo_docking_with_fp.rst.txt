@@ -42,7 +42,7 @@ Instructions
       ros2 launch nova_carter_docking docking_with_fp_sim.launch.py init_pose_x:=-2.0 init_pose_y:=14.0 init_pose_yaw:=3.14
 
    .. note::
-   
+
       Verify that you see an ``RViz2`` window open. In ``RViz2``, change the ``Detection3DArray`` topic name to ``/tracking/output`` to display the 3D pose estimation bounding box overlaid on the input image.
 
 5. Send a docking action:
@@ -80,13 +80,13 @@ Troubleshooting
    The default value is ``-0.15``. You may increase this value to bring the Nova Carter closer to the dock.
    More details for docking parameters can be found on `GitHub <https://github.com/open-navigation/opennav_docking/tree/main?tab=readme-ov-file#configuration>`__.
 
-2. If you encounter a situation where the robot cannot complete the docking goal using `FoundationPose`, 
+2. If you encounter a situation where the robot cannot complete the docking goal using `FoundationPose`,
    it may be due to the limited performance of your workstation. In our example, we are using a workstation with the following specifications:
 
    - CPU: Intel Core i9-14900K, 24 cores, 6.0 GHz
    - GPU: NVIDIA RTX 6000 Ada Generation
    - RAM: 128 GB DDR5
 
-   We rely on pose estimation at the staging location and dock using the tracking results. As the robot gets closer to the dock, detection becomes unreliable due to the limited field of view. 
-   To address this, you may need to increase the `reset_period` parameter in the launch file :ir_repo:`here <isaac_ros_pose_estimation> <isaac_ros_foundationpose/launch/isaac_ros_foundationpose_isaac_sim_tracking.launch.py>` 
+   We rely on pose estimation at the staging location and dock using the tracking results. As the robot gets closer to the dock, detection becomes unreliable due to the limited field of view.
+   To address this, you may need to increase the `reset_period` parameter in the launch file :ir_repo:`here <isaac_ros_pose_estimation> <isaac_ros_foundationpose/launch/isaac_ros_foundationpose_isaac_sim_tracking.launch.py>`
    or consider launching the `fp_dock_pose_publisher` in the launch file :ir_repo:`here <nova_carter> <nova_carter_docking/launch/docking_with_fp_sim.launch.py>` separately at the staging location when the pose estimation is accurate.

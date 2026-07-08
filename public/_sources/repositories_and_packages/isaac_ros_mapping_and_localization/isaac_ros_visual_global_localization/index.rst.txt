@@ -11,16 +11,17 @@ This package includes the ROS node and launch files for :doc:`visual global loca
 It takes the global localization map along with raw or rectified stereo images as inputs and outputs the global pose.
 The package supports both single and multiple stereo image inputs.
 
-:ref:`Visual Global Localization Metrics <concepts/visual_global_localization/index:Metrics of cuVGL>`.
-
 Quickstart
 ----------
+
+.. _isaac_ros_visual_global_localization_setup_dev_env:
 
 Set Up Development Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: /repositories_and_packages/isaac_ros_mapping_and_localization/_snippets/setup_dev_env_mapping.rst
 
+.. _isaac_ros_visual_global_localization_install:
 
 Install or Build |package name|
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -72,110 +73,19 @@ Install or Build |package name|
 
             source install/setup.bash
 
-Localization with Rosbag Replay
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tutorials
+----------
 
-We provide an end-to-end ROS launch file for replaying a rosbag and running global localization. It continuously
-run global localization on incoming frames, even after a localization pose has already been computed. It also
-activates the 3D Lidar to create a point cloud overlay on the occupancy map using the result poses.
+To create cuVGL map, see :doc:`Tutorial: cuVGL Map Creation </concepts/visual_global_localization/tutorials/tutorial_map_creation>`.
 
-#. Create a map by following :doc:`Tutorial with Map Creation </concepts/visual_global_localization/tutorials/tutorial_map_creation>`.
-#. Record a localization rosbag using appropriate data recording tools. Please keep the localization trajectory within 1m from the map trajectory's coverage.
-#. Launch container and go to container's terminal.
-#. Export TensorRT engine files (optional and one time setup):
+To localize with cuVGL, see :doc:`Tutorial: Localization with cuVGL </concepts/visual_global_localization/tutorials/tutorial_localization>`.
 
-    .. code-block:: bash
-
-      OUTPUT_MODEL_DIR="path_to_output_model_dir"
-
-      mkdir -p $OUTPUT_MODEL_DIR
-      # Then export the lightglue and aliked extractor engine files
-      $(ros2 pkg prefix isaac_ros_visual_mapping)/bin/visual_mapping/export_lightglue_engine \
-          --worker_config_file $(ros2 pkg prefix --share isaac_ros_visual_mapping)/configs/isaac/matching_task_worker_config.pb.txt \
-          --model_dir $(ros2 pkg prefix --share isaac_ros_visual_mapping)/models \
-          --output_model_dir $OUTPUT_MODEL_DIR
-
-      $(ros2 pkg prefix isaac_ros_visual_mapping)/bin/visual_mapping/export_extractor_engine \
-          --configure_file $(ros2 pkg prefix --share isaac_ros_visual_mapping)/configs/isaac/keypoint_creation_config.pb.txt \
-          --model_dir $(ros2 pkg prefix --share isaac_ros_visual_mapping)/models \
-          --output_model_dir $OUTPUT_MODEL_DIR
-
-#. Run the following command to replay the localization rosbag and localize the robot:
-
-   .. code:: bash
-
-      ros2 launch isaac_ros_visual_global_localization run_cuvgl_rosbag_replay.launch.py \
-         rosbag_path:=$ROS_BAG_PATH \
-         camera_names:='front_stereo_camera,left_stereo_camera,right_stereo_camera,back_stereo_camera' \
-         vgl_map_dir:=${MAP_DIR}/cuvgl_map \
-         occupancy_map_yaml_file:=${MAP_DIR}/occupancy_map.yaml \
-         vgl_model_dir:=$OUTPUT_MODEL_DIR
-
-.. note::
-
-   For live testing, refer to the appropriate localization workflow documentation.
-
-Visualize Results
-^^^^^^^^^^^^^^^^^
-
-.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_mapping_and_localization/visualize_vgl_pose.png>`
-    :align: center
-    :width: 800px
-
-Visualize the `/map`, `/front_3d_lidar/lidar_points_filtered`, and `/visual_localization/pose` topics in
-RViz or Foxglove. The alignment between the point cloud and the occupancy map indicates the accuracy of
-the result pose, which is used to transform the point cloud into the occupancy map frame. The axes shows
-the localization pose, with the red axes pointing in the the robot's forward direction.
-
-Try More Examples
------------------
-
-To continue your exploration, check out the following suggested examples:
-
-.. toctree::
-   :maxdepth: 1
-
-   Tutorial with Map Creation </concepts/visual_global_localization/tutorials/tutorial_map_creation>
-
-   Tutorial with Visual Global Localization </concepts/visual_global_localization/tutorials/tutorial_localization>
-
-Coordinate Frames
------------------
-
-This section describes the coordinate frames that are involved in the
-``VisualGlobalLocalizationNode``. The frames discussed below are oriented as follows:
-
-.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_visual_slam/Axes.png>`
-   :width: 300px
-   :align: center
-
-#. ``base_frame``: The base frame of the robot or camera rig. It is assumed that
-   all cameras are rigidly mounted to this frame, such that the transforms between
-   the ``base_frame`` and the ``camera_optical_frames`` can assumed to be static.
-   The estimated odometry and SLAM pose will represent the pose of this frame.
-
-#. ``map_frame``: The frame corresponding to the origin of the map that cuVGL
-   creates or localizes in. The SLAM pose reported by cuVGL corresponds with
-   the transform ``map_frame`` -> ``base_frame``.
-
-#. ``camera_optical_frames``: The frames corresponding to the optical center of
-   every camera. The frame is expected to lie at the center of the camera lens
-   and oriented with the z-axis pointing in the view direction and the y-axis
-   pointing to the floor.
 
 Troubleshooting
 ---------------
 
-Isaac ROS Troubleshooting
-^^^^^^^^^^^^^^^^^^^^^^^^^
+For Isaac ROS setup issues, please check :doc:`here </troubleshooting/index>`.
 
-For solutions to problems with Isaac ROS, please check :doc:`here </troubleshooting/index>`.
-
-Troubleshooting Suggestions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-#. If localization frequently fails to return a pose, consider relaxing the rejection criteria, allowing it to return less confident results, by setting: ``vgl_localization_precision_level:=0``.
-#. To print more debug messages from the localization node, use launch parameters: ``vgl_verbose_logging:=True vgl_init_glog:=True vgl_glog_v:=1``.
 
 API
 ----
