@@ -67,7 +67,7 @@ this repository.
 
 ## Latest
 
-Update 2026-04-30: Compatibility and integration updates for the Isaac ROS 4.4.0 release
+Update 2026-07-06: Improved timestamp correlation, launch argument handling, and test robustness
 
 ## Supported Platforms
 

@@ -97,4 +97,4 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-07-06: Flipped hand order in Isaac ROS cuMotion Controllers to support Isaac Teleop updates
+Update 2026-07-06: Updated cuMotion to 1.1.0, improved self-consistent ESDF planning, added AABB clearing for drop-pose planning, and flipped controller PoseArray hand order to align with Isaac ROS Teleop

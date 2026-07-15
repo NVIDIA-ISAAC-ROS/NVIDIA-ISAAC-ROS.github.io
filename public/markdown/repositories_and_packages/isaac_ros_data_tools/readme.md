@@ -6,4 +6,4 @@ Tools for inspecting and validating data sent through graphs containing Isaac RO
 
 ## Latest
 
-Update 2026-04-30: Compatibility and integration updates for the Isaac ROS 4.4.0 release
+Update 2026-07-06: Added the MCAP-to-LeRobot converter, multiple recording-session conversion, FPS resampling, and action.effort export support

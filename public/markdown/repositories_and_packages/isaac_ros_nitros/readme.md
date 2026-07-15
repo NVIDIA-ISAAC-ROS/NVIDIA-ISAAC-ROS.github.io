@@ -72,4 +72,4 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-04-30: Compatibility and integration updates for the Isaac ROS 4.4.0 release
+Update 2026-07-06: Reduced NITROS build/runtime complexity by sun-setting the GXF implementation and added CUDA streaming support for NITROS messaging

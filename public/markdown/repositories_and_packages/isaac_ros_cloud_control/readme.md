@@ -63,7 +63,7 @@ MCP tutorials in Cursor:
 
 ## Latest
 
-Update 2026-04-30: Compatibility and integration updates for the Isaac ROS 4.4.0 release
+Update 2026-07-06: Compatibility and integration updates for the Isaac ROS 4.5.0 release
 
 ## Contributors
 

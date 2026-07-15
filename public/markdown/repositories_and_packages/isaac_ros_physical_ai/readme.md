@@ -51,4 +51,4 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-07-06: Support CloudXR runtime without Docker
+Update 2026-07-06: Added Docker-free CloudXR runtime support and an end-to-end GR00T workflow for Unitree G1 on real hardware

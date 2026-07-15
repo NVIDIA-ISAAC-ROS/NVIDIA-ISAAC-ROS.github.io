@@ -26,4 +26,4 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-07-06: Updated default topic names and renamed some frames
+Update 2026-07-06: Updated Unitree G1 bridge and bringup defaults, including topic names, frame names, controller configuration, GR00T launch behavior, and bridge acknowledgment checks

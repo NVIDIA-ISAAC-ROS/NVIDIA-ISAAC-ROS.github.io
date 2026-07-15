@@ -84,4 +84,4 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-04-30: Compatibility and integration updates for the Isaac ROS 4.4.0 release
+Update 2026-07-06: Compatibility and integration updates for the Isaac ROS 4.5.0 release

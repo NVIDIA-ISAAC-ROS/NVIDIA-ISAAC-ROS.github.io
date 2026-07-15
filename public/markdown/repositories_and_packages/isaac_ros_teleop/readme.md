@@ -33,4 +33,4 @@ Refer to the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/reposi
 
 ## Latest
 
-Update 2026-07-06: Support CloudXR without Docker, flipped PoseArray hand order and exposed raw controller data
+Update 2026-07-06: Added Docker-free CloudXR runtime support, Meta Quest 3 headset support, raw controller data publishing, configurable XR pose transforms, RViz visualization, and updated PoseArray hand order
