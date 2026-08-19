@@ -1,0 +1,141 @@
+=======================================
+GR00T Reference Workflow for Unitree G1
+=======================================
+
+This tutorial walks through the full GR00T Reference Workflow on the
+Unitree G1: turning human teleoperation demonstrations into a deployed
+humanoid policy. You will record demonstrations to fine-tune the GR00T N
+foundation model, then deploy it on the robot to perform the task autonomously.
+
+The example task is **apple-to-plate** — the robot stands at a table,
+picks up an apple, and places it on a plate.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/apple_to_plate.gif>`
+   :alt: Unitree G1 placing an apple on a plate with a fine-tuned GR00T policy
+
+The three high-level steps are:
+
+- Collect data via teleoperation.
+- Train a fine-tuned GR00T N policy on the collected data and export it via LEAPP.
+- Deploy the policy on a Unitree G1.
+
+If you do not want to collect your own demonstrations, a pre-trained
+GR00T N policy already fine-tuned to this task is provided.
+
+Requirements
+------------
+
+To follow this workflow you will need:
+
+- Unitree G1 humanoid with Dex3-1 hands and an attached Intel RealSense camera
+- Jetson AGX Thor or an x86_64 system with an NVIDIA GPU
+
+To collect your own demonstrations, you will **also** need:
+
+- A PICO 4 Ultra or Meta Quest 3 XR headset
+- An L-40 or better NVIDIA GPU
+- Two people for the teleoperation — one to operate the robot, one to monitor the recording
+
+For the apple-to-plate task:
+
+- A light red apple
+- A white plate roughly 19 cm in diameter
+- A table with a black surface (height ≈ 75 cm). If using a tablecloth, affix it firmly to the table.
+
+.. note::
+
+   For Jetson AGX Thor workflows, you can use either an external Jetson AGX Thor
+   connected to the robot or the official Unitree Thor backpack mounted on the robot.
+
+Setup
+-----
+
+Complete the following one-time setup before starting any sub-tutorial.
+
+Compute Hardware
+^^^^^^^^^^^^^^^^
+
+If you plan to deploy on a real Unitree G1 with Jetson AGX Thor,
+complete the host-level setup before starting the Isaac ROS environment
+with ``isaac-ros activate``. See
+:ref:`Real-Hardware Prerequisite Details <repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index:Real-Hardware Prerequisite Details>`.
+
+Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+The recommended Docker ``config.yaml`` for this Workflow is the following:
+
+.. code:: yaml
+
+   docker:
+     image:
+       additional_image_keys:
+         - realsense
+         - gr00t_workflow
+
+Camera
+^^^^^^
+
+Set up the Intel RealSense camera by following the
+:doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`.
+
+Workflow
+--------
+
+Each sub-tutorial assumes the Isaac ROS environment is active
+(``isaac-ros activate``) and the workspace is sourced
+(``source install/setup.bash``). Follow the six sub-tutorials below in
+order.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 5 25 30 30 15
+
+   * - #
+     - Step
+     - Tutorial
+     - Package reference
+     - Supported Compute Platform
+   * - 1
+     - Teleoperate the robot
+     - :doc:`tutorial_teleop`
+     - :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index`
+     - Jetson AGX Thor
+   * - 2
+     - Record demonstrations
+     - :doc:`tutorial_record`
+     - :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder/index`
+     - Jetson AGX Thor
+   * - 3
+     - Convert MCAP → LeRobot
+     - :doc:`tutorial_convert`
+     - :doc:`/repositories_and_packages/isaac_ros_data_tools/isaac_ros_mcap_lerobot_converter/index`
+     - x86_64 or Jetson AGX Thor
+   * - 4
+     - Fine-tune GR00T N *(external)*
+     - :doc:`tutorial_finetune`
+     - `gr00t-leapp-export <https://github.com/nvidia-isaac/gr00t-leapp-export/tree/n17-export>`__ *(external)*
+     - x86_64
+   * - 5
+     - Export via LEAPP *(external)*
+     - :doc:`tutorial_leapp_export`
+     - `gr00t-leapp-export <https://github.com/nvidia-isaac/gr00t-leapp-export/tree/n17-export>`__ *(external)*
+     - x86_64
+   * - 6
+     - Deploy the fine-tuned policy
+     - :doc:`tutorial_deploy`
+     - :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index`
+     - Jetson AGX Thor
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   tutorial_teleop.rst
+   tutorial_record.rst
+   tutorial_convert.rst
+   tutorial_finetune.rst
+   tutorial_leapp_export.rst
+   tutorial_deploy.rst

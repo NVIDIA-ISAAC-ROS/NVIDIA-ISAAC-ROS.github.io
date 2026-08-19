@@ -1,0 +1,94 @@
+============================
+How to add custom converters
+============================
+
+Converters translate between robot signals and policy tensors. Isaac ROS Deploy
+already provides converters for the most common use cases, but you can also add
+your own. See the :doc:`converter catalog <../reference/converter_catalog>` for
+all existing converters, and add a custom converter when a bundle uses a semantic
+``kind`` that is not listed there.
+
+There are four converter types, grouped by runtime and direction:
+
+- Topic input converters turn ROS messages into tensors.
+- Topic output converters turn tensors into ROS messages.
+- ROS2 Control state interface converters read hardware state interfaces into
+  tensors.
+- ROS2 Control command interface converters write output tensors to hardware
+  command interfaces.
+
+The :doc:`converter extension reference <../reference/converter_interfaces>`
+lists the base class, required overrides, and registration point for every type.
+
+1. Choose the converter type
+============================
+
+Choose the row that matches the runtime and data direction:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 30 45
+
+   * - Runtime
+     - Direction
+     - Converter type
+   * - ROS 2 node
+     - ROS message to policy tensor
+     - Topic input
+   * - ROS 2 node
+     - Policy tensor to ROS message
+     - Topic output
+   * - ROS 2 Control
+     - State interface to policy tensor
+     - State interface
+   * - ROS 2 Control
+     - Policy tensor to command interface
+     - Command interface
+
+2. Start from a built-in converter
+==================================
+
+Copy the converter that matches the type you chose in step 1 and that has a
+similar tensor shape:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Converter type
+     - Starter source
+   * - Topic input
+     - :ir_repo:`message_to_tensor_converters.cpp <isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_converters/src/converters/message_to_tensor_converters.cpp>`
+   * - Topic output
+     - :ir_repo:`tensor_to_message_converters.cpp <isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_converters/src/converters/tensor_to_message_converters.cpp>`
+   * - State interface
+     - :ir_repo:`state_interface_converters.cpp <isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_ros2_control/src/converters/state_interface_converters.cpp>`
+   * - Command interface
+     - :ir_repo:`command_interface_converters.cpp <isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_ros2_control/src/converters/command_interface_converters.cpp>`
+
+When you adapt the copy:
+
+- Keep the converter stateless.
+- Return or write values in the transport's native order. The runtime reorders
+  named elements from the converter's tensor specification when needed.
+
+3. Implement the interface and register the kind
+================================================
+
+1. Implement the methods for your converter type in the
+   :doc:`converter extension reference <../reference/converter_interfaces>`.
+2. Register a factory in the matching ``initialize_*_converters()`` function.
+   Use the LEAPP semantic ``kind`` as the registry key.
+
+Follow these type-specific registration rules:
+
+- **Topic input:** The first message type registered for a ``kind`` is the
+  default. Register extra message types under the same ``kind`` when launch
+  files must select them with ``source_message_type``.
+- **Topic output:** The factory receives the bundle-declared tensor shape.
+  Return ``nullptr`` for unsupported ranks so one ``kind`` can pick different
+  implementations for single-step and trajectory outputs.
+- **Command interface:** Follow the built-in name chaining. Add
+  ``prefix + "/"`` only when ``prefix`` is nonempty, and append ``suffix`` to
+  the interface type. For example, the prefix ``safety_controller`` and suffix
+  ``_raw`` produce ``safety_controller/left_knee/temperature_raw``.

@@ -1,0 +1,185 @@
+=========================
+Isaac ROS ZED Setup
+=========================
+
+
+ZED cameras require the following to be able to publish data to ROS 2 topics:
+
+- ``ZED SDK``
+- ``zed-ros2-wrapper``
+- ZED X driver (ZED X / ZED X Mini only; installed on the host machine)
+
+When using Isaac ROS with Docker, the ZED SDK and ``zed-ros2-wrapper`` are installed automatically during container
+build when you enable the ``zed`` image key in the Isaac ROS CLI configuration. If you are using a Virtual
+Environment or Bare Metal workflow, you must install the SDK and build ``zed-ros2-wrapper`` manually.
+
+Camera Compatibility
+--------------------
+
+All cameras supported by the `zed ros2 wrapper <https://github.com/stereolabs/zed-ros2-wrapper>`_ work with Isaac ROS.
+
+================= ==============
+ZED Model         SQA Testing?
+================= ==============
+ZED 2i              ✓
+ZED X               ✗
+ZED 2               ✓
+ZED                 ✓
+ZED Mini            ✗
+ZED X Mini          ✗
+================= ==============
+
+
+Setup Instructions
+------------------
+
+.. note::
+
+   **DGX Spark**: ZED camera support has not been tested on DGX Spark.
+
+This tutorial assumes that you have completed the instructions in :doc:`Developer Environment Setup </getting_started/index>`.
+
+#. Configure the Isaac ROS environment to include ZED:
+
+   .. tab-set::
+
+      .. tab-item:: Docker
+         :sync: docker
+
+         Create a file called ``~/.config/isaac-ros-cli/config.yaml`` with the following content:
+
+         .. code:: bash
+
+            mkdir -p ~/.config/isaac-ros-cli
+            touch ~/.config/isaac-ros-cli/config.yaml
+
+         .. code:: yaml
+
+            docker:
+              image:
+                additional_image_keys:
+                  - zed
+
+         This will install the ZED SDK and build ``zed-ros2-wrapper`` into the container image when you rebuild it.
+
+      .. tab-item:: Virtual Environment
+         :sync: venv
+
+         Clone the ``zed-ros2-wrapper`` repository on the ``master`` branch. You will also need to install the
+         ZED SDK on the host (see step 5 below).
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+            git clone --recurse-submodules https://github.com/stereolabs/zed-ros2-wrapper
+
+      .. tab-item:: Bare Metal
+         :sync: baremetal
+
+         Clone the ``zed-ros2-wrapper`` repository on the ``master`` branch. You will also need to install the
+         ZED SDK on the host (see step 5 below).
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+            git clone --recurse-submodules https://github.com/stereolabs/zed-ros2-wrapper
+
+#. If you are using ZED X or ZED X Mini, refer to the appropriate `Stereolabs setup guide <https://www.stereolabs.com/docs/get-started-with-zed-x/>`__.
+
+   - You must install the ZED X driver on the host.
+   - If you are using Docker, you do **not** need to install the ZED SDK on the host (it is installed into the
+     container image when you rebuild it).
+
+#. Plug in the USB cable of your ZED camera before activating the Isaac ROS environment in the next step.
+
+#. Activate the Isaac ROS environment:
+
+   .. tab-set::
+
+      .. tab-item:: Docker
+         :sync: docker
+
+         .. code:: bash
+
+            isaac-ros activate --build-local
+
+         This ``--build-local`` flag rebuilds the container image using ``Dockerfile.zed`` in one of its layered
+         stages. Rebuilding can take several minutes.
+
+         After the image has been built once, you can use ``isaac-ros activate`` to launch the container without
+         rebuilding the image.
+
+      .. tab-item:: Virtual Environment
+         :sync: venv
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      .. tab-item:: Bare Metal
+         :sync: baremetal
+
+         .. code:: bash
+
+            isaac-ros activate
+
+#. Install the ZED SDK (Virtual Environment / Bare Metal only):
+
+   .. tab-set::
+
+      .. tab-item:: Docker
+         :sync: docker
+
+         No action required. The ZED SDK is installed into the container image during the Docker build.
+
+      .. tab-item:: Virtual Environment
+         :sync: venv
+
+         Install the ZED SDK on your host by downloading and running the appropriate installer from the
+         `ZED SDK release page <https://www.stereolabs.com/developers/release>`__.
+
+      .. tab-item:: Bare Metal
+         :sync: baremetal
+
+         Install the ZED SDK on your host by downloading and running the appropriate installer from the
+         `ZED SDK release page <https://www.stereolabs.com/developers/release>`__.
+
+#. Install the dependencies for the ``zed_wrapper`` package and build it (Virtual Environment / Bare Metal only):
+
+   .. tab-set::
+
+      .. tab-item:: Docker
+         :sync: docker
+
+         No action required. ``zed-ros2-wrapper`` is built into the container image during the Docker build.
+
+      .. tab-item:: Virtual Environment
+         :sync: venv
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+            sudo apt update && \
+            rosdep update && rosdep install --from-paths src/zed-ros2-wrapper --ignore-src -r -y && \
+            colcon build --symlink-install --packages-up-to zed_wrapper
+
+      .. tab-item:: Bare Metal
+         :sync: baremetal
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+            sudo apt update && \
+            rosdep update && rosdep install --from-paths src/zed-ros2-wrapper --ignore-src -r -y && \
+            colcon build --symlink-install --packages-up-to zed_wrapper
+
+#. Verify that the ZED camera is connected by running ``/usr/local/zed/tools/ZED_Explorer``:
+
+   .. code:: bash
+
+      /usr/local/zed/tools/ZED_Explorer
+
+   If everything is working as expected, verify that you have something similar to the following:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/zed_explorer.png>`
+      :align: center

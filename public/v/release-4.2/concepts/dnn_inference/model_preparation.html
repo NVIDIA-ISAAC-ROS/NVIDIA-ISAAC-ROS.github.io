@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -686,12 +686,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../release-3.2/concepts/dnn_inference/model_preparation.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.4/concepts/dnn_inference/model_preparation.html">release-4.4</a></dd>
         <dd><a href="../../../release-4.5/concepts/dnn_inference/model_preparation.html">release-4.5</a></dd>
+        <dd><a href="../../../release-4.6/concepts/dnn_inference/model_preparation.html">release-4.6</a></dd>
         <dd><a href="../../../../concepts/dnn_inference/model_preparation.html">latest</a></dd>
         <dd><a href="../../../release-2.1/concepts/dnn_inference/model_preparation.html">release-2.1</a></dd>
         <dd><a href="../../../release-3.1/concepts/dnn_inference/model_preparation.html">release-3.1</a></dd>
-        <dd><a href="../../../release-3.2/concepts/dnn_inference/model_preparation.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.0/concepts/dnn_inference/model_preparation.html">release-4.0</a></dd>
         <dd><a href="../../../release-4.1/concepts/dnn_inference/model_preparation.html">release-4.1</a></dd>
         <dd><a href="model_preparation.html">release-4.2</a></dd>
@@ -839,8 +840,8 @@ write permission to the output directory.</p>
 <p>Check the model’s page on NGC for the latest <code class="docutils literal notranslate"><span class="pre">wget</span></code>
 command.</p>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>--content-disposition<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&amp;path=resnet34_peoplenet.onnx&#39;</span><span class="w"> </span>-O<span class="w"> </span>/workspaces/isaac_ros-dev/models/resnet34_peoplenet.onnx<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-wget<span class="w"> </span>--content-disposition<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&amp;path=resnet34_peoplenet_int8.txt&#39;</span><span class="w"> </span>-O<span class="w"> </span>/workspaces/isaac_ros-dev/models/resnet34_peoplenet_int8.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>--content-disposition<span class="w"> </span><span class="s1">'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&amp;path=resnet34_peoplenet.onnx'</span><span class="w"> </span>-O<span class="w"> </span>/workspaces/isaac_ros-dev/models/resnet34_peoplenet.onnx<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+wget<span class="w"> </span>--content-disposition<span class="w"> </span><span class="s1">'https://api.ngc.nvidia.com/v2/models/org/nvidia/team/tao/peoplenet/deployable_quantized_onnx_v2.6.3/files?redirect=true&amp;path=resnet34_peoplenet_int8.txt'</span><span class="w"> </span>-O<span class="w"> </span>/workspaces/isaac_ros-dev/models/resnet34_peoplenet_int8.txt
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/usr/src/tensorrt/bin/trtexec<span class="w"> </span>--onnx<span class="o">=</span>/workspaces/isaac_ros-dev/models/resnet34_peoplenet.onnx<span class="w"> </span>--saveEngine<span class="o">=</span>/workspaces/isaac_ros-dev/models/resnet34_peoplenet.plan<span class="w"> </span>--int8<span class="w"> </span>--calib<span class="o">=</span>/workspaces/isaac_ros-dev/models/resnet34_peoplenet_int8.txt<span class="w"> </span>--minShapes<span class="o">=</span>input_1:0:1x3x544x960<span class="w"> </span>--optShapes<span class="o">=</span>input_1:0:1x3x544x960<span class="w"> </span>--maxShapes<span class="o">=</span>input_1:0:1x3x544x960
@@ -1019,7 +1020,7 @@ these correspond to the expected tensor names within the ROS 2 <code class="docu
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

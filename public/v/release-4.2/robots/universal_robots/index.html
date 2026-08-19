@@ -65,7 +65,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -688,12 +688,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.4/robots/universal_robots/index.html">release-4.4</a></dd>
         <dd><a href="../../../release-4.5/robots/universal_robots/index.html">release-4.5</a></dd>
+        <dd><a href="../../../release-4.6/robots/universal_robots/index.html">release-4.6</a></dd>
         <dd><a href="../../../../robots/universal_robots/index.html">latest</a></dd>
         <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../release-3.1/index.html">release-3.1</a></dd>
-        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.0/robots/universal_robots/index.html">release-4.0</a></dd>
         <dd><a href="../../../release-4.1/robots/universal_robots/index.html">release-4.1</a></dd>
         <dd><a href="index.html">release-4.2</a></dd>
@@ -836,8 +837,8 @@ instructions to calibrate the cameras with respect to the robot. The <code class
 output from each calibration process will include a code snippet similar to the following
 example (values included for illustration only as they will differ for different setups):</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;&quot;&quot; Static transform publisher acquired via MoveIt 2 hand-eye calibration &quot;&quot;&quot;</span>
-<span class="s2">&quot;&quot;&quot; EYE-TO-HAND: world -&gt; camera &quot;&quot;&quot;</span>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="s2">""" Static transform publisher acquired via MoveIt 2 hand-eye calibration """</span>
+<span class="s2">""" EYE-TO-HAND: world -&gt; camera """</span>
 from<span class="w"> </span>launch<span class="w"> </span>import<span class="w"> </span>LaunchDescription
 from<span class="w"> </span>launch_ros.actions<span class="w"> </span>import<span class="w"> </span>Node
 
@@ -845,34 +846,34 @@ from<span class="w"> </span>launch_ros.actions<span class="w"> </span>import<spa
 def<span class="w"> </span>generate_launch_description<span class="o">()</span><span class="w"> </span>-&gt;<span class="w"> </span>LaunchDescription:
 <span class="w">    </span><span class="nv">nodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>
 <span class="w">        </span>Node<span class="o">(</span>
-<span class="w">            </span><span class="nv">package</span><span class="o">=</span><span class="s2">&quot;tf2_ros&quot;</span>,
-<span class="w">            </span><span class="nv">executable</span><span class="o">=</span><span class="s2">&quot;static_transform_publisher&quot;</span>,
-<span class="w">            </span><span class="nv">output</span><span class="o">=</span><span class="s2">&quot;log&quot;</span>,
+<span class="w">            </span><span class="nv">package</span><span class="o">=</span><span class="s2">"tf2_ros"</span>,
+<span class="w">            </span><span class="nv">executable</span><span class="o">=</span><span class="s2">"static_transform_publisher"</span>,
+<span class="w">            </span><span class="nv">output</span><span class="o">=</span><span class="s2">"log"</span>,
 <span class="w">            </span><span class="nv">arguments</span><span class="o">=[</span>
-<span class="w">                </span><span class="s2">&quot;--frame-id&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;world&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;--child-frame-id&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;camera&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;--x&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;1.77278&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;--y&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;0.939827&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;--z&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;-0.0753478&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;--qx&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;-0.128117&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;--qy&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;-0.0317539&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;--qz&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;0.955077&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;--qw&quot;</span>,
-<span class="w">                </span><span class="s2">&quot;-0.265339&quot;</span>,
-<span class="w">                </span><span class="c1"># &quot;--roll&quot;,</span>
-<span class="w">                </span><span class="c1"># &quot;0.132507&quot;,</span>
-<span class="w">                </span><span class="c1"># &quot;--pitch&quot;,</span>
-<span class="w">                </span><span class="c1"># &quot;-0.229891&quot;,</span>
-<span class="w">                </span><span class="c1"># &quot;--yaw&quot;,</span>
-<span class="w">                </span><span class="c1"># &quot;-2.5843&quot;,</span>
+<span class="w">                </span><span class="s2">"--frame-id"</span>,
+<span class="w">                </span><span class="s2">"world"</span>,
+<span class="w">                </span><span class="s2">"--child-frame-id"</span>,
+<span class="w">                </span><span class="s2">"camera"</span>,
+<span class="w">                </span><span class="s2">"--x"</span>,
+<span class="w">                </span><span class="s2">"1.77278"</span>,
+<span class="w">                </span><span class="s2">"--y"</span>,
+<span class="w">                </span><span class="s2">"0.939827"</span>,
+<span class="w">                </span><span class="s2">"--z"</span>,
+<span class="w">                </span><span class="s2">"-0.0753478"</span>,
+<span class="w">                </span><span class="s2">"--qx"</span>,
+<span class="w">                </span><span class="s2">"-0.128117"</span>,
+<span class="w">                </span><span class="s2">"--qy"</span>,
+<span class="w">                </span><span class="s2">"-0.0317539"</span>,
+<span class="w">                </span><span class="s2">"--qz"</span>,
+<span class="w">                </span><span class="s2">"0.955077"</span>,
+<span class="w">                </span><span class="s2">"--qw"</span>,
+<span class="w">                </span><span class="s2">"-0.265339"</span>,
+<span class="w">                </span><span class="c1"># "--roll",</span>
+<span class="w">                </span><span class="c1"># "0.132507",</span>
+<span class="w">                </span><span class="c1"># "--pitch",</span>
+<span class="w">                </span><span class="c1"># "-0.229891",</span>
+<span class="w">                </span><span class="c1"># "--yaw",</span>
+<span class="w">                </span><span class="c1"># "-2.5843",</span>
 <span class="w">            </span><span class="o">]</span>,
 <span class="w">        </span><span class="o">)</span>,
 <span class="w">    </span><span class="o">]</span>
@@ -895,19 +896,19 @@ file, duplicate the <code class="docutils literal notranslate"><span class="pre"
 only) from the previous point would look as follows:</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">calibrations_dict</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">{</span>
-<span class="w">    </span><span class="s1">&#39;hubble_test_bench&#39;</span>:<span class="w"> </span><span class="o">{</span>
-<span class="w">        </span><span class="s1">&#39;world_to_camera&#39;</span>:<span class="w"> </span><span class="o">{</span>
-<span class="w">            </span><span class="s1">&#39;parent_frame&#39;</span>:<span class="w"> </span><span class="s1">&#39;world&#39;</span>,
-<span class="w">            </span><span class="s1">&#39;child_frame&#39;</span>:<span class="w"> </span><span class="s1">&#39;camera_1_link&#39;</span>,
-<span class="w">            </span><span class="s1">&#39;translation&#39;</span>:<span class="w"> </span><span class="o">[</span>-1.75433,<span class="w"> </span>-0.0887958,<span class="w"> </span><span class="m">0</span>.419998<span class="o">]</span>,
-<span class="w">            </span><span class="s1">&#39;rotation&#39;</span>:<span class="w"> </span><span class="o">[</span>-0.00447052,<span class="w"> </span><span class="m">0</span>.138631,<span class="w"> </span>-0.0101076,<span class="w"> </span><span class="m">0</span>.990282<span class="o">]</span>,<span class="w">  </span><span class="c1"># [qx, qy ,qz, qw]</span>
+<span class="w">    </span><span class="s1">'hubble_test_bench'</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="s1">'world_to_camera'</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">            </span><span class="s1">'parent_frame'</span>:<span class="w"> </span><span class="s1">'world'</span>,
+<span class="w">            </span><span class="s1">'child_frame'</span>:<span class="w"> </span><span class="s1">'camera_1_link'</span>,
+<span class="w">            </span><span class="s1">'translation'</span>:<span class="w"> </span><span class="o">[</span>-1.75433,<span class="w"> </span>-0.0887958,<span class="w"> </span><span class="m">0</span>.419998<span class="o">]</span>,
+<span class="w">            </span><span class="s1">'rotation'</span>:<span class="w"> </span><span class="o">[</span>-0.00447052,<span class="w"> </span><span class="m">0</span>.138631,<span class="w"> </span>-0.0101076,<span class="w"> </span><span class="m">0</span>.990282<span class="o">]</span>,<span class="w">  </span><span class="c1"># [qx, qy ,qz, qw]</span>
 <span class="w">        </span><span class="o">}</span>,
-<span class="w">    </span><span class="s1">&#39;realsense_example&#39;</span>:<span class="w"> </span><span class="o">{</span>
-<span class="w">        </span><span class="s1">&#39;world_to_camera&#39;</span>:<span class="w"> </span><span class="o">{</span>
-<span class="w">            </span><span class="s1">&#39;parent_frame&#39;</span>:<span class="w"> </span><span class="s1">&#39;world&#39;</span>,
-<span class="w">            </span><span class="s1">&#39;child_frame&#39;</span>:<span class="w"> </span><span class="s1">&#39;camera_1_link&#39;</span>,
-<span class="w">            </span><span class="s1">&#39;translation&#39;</span>:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.77278,<span class="w"> </span><span class="m">0</span>.939827,<span class="w"> </span>-0.0753478<span class="o">]</span>,
-<span class="w">            </span><span class="s1">&#39;rotation&#39;</span>:<span class="w"> </span><span class="o">[</span>-0.128117<span class="w"> </span>-0.0317539,<span class="w"> </span><span class="m">0</span>.955077,<span class="w"> </span>-0.265339<span class="o">]</span>,<span class="w">  </span><span class="c1"># [qx, qy ,qz, qw]</span>
+<span class="w">    </span><span class="s1">'realsense_example'</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="s1">'world_to_camera'</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">            </span><span class="s1">'parent_frame'</span>:<span class="w"> </span><span class="s1">'world'</span>,
+<span class="w">            </span><span class="s1">'child_frame'</span>:<span class="w"> </span><span class="s1">'camera_1_link'</span>,
+<span class="w">            </span><span class="s1">'translation'</span>:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.77278,<span class="w"> </span><span class="m">0</span>.939827,<span class="w"> </span>-0.0753478<span class="o">]</span>,
+<span class="w">            </span><span class="s1">'rotation'</span>:<span class="w"> </span><span class="o">[</span>-0.128117<span class="w"> </span>-0.0317539,<span class="w"> </span><span class="m">0</span>.955077,<span class="w"> </span>-0.265339<span class="o">]</span>,<span class="w">  </span><span class="c1"># [qx, qy ,qz, qw]</span>
 <span class="w">        </span><span class="o">}</span>,
 ...
 </pre></div>
@@ -1329,7 +1330,7 @@ It is recommended to run the tests manually using <code class="docutils literal 
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

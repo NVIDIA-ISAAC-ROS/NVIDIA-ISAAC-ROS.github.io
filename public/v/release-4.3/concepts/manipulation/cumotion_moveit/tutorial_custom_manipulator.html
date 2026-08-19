@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -698,12 +698,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../../release-3.2/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.4/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-4.4</a></dd>
         <dd><a href="../../../../release-4.5/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-4.5</a></dd>
+        <dd><a href="../../../../release-4.6/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-4.6</a></dd>
         <dd><a href="../../../../../concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">latest</a></dd>
         <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../../release-3.1/index.html">release-3.1</a></dd>
-        <dd><a href="../../../../release-3.2/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.0/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-4.0</a></dd>
         <dd><a href="../../../../release-4.1/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-4.1</a></dd>
         <dd><a href="../../../../release-4.2/concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">release-4.2</a></dd>
@@ -865,8 +866,8 @@ for the UR10e robot may be used as a reference.</p></li>
 </ol>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;hardware&gt;</span>
 <span class="w">  </span><span class="nt">&lt;plugin&gt;</span>topic_based_ros2_control/TopicBasedSystem<span class="nt">&lt;/plugin&gt;</span>
-<span class="w">  </span><span class="nt">&lt;param</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;joint_commands_topic&quot;</span><span class="nt">&gt;</span>/isaac_joint_commands<span class="nt">&lt;/param&gt;</span>
-<span class="w">  </span><span class="nt">&lt;param</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;joint_states_topic&quot;</span><span class="nt">&gt;</span>/isaac_joint_states<span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;param</span><span class="w"> </span><span class="na">name=</span><span class="s">"joint_commands_topic"</span><span class="nt">&gt;</span>/isaac_joint_commands<span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;param</span><span class="w"> </span><span class="na">name=</span><span class="s">"joint_states_topic"</span><span class="nt">&gt;</span>/isaac_joint_states<span class="nt">&lt;/param&gt;</span>
 <span class="nt">&lt;/hardware&gt;</span>
 </pre></div>
 </div>
@@ -884,32 +885,32 @@ for the UR10e robot is used as a reference.</p>
 <li><p>Create a copy of the provided
 <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-4.3/isaac_ros_cumotion_examples/ur_config/ur.urdf.xacro" rel="noreferrer" target="_blank">sample xacro file</a>.</p></li>
 <li><p>Replace <code class="docutils literal notranslate"><span class="pre">$(arg</span> <span class="pre">ur_type)</span></code> in the following line with your robot name:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;robot</span><span class="w"> </span><span class="na">xmlns:xacro=</span><span class="s">&quot;http://www.ros.org/wiki/xacro&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;$(arg ur_type)&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;robot</span><span class="w"> </span><span class="na">xmlns:xacro=</span><span class="s">"http://www.ros.org/wiki/xacro"</span><span class="w"> </span><span class="na">name=</span><span class="s">"$(arg ur_type)"</span><span class="nt">&gt;</span>
 </pre></div>
 </div>
 </li>
 <li><p>Replace the following lines with any needed to set arguments required by your URDF or <code class="docutils literal notranslate"><span class="pre">ros2_control</span></code> xacro files:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ur_type&quot;</span><span class="w"> </span><span class="na">default=</span><span class="s">&quot;ur&quot;</span><span class="nt">/&gt;</span>
-<span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;use_fake_hardware&quot;</span><span class="w"> </span><span class="na">default=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
-<span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;name&quot;</span><span class="w"> </span><span class="na">default=</span><span class="s">&quot;ur10e&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">"ur_type"</span><span class="w"> </span><span class="na">default=</span><span class="s">"ur"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">"use_fake_hardware"</span><span class="w"> </span><span class="na">default=</span><span class="s">"true"</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">"name"</span><span class="w"> </span><span class="na">default=</span><span class="s">"ur10e"</span><span class="w"> </span><span class="nt">/&gt;</span>
 
 <span class="cm">&lt;!-- Do not add ROS2 control from default UR package, add TopicBasedROS2 Control --&gt;</span>
-<span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;generate_ros2_control_tag&quot;</span><span class="w"> </span><span class="na">default=</span><span class="s">&quot;false&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;xacro:arg</span><span class="w"> </span><span class="na">name=</span><span class="s">"generate_ros2_control_tag"</span><span class="w"> </span><span class="na">default=</span><span class="s">"false"</span><span class="w"> </span><span class="nt">/&gt;</span>
 </pre></div>
 </div>
 </li>
 <li><p>Modify the following line so it imports your URDF xacro file:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;xacro:include</span><span class="w"> </span><span class="na">filename=</span><span class="s">&quot;$(find isaac_ros_cumotion_examples)/ur_config/ur_sim.urdf.xacro&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;xacro:include</span><span class="w"> </span><span class="na">filename=</span><span class="s">"$(find isaac_ros_cumotion_examples)/ur_config/ur_sim.urdf.xacro"</span><span class="w"> </span><span class="nt">/&gt;</span>
 </pre></div>
 </div>
 </li>
 <li><p>Modify the following line so it imports your <code class="docutils literal notranslate"><span class="pre">ros2_control</span></code> xacro file:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;xacro:include</span><span class="w"> </span><span class="na">filename=</span><span class="s">&quot;ur.ros2_control.xacro&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;xacro:include</span><span class="w"> </span><span class="na">filename=</span><span class="s">"ur.ros2_control.xacro"</span><span class="w"> </span><span class="nt">/&gt;</span>
 </pre></div>
 </div>
 </li>
 <li><p>Remove the following line or adjust as needed:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;xacro:ur_ros2_control</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;URFakeSystem&quot;</span><span class="w"> </span><span class="na">tf_prefix=</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;xacro:ur_ros2_control</span><span class="w"> </span><span class="na">name=</span><span class="s">"URFakeSystem"</span><span class="w"> </span><span class="na">tf_prefix=</span><span class="s">""</span><span class="w"> </span><span class="nt">/&gt;</span>
 </pre></div>
 </div>
 </li>
@@ -937,10 +938,10 @@ Isaac Sim.</p>
 <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_cumotion/blob/release-4.3/isaac_ros_cumotion_examples/launch/ur_isaac_sim.launch.py" rel="noreferrer" target="_blank">sample launch file</a>.</p></li>
 <li><p>Update <code class="docutils literal notranslate"><span class="pre">generate_launch_description()</span></code> to declare any required launch arguments, removing the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DeclareLaunchArgument</span><span class="p">(</span>
-    <span class="s1">&#39;ur_type&#39;</span><span class="p">,</span>
-    <span class="n">default_value</span><span class="o">=</span><span class="s1">&#39;ur10e&#39;</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;UR robot type&#39;</span><span class="p">,</span>
-    <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ur3&#39;</span><span class="p">,</span> <span class="s1">&#39;ur3e&#39;</span><span class="p">,</span> <span class="s1">&#39;ur5&#39;</span><span class="p">,</span> <span class="s1">&#39;ur5e&#39;</span><span class="p">,</span> <span class="s1">&#39;ur10&#39;</span><span class="p">,</span> <span class="s1">&#39;ur10e&#39;</span><span class="p">,</span> <span class="s1">&#39;ur16e&#39;</span><span class="p">,</span> <span class="s1">&#39;ur20&#39;</span><span class="p">,</span> <span class="s1">&#39;ur30&#39;</span><span class="p">]</span>
+    <span class="s1">'ur_type'</span><span class="p">,</span>
+    <span class="n">default_value</span><span class="o">=</span><span class="s1">'ur10e'</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">'UR robot type'</span><span class="p">,</span>
+    <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">'ur3'</span><span class="p">,</span> <span class="s1">'ur3e'</span><span class="p">,</span> <span class="s1">'ur5'</span><span class="p">,</span> <span class="s1">'ur5e'</span><span class="p">,</span> <span class="s1">'ur10'</span><span class="p">,</span> <span class="s1">'ur10e'</span><span class="p">,</span> <span class="s1">'ur16e'</span><span class="p">,</span> <span class="s1">'ur20'</span><span class="p">,</span> <span class="s1">'ur30'</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -948,30 +949,30 @@ Isaac Sim.</p>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">launch_setup()</span></code>, remove the definition of <code class="docutils literal notranslate"><span class="pre">ur_type</span></code> and replace any references to it.</p></li>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">launch_setup()</span></code>, set the <code class="docutils literal notranslate"><span class="pre">package_name</span></code> keyword argument of the <code class="docutils literal notranslate"><span class="pre">MoveItConfigsBuilder()</span></code> constructor
 to the name of your robot’s MoveIt configuration package, replacing <code class="docutils literal notranslate"><span class="pre">ur_moveit_config</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MoveItConfigsBuilder</span><span class="p">(</span><span class="n">ur_type</span><span class="p">,</span> <span class="n">package_name</span><span class="o">=</span><span class="s1">&#39;ur_moveit_config&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MoveItConfigsBuilder</span><span class="p">(</span><span class="n">ur_type</span><span class="p">,</span> <span class="n">package_name</span><span class="o">=</span><span class="s1">'ur_moveit_config'</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">launch_setup()</span></code>, replace the following lines to set the file path to the <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT&gt;.urdf.xacro</span></code> file created
 earlier in this tutorial:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">file_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;isaac_ros_cumotion_examples&#39;</span><span class="p">),</span>
-    <span class="s1">&#39;ur_config&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ur.urdf.xacro&#39;</span>
+    <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">'isaac_ros_cumotion_examples'</span><span class="p">),</span>
+    <span class="s1">'ur_config'</span><span class="p">,</span>
+    <span class="s1">'ur.urdf.xacro'</span>
 <span class="p">),</span>
 </pre></div>
 </div>
 </li>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">launch_setup()</span></code>, remove the following argument or add your own mappings as needed.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mappings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ur_type&#39;</span><span class="p">:</span> <span class="n">ur_type</span><span class="p">}</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mappings</span><span class="o">=</span><span class="p">{</span><span class="s1">'ur_type'</span><span class="p">:</span> <span class="n">ur_type</span><span class="p">}</span>
 </pre></div>
 </div>
 </li>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">launch_setup()</span></code>, modify the file paths and mappings as needed.  File paths are relative to the root
 of your MoveIt configuration package.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">robot_description_semantic</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">&#39;srdf/ur.srdf.xacro&#39;</span><span class="p">,</span> <span class="n">mappings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;ur&#39;</span><span class="p">})</span>
-<span class="o">.</span><span class="n">robot_description_kinematics</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">&#39;config/kinematics.yaml&#39;</span><span class="p">)</span>
-<span class="o">.</span><span class="n">trajectory_execution</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">&#39;config/controllers.yaml&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">robot_description_semantic</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">'srdf/ur.srdf.xacro'</span><span class="p">,</span> <span class="n">mappings</span><span class="o">=</span><span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="s1">'ur'</span><span class="p">})</span>
+<span class="o">.</span><span class="n">robot_description_kinematics</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">'config/kinematics.yaml'</span><span class="p">)</span>
+<span class="o">.</span><span class="n">trajectory_execution</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="s1">'config/controllers.yaml'</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
@@ -982,40 +983,40 @@ of your MoveIt configuration package.</p>
 <span class="c1"># ur_description: github.com/UniversalRobots/Universal_Robots_ROS2_Description/tree/2.1.5</span>
 
 <span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;moveit_simple_controller_manager&#39;</span><span class="p">:</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span>
+    <span class="s1">'moveit_simple_controller_manager'</span><span class="p">:</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span>
 <span class="p">}</span>
-<span class="k">del</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span><span class="p">[</span><span class="s1">&#39;moveit_simple_controller_manager&#39;</span><span class="p">][</span>
-    <span class="s1">&#39;moveit_manage_controllers&#39;</span>
+<span class="k">del</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span><span class="p">[</span><span class="s1">'moveit_simple_controller_manager'</span><span class="p">][</span>
+    <span class="s1">'moveit_manage_controllers'</span>
 <span class="p">]</span>
-<span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span><span class="p">[</span><span class="s1">&#39;moveit_manage_controllers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span><span class="p">[</span><span class="s1">&#39;trajectory_execution&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;allowed_execution_duration_scaling&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>
-    <span class="s1">&#39;allowed_goal_duration_margin&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
-    <span class="s1">&#39;allowed_start_tolerance&#39;</span><span class="p">:</span> <span class="mf">0.01</span>
+<span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span><span class="p">[</span><span class="s1">'moveit_manage_controllers'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span><span class="p">[</span><span class="s1">'trajectory_execution'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'allowed_execution_duration_scaling'</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>
+    <span class="s1">'allowed_goal_duration_margin'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="s1">'allowed_start_tolerance'</span><span class="p">:</span> <span class="mf">0.01</span>
 <span class="p">}</span>
-<span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span><span class="p">[</span><span class="s1">&#39;moveit_controller_manager&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;moveit_simple_controller_manager/MoveItSimpleControllerManager&#39;</span>
+<span class="n">moveit_config</span><span class="o">.</span><span class="n">trajectory_execution</span><span class="p">[</span><span class="s1">'moveit_controller_manager'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">'moveit_simple_controller_manager/MoveItSimpleControllerManager'</span>
 <span class="p">)</span>
 
-<span class="n">moveit_config</span><span class="o">.</span><span class="n">robot_description_kinematics</span><span class="p">[</span><span class="s1">&#39;robot_description_kinematics&#39;</span><span class="p">][</span><span class="s1">&#39;ur_manipulator&#39;</span><span class="p">]</span> \
-    <span class="o">=</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">robot_description_kinematics</span><span class="p">[</span><span class="s1">&#39;robot_description_kinematics&#39;</span><span class="p">][</span><span class="s1">&#39;/**&#39;</span><span class="p">][</span>
-        <span class="s1">&#39;ros__parameters&#39;</span><span class="p">][</span><span class="s1">&#39;robot_description_kinematics&#39;</span><span class="p">][</span><span class="s1">&#39;ur_manipulator&#39;</span><span class="p">]</span>
-<span class="k">del</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">robot_description_kinematics</span><span class="p">[</span><span class="s1">&#39;robot_description_kinematics&#39;</span><span class="p">][</span><span class="s1">&#39;/**&#39;</span><span class="p">]</span>
+<span class="n">moveit_config</span><span class="o">.</span><span class="n">robot_description_kinematics</span><span class="p">[</span><span class="s1">'robot_description_kinematics'</span><span class="p">][</span><span class="s1">'ur_manipulator'</span><span class="p">]</span> \
+    <span class="o">=</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">robot_description_kinematics</span><span class="p">[</span><span class="s1">'robot_description_kinematics'</span><span class="p">][</span><span class="s1">'/**'</span><span class="p">][</span>
+        <span class="s1">'ros__parameters'</span><span class="p">][</span><span class="s1">'robot_description_kinematics'</span><span class="p">][</span><span class="s1">'ur_manipulator'</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">robot_description_kinematics</span><span class="p">[</span><span class="s1">'robot_description_kinematics'</span><span class="p">][</span><span class="s1">'/**'</span><span class="p">]</span>
 
-<span class="n">moveit_config</span><span class="o">.</span><span class="n">joint_limits</span><span class="p">[</span><span class="s1">&#39;robot_description_planning&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_yaml</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;ur_description&#39;</span><span class="p">),</span>
-    <span class="s1">&#39;config&#39;</span><span class="p">,</span>
+<span class="n">moveit_config</span><span class="o">.</span><span class="n">joint_limits</span><span class="p">[</span><span class="s1">'robot_description_planning'</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_yaml</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">'ur_description'</span><span class="p">),</span>
+    <span class="s1">'config'</span><span class="p">,</span>
     <span class="n">ur_type</span><span class="p">,</span>
-    <span class="s1">&#39;joint_limits.yaml&#39;</span>
+    <span class="s1">'joint_limits.yaml'</span>
 <span class="p">))</span>
 
 <span class="c1"># add limits from ur_moveit_config joint_limits.yaml to limits from ur_description</span>
-<span class="k">for</span> <span class="n">joint</span> <span class="ow">in</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">joint_limits</span><span class="p">[</span><span class="s1">&#39;robot_description_planning&#39;</span><span class="p">][</span><span class="s1">&#39;joint_limits&#39;</span><span class="p">]:</span>
-    <span class="n">moveit_config</span><span class="o">.</span><span class="n">joint_limits</span><span class="p">[</span><span class="s1">&#39;robot_description_planning&#39;</span><span class="p">][</span><span class="s1">&#39;joint_limits&#39;</span><span class="p">][</span><span class="n">joint</span><span class="p">][</span>
-        <span class="s1">&#39;has_acceleration_limits&#39;</span>
+<span class="k">for</span> <span class="n">joint</span> <span class="ow">in</span> <span class="n">moveit_config</span><span class="o">.</span><span class="n">joint_limits</span><span class="p">[</span><span class="s1">'robot_description_planning'</span><span class="p">][</span><span class="s1">'joint_limits'</span><span class="p">]:</span>
+    <span class="n">moveit_config</span><span class="o">.</span><span class="n">joint_limits</span><span class="p">[</span><span class="s1">'robot_description_planning'</span><span class="p">][</span><span class="s1">'joint_limits'</span><span class="p">][</span><span class="n">joint</span><span class="p">][</span>
+        <span class="s1">'has_acceleration_limits'</span>
     <span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">moveit_config</span><span class="o">.</span><span class="n">joint_limits</span><span class="p">[</span><span class="s1">&#39;robot_description_planning&#39;</span><span class="p">][</span><span class="s1">&#39;joint_limits&#39;</span><span class="p">][</span><span class="n">joint</span><span class="p">][</span>
-        <span class="s1">&#39;max_acceleration&#39;</span>
+    <span class="n">moveit_config</span><span class="o">.</span><span class="n">joint_limits</span><span class="p">[</span><span class="s1">'robot_description_planning'</span><span class="p">][</span><span class="s1">'joint_limits'</span><span class="p">][</span><span class="n">joint</span><span class="p">][</span>
+        <span class="s1">'max_acceleration'</span>
     <span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span>
 </pre></div>
 </div>
@@ -1023,20 +1024,20 @@ of your MoveIt configuration package.</p>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">launch_setup()</span></code>, replace the following lines to set <code class="docutils literal notranslate"><span class="pre">rviz_config_file</span></code> to the correct path for your RViz
 configuration file:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rviz_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;isaac_ros_cumotion_examples&#39;</span><span class="p">),</span>
-    <span class="s1">&#39;rviz&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ur_moveit_config.rviz&#39;</span><span class="p">,</span>
+    <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">'isaac_ros_cumotion_examples'</span><span class="p">),</span>
+    <span class="s1">'rviz'</span><span class="p">,</span>
+    <span class="s1">'ur_moveit_config.rviz'</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </li>
 <li><p>In the following <code class="docutils literal notranslate"><span class="pre">Node()</span></code> constructor, replace <code class="docutils literal notranslate"><span class="pre">'base_link'</span></code> with the name of your robot’s base link:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">world2robot_tf_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
-    <span class="n">package</span><span class="o">=</span><span class="s1">&#39;tf2_ros&#39;</span><span class="p">,</span>
-    <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;static_transform_publisher&#39;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;static_transform_publisher&#39;</span><span class="p">,</span>
-    <span class="n">output</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span>
-    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;--frame-id&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">,</span> <span class="s1">&#39;--child-frame-id&#39;</span><span class="p">,</span> <span class="s1">&#39;base_link&#39;</span><span class="p">],</span>
+    <span class="n">package</span><span class="o">=</span><span class="s1">'tf2_ros'</span><span class="p">,</span>
+    <span class="n">executable</span><span class="o">=</span><span class="s1">'static_transform_publisher'</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">'static_transform_publisher'</span><span class="p">,</span>
+    <span class="n">output</span><span class="o">=</span><span class="s1">'log'</span><span class="p">,</span>
+    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span><span class="s1">'--frame-id'</span><span class="p">,</span> <span class="s1">'world'</span><span class="p">,</span> <span class="s1">'--child-frame-id'</span><span class="p">,</span> <span class="s1">'base_link'</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1044,9 +1045,9 @@ configuration file:</p>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">launch_setup()</span></code>, replace the following lines to set <code class="docutils literal notranslate"><span class="pre">ros2_controllers_path</span></code> to the correct path for your
 <code class="docutils literal notranslate"><span class="pre">ros2_controllers.yaml</span></code> file:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ros2_controllers_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-     <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;isaac_ros_cumotion_examples&#39;</span><span class="p">),</span>
-     <span class="s1">&#39;ur_config&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;ros2_controllers.yaml&#39;</span>
+     <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">'isaac_ros_cumotion_examples'</span><span class="p">),</span>
+     <span class="s1">'ur_config'</span><span class="p">,</span>
+     <span class="s1">'ros2_controllers.yaml'</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1054,15 +1055,15 @@ configuration file:</p>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">launch_setup()</span></code>, modify the following lines as needed based on the controllers in your <code class="docutils literal notranslate"><span class="pre">ros2_controllers.yaml</span></code>
 file:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scaled_joint_trajectory_controller_spawner</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
-    <span class="n">package</span><span class="o">=</span><span class="s1">&#39;controller_manager&#39;</span><span class="p">,</span>
-    <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;spawner&#39;</span><span class="p">,</span>
-    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;scaled_joint_trajectory_controller&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;/controller_manager&#39;</span><span class="p">],</span>
+    <span class="n">package</span><span class="o">=</span><span class="s1">'controller_manager'</span><span class="p">,</span>
+    <span class="n">executable</span><span class="o">=</span><span class="s1">'spawner'</span><span class="p">,</span>
+    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span><span class="s1">'scaled_joint_trajectory_controller'</span><span class="p">,</span> <span class="s1">'-c'</span><span class="p">,</span> <span class="s1">'/controller_manager'</span><span class="p">],</span>
 <span class="p">)</span>
 
 <span class="n">joint_trajectory_controller_spawner</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
-    <span class="n">package</span><span class="o">=</span><span class="s1">&#39;controller_manager&#39;</span><span class="p">,</span>
-    <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;spawner&#39;</span><span class="p">,</span>
-    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;joint_trajectory_controller&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;/controller_manager&#39;</span><span class="p">],</span>
+    <span class="n">package</span><span class="o">=</span><span class="s1">'controller_manager'</span><span class="p">,</span>
+    <span class="n">executable</span><span class="o">=</span><span class="s1">'spawner'</span><span class="p">,</span>
+    <span class="n">arguments</span><span class="o">=</span><span class="p">[</span><span class="s1">'joint_trajectory_controller'</span><span class="p">,</span> <span class="s1">'-c'</span><span class="p">,</span> <span class="s1">'/controller_manager'</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1238,7 +1239,7 @@ file:</p>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

@@ -1,0 +1,102 @@
+Record Demonstrations
+=====================
+
+This tutorial will guide you on how to use the recorder to capture
+teleoperation demonstrations in the MCAP data format. Both the Robot (via Ethernet) and the RealSense (via USB) must be connected to the host.
+
+Verify sensor connectivity
+--------------------------
+
+Before continuing, verify that the sensor connectivity is working. You may have to stop the teleop stack from :doc:`tutorial_teleop` before continuing.
+
+#. On the **host machine** (outside Docker), confirm the kernel sees the
+   camera over USB:
+
+   .. code:: bash
+
+      lsusb | grep -i intel
+
+   You should see an entry with ``Intel(R) RealSense(TM) Depth Camera``.
+
+#. Activate the Isaac ROS environment and confirm the camera is
+   visible **inside the container**:
+
+   .. code:: bash
+
+      rs-enumerate-devices
+
+   The output should contain a connected RealSense with its serial number
+   and firmware version.
+
+#. Still in the container, confirm the apple and plate are visible in the camera:
+
+   .. code:: bash
+
+      realsense-viewer
+
+   Enable the **Stereo Module** and *RGB* to verify you see a depth stream and color image. If
+   ``realsense-viewer`` does not detect the camera, return to the
+   :doc:`RealSense setup tutorial </getting_started/sensors/realsense_setup>`
+   before continuing.
+
+Run the Recorder
+----------------
+
+Open a **second** terminal (the teleop stack from :doc:`tutorial_teleop`
+must keep running in the first, restart it if necessary).
+
+Activate the Isaac ROS environment and install the recorder:
+
+.. code:: bash
+
+   isaac-ros activate
+
+.. note::
+   
+   If your container was built with the ``gr00t_workflow`` Docker layer, you can skip 
+   past the install steps to the ``ros2 run isaac_ros_unitree_g1_recorder record`` command.
+
+:ir_apt:
+
+.. code:: bash
+
+   sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-unitree-g1-recorder
+   source /opt/ros/:ir_ros_distro:/setup.bash
+
+Start the recorder:
+
+.. code:: bash
+
+   ros2 run isaac_ros_unitree_g1_recorder record -- \
+       task_description:="move the apple to the plate"
+
+A terminal UI will show. Press **Space** to start an episode, **Space** again
+to save an episode (or **c** to discard an episode). Recordings will be stored in
+``/workspaces/isaac_ros-dev/recordings/``.
+
+
+For high quality datasets, we recommend:
+
+- Two people: one to operate the robot and one to start/stop the recording.
+- Use the left hand to move the apple to the plate.
+- Wait until the recorder is ready and keep the hands still for at least one second before starting to move.
+- Use slow and deliberate movements.
+- Keep the hands steady for a few seconds at the end of the episode.
+- Collect at least 200 successful episodes.
+- Vary grasp approach (side, top, and diagonal).
+- Lift the apple up, do not drag it along the table.
+- Pause above the plate before placing the apple.
+- Keep the hands still again at the end of the episode before stopping the recording.
+- Keep the unused (right) hand in a natural position just above the table.
+
+.. seealso::
+
+   :doc:`/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder/index`
+   — full keyboard reference, all launch arguments, recorded topics,
+   services, build-from-source instructions, troubleshooting.
+
+Next
+----
+
+Continue with :doc:`tutorial_convert` to turn the session into a LeRobot
+dataset that is ready for fine-tuning a GR00T policy.

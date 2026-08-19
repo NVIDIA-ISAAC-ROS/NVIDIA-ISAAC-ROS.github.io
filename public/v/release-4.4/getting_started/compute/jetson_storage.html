@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -707,12 +707,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="jetson_storage.html">release-4.4</a></dd>
         <dd><a href="../../../release-4.5/getting_started/compute/jetson_storage.html">release-4.5</a></dd>
+        <dd><a href="../../../release-4.6/getting_started/compute/jetson_storage.html">release-4.6</a></dd>
         <dd><a href="../../../../getting_started/compute/jetson_storage.html">latest</a></dd>
         <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../release-3.1/index.html">release-3.1</a></dd>
-        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.0/getting_started/compute/jetson_storage.html">release-4.0</a></dd>
         <dd><a href="../../../release-4.1/getting_started/compute/jetson_storage.html">release-4.1</a></dd>
         <dd><a href="../../../release-4.2/getting_started/compute/jetson_storage.html">release-4.2</a></dd>
@@ -919,14 +920,14 @@ newgrp<span class="w"> </span>docker
 </div>
 <p>Insert <code class="docutils literal notranslate"><span class="pre">&quot;data-root&quot;</span></code> line similar to the following:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;runtimes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;nvidia&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nvidia-container-runtime&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;runtimeArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">    </span><span class="nt">"runtimes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"nvidia"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nvidia-container-runtime"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"runtimeArgs"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;default-runtime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nvidia&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;data-root&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/mnt/nova_ssd/docker&quot;</span>
+<span class="w">    </span><span class="nt">"default-runtime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nvidia"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"data-root"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/mnt/nova_ssd/docker"</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -974,7 +975,7 @@ nvcr.io/nvidia/l4t-base<span class="w">     </span>r35.2.1<span class="w">   </s
 <h2>Final Verification<a class="headerlink" href="#final-verification" title="Link to this heading">#</a></h2>
 <p>Reboot your Jetson, and verify that you observe the following:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~$<span class="w"> </span>sudo<span class="w"> </span>blkid<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>nvme
-/dev/nvme0n1:<span class="w"> </span><span class="nv">UUID</span><span class="o">=</span><span class="s2">&quot;9fc06de1-7cf3-43e2-928a-53a9c03fc5d8&quot;</span><span class="w"> </span><span class="nv">TYPE</span><span class="o">=</span><span class="s2">&quot;ext4&quot;</span>
+/dev/nvme0n1:<span class="w"> </span><span class="nv">UUID</span><span class="o">=</span><span class="s2">"9fc06de1-7cf3-43e2-928a-53a9c03fc5d8"</span><span class="w"> </span><span class="nv">TYPE</span><span class="o">=</span><span class="s2">"ext4"</span>
 
 ~$<span class="w"> </span>df<span class="w"> </span>-h
 Filesystem<span class="w">      </span>Size<span class="w">  </span>Used<span class="w"> </span>Avail<span class="w"> </span>Use%<span class="w"> </span>Mounted<span class="w"> </span>on
@@ -1008,7 +1009,7 @@ drwx-----x<span class="w">  </span><span class="m">2</span><span class="w"> </sp
 752M<span class="w">    </span>/mnt/nova_ssd/docker/
 752M<span class="w">    </span>total
 
-~$<span class="w"> </span>docker<span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;Runtime&quot;</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;Root&quot;</span>
+~$<span class="w"> </span>docker<span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-e<span class="w"> </span><span class="s2">"Runtime"</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"Root"</span>
 <span class="w"> </span>Runtimes:<span class="w"> </span>io.containerd.runtime.v1.linux<span class="w"> </span>nvidia<span class="w"> </span>runc<span class="w"> </span>io.containerd.runc.v2
 <span class="w"> </span>Default<span class="w"> </span>Runtime:<span class="w"> </span>nvidia
 <span class="w"> </span>Docker<span class="w"> </span>Root<span class="w"> </span>Dir:<span class="w"> </span>/mnt/nova_ssd/docker
@@ -1172,7 +1173,7 @@ drwx-----x<span class="w">  </span><span class="m">2</span><span class="w"> </sp
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

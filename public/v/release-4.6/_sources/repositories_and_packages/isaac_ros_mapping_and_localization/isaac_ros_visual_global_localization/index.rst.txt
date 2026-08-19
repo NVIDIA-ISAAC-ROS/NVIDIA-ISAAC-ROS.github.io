@@ -1,0 +1,197 @@
+==========================
+|package name|
+==========================
+
+:ir_github:`<isaac_ros_mapping_and_localization> <isaac_ros_visual_global_localization>`
+
+Overview
+--------
+
+This package includes the ROS node and launch files for :doc:`visual global localization </concepts/visual_global_localization/index>`.
+It takes the global localization map along with raw or rectified stereo images as inputs and outputs the global pose.
+The package supports both single and multiple stereo image inputs.
+
+Quickstart
+----------
+
+.. _isaac_ros_visual_global_localization_setup_dev_env:
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /repositories_and_packages/isaac_ros_mapping_and_localization/_snippets/setup_dev_env_mapping.rst
+
+.. _isaac_ros_visual_global_localization_install:
+
+Install or Build |package name|
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Install Binary Package
+
+      #. Install the prebuilt Debian package in the container:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-visual-global-localization
+
+   .. tab:: Build from Source
+
+      #. Open a new terminal outside container and clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_mapping_and_localization>`
+
+      #. Launch container and use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            colcon build --symlink-install --packages-up-to isaac_ros_visual_global_localization --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization
+
+      #.  Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+
+Tutorials
+----------
+
+To create cuVGL map, refer to :doc:`Tutorial: cuVGL Map Creation </concepts/visual_global_localization/tutorials/tutorial_cuvgl_map_creation>`.
+
+To localize with cuVGL, refer to :doc:`Tutorial: Localization with cuVGL </concepts/visual_global_localization/tutorials/tutorial_cuvgl_localization>`.
+
+
+Troubleshooting
+---------------
+
+For Isaac ROS setup issues, refer to :doc:`troubleshooting </troubleshooting/index>`.
+
+API
+----
+
+Usage
+^^^^^
+.. code:: bash
+
+   ros2 launch isaac_ros_visual_global_localization isaac_ros_visual_global_localization_node.launch.py
+
+ROS Parameters
+^^^^^^^^^^^^^^
+======================================== ============================ ===================================== =====================================================================================================================================================================================================================
+ROS Parameter                            Type                         Default                               Description
+======================================== ============================ ===================================== =====================================================================================================================================================================================================================
+*Functional Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``num_cameras``                          ``int``                      ``2``                                 Number of cameras used. Set to 2 for single stereo camera.
+``stereo_localizer_cam_ids``             ``std::string``              ``0,1``                               Camera ids for stereo camera pairs, in the form of "stereo0_left_camera_id,stereo0_right_camera_id,stereo1_left_camera_id...".
+``image_sync_match_threshold_ms``        ``double``                   ``5.0``                               Maximum duration between image timestamps to still consider them synced.
+``enable_rectify_images``                ``bool``                     ``false``                             If enabled, will do rectification for the incoming images.
+``enable_continuous_localization``       ``bool``                     ``true``                              Whether or not to continue triggering localization after a localization pose is successfully computed.
+``use_initial_guess``                    ``bool``                     ``false``                             If use_initial_guess is true, the localizer will do cuSFM-based localization. If it is false, the localizer will do global localization.
+``map_dir``                              ``std::string``              ``""``                                Required, the directory of cuVGL map files.
+``config_dir``                           ``std::string``              ``""``                                Required, the directory of config files, which should include ``keypoint_creation_config.pb.txt`` and ``localizer_config.pb.txt``.
+``model_dir``                            ``std::string``              ``""``                                The directory of model file. This value can be set in config file.
+``input_image_topic_name``               ``std::string``              ``visual_localization/image``         The prefix of the input image topic name, the full topic name is ``<input_image_topic_name>_{i}`` for the :spelling:ignore:`i-th` camera.
+``input_camera_info_topic_name``         ``std::string``              ``visual_localization/camera_info``   The prefix of the input camera info topic name, the full topic name is ``<input_camera_info_topic_name>_{i}`` for the :spelling:ignore:`i-th` camera.
+``localization_precision_level``         ``int``                      ``2``                                 The localization precision level: 0 for lowest precision, returning more poses; 1 for medium precision; 2 for highest precision, returning fewer poses.
+*Frame Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``map_frame``                            ``std::string``              ``vmap``                              The frame name associated with the map origin.
+``base_frame``                           ``std::string``              ``base_link``                         The frame name associated with the base of the robot or camera rig.
+*Message Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``image_buffer_size``                    ``int``                      ``100``                               Buffer size used by the image synchronizer.
+``image_qos_profile``                    ``std::string``              ``DEFAULT``                           QoS profile for the image subscribers.
+*Output Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``publish_map_to_base_tf``               ``bool``                     ``true``                              Enable ``tf`` broadcaster for ``map_frame`` -> ``base_frame`` transform.
+``invert_map_to_base_tf``                ``bool``                     ``false``                             Invert the ``map_frame`` -> ``base_frame`` transform before broadcasting to the ``tf`` tree.
+*Debug/Visualization Parameters*
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+``debug_dir``                            ``std::string``              ``""``                                If it is set, will generate debug images to this folder.
+``debug_map_raw_dir``                    ``std::string``              ``""``                                Optional, the directory that saves the raw images of the map frames.
+``publish_rectified_images``             ``bool``                     ``false``                             Optional, if to publish the rectified images. This flag is used only when ``enable_rectify_image`` is true.
+``verbose_logging``                      ``bool``                     ``false``                             Optional, if to print more verbose ROS logs.
+``init_glog``                            ``bool``                     ``false``                             Optional, if to initialize `glog <https://google.github.io/glog/stable/>`__. Note that glog can be initialized only once per process, otherwise it raises error.
+``glog_v``                               ``int``                      ``0``                                 Optional, the verbose level for glog.
+======================================== ============================ ===================================== =====================================================================================================================================================================================================================
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``visual_localization/image_{i}``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - Image from the :spelling:ignore:`i-th` camera in grayscale (i is in range [0, ``num_cameras``-1]).
+   * - ``visual_localization/camera_info_{i}``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+     - Camera info from the :spelling:ignore:`i-th` camera (i is in range [0, ``num_cameras``-1]).
+   * - ``visual_localization/trigger_localization``
+     - `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__
+     - Pose used as tick for localizing in an existing map. Every received message will trigger a localization.
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``visual_localization/pose``
+     - `geometry_msgs/PoseWithCovarianceStamped <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/geometry_msgs/msg/PoseWithCovarianceStamped.msg>`__
+     - Current pose with covariance of the ``base_frame``.
+   * - ``visual_localization/debug_image``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - Image for debugging.
+   * - ``visual_localization/camera_{i}/image_rect``
+     - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+     - Rectified images from visual localization node, published only when ``enable_rectify_images`` and ``publish_rectified_images`` are set true.
+   * - ``visual_localization/camera_{i}/camera_info_rect``
+     - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+     - Camera info for the rectified images, published only when ``enable_rectify_images`` and ``publish_rectified_images`` are set true.
+   * - ``/diagnostics``
+     - `diagnostic_msgs/DiagnosticArray <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/diagnostic_msgs/msg/DiagnosticArray.msg>`__
+     - Diagnostic message. Similar to ``status`` topic but in a different format.
+
+ROS Services Advertised
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Service
+     - Interface
+     - Description
+   * - ``visual_localization/trigger_localization``
+     - `std_srvs::srv::Trigger <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/std_srvs/srv/Trigger.srv>`__
+     - A service to trigger localization the node.
+
+.. |package name| replace:: ``isaac_ros_visual_global_localization``

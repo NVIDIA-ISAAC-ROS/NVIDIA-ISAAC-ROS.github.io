@@ -18,6 +18,12 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Packages
 
+* [`franka_fr3_ros2_control`](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/franka_fr3_ros2_control/index.html)
+  * [Overview](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/franka_fr3_ros2_control/index.html#overview)
+  * [How it works](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/franka_fr3_ros2_control/index.html#how-it-works)
+  * [URDF parameters](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/franka_fr3_ros2_control/index.html#urdf-parameters)
+  * [Host setup](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/franka_fr3_ros2_control/index.html#host-setup)
+  * [Safety](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/franka_fr3_ros2_control/index.html#safety)
 * [`unitree_g1_bridge`](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/unitree_g1_bridge/index.html)
   * [Overview](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/unitree_g1_bridge/index.html#overview)
   * [Quickstart](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_robots/unitree_g1_bridge/index.html#quickstart)
@@ -26,4 +32,4 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-07-06: Updated default topic names and renamed some frames
+Update 2026-08-18: Compatibility and integration updates for the Isaac ROS 4.6.0 release

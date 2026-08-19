@@ -1794,7 +1794,7 @@ git<span class="w"> </span>clone<span class="w"> </span>https://github.com/NVIDI
 </li>
 <li><p>Create a ROS 1 workspace for experimenting with Isaac ROS:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w">  </span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/workspaces/isaac_ros_1-dev/src
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export ISAAC_ROS_1_WS=</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/workspaces/isaac_ros_1-dev/&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"export ISAAC_ROS_1_WS=</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/workspaces/isaac_ros_1-dev/"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
 <span class="nb">source</span><span class="w"> </span>~/.bashrc
 </pre></div>
 </div>
@@ -1814,12 +1814,12 @@ git<span class="w"> </span>clone<span class="w"> </span>https://github.com/NVIDI
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_common/scripts<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 touch<span class="w"> </span>.isaac_ros_common-config<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="nb">echo</span><span class="w"> </span><span class="nv">CONFIG_IMAGE_KEY</span><span class="o">=</span>ros2_humble.ros1_noetic<span class="w"> </span>&gt;&gt;<span class="w"> </span>.isaac_ros_common-config<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;CONFIG_DOCKER_SEARCH_DIRS=(../../isaac_ros_nitros_bridge/docker)&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>.isaac_ros_common-config
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"CONFIG_DOCKER_SEARCH_DIRS=(../../isaac_ros_nitros_bridge/docker)"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>.isaac_ros_common-config
 </pre></div>
 </div>
 </li>
 <li><p><strong>Remove the following two lines</strong> from <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common/blob/release-2.1/docker/scripts/workspace-entrypoint.sh">workspace-entrypoint.sh</a> in the <code class="docutils literal notranslate"><span class="pre">isaac_ros_common/docker/scripts</span></code> directory because <code class="docutils literal notranslate"><span class="pre">ros1_bridge</span></code> requires a specific <code class="docutils literal notranslate"><span class="pre">setup.bash</span></code> script sourcing order:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source /opt/ros/</span><span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span><span class="s2">/setup.bash&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">"source /opt/ros/</span><span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span><span class="s2">/setup.bash"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
 <span class="nb">source</span><span class="w"> </span>/opt/ros/<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>/setup.bash
 </pre></div>
 </div>
@@ -1847,8 +1847,8 @@ ROS Noetic packages and they are skipped from the building. Please ignore those 
 </li>
 </ol>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>WARNING:colcon.colcon_cmake.task.cmake.build:Could<span class="w"> </span>not<span class="w"> </span>run<span class="w"> </span>installation<span class="w"> </span>step<span class="w"> </span><span class="k">for</span><span class="w"> </span>package<span class="w"> </span><span class="s1">&#39;isaac_ros_nitros_bridge_ros1&#39;</span><span class="w"> </span>because<span class="w"> </span>it<span class="w"> </span>has<span class="w"> </span>no<span class="w"> </span><span class="s1">&#39;install&#39;</span><span class="w"> </span>target
-WARNING:colcon.colcon_cmake.task.cmake.build:Could<span class="w"> </span>not<span class="w"> </span>run<span class="w"> </span>installation<span class="w"> </span>step<span class="w"> </span><span class="k">for</span><span class="w"> </span>package<span class="w"> </span><span class="s1">&#39;isaac_ros_ros1_forward&#39;</span><span class="w"> </span>because<span class="w"> </span>it<span class="w"> </span>has<span class="w"> </span>no<span class="w"> </span><span class="s1">&#39;install&#39;</span><span class="w"> </span>target
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>WARNING:colcon.colcon_cmake.task.cmake.build:Could<span class="w"> </span>not<span class="w"> </span>run<span class="w"> </span>installation<span class="w"> </span>step<span class="w"> </span><span class="k">for</span><span class="w"> </span>package<span class="w"> </span><span class="s1">'isaac_ros_nitros_bridge_ros1'</span><span class="w"> </span>because<span class="w"> </span>it<span class="w"> </span>has<span class="w"> </span>no<span class="w"> </span><span class="s1">'install'</span><span class="w"> </span>target
+WARNING:colcon.colcon_cmake.task.cmake.build:Could<span class="w"> </span>not<span class="w"> </span>run<span class="w"> </span>installation<span class="w"> </span>step<span class="w"> </span><span class="k">for</span><span class="w"> </span>package<span class="w"> </span><span class="s1">'isaac_ros_ros1_forward'</span><span class="w"> </span>because<span class="w"> </span>it<span class="w"> </span>has<span class="w"> </span>no<span class="w"> </span><span class="s1">'install'</span><span class="w"> </span>target
 </pre></div>
 </div>
 </div></blockquote>
@@ -1879,7 +1879,7 @@ ROS 1, then echo back to ROS2 for visualize.</p>
 <ol class="arabic">
 <li><p>Pull down a rosbag of sample data:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/workspaces/isaac_ros-dev/isaac_ros-dev/src/isaac_ros_nitros_bridge<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>git<span class="w"> </span>lfs<span class="w"> </span>pull<span class="w"> </span>-X<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>-I<span class="w"> </span><span class="s2">&quot;resources/quickstart.bag&quot;</span>
+<span class="w">  </span>git<span class="w"> </span>lfs<span class="w"> </span>pull<span class="w"> </span>-X<span class="w"> </span><span class="s2">""</span><span class="w"> </span>-I<span class="w"> </span><span class="s2">"resources/quickstart.bag"</span>
 </pre></div>
 </div>
 </li>
@@ -1920,7 +1920,7 @@ For an example to run DNN image segmentation with NITROS bridge, see <a class="r
 <p>If you have both ROS 1 and ROS 2 installed in the Docker environment,
 you may see the following error message while building ROS 2 packages:</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Could<span class="w"> </span>not<span class="w"> </span>find<span class="w"> </span>a<span class="w"> </span>package<span class="w"> </span>configuration<span class="w"> </span>file<span class="w"> </span>provided<span class="w"> </span>by<span class="w"> </span><span class="s2">&quot;ament_cmake_auto&quot;</span>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Could<span class="w"> </span>not<span class="w"> </span>find<span class="w"> </span>a<span class="w"> </span>package<span class="w"> </span>configuration<span class="w"> </span>file<span class="w"> </span>provided<span class="w"> </span>by<span class="w"> </span><span class="s2">"ament_cmake_auto"</span>
 with<span class="w"> </span>any<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>following<span class="w"> </span>names:
 <span class="w">  </span>ament_cmake_autoConfig.cmake
 <span class="w">  </span>ament_cmake_auto-config.cmake
@@ -1968,7 +1968,7 @@ with<span class="w"> </span>any<span class="w"> </span>of<span class="w"> </span
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, NVIDIA.
-      <span class="lastupdated">Last updated on Jul 08, 2026.
+      <span class="lastupdated">Last updated on Aug 18, 2026.
       </span></p>
   </div>
 
@@ -2005,12 +2005,13 @@ with<span class="w"> </span>any<span class="w"> </span>of<span class="w"> </span
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
+            <dd><a href="../../../release-3.2/repositories_and_packages/isaac_ros_nitros_bridge/index.html">release-3.2</a></dd>
             <dd><a href="../../../release-4.4/index.html">release-4.4</a></dd>
             <dd><a href="../../../release-4.5/index.html">release-4.5</a></dd>
+            <dd><a href="../../../release-4.6/index.html">release-4.6</a></dd>
             <dd><a href="../../../../index.html">latest</a></dd>
             <dd><a href="index.html">release-2.1</a></dd>
             <dd><a href="../../../release-3.1/repositories_and_packages/isaac_ros_nitros_bridge/index.html">release-3.1</a></dd>
-            <dd><a href="../../../release-3.2/repositories_and_packages/isaac_ros_nitros_bridge/index.html">release-3.2</a></dd>
             <dd><a href="../../../release-4.0/index.html">release-4.0</a></dd>
             <dd><a href="../../../release-4.1/index.html">release-4.1</a></dd>
             <dd><a href="../../../release-4.2/index.html">release-4.2</a></dd>

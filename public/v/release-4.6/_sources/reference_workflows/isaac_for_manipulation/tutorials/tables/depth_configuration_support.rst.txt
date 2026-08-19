@@ -1,0 +1,63 @@
+**RealSense Cameras**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 25 45
+
+   * - Depth Type
+     - ``enable_dnn_depth_in_realsense``
+     - Actual Depth Source
+
+   * - Any depth type
+     - ``false``
+     - Native RealSense depth (overrides ``depth_type``)
+
+   * - ``ESS_FULL``
+     - ``true``
+     - ESS Full DNN depth
+
+   * - ``ESS_LIGHT``
+     - ``true``
+     - ESS Light DNN depth
+
+   * - ``FOUNDATION_STEREO_LOW_RES``
+     - ``true``
+     - Foundation Stereo DNN depth (320x736)
+
+   * - ``FOUNDATION_STEREO_HIGH_RES``
+     - ``true``
+     - Foundation Stereo DNN depth (576x960)
+
+   * - ``ISAAC_SIM``
+     - Any value
+     - Simulation depth
+
+**Isaac Sim Cameras**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 50 50
+
+   * - Supported Depth Type
+     - Actual Depth Source
+
+   * - ``ISAAC_SIM``
+     - Simulation depth
+
+.. note::
+
+   **Key Configuration Rules:**
+   
+   - **RealSense cameras** have native depth capability. Set ``enable_dnn_depth_in_realsense: false`` to use native depth, or ``true`` to use DNN-based depth estimation.
+   - In RealSense Object Following workflows that use ``FOUNDATION_POSE``, ``enable_dnn_depth_in_realsense: true`` enables DNN depth for scene reconstruction and collision avoidance, while the FoundationPose pose-estimation path continues to use native aligned RealSense depth for timestamp-compatible RGB, depth, and segmentation input.
+   - **Isaac Sim cameras** provide simulation depth directly and only support ``ISAAC_SIM`` depth type. The ``enable_dnn_depth_in_realsense`` parameter is ignored.
+   - When using RealSense with ``enable_dnn_depth_in_realsense: false``, the ``depth_type`` setting is overridden and native RealSense depth is used regardless.
+   - DNN-based depth methods (``ESS_FULL``, ``ESS_LIGHT``, ``FOUNDATION_STEREO_LOW_RES``, ``FOUNDATION_STEREO_HIGH_RES``) provide better quality but require additional computational resources.
+   
+   **Unsupported Combinations:**
+   
+   - Isaac Sim cameras cannot use ``ESS_FULL``, ``ESS_LIGHT``, ``FOUNDATION_STEREO_LOW_RES``, ``FOUNDATION_STEREO_HIGH_RES``, or ``REALSENSE`` depth types
+
+.. note::
+
+   **Engine file paths.** Each DNN-based depth type has a dedicated engine file parameter (``ess_full_engine_file_path``, ``ess_light_engine_file_path``, ``foundationstereo_low_res_engine_file_path``, ``foundationstereo_high_res_engine_file_path``). The workflow automatically selects the correct engine based on ``depth_type``. Verify that all engine paths are valid for your platform during initial setup. See :ref:`Engine File Path Configuration <engine-file-path-configuration>` for details.

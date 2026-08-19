@@ -1721,7 +1721,7 @@ and make sure it is working.</p></li>
 </li>
 <li><p>Pull down a rosbag of sample data:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_image_segmentation<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>git<span class="w"> </span>lfs<span class="w"> </span>pull<span class="w"> </span>-X<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>-I<span class="w"> </span><span class="s2">&quot;resources/rosbags/&quot;</span>
+<span class="w">    </span>git<span class="w"> </span>lfs<span class="w"> </span>pull<span class="w"> </span>-X<span class="w"> </span><span class="s2">""</span><span class="w"> </span>-I<span class="w"> </span><span class="s2">"resources/rosbags/"</span>
 </pre></div>
 </div>
 </li>
@@ -1743,8 +1743,8 @@ and make sure it is working.</p></li>
 inference mode cache file:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>/workspaces/isaac_ros-dev/models/peoplesemsegnet/1
 <span class="nb">cd</span><span class="w"> </span>/workspaces/isaac_ros-dev/models/peoplesemsegnet
-wget<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_quantized_vanilla_unet_v2.0/files/peoplesemsegnet_vanilla_unet_dynamic_etlt_int8.cache&#39;</span>
-wget<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_quantized_vanilla_unet_v2.0/files/peoplesemsegnet_vanilla_unet_dynamic_etlt_int8_fp16.etlt&#39;</span>
+wget<span class="w"> </span><span class="s1">'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_quantized_vanilla_unet_v2.0/files/peoplesemsegnet_vanilla_unet_dynamic_etlt_int8.cache'</span>
+wget<span class="w"> </span><span class="s1">'https://api.ngc.nvidia.com/v2/models/nvidia/tao/peoplesemsegnet/versions/deployable_quantized_vanilla_unet_v2.0/files/peoplesemsegnet_vanilla_unet_dynamic_etlt_int8_fp16.etlt'</span>
 </pre></div>
 </div>
 </li>
@@ -1756,19 +1756,19 @@ wget<span class="w"> </span><span class="s1">&#39;https://api.ngc.nvidia.com/v2/
 <li><p>Create the Triton configuration file called
 <code class="docutils literal notranslate"><span class="pre">/workspaces/isaac_ros-dev/models/peoplesemsegnet/config.pbtxt</span></code>
 with the following content:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>name:<span class="w"> </span><span class="s2">&quot;peoplesemsegnet&quot;</span>
-platform:<span class="w"> </span><span class="s2">&quot;tensorrt_plan&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>name:<span class="w"> </span><span class="s2">"peoplesemsegnet"</span>
+platform:<span class="w"> </span><span class="s2">"tensorrt_plan"</span>
 max_batch_size:<span class="w"> </span><span class="m">0</span>
 input<span class="w"> </span><span class="o">[</span>
 <span class="w">  </span><span class="o">{</span>
-<span class="w">    </span>name:<span class="w"> </span><span class="s2">&quot;input_1:0&quot;</span>
+<span class="w">    </span>name:<span class="w"> </span><span class="s2">"input_1:0"</span>
 <span class="w">    </span>data_type:<span class="w"> </span>TYPE_FP32
 <span class="w">    </span>dims:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">1</span>,<span class="w"> </span><span class="m">3</span>,<span class="w"> </span><span class="m">544</span>,<span class="w"> </span><span class="m">960</span><span class="w"> </span><span class="o">]</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">]</span>
 output<span class="w"> </span><span class="o">[</span>
 <span class="w">  </span><span class="o">{</span>
-<span class="w">    </span>name:<span class="w"> </span><span class="s2">&quot;argmax_1&quot;</span>
+<span class="w">    </span>name:<span class="w"> </span><span class="s2">"argmax_1"</span>
 <span class="w">    </span>data_type:<span class="w"> </span>TYPE_INT32
 <span class="w">    </span>dims:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">1</span>,<span class="w"> </span><span class="m">544</span>,<span class="w"> </span><span class="m">960</span>,<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]</span>
 <span class="w">  </span><span class="o">}</span>
@@ -1794,7 +1794,7 @@ version_policy:<span class="w"> </span><span class="o">{</span>
 </div>
 </li>
 <li><p>Run the following launch file to get the ROS node running:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_unet<span class="w"> </span>isaac_ros_unet_triton.launch.py<span class="w"> </span>model_name:<span class="o">=</span>peoplesemsegnet<span class="w"> </span>model_repository_paths:<span class="o">=[</span><span class="s1">&#39;/workspaces/isaac_ros-dev/models&#39;</span><span class="o">]</span><span class="w"> </span>input_binding_names:<span class="o">=[</span><span class="s1">&#39;input_1:0&#39;</span><span class="o">]</span><span class="w"> </span>output_binding_names:<span class="o">=[</span><span class="s1">&#39;argmax_1&#39;</span><span class="o">]</span><span class="w"> </span>network_output_type:<span class="o">=</span><span class="s1">&#39;argmax&#39;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_unet<span class="w"> </span>isaac_ros_unet_triton.launch.py<span class="w"> </span>model_name:<span class="o">=</span>peoplesemsegnet<span class="w"> </span>model_repository_paths:<span class="o">=[</span><span class="s1">'/workspaces/isaac_ros-dev/models'</span><span class="o">]</span><span class="w"> </span>input_binding_names:<span class="o">=[</span><span class="s1">'input_1:0'</span><span class="o">]</span><span class="w"> </span>output_binding_names:<span class="o">=[</span><span class="s1">'argmax_1'</span><span class="o">]</span><span class="w"> </span>network_output_type:<span class="o">=</span><span class="s1">'argmax'</span>
 </pre></div>
 </div>
 </li>
@@ -1879,7 +1879,7 @@ you can use the <code class="docutils literal notranslate"><span class="pre">fla
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, NVIDIA.
-      <span class="lastupdated">Last updated on Jul 08, 2026.
+      <span class="lastupdated">Last updated on Aug 18, 2026.
       </span></p>
   </div>
 
@@ -1916,12 +1916,13 @@ you can use the <code class="docutils literal notranslate"><span class="pre">fla
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
+            <dd><a href="../../../../../release-3.2/index.html">release-3.2</a></dd>
             <dd><a href="../../../../../release-4.4/index.html">release-4.4</a></dd>
             <dd><a href="../../../../../release-4.5/index.html">release-4.5</a></dd>
+            <dd><a href="../../../../../release-4.6/index.html">release-4.6</a></dd>
             <dd><a href="../../../../../../index.html">latest</a></dd>
             <dd><a href="tutorial_human_reconstruction_realsense.html">release-2.1</a></dd>
             <dd><a href="../../../../../release-3.1/index.html">release-3.1</a></dd>
-            <dd><a href="../../../../../release-3.2/index.html">release-3.2</a></dd>
             <dd><a href="../../../../../release-4.0/index.html">release-4.0</a></dd>
             <dd><a href="../../../../../release-4.1/index.html">release-4.1</a></dd>
             <dd><a href="../../../../../release-4.2/index.html">release-4.2</a></dd>

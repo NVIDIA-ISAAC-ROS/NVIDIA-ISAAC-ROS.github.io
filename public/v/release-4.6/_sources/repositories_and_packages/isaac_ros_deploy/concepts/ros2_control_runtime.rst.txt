@@ -1,0 +1,107 @@
+==========================
+ROS2 Control LEAPP Runtime
+==========================
+
+The ROS2 Control LEAPP Runtime allows running a LEAPP bundle as a ROS 2 controller plugin inside
+the ``ros2_control`` update loop.
+
+.. note::
+
+   This runtime supports LEAPP bundles with a single node exported with
+   ``backend: onnx``. For multi-model bundles (for example, VLAs), use the
+   :doc:`ROS2 Node LEAPP Runtime <ros2_nodes_runtime>`.
+
+Architecture
+------------
+
+The ``InferenceController`` is a ROS 2 controller plugin that wraps the core
+``isaac_deploy_core::InferenceController``. On each ``update()`` tick it:
+
+1. Reads hardware state via ``StateInterfaceAdapter``
+2. Converts topic messages via the converter registry
+3. Delegates to the core controller for inference
+4. Writes results to hardware via ``CommandInterfaceAdapter``
+
+.. mermaid::
+
+   graph TD
+      A["Hardware Interface - Read"] --> B["StateInterfaceAdapter → NamedTensors"]
+      subgraph InferenceController
+      B --> C["InputBuilder (preprocess: reorder, history, reshape)"]
+      C --> D["InferenceRunner (Triton)"]
+      D --> E["OutputBuilder (postprocess)"]
+      E --> F["CommandInterfaceAdapter → Hardware Commands"]
+      end
+      F --> G["Hardware Interface - Write"]
+
+Key Components
+--------------
+
+StateInterfaceAdapter
+~~~~~~~~~~~~~~~~~~~~~
+
+Creates tensors from hardware state interfaces (joint positions, velocities, IMU data).
+Each input term in the bundle configuration YAML whose semantic ``kind`` has a registered state
+interface converter is automatically read from hardware.
+
+Converter Registry
+~~~~~~~~~~~~~~~~~~
+
+Creates tensors from ROS topic messages (velocity commands, reference motions). Input terms
+whose semantic ``kind`` does not have a registered state interface converter are treated as
+topic inputs. The controller subscribes to the appropriate ROS topic and uses a
+``MessageToTensorConverter`` to produce tensors.
+
+CommandInterfaceAdapter
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Converts output tensors back into hardware command interfaces (position targets, stiffness,
+damping). Each output term with a registered command interface converter writes directly to
+``ros2_control`` command interfaces.
+
+Controller Chaining
+-------------------
+
+The inference controller can be used standalone but is normally chained through a safety
+controller:
+
+.. code-block:: text
+
+   inference_controller → safety_controller → hardware
+
+This is configured via the ``command_prefix`` and ``command_suffix`` parameters on the
+inference controller. For example, with ``command_prefix: safety_controller`` and
+``command_suffix: _raw``, position commands are written to
+``safety_controller/left_hip_pitch_joint/position_raw``.
+
+Parameters
+----------
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Default
+     - Description
+   * - ``config_path``
+     - ``string``
+     - ``""``
+     - Path to the LEAPP bundle configuration YAML (required).
+   * - ``model_path``
+     - ``string``
+     - ``""``
+     - Override model path from the bundle configuration YAML. If empty, uses the
+       path in that file.
+   * - ``decimation``
+     - ``int``
+     - ``4``
+     - Run inference every N control cycles.
+   * - ``command_prefix``
+     - ``string``
+     - ``""``
+     - Prefix for command interface names (for controller chaining).
+   * - ``command_suffix``
+     - ``string``
+     - ``""``
+     - Suffix for command interface names (for controller chaining).

@@ -1,0 +1,156 @@
+========================
+|package_name|
+========================
+
+:ir_github:`<isaac_ros_robots> <franka_fr3/franka_fr3_ros2_control>`
+
+Overview
+--------
+
+.. include:: _snippets/overview.rst
+
+How it works
+------------
+
+``FrankaFr3SystemInterface`` spawns a dedicated thread in ``on_activate()``
+running ``franka::Robot::control(callback, kJointImpedance)``.
+``libfranka`` clocks the 1 kHz loop, not ``ros2_control``. Each tick the
+callback reads the latest target written by ``write()``
+(via ``realtime_tools::RealtimeBuffer``, ``readFromRT()`` on the RT side),
+steps Ruckig OTG, and returns ``franka::JointPositions``. ``read()`` /
+``write()`` on the non-RT controller-manager thread are constant-time
+exchanges — three ``seqlock`` reads of measured joint state, one
+``writeFromNonRT`` of the target.
+
+The FCI thread sets its own ``SCHED_FIFO`` priority, CPU affinity, and
+``mlockall`` via ``realtime_tools`` helpers.
+
+.. warning::
+
+   The URDF must **not** set ``is_async`` / ``rw_rate``. The async path
+   paces ``read()`` / ``write()`` on a host clock that drifts against
+   ``libfranka``'s FCI packet clock and trips a reflex within tens of
+   milliseconds.
+
+Why not ``franka_ros2`` (``franka_hardware``)?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We use the official ``libfranka`` library directly, but not the
+``franka_ros2`` ``franka_hardware`` ``ros2_control`` plugin. The reason
+is structural:
+
+- ``franka_hardware`` is pull-based: its ``read()`` / ``write()`` are
+  the FCI exchange (one command per controller-manager cycle), with no
+  trajectory interpolation. Feeding the FR3 its required 1 kHz stream
+  therefore forces the entire controller-manager to run at 1 kHz.
+- Our deploy stack runs the RL policy as a controller inside the
+  controller-manager so it inherits real-time scheduling — essential
+  for the fleet's balancing humanoids, where a late 50 Hz step can make
+  them fall. A neural-net inference step takes more than 1 ms, so it
+  cannot live in a 1 kHz loop; a 1 kHz controller-manager therefore
+  can't host inference.
+- We run on a stock kernel (the NVIDIA GPU driver precludes
+  PREEMPT_RT), where clocking the whole controller-manager at 1 kHz
+  isn't guaranteed anyway.
+
+Adopting ``franka_hardware`` would force the policy out of the
+controller-manager — losing the real-time guarantee and diverging from
+every other robot. This interface instead keeps the controller-manager
+slow (≈50–200 Hz, inference RT-scheduled there like the rest of the
+fleet) and owns the 1 kHz FCI loop on its own RT thread, with Ruckig
+bridging the slow command stream up to 1 kHz. Robot-specific complexity
+stays in the hardware interface; the shared controllers are identical
+across the fleet.
+
+``franka_hardware`` is the right choice for its intended use — MoveIt /
+``joint_trajectory`` at 1 kHz, or analytic torque/impedance controllers
+on a PREEMPT_RT kernel — just not a sub-1 kHz learned-policy stack on a
+stock kernel.
+
+URDF parameters
+---------------
+
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Parameter
+     - Default
+     - Notes
+   * - ``robot_ip``
+     - — (required)
+     - FCI IP of the Control unit. Franka factory default is
+       ``172.16.0.2``.
+   * - ``joint_impedance``
+     - ``1500,1500,1500,1250,1250,1000,1000``
+     - 7 K_theta values in Nm/rad, each in ``[10, 5000]``.
+   * - ``relative_dynamics``
+     - ``0.3``
+     - Ruckig velocity / acceleration / jerk scaling, in ``(0, 1]``.
+   * - ``rt_cpus``
+     - (empty, no affinity)
+     - CPU core(s) for the FCI thread. Must be a subset of the host's
+       ``isolcpus``. One core is sufficient. The ``franka_fr3_bringup``
+       launch file exposes this as the ``rt_cpus`` launch argument.
+   * - ``rt_priority``
+     - ``95``
+     - ``SCHED_FIFO`` priority, ``[1, 99]``.
+
+``robot_ip`` and ``rt_cpus`` are exposed as launch arguments by
+``franka_fr3_bringup`` so you don't need to edit URDF / xacro source to
+point at a different robot or host.
+
+Host setup
+----------
+
+For deterministic 1 kHz on real hardware, two things have to be true:
+
+1. **One CPU core reserved at boot.** ``franka::Robot::control()`` is
+   single-threaded; one isolated core is sufficient. Add to GRUB kernel
+   parameters (reboot required), substituting whichever core you want:
+
+   .. code:: text
+
+      isolcpus=6 nohz_full=6 rcu_nocbs=6
+
+   Then launch with ``rt_cpus:=<core>``.
+
+   If hyperthreading is enabled on the host, the chosen core's SMT
+   sibling shares physical execution units with it. Isolate both
+   siblings via ``isolcpus`` (find them via
+   ``/sys/devices/system/cpu/cpuN/topology/thread_siblings_list``) and
+   still pin only one in ``rt_cpus``.
+
+2. **Container realtime permissions** — ``CAP_SYS_NICE``,
+   ``rtprio=99``, ``memlock=-1``. The Isaac dev container sets these
+   via ``~/.isaac_ros_dev-dockerargs``.
+
+Without these, the FCI thread logs a warning and runs at default
+scheduling — fine for a quick test, expect occasional FCI deadline
+misses under load.
+
+Robot side: enable FCI in Franka Desk; the host must be able to reach
+the Control unit IP.
+
+Safety
+------
+
+In-callback defense: stale-command watchdog (25 ms soft / 500 ms hard
+hold-then-decelerate), ``NaN`` guard, joint-limit clamp, Ruckig kinematic
+limits, K_theta range check at init. FCI exceptions surface via
+``read()`` / ``write()`` returning ``ERROR`` so ``ros2_control``
+deactivates cleanly; ``libfranka``'s own collision/reflex layer trips
+within ~3 ms on catastrophic faults.
+
+If Ruckig fails internally (rare given ``NaN``-filtered, joint-clamped,
+dynamics-bounded inputs), the FCI loop holds the last trajectory under
+joint-impedance control and logs a throttled warning from ``read()``.
+This is deliberate: terminating the FCI session would drop the arm into
+gravity-compensation, which is worse under payload than impedance hold.
+The operator sees the warning and intervenes on their own timeline.
+
+Policy-level safety (blend, clamp, OOD detection) lives upstream in
+``isaac_ros_deploy_ros2_control::SafetyController``; this package is
+the hardware adapter only.
+
+.. |package_name| replace:: ``franka_fr3_ros2_control``

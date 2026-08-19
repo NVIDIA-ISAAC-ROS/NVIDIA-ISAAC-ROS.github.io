@@ -1,0 +1,94 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_manipulation> <isaac_ros_manipulation_object_following>`
+
+Overview
+--------
+
+The ``isaac_ros_manipulation_object_following`` package provides the object-following workflow node for Isaac ROS Manipulation. The node plans and executes motions to follow a detected object using the cuMotion ``MotionPlan`` action server for planning and the MoveIt ``ExecuteTrajectory`` action server for execution. It targets a TF frame representing the detected object (grasp frame), with stale frame detection and minimum goal change thresholds. It is launched via ``isaac_ros_manipulation_bringup`` (e.g. ``object_following.launch.py``) as part of the Goal State Estimation component in the reference architecture.
+
+API
+---
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+
+   * - ``grasp_frame``
+     - ``string``
+     - ``goal_frame``
+     - TF frame representing the detected object's target pose that the robot tool should move toward
+
+   * - ``grasp_frame_stale_time_threshold``
+     - ``float``
+     - ``30.0``
+     - Duration in seconds after which the target grasp frame is considered stale
+
+   * - ``goal_change_position_threshold``
+     - ``float``
+     - ``0.1``
+     - Minimum distance in meters the goal must move to trigger re-planning
+
+   * - ``plan_timer_period``
+     - ``float``
+     - ``2.0``
+     - Period in seconds between planning requests
+
+   * - ``world_frame``
+     - ``string``
+     - ``base_link``
+     - Reference frame used for TF lookup and in which goal poses are expressed (typically the robot base frame)
+
+   * - ``link_name``
+     - ``string``
+     - ``base_link``
+     - Link name used for the goal pose reference
+
+   * - ``motion_plan_action_server_name``
+     - ``string``
+     - ``cumotion/motion_plan``
+     - Name of the cuMotion MotionPlan action server
+
+   * - ``execute_trajectory_action_server_name``
+     - ``string``
+     - ``execute_trajectory``
+     - Name of the MoveIt ExecuteTrajectory action server
+
+   * - ``time_dilation_factor``
+     - ``float``
+     - ``0.2``
+     - Time dilation factor passed to the cuMotion planner to control trajectory execution speed
+
+   * - ``update_esdf``
+     - ``bool``
+     - ``true``
+     - Whether to request an ESDF update from nvblox before planning
+
+ROS Action Clients
+^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Action
+     - Interface
+     - Description
+
+   * - ``cumotion/motion_plan``
+     - :ir_repo:`isaac_ros_cumotion_interfaces/MotionPlan <isaac_ros_cumotion> <isaac_ros_cumotion_interfaces/action/MotionPlan.action>`
+     - Sends goal poses to the cuMotion planner for trajectory planning
+
+   * - ``execute_trajectory``
+     - ``moveit_msgs/ExecuteTrajectory``
+     - Sends the planned trajectory for execution on the robot
+
+.. |package_name| replace:: ``isaac_ros_manipulation_object_following``

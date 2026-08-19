@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -686,12 +686,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.4/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-4.4</a></dd>
         <dd><a href="../../../../release-4.5/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-4.5</a></dd>
+        <dd><a href="../../../../release-4.6/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-4.6</a></dd>
         <dd><a href="../../../../../repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">latest</a></dd>
         <dd><a href="../../../../release-2.1/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-2.1</a></dd>
         <dd><a href="../../../../release-3.1/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-3.1</a></dd>
-        <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.0/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-4.0</a></dd>
         <dd><a href="../../../../release-4.1/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html">release-4.1</a></dd>
         <dd><a href="index.html">release-4.2</a></dd>
@@ -770,16 +771,16 @@ below to create your own launch file:</p>
 a camera node and <code class="docutils literal notranslate"><span class="pre">RectifyNode</span></code> as an example, the nodes can be
 created as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rectify_node</span> <span class="o">=</span> <span class="n">ComposableNode</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;rectify_node&#39;</span><span class="p">,</span>
-    <span class="n">package</span><span class="o">=</span><span class="s1">&#39;isaac_ros_image_proc&#39;</span><span class="p">,</span>
-    <span class="n">plugin</span><span class="o">=</span><span class="s1">&#39;nvidia::isaac_ros::image_proc::RectifyNode&#39;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">'rectify_node'</span><span class="p">,</span>
+    <span class="n">package</span><span class="o">=</span><span class="s1">'isaac_ros_image_proc'</span><span class="p">,</span>
+    <span class="n">plugin</span><span class="o">=</span><span class="s1">'nvidia::isaac_ros::image_proc::RectifyNode'</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">[{</span>
-        <span class="s1">&#39;output_width&#39;</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
-        <span class="s1">&#39;output_height&#39;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">,</span>
+        <span class="s1">'output_width'</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+        <span class="s1">'output_height'</span><span class="p">:</span> <span class="mi">1200</span><span class="p">,</span>
     <span class="p">}],</span>
     <span class="n">remapping</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;image_raw&#39;</span><span class="p">,</span> <span class="s1">&#39;image_raw&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;camera_info&#39;</span><span class="p">,</span> <span class="s1">&#39;camera_info&#39;</span><span class="p">)</span>
+        <span class="p">(</span><span class="s1">'image_raw'</span><span class="p">,</span> <span class="s1">'image_raw'</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">'camera_info'</span><span class="p">,</span> <span class="s1">'camera_info'</span><span class="p">)</span>
     <span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
@@ -787,9 +788,9 @@ created as follows:</p>
 </li>
 <li><p>Place the created nodes in <code class="docutils literal notranslate"><span class="pre">ComposableNodeContainer</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nitros_container</span> <span class="o">=</span> <span class="n">ComposableNodeContainer</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;nitros_container&#39;</span><span class="p">,</span>
-    <span class="n">package</span><span class="o">=</span><span class="s1">&#39;rclcpp_components&#39;</span><span class="p">,</span>
-    <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;component_container_mt&#39;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">'nitros_container'</span><span class="p">,</span>
+    <span class="n">package</span><span class="o">=</span><span class="s1">'rclcpp_components'</span><span class="p">,</span>
+    <span class="n">executable</span><span class="o">=</span><span class="s1">'component_container_mt'</span><span class="p">,</span>
     <span class="n">composable_node_descriptions</span><span class="o">=</span><span class="p">[</span><span class="n">rectify_node</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
@@ -1074,7 +1075,7 @@ still publishing drop rates and other data for nodes with expected topics and ex
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

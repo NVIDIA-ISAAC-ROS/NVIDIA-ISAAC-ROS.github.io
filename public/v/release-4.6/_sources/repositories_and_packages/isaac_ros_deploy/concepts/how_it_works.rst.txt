@@ -1,0 +1,123 @@
+============
+How It Works
+============
+
+Isaac ROS Deploy takes a policy trained in PyTorch, whether by reinforcement
+learning (for example, with NVIDIA Isaac Lab) or by imitation learning (for
+example, with Isaac GR00T), and runs it on a real or simulated robot. This page
+explains the pieces and why they exist.
+
+Why a separate export step?
+===========================
+
+A policy that trains fine in Python cannot be dropped straight onto a robot. The
+LEAPP export step solves three problems.
+
+#. **Real-time determinism.** A robot control loop needs hard, predictable
+   timing. A Python or PyTorch training process cannot guarantee it, because of
+   the GIL, garbage collection, a dynamic graph, and per-step allocations. Isaac
+   ROS Deploy instead runs the policy in a C++ runtime and executes the network
+   through NVIDIA Triton, so it can run in fast, real-time control loops. The
+   export produces the portable ONNX graph that the runtime consumes.
+
+#. **The input/output contract differs from training.** In training, observations
+   and actions are assembled in a particular way, with a specific ordering,
+   units, frames, history stacking, and recurrent state. That does not match the
+   robot's ROS topics or ``ros2_control`` interfaces. The LEAPP bundle captures
+   this contract as metadata, so the runtime can automatically connect the policy
+   to the right signals and reorder observations. No hand-written glue code is
+   needed. This metadata is optional in LEAPP itself; the automatic wiring
+   described here applies when the export includes the relevant term semantics.
+   Refer to :doc:`converters` for more.
+
+#. **Deployment decoupling.** The robot does not need the training stack or any
+   of its dependencies. A LEAPP bundle is self-contained: a graph YAML, ONNX
+   weights, and an optional ``.safetensors`` file.
+
+The pipeline
+============
+
+.. mermaid::
+
+   graph LR
+      T["Trained Policy (PyTorch)"] --> E["LEAPP Export"]
+      E --> B["LEAPP Bundle"]
+      B --> RC["ROS2 Control LEAPP Runtime"]
+      B --> RN["ROS2 Node LEAPP Runtime"]
+
+What is LEAPP?
+==============
+
+LEAPP is an exporter for trained policies. It lets you annotate an existing
+Python policy setup, in a non-invasive way, and export it for deployment as a
+LEAPP bundle.
+
+There are two preconfigured LEAPP integrations, Isaac Lab and Isaac GR00T, and
+you can also integrate LEAPP into your own setup:
+
+- Isaac Lab integration: export RL policies from within Isaac Lab. Refer to
+  :doc:`../how_to_guides/bring_your_own_policy`.
+- Isaac GR00T integration: export GR00T policies for deployment. Refer to the
+  :doc:`Isaac for Physical AI reference workflow </reference_workflows/isaac_for_physical_ai/index>`.
+
+Both integrations emit the same LEAPP bundle format.
+
+What is a LEAPP runtime?
+========================
+
+A LEAPP bundle is executed by a LEAPP runtime. Two runtimes are available, and
+both run the ONNX through NVIDIA Triton.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 40 30
+
+   * - Runtime
+     - How it runs
+     - Use when
+   * - :doc:`ROS2 Control LEAPP Runtime <ros2_control_runtime>`
+     - A controller plugin inside the ``ros2_control`` update loop. It reads
+       hardware state interfaces and writes command interfaces directly.
+     - Proprioceptive policies that need strict real-time, single-model.
+   * - :doc:`ROS2 Node LEAPP Runtime <ros2_nodes_runtime>`
+     - Composable nodes (``InputBuilderNode`` → ``TritonNode`` →
+       ``OutputBuilderNode``). All data flows over ROS topics.
+     - Multi-model graphs, VLAs, camera and sensor topics, feedback self-loops.
+
+What are Isaac ROS Deploy converters?
+=====================================
+
+A LEAPP bundle operates only at the tensor level. It takes tensors as inputs and
+produces tensors as outputs. Converters translate between those tensors and the
+robot's signals: they turn ROS topics or ``ros2_control`` state and command
+interfaces into the input tensors a bundle expects, and turn the output tensors
+back. Isaac ROS Deploy provides a set of converters, and you can add your own.
+
+There are two types of converters:
+
+- Message to tensor: convert ROS messages into input tensors, and output tensors
+  back into ROS messages. Both runtimes can use these.
+- Interface to tensor: convert ``ros2_control`` ``StateInterfaces`` and
+  ``CommandInterfaces`` into input tensors, and output tensors back into
+  interfaces. Only the ROS2 Control LEAPP Runtime can use these.
+
+Converters also reorder the tensors into the order the policy expects, using the
+``element_names`` from the LEAPP metadata. The full catalog is in the
+:doc:`converter catalog <../reference/converter_catalog>`.
+
+Safety
+======
+
+Because a learning-based policy can behave unpredictably, you can insert an
+optional safety controller that post-processes the policy's commands before they
+reach the hardware. This gives you explicit control over the policy. It can
+gradually phase a policy in from a held pose, by ramping ``blend_ratio`` from 0
+to 1, and it can trigger an emergency fallback when it detects out-of-domain
+states. Refer to :doc:`safety`.
+
+Next steps
+==========
+
+- :doc:`converters`: how converters work.
+- :doc:`../how_to_guides/bring_your_own_policy`: deploy your own custom policy.
+- :doc:`../how_to_guides/bring_your_own_embodiment`: deploy on your own robot.

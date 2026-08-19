@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -698,12 +698,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../../release-3.2/concepts/pose_estimation/dope/tutorial_triton.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.4/concepts/pose_estimation/dope/tutorial_triton.html">release-4.4</a></dd>
         <dd><a href="../../../../release-4.5/concepts/pose_estimation/dope/tutorial_triton.html">release-4.5</a></dd>
+        <dd><a href="../../../../release-4.6/concepts/pose_estimation/dope/tutorial_triton.html">release-4.6</a></dd>
         <dd><a href="../../../../../concepts/pose_estimation/dope/tutorial_triton.html">latest</a></dd>
         <dd><a href="../../../../release-2.1/concepts/pose_estimation/dope/tutorial_triton.html">release-2.1</a></dd>
         <dd><a href="../../../../release-3.1/concepts/pose_estimation/dope/tutorial_triton.html">release-3.1</a></dd>
-        <dd><a href="../../../../release-3.2/concepts/pose_estimation/dope/tutorial_triton.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.0/concepts/pose_estimation/dope/tutorial_triton.html">release-4.0</a></dd>
         <dd><a href="../../../../release-4.1/concepts/pose_estimation/dope/tutorial_triton.html">release-4.1</a></dd>
         <dd><a href="../../../../release-4.2/concepts/pose_estimation/dope/tutorial_triton.html">release-4.2</a></dd>
@@ -841,19 +842,19 @@ same as the model repository. Depending on the platform selected from
 a previous step, a slightly different <code class="docutils literal notranslate"><span class="pre">config.pbtxt</span></code> file must be
 created: <code class="docutils literal notranslate"><span class="pre">onnxruntime_onnx</span></code> (<code class="docutils literal notranslate"><span class="pre">.onnx</span></code> file), <code class="docutils literal notranslate"><span class="pre">tensorrt_plan</span></code>
 (<code class="docutils literal notranslate"><span class="pre">.plan</span></code> file) or <code class="docutils literal notranslate"><span class="pre">pytorch_libtorch</span></code> (<code class="docutils literal notranslate"><span class="pre">.pt</span></code> file):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>name:<span class="w"> </span><span class="s2">&quot;dope_ketchup&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>name:<span class="w"> </span><span class="s2">"dope_ketchup"</span>
 platform:<span class="w"> </span>&lt;insert-platform&gt;
 max_batch_size:<span class="w"> </span><span class="m">0</span>
 input<span class="w"> </span><span class="o">[</span>
 <span class="w">  </span><span class="o">{</span>
-<span class="w">    </span>name:<span class="w"> </span><span class="s2">&quot;INPUT__0&quot;</span>
+<span class="w">    </span>name:<span class="w"> </span><span class="s2">"INPUT__0"</span>
 <span class="w">    </span>data_type:<span class="w"> </span>TYPE_FP32
 <span class="w">    </span>dims:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">1</span>,<span class="w"> </span><span class="m">3</span>,<span class="w"> </span><span class="m">720</span>,<span class="w"> </span><span class="m">1280</span><span class="w"> </span><span class="o">]</span>
 <span class="w">  </span><span class="o">}</span>
 <span class="o">]</span>
 output<span class="w"> </span><span class="o">[</span>
 <span class="w">  </span><span class="o">{</span>
-<span class="w">    </span>name:<span class="w"> </span><span class="s2">&quot;OUTPUT__0&quot;</span>
+<span class="w">    </span>name:<span class="w"> </span><span class="s2">"OUTPUT__0"</span>
 <span class="w">    </span>data_type:<span class="w"> </span>TYPE_FP32
 <span class="w">    </span>dims:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="m">1</span>,<span class="w"> </span><span class="m">25</span>,<span class="w"> </span><span class="m">90</span>,<span class="w"> </span><span class="m">160</span><span class="w"> </span><span class="o">]</span>
 <span class="w">  </span><span class="o">}</span>
@@ -888,7 +889,7 @@ or similar packages. If another image resolution is desired, please see <a class
 </div></blockquote>
 </li>
 <li><p>Start <code class="docutils literal notranslate"><span class="pre">isaac_ros_dope</span></code> using the launch file:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_dope<span class="w"> </span>isaac_ros_dope_triton.launch.py<span class="w"> </span>model_name:<span class="o">=</span>dope_ketchup<span class="w"> </span>model_repository_paths:<span class="o">=[</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models<span class="o">]</span><span class="w"> </span>input_binding_names:<span class="o">=[</span><span class="s1">&#39;INPUT__0&#39;</span><span class="o">]</span><span class="w">   </span>output_binding_names:<span class="o">=[</span><span class="s1">&#39;OUTPUT__0&#39;</span><span class="o">]</span><span class="w"> </span>object_name:<span class="o">=</span>Ketchup
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_dope<span class="w"> </span>isaac_ros_dope_triton.launch.py<span class="w"> </span>model_name:<span class="o">=</span>dope_ketchup<span class="w"> </span>model_repository_paths:<span class="o">=[</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/models<span class="o">]</span><span class="w"> </span>input_binding_names:<span class="o">=[</span><span class="s1">'INPUT__0'</span><span class="o">]</span><span class="w">   </span>output_binding_names:<span class="o">=[</span><span class="s1">'OUTPUT__0'</span><span class="o">]</span><span class="w"> </span>object_name:<span class="o">=</span>Ketchup
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1100,7 +1101,7 @@ dimensions your DNN model is expecting.</p>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

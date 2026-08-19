@@ -1,0 +1,167 @@
+============================
+How to bring your own policy
+============================
+
+This guide shows how to deploy a custom policy on a robot that Isaac ROS Deploy
+already supports, such as the Unitree G1.
+
+The policy can be trained with reinforcement learning, imitation learning, or
+similar approaches. The only requirement is that the training setup supports a LEAPP
+export.
+
+For this guide we assume the robot embodiment is already supported by Isaac ROS
+Deploy. If it is not, see :doc:`How to bring your own embodiment
+<bring_your_own_embodiment>` for how to add a new custom embodiment.
+
+With a supported embodiment in place, deploying your policy comes down to a few
+steps: export it to a LEAPP bundle, check that its inputs and outputs use
+semantic kinds the runtime understands, choose a runtime, and launch it pointed
+at the bundle. The rest of this guide walks through each step.
+
+Export to a LEAPP bundle
+========================
+
+First, export your policy with LEAPP. Isaac Lab and GR00T already provide a
+native LEAPP integration. For other training frameworks, you'll have to add the
+LEAPP annotations to your policy yourself.
+
+For example, for an Isaac Lab RSL-RL policy, run the LEAPP export script to
+obtain a LEAPP bundle:
+
+.. code-block:: bash
+
+   ./isaaclab.sh -p scripts/reinforcement_learning/leapp/rsl_rl/export.py \
+       --task <TASK_NAME> \
+       --checkpoint <PATH_TO_CHECKPOINT>
+
+This produces a LEAPP bundle, which contains:
+
+- a YAML file with the policy metadata,
+- one or more ONNX files with the compute graph and weights, and
+- for recurrent policies, ``.safetensors`` files with the initial values.
+
+Review the exported bundle
+==========================
+
+Once you have exported the bundle, verify its contents:
+
+- Review the visualization of the node graph and verify that it correctly
+  represents your policy.
+- Optionally, open the ONNX file in a viewer such as
+  `Netron <https://netron.app/>`_ to visualize the compute graph. Focus on the
+  input and output tensors.
+- Confirm the bundle contains the expected files: the YAML, the ONNX file(s),
+  and, for recurrent policies, ``.safetensors``.
+
+Add custom converters
+=====================
+
+Every input and output of your policy carries a semantic ``kind``, which
+describes the semantic type of that input or output tensor. The LEAPP runtimes
+use the ``kind`` to convert the tensor to or from a ROS message or a
+``ros2_control`` interface. If your policy requires custom semantic kinds that
+the default converters do not yet support, you have to add your own converter.
+
+Check whether your kinds are already supported in the
+:doc:`converter catalog <../reference/converter_catalog>`:
+
+- If all of them are listed, no code changes are needed.
+- If not, refer to :doc:`How to add custom converters <add_custom_converter>`.
+
+Choose a runtime
+================
+
+Next, choose an appropriate LEAPP runtime for your policy:
+
+- :doc:`ROS2 Control LEAPP Runtime <../concepts/ros2_control_runtime>`: use this
+  for proprioceptive, strict real-time control. It supports LEAPP bundles with a
+  single node. For example, whole-body control policies.
+- :doc:`ROS2 Node LEAPP Runtime <../concepts/ros2_nodes_runtime>`: use this for
+  soft real-time policies with visual inputs. It supports LEAPP bundles with
+  multiple nodes. For example, VLAs.
+
+Run it
+======
+
+.. tab-set::
+
+   .. tab-item:: ROS2 Control LEAPP Runtime
+
+      To use the ROS2 Control LEAPP Runtime, run the ROS2 Control
+      ``ControllerManager`` and load the inference controller. Then point the
+      controller at your custom LEAPP bundle through its ``config_path``
+      parameter.
+
+      Configure the controllers in two files:
+
+      - ``controller_manager.yaml`` defines the controller plugins, joints,
+        gains, and thresholds.
+      - ``controller_groups.yaml`` defines which controllers run together and
+        specifies the bundle, topic mappings, command prefix and suffix, and
+        activation order.
+
+      See :doc:`ROS2 Control LEAPP Runtime
+      <../concepts/ros2_control_runtime>` for the available parameters and
+      :doc:`bring_your_own_embodiment` for robot integration.
+
+      Launch the controller group through the robot's bringup package. Launch
+      arguments vary by robot. For a complete Unitree G1 example, follow the
+      :doc:`AGILE WBC deployment tutorial <../tutorials/deploy_agile>`.
+
+      .. note::
+
+         The optional :doc:`SafetyController <../concepts/safety>` provides
+         blend-ratio command ramping and configurable out-of-domain checks. It is
+         not a functional-safety component; review its limitations before adding
+         it to a controller group.
+
+   .. tab-item:: ROS2 Node LEAPP Runtime
+
+      To use the ROS2 Node LEAPP Runtime, use the ``inference_graph.launch.py``
+      launch file. It is intended to be included in your application as a
+      sub-launch file, and it adds the input and output builder nodes and the
+      Triton node.
+
+      Use the ``config_path`` launch argument to point the runtime at your custom
+      LEAPP bundle. You also specify which topics the runtime uses for the
+      policy's inputs and outputs, with the ``source_to_topic`` and
+      ``output_to_topic`` arguments.
+
+      Normally you include this launch file in a larger launch file:
+
+      .. code-block:: python
+
+         from launch.actions import IncludeLaunchDescription
+         from launch.launch_description_sources import PythonLaunchDescriptionSource
+         from launch_ros.substitutions import FindPackageShare
+
+         IncludeLaunchDescription(
+             PythonLaunchDescriptionSource([
+                 FindPackageShare("isaac_ros_deploy_bringup"),
+                 "/launch/inference_graph.launch.py",
+             ]),
+             launch_arguments={
+                 "config_path": "/path/to/your/policy.yaml",
+                 "source_to_topic": "state/joint/position:joint_states,"
+                                    "state/joint/velocity:joint_states,"
+                                    "state/body/rotation:imu",
+                 "output_to_topic": "joint_pos_targets:joint_commands",
+             }.items(),
+         )
+
+      This only launches the inference graph. You still have to connect the
+      inference graph's output topics to your hardware, for example through the
+      ``ros2_control`` controller manager.
+
+      The launch arguments are:
+
+      - ``config_path``: path to your LEAPP bundle configuration YAML.
+      - ``source_to_topic``: maps each input source to the ROS topic that
+        supplies it. Defaults to the source name.
+      - ``source_message_type``: overrides a message type where needed, for
+        example ``command/body/velocity:geometry_msgs/msg/TwistStamped``.
+      - ``output_to_topic``: routes generated commands to your actuation topics.
+
+      For a complete example that uses the ROS2 Node LEAPP Runtime, follow
+      :doc:`Deploy the Fine-Tuned Policy
+      </reference_workflows/isaac_for_physical_ai/tutorials/tutorial_deploy>`.

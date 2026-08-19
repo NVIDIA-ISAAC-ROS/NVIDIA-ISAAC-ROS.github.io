@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -698,12 +698,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.4/getting_started/sensors/eagle_setup.html">release-4.4</a></dd>
         <dd><a href="../../../release-4.5/getting_started/sensors/eagle_setup.html">release-4.5</a></dd>
+        <dd><a href="../../../release-4.6/getting_started/sensors/eagle_setup.html">release-4.6</a></dd>
         <dd><a href="../../../../getting_started/sensors/eagle_setup.html">latest</a></dd>
         <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../release-3.1/index.html">release-3.1</a></dd>
-        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.0/index.html">release-4.0</a></dd>
         <dd><a href="../../../release-4.1/index.html">release-4.1</a></dd>
         <dd><a href="../../../release-4.2/index.html">release-4.2</a></dd>
@@ -876,7 +877,7 @@ git<span class="w"> </span>checkout
 camera’s EEPROM and generate ROS 2 <code class="docutils literal notranslate"><span class="pre">CameraInfo</span></code>-compatible YAML files.
 Read both RGB and IR calibration data for both cameras and save to <code class="docutils literal notranslate"><span class="pre">eagle_calib</span></code> in your home directory:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">TOOLS_DIR</span><span class="o">=</span>/tmp/isaac_ros_sipl_camera/isaac_ros_sipl_camera/tools<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="nv">$TOOLS_DIR</span>/read_eagle_eeprom.py<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Error: </span><span class="nv">$TOOLS_DIR</span><span class="s2">/read_eagle_eeprom.py not found&quot;</span><span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="nv">$TOOLS_DIR</span>/read_eagle_eeprom.py<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Error: </span><span class="nv">$TOOLS_DIR</span><span class="s2">/read_eagle_eeprom.py not found"</span><span class="p">;</span><span class="w"> </span>false<span class="p">;</span><span class="w"> </span><span class="o">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="nv">OUTPUT_DIR</span><span class="o">=</span><span class="nv">$HOME</span>/eagle_calib<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 mkdir<span class="w"> </span>-p<span class="w"> </span><span class="nv">$OUTPUT_DIR</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--net<span class="w"> </span>host<span class="w"> </span>--runtime<span class="o">=</span>nvidia<span class="w"> </span>--privileged<span class="w"> </span><span class="se">\</span>
@@ -885,9 +886,9 @@ docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </
 <span class="w">  </span>-v<span class="w"> </span><span class="nv">$TOOLS_DIR</span>:/tools:ro<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-v<span class="w"> </span><span class="nv">$OUTPUT_DIR</span>:/eagle_calib<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>hololink-demo:<span class="nv">$HOLOSCAN_BRANCH</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;pip install --user -q opencv-python-headless &amp;&amp; \</span>
+<span class="w">  </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">"pip install --user -q opencv-python-headless &amp;&amp; \</span>
 <span class="s2">           python3 /tools/read_eagle_eeprom.py --part 2 --camera both \</span>
-<span class="s2">             --output-dir /eagle_calib&quot;</span>
+<span class="s2">             --output-dir /eagle_calib"</span>
 </pre></div>
 </div>
 <p><strong>Command Options</strong></p>
@@ -956,7 +957,7 @@ Intrinsics are expected to be calibrated at the native sensor resolution of 2560
 <span class="sd-summary-text">Example YAML structure</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">image_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2560</span>
 <span class="nt">image_height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1984</span>
-<span class="nt">camera_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;eagle_rgb_left&quot;</span>
+<span class="nt">camera_name</span><span class="p">:</span><span class="w"> </span><span class="s">"eagle_rgb_left"</span>
 <span class="nt">camera_matrix</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">rows</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
 <span class="w">  </span><span class="nt">cols</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
@@ -1176,7 +1177,7 @@ ethtool<span class="w"> </span>mgbe0_0<span class="w"> </span><span class="p">|<
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

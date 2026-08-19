@@ -3531,15 +3531,15 @@
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CONFIG_FILE</span><span class="o">=</span>/mosquitto.conf
 <span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$#</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;usage: </span><span class="nv">$0</span><span class="s2"> &lt;tcp_port&gt; &lt;websocket_port&gt;&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"usage: </span><span class="nv">$0</span><span class="s2"> &lt;tcp_port&gt; &lt;websocket_port&gt;"</span>
 <span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="k">fi</span>
 <span class="nv">PORT</span><span class="o">=</span><span class="nv">$1</span>
 <span class="nv">PORT_WEBSOCKET</span><span class="o">=</span><span class="nv">$2</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;allow_anonymous true&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;listener </span><span class="nv">$PORT</span><span class="s2"> 0.0.0.0&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;listener </span><span class="nv">$PORT_WEBSOCKET</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;protocol websockets&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"allow_anonymous true"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"listener </span><span class="nv">$PORT</span><span class="s2"> 0.0.0.0"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"listener </span><span class="nv">$PORT_WEBSOCKET</span><span class="s2">"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"protocol websockets"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
 mosquitto<span class="w"> </span>-c<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
 </pre></div>
 </div>
@@ -3710,7 +3710,7 @@ spheres.</p>
 <blockquote>
 <div><p>You must have the launch file running to run this command.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>send_goal<span class="w"> </span>/robotiq_gripper_controller/gripper_cmd<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>control_msgs/action/GripperCommand<span class="w"> </span><span class="s2">&quot;{command: {position: 0.0, max_effort: 0.0}}&quot;</span>
+<span class="w">    </span>control_msgs/action/GripperCommand<span class="w"> </span><span class="s2">"{command: {position: 0.0, max_effort: 0.0}}"</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -3728,9 +3728,9 @@ spheres.</p>
 <li><p>Use the <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/robot</span></code> endpoint to create robot with name <code class="docutils literal notranslate"><span class="pre">arm01</span></code>.</p>
 <blockquote>
 <div><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;labels&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">    </span><span class="nt">&quot;heartbeat_timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arm01&quot;</span>
+<span class="w">    </span><span class="nt">"labels"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">    </span><span class="nt">"heartbeat_timeout"</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arm01"</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -3742,20 +3742,20 @@ more meaning, like ‘arm01’. Delete the <code class="docutils literal notrans
 <li><p>Trigger object detection using <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/mission</span></code> endpoint. Here is an example input:</p>
 <blockquote>
 <div><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;robot&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arm01&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;mission_tree&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"robot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arm01"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"mission_tree"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;get_objects&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;action_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;get_objects&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;action_parameters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"get_objects"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"parent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"root"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">"action_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"get_objects"</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">"action_parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
 <span class="w">            </span><span class="p">}</span>
 
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;needs_canceled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="nt">"timeout"</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"needs_canceled"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -3769,24 +3769,24 @@ more meaning, like ‘arm01’. Delete the <code class="docutils literal notrans
 <li><p>Trigger pick and place using <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/mission</span></code> endpoint. <code class="docutils literal notranslate"><span class="pre">object_id</span></code> and <code class="docutils literal notranslate"><span class="pre">class_id</span></code> come from the detection results. <code class="docutils literal notranslate"><span class="pre">place_pose</span></code> is a comma separated string with 7 floats, representing the position and quaternion of where the gripper drops the object in the manipulator <code class="docutils literal notranslate"><span class="pre">base_link</span></code> frame. For the example scene in Isaac Sim, set <code class="docutils literal notranslate"><span class="pre">place_pose</span></code> as <code class="docutils literal notranslate"><span class="pre">&quot;-0.35,0.2,0.4,0.996,0.066,0.042,0.034&quot;</span></code> to drop the object into the bin.</p>
 <blockquote>
 <div><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;robot&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arm01&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;mission_tree&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"robot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arm01"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"mission_tree"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pick_place&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;action_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pick_and_place&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;action_parameters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;object_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;object_id&gt;&quot;</span><span class="p">,</span>
-<span class="w">                    </span><span class="nt">&quot;class_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;class_id&gt;&quot;</span><span class="p">,</span>
-<span class="w">                    </span><span class="nt">&quot;place_pose&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;position_x&gt;, &lt;position_y&gt;, &lt;position_z&gt;, &lt;Quaternion_x&gt;, &lt;Quaternion_y&gt;, &lt;Quaternion_z&gt;, &lt;Quaternion_w&gt;&quot;</span>
+<span class="w">            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pick_place"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"parent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"root"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">"action_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pick_and_place"</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">"action_parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">"object_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;object_id&gt;"</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">"class_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;class_id&gt;"</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">"place_pose"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;position_x&gt;, &lt;position_y&gt;, &lt;position_z&gt;, &lt;Quaternion_x&gt;, &lt;Quaternion_y&gt;, &lt;Quaternion_z&gt;, &lt;Quaternion_w&gt;"</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">            </span><span class="p">}</span>
 
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;needs_canceled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="nt">"timeout"</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"needs_canceled"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -3797,22 +3797,22 @@ more meaning, like ‘arm01’. Delete the <code class="docutils literal notrans
 <li><p>The pick and place server will cache object poses. If you rerun the pipeline and the object position is different, clear the cache using the <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/mission</span></code> endpoint. The <code class="docutils literal notranslate"><span class="pre">object_ids</span></code> parameter can be either empty to clear all objects or a comma separated string to clear specific objects.</p></li>
 </ul>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;robot&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arm01&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;mission_tree&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"robot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arm01"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"mission_tree"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;clear_objects&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;action_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;clear_objects&quot;</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;action_parameters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                    </span><span class="nt">&quot;object_ids&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"clear_objects"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"parent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"root"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">"action_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"clear_objects"</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">"action_parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">"object_ids"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">            </span><span class="p">}</span>
 
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;needs_canceled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="nt">"timeout"</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"needs_canceled"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -3863,7 +3863,7 @@ more meaning, like ‘arm01’. Delete the <code class="docutils literal notrans
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2026, NVIDIA.
-      <span class="lastupdated">Last updated on Jul 08, 2026.
+      <span class="lastupdated">Last updated on Aug 18, 2026.
       </span></p>
   </div>
 
@@ -3900,12 +3900,13 @@ more meaning, like ‘arm01’. Delete the <code class="docutils literal notrans
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
+            <dd><a href="tutorial_pick_and_place_from_cloud_service.html">release-3.2</a></dd>
             <dd><a href="../../../../release-4.4/index.html">release-4.4</a></dd>
             <dd><a href="../../../../release-4.5/index.html">release-4.5</a></dd>
+            <dd><a href="../../../../release-4.6/index.html">release-4.6</a></dd>
             <dd><a href="../../../../../index.html">latest</a></dd>
             <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
             <dd><a href="../../../../release-3.1/index.html">release-3.1</a></dd>
-            <dd><a href="tutorial_pick_and_place_from_cloud_service.html">release-3.2</a></dd>
             <dd><a href="../../../../release-4.0/index.html">release-4.0</a></dd>
             <dd><a href="../../../../release-4.1/index.html">release-4.1</a></dd>
             <dd><a href="../../../../release-4.2/index.html">release-4.2</a></dd>

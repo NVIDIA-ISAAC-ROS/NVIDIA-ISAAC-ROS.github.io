@@ -1,0 +1,73 @@
+Convert MCAP Bags to a LeRobot Dataset
+======================================
+
+This tutorial will guide you on how to convert the MCAP recordings
+produced by :doc:`tutorial_record` into a
+`LeRobot <https://github.com/huggingface/lerobot>`__ dataset that the
+GR00T N fine-tuning script can consume.
+
+This tutorial can be run on an x86_64 workstation or Jetson AGX Thor. The converter is pure
+Python so no GPU is required. The MCAP-to-LeRobot converter does not require a ROS installation,
+thus you can run it in the Isaac ROS container or also directly on your host.
+
+Clone the data-tools repository and install the converter on the host
+with `uv <https://docs.astral.sh/uv/>`__:
+
+.. code:: bash
+
+   cd ${ISAAC_ROS_WS}/src && \
+      git clone :ir_clone:`<isaac_ros_data_tools>`
+
+.. code:: bash
+
+   cd ${ISAAC_ROS_WS}/src/isaac_ros_data_tools/isaac_ros_mcap_lerobot_converter
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   uv venv --python 3.12 .venv
+   source .venv/bin/activate
+   uv pip install -e .
+
+Run the conversion against the recordings directory:
+
+.. note::
+
+   ``mcap-to-lerobot`` fails if ``--output-dir`` already exists. Before
+   re-running, remove it with
+   ``rm -r ${ISAAC_ROS_WS}/recordings/lerobot_output``.
+
+.. code:: bash
+
+   mcap-to-lerobot \
+       --rosbags-dir ${ISAAC_ROS_WS}/recordings/session_<TIMESTAMP> \
+       --output-dir ${ISAAC_ROS_WS}/recordings/lerobot_output \
+       --task "move the apple to the plate" \
+       --fps 30 --robot-type unitree_g1
+
+Replace ``<TIMESTAMP>`` with the session you want to convert.
+
+To merge several recording sessions into one dataset, repeat
+``--rosbags-dir``:
+
+.. code:: bash
+
+   mcap-to-lerobot \
+       --rosbags-dir ${ISAAC_ROS_WS}/recordings/session_A \
+       --rosbags-dir ${ISAAC_ROS_WS}/recordings/session_B \
+       --rosbags-dir ${ISAAC_ROS_WS}/recordings/session_C \
+       --output-dir ${ISAAC_ROS_WS}/recordings/lerobot_output \
+       --task "move the apple to the plate" \
+       --fps 30 --robot-type unitree_g1
+
+Episodes are numbered sequentially across the supplied sessions in the
+order given.
+
+.. seealso::
+
+   :doc:`/repositories_and_packages/isaac_ros_data_tools/isaac_ros_mcap_lerobot_converter/index`
+   — full CLI reference, output layout, ``--fps`` / ``sync_rate``
+   rationale.
+
+Next
+----
+
+Continue with :doc:`tutorial_finetune` to fine-tune a GR00T N policy on
+the converted dataset.

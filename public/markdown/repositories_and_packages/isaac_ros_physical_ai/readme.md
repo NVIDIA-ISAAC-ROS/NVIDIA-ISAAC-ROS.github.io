@@ -32,6 +32,11 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 ## Packages
 
 * [`isaac_ros_data_flywheel`](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_data_flywheel/index.html)
+* [`isaac_ros_unitree_g1_cloud_control_bringup`](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index.html)
+  * [Overview](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index.html#overview)
+  * [Tutorial — Cloud Control of the Unitree G1](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index.html#tutorial-cloud-control-of-the-unitree-g1)
+  * [API](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index.html#api)
+  * [Troubleshooting](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index.html#troubleshooting)
 * [`isaac_ros_unitree_g1_gr00t`](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index.html)
   * [Overview](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index.html#overview)
   * [Tutorial: Deploy a Fine-Tuned GR00T Policy](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index.html#tutorial-deploy-a-fine-tuned-gr00t-policy)
@@ -45,10 +50,10 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
   * [Troubleshooting](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder/index.html#troubleshooting)
 * [`isaac_ros_unitree_g1_teleop_bringup`](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html)
   * [Overview](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html#overview)
-  * [Tutorial: Unitree G1 XR Teleop](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html#tutorial-unitree-g1-xr-teleop)
+  * [Tutorial — Unitree G1 XR Teleop](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html#tutorial-unitree-g1-xr-teleop)
   * [API](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html#api)
   * [Troubleshooting](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html#troubleshooting)
 
 ## Latest
 
-Update 2026-07-06: Support CloudXR runtime without Docker
+Update 2026-08-18: Added Unitree G1 cloud control on real hardware and Isaac Sim

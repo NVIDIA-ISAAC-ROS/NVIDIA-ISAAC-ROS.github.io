@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -729,12 +729,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.4/concepts/dev_env/index.html">release-4.4</a></dd>
         <dd><a href="index.html">release-4.5</a></dd>
+        <dd><a href="../../../release-4.6/concepts/dev_env/index.html">release-4.6</a></dd>
         <dd><a href="../../../../concepts/dev_env/index.html">latest</a></dd>
         <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../release-3.1/index.html">release-3.1</a></dd>
-        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.0/concepts/dev_env/index.html">release-4.0</a></dd>
         <dd><a href="../../../release-4.1/concepts/dev_env/index.html">release-4.1</a></dd>
         <dd><a href="../../../release-4.2/concepts/dev_env/index.html">release-4.2</a></dd>
@@ -1006,7 +1007,7 @@ Public Repository</label><div class="sd-tab-content docutils">
 <span class="w">    </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/tmp/rosdep_ws/src/vslam<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s2">&quot;https://raw.githubusercontent.com/NVIDIA-ISAAC-ROS/isaac_ros_visual_slam/main/isaac_ros_visual_slam/package.xml&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s2">"https://raw.githubusercontent.com/NVIDIA-ISAAC-ROS/isaac_ros_visual_slam/main/isaac_ros_visual_slam/package.xml"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">       </span>-o<span class="w"> </span>/tmp/rosdep_ws/src/vslam/package.xml<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ROS_ROOT</span><span class="si">}</span>/setup.bash<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rosdep<span class="w"> </span>update<span class="w"> </span><span class="se">\</span>
@@ -1033,23 +1034,23 @@ your real <code class="docutils literal notranslate"><span class="pre">package.x
 <span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_ROOT</span><span class="o">=</span>/opt/ros/<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>
 
 <span class="c"># Pre-install rosdep dependencies using a shim package.xml.</span>
-<span class="c"># Copy the &lt;depend&gt; entries from your package&#39;s real package.xml.</span>
+<span class="c"># Copy the &lt;depend&gt; entries from your package's real package.xml.</span>
 <span class="k">RUN</span><span class="w"> </span>--mount<span class="o">=</span><span class="nv">type</span><span class="o">=</span>cache,target<span class="o">=</span>/var/cache/apt,sharing<span class="o">=</span>locked<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/tmp/rosdep_ws/src/deps<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;%s\n&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot;?&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;&lt;package format=&quot;3&quot;&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;name&gt;deps&lt;/name&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;version&gt;0.0.0&lt;/version&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;description&gt;Dependency shim&lt;/description&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;maintainer email=&quot;maintainer@example.com&quot;&gt;Maintainer&lt;/maintainer&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;license&gt;Apache-2.0&lt;/license&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;depend&gt;rclcpp&lt;/depend&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;depend&gt;sensor_msgs&lt;/depend&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;depend&gt;cv_bridge&lt;/depend&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;  &lt;depend&gt;tf2_ros&lt;/depend&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">       </span><span class="s1">&#39;&lt;/package&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s\n'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'&lt;?xml version="1.0"?&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'&lt;package format="3"&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;name&gt;deps&lt;/name&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;version&gt;0.0.0&lt;/version&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;description&gt;Dependency shim&lt;/description&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;maintainer email="maintainer@example.com"&gt;Maintainer&lt;/maintainer&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;license&gt;Apache-2.0&lt;/license&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;depend&gt;rclcpp&lt;/depend&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;depend&gt;sensor_msgs&lt;/depend&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;depend&gt;cv_bridge&lt;/depend&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'  &lt;depend&gt;tf2_ros&lt;/depend&gt;'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s1">'&lt;/package&gt;'</span><span class="w"> </span><span class="se">\</span>
 <span class="w">       </span>&gt;<span class="w"> </span>/tmp/rosdep_ws/src/deps/package.xml<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ROS_ROOT</span><span class="si">}</span>/setup.bash<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rosdep<span class="w"> </span>update<span class="w"> </span><span class="se">\</span>
@@ -1277,7 +1278,7 @@ stack together, so that user-level and workspace-level keys are combined at runt
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

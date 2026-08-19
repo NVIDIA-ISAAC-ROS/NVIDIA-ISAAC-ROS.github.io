@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -729,12 +729,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.4/index.html">release-4.4</a></dd>
         <dd><a href="isaac_ros_mission_client.html">release-4.5</a></dd>
+        <dd><a href="../../../../release-4.6/repositories_and_packages/isaac_ros_cloud_control/isaac_ros_mission_client/isaac_ros_mission_client.html">release-4.6</a></dd>
         <dd><a href="../../../../../repositories_and_packages/isaac_ros_cloud_control/isaac_ros_mission_client/isaac_ros_mission_client.html">latest</a></dd>
         <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../../release-3.1/index.html">release-3.1</a></dd>
-        <dd><a href="../../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.0/index.html">release-4.0</a></dd>
         <dd><a href="../../../../release-4.1/index.html">release-4.1</a></dd>
         <dd><a href="../../../../release-4.2/index.html">release-4.2</a></dd>
@@ -844,15 +845,15 @@ and <a class="reference internal" href="index.html#mission-client-build"><span c
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CONFIG_FILE</span><span class="o">=</span>/mosquitto.conf
 <span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$#</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;usage: </span><span class="nv">$0</span><span class="s2"> &lt;tcp_port&gt; &lt;websocket_port&gt;&quot;</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"usage: </span><span class="nv">$0</span><span class="s2"> &lt;tcp_port&gt; &lt;websocket_port&gt;"</span>
 <span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <span class="k">fi</span>
 <span class="nv">PORT</span><span class="o">=</span><span class="nv">$1</span>
 <span class="nv">PORT_WEBSOCKET</span><span class="o">=</span><span class="nv">$2</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;allow_anonymous true&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;listener </span><span class="nv">$PORT</span><span class="s2"> 0.0.0.0&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;listener </span><span class="nv">$PORT_WEBSOCKET</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;protocol websockets&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"allow_anonymous true"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"listener </span><span class="nv">$PORT</span><span class="s2"> 0.0.0.0"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"listener </span><span class="nv">$PORT_WEBSOCKET</span><span class="s2">"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"protocol websockets"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
 mosquitto<span class="w"> </span>-c<span class="w"> </span><span class="nv">$CONFIG_FILE</span>
 </pre></div>
 </div>
@@ -960,13 +961,13 @@ ARM64</label><div class="sd-tab-content docutils">
 <li><p>Open <cite>http://localhost:5000/docs</cite> in a web browser.</p></li>
 <li><p>Use the <cite>POST /robots</cite> endpoint to create robot objects. In the request body, use the following JSON as a starting point — replace <code class="docutils literal notranslate"><span class="pre">carter01</span></code> with your desired robot name:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;labels&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">  </span><span class="nt">&quot;battery&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;critical_level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
+<span class="w">  </span><span class="nt">"labels"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">"battery"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"critical_level"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;heartbeat_timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;switch_teleop&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;carter01&quot;</span>
+<span class="w">  </span><span class="nt">"heartbeat_timeout"</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"switch_teleop"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"carter01"</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -984,17 +985,17 @@ Delete the <code class="docutils literal notranslate"><span class="pre">prefix</
 endpoint. If the robots are connected, the state should reflect the actual position of the robots.</p></li>
 <li><p>Send a mission to the robot using the <cite>POST /mission</cite> endpoint. Use the following JSON as a starting point — replace <code class="docutils literal notranslate"><span class="pre">carter01</span></code> with the robot name you created in step 9, and set the <code class="docutils literal notranslate"><span class="pre">waypoints</span></code> to the destination pose:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;robot&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;carter01&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;mission_tree&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"robot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"carter01"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"mission_tree"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;move_to_goal&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;waypoints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"move_to_goal"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"parent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"root"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"waypoints"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;theta&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span>
+<span class="w">            </span><span class="nt">"x"</span><span class="p">:</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"y"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"theta"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span>
 <span class="w">          </span><span class="p">}</span>
 <span class="w">        </span><span class="p">]</span>
 <span class="w">      </span><span class="p">}</span>
@@ -1185,7 +1186,7 @@ This may help improve sensor synchronization.</p>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       
