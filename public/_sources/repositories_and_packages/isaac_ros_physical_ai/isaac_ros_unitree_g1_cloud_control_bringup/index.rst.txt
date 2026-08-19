@@ -1,0 +1,956 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_physical_ai> <isaac_ros_unitree_g1_cloud_control_bringup>`
+
+Overview
+--------
+
+Top-level launch file for VDA5050-based cloud control of the Unitree G1
+humanoid. It combines the AGILE locomotion policy and the GR00T 
+manipulation policy with the VDA5050 mission
+client, so a fleet management system (Isaac Mission Control / Mission Dispatch)
+can command navigation and manipulation over MQTT.
+
+The mission client dispatches navigation Orders to ``nav2`` and manipulation
+Orders through the
+:doc:`isaac_ros_humanoid_task_server </repositories_and_packages/isaac_ros_cloud_control/isaac_ros_humanoid_task_server/index>`
+action server, which opens a gate on the GR00T deploy pipeline output. GR00T
+Triton inference runs continuously, but its output only reaches the robot while
+a task is active. The robot stays balanced through AGILE at all times. The GR00T
+deploy pipeline ``isaac_ros_deploy``
+feeds the gate. ``ros2_control`` then applies commands to the G1 through the
+AGILE inference controller (legs/waist) and the upper-body controller
+(arms/hands).
+
+On real hardware the launch optionally brings up a camera with camera-based
+localization: **Visual SLAM (VSLAM)** provides
+visual odometry/SLAM and owns the ``map→odom`` transform, and **Visual
+Global Localization (VGL)** localizes against a prebuilt map. Together they
+supply odometry and a global pose to ``nav2``. The localization camera is the
+**Intel RealSense D435**.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/cloud_control_architecture.png>`
+   :width: 800px
+   :align: center
+   :alt: Unitree G1 cloud control architecture
+
+For background on missions, Orders, and the behavior-tree model used by the
+fleet system, refer to :doc:`/concepts/cloud_control/index`.
+
+Tutorial — Cloud Control of the Unitree G1
+------------------------------------------
+
+This tutorial:
+
+* brings up the Mission Control and Mission Dispatch cloud stack
+* launches the G1 robot stack with camera-based localization
+* submits a mission that navigates and then runs a GR00T manipulation task on real hardware
+
+.. note::
+
+   This tutorial has been tested on **Jetson AGX Thor** for real-robot
+   deployment. Simulation (Isaac Sim) is also supported on x86_64.
+   Refer to the **Isaac Sim** tabs in the map and launch steps below.
+
+Prerequisites
+^^^^^^^^^^^^^
+
+**Required for all targets** (real robot and Isaac Sim):
+
+- A host running the cloud stack (Docker + Docker Compose) reachable over the
+  network from the machine running the robot stack. Note its IP address (used
+  as ``mqtt_host_name``). Needed whenever ``enable_mission_client:=True``,
+  regardless of ``hardware_type``.
+
+**Real robot only**:
+
+- A Unitree G1 powered on and connected to the robot host through Ethernet.
+- The host-to-G1 network configured using the network setup script. If you have
+  not already, run the **Set up the network** step under the **Real Robot** tab
+  of
+  :ref:`Launch the application <isaac-ros-unitree-g1-teleop-launch>`
+  in the teleop doc. Note the interface it selects. You pass it to the launch as
+  ``network_interface``.
+- An Intel RealSense D435 mounted on the robot (the default localization
+  camera).
+- The real-hardware host prerequisites. This stack reuses the GR00T + AGILE
+  inference graph, so complete
+  :ref:`Real-Hardware Prerequisite Details <isaac-ros-unitree-g1-gr00t-real-hardware-prerequisites>`
+  (CUDA MPS and real-time scheduling, ``--ulimit rtprio=99``, on the Jetson AGX
+  Thor) before ``isaac-ros activate``.
+- GR00T manipulation through cloud control is supported on real hardware only.
+
+**Simulation only**:
+
+- An x86_64 host with an NVIDIA GPU and Isaac Sim installed. Set
+  ``ISAAC_PATH`` to the Isaac Sim install root (the directory that contains
+  ``isaac-sim.sh`` and ``python.sh``).
+- A prebuilt G1 navigation USD.
+- Isaac Sim supports navigation through cloud control. GR00T manipulation tasks
+  through cloud control are not supported in Isaac Sim.
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+The recommended Docker ``config.yaml`` for this workflow is the following:
+
+.. code:: yaml
+
+   docker:
+     image:
+       additional_image_keys:
+         - realsense
+         - gr00t_workflow
+
+Build ``isaac_ros_unitree_g1_cloud_control_bringup``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. Install and build ``isaac_ros_unitree_g1_cloud_control_bringup``:
+
+   .. tabs::
+
+      .. tab:: Binary Package
+
+         #. Activate the Isaac ROS environment:
+
+            .. code:: bash
+
+               isaac-ros activate
+
+         #. Install the prebuilt Debian package:
+
+            :ir_apt:
+
+            .. code:: bash
+
+               sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-unitree-g1-cloud-control-bringup
+
+      .. tab:: Build from Source
+
+         #. Install Git LFS:
+
+            .. code:: bash
+
+               sudo apt-get install -y git-lfs && git lfs install
+
+         #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS}/src && \
+                  git clone :ir_clone:`<isaac_ros_physical_ai>`
+
+         #. Activate the Isaac ROS environment:
+
+            .. code:: bash
+
+               isaac-ros activate
+
+         #. Use ``rosdep`` to install the package's dependencies:
+
+            :ir_apt:
+
+            .. code:: bash
+
+               rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup --ignore-src -y
+
+         #. Build the package from source:
+
+            .. code:: bash
+
+               cd ${ISAAC_ROS_WS}/ && \
+                  colcon build --symlink-install --packages-up-to isaac_ros_unitree_g1_cloud_control_bringup --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup
+
+         #. Source the ROS workspace:
+
+            .. note::
+
+               Repeat this step in **every** terminal created inside the Isaac ROS environment. Because you built this package from source, you must source the enclosing workspace for ROS to find the package's contents.
+
+            .. code:: bash
+
+               source install/setup.bash
+
+#. To use Isaac Sim, make Isaac ROS Deploy available and build the source-only
+   Isaac Sim extension package. Skip the clone if ``isaac_ros_deploy`` is
+   already present in ``${ISAAC_ROS_WS}/src``.
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}/src && \
+         git clone :ir_clone:`<isaac_ros_deploy>`
+      rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_deploy --ignore-src -y
+      cd ${ISAAC_ROS_WS}/ && \
+         colcon build --symlink-install --packages-up-to isaac_ros_deploy_isaac_sim_extension
+      source install/setup.bash
+
+#. Download and install the GR00T policy assets. ``rosdep`` does **not** pull
+   these, and they require EULA acceptance:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_gr00t_unitree_g1_install install_gr00t_unitree_g1.sh --eula
+
+   This downloads the model files to ``${ISAAC_ROS_WS}/isaac_ros_assets/``. Refer to
+   :doc:`isaac_ros_unitree_g1_gr00t </repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index>`
+   for details. These assets are required for real-hardware manipulation through
+   cloud control.
+
+Build a Map for Navigation
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Navigation requires a prebuilt map — an occupancy-map image (``.png``) and its
+``nav2`` metadata (``.yaml``). ``nav2`` on the robot consumes it through the ``map``
+launch argument, and Mission Control consumes it through ``map_file`` /
+``metadata_yaml``.
+
+.. note::
+
+   ``occupancy_map`` is just the example base name used throughout this tutorial.
+   The map files can be named anything. Only the references have to match. Point
+   the launch ``map`` argument and the Mission Control ``map_file`` /
+   ``metadata_yaml`` at your actual filenames, and make sure the ``image:`` field
+   inside the ``.yaml`` names its corresponding ``.png``.
+
+   If you do not pass the ``map`` launch argument, the launch uses the default
+   nav2 map installed by ``isaac_ros_vda5050_client_bringup``:
+   the :ir_repo:`carter_warehouse_navigation reference occupancy map <isaac_ros_cloud_control> <isaac_ros_vda5050_client_bringup/maps>`.
+   Use this map when running the sample Isaac Sim scene. For a different real
+   robot environment or Isaac Sim USD scene, use an occupancy map that matches
+   that environment and update the launch ``map`` argument plus the Mission
+   Control ``map_file`` / ``metadata_yaml`` paths.
+
+.. tabs::
+
+   .. tab:: Real Robot
+
+      If you don't already have a map, build one by following
+      :doc:`/concepts/visual_global_localization/tutorials/tutorial_map_creation`.
+
+      The map folder holds the ``occupancy_map.*`` plus the ``cuvslam_map/`` and
+      ``cuvgl_map/`` folders (used by VSLAM/VGL). Both the Mission Control config
+      (``map_file`` / ``metadata_yaml``) and the robot launch (``map_dir`` /
+      ``map``) consume it.
+
+
+   .. tab:: Isaac Sim
+
+      In simulation, camera localization is off (no VSLAM/VGL), so you only need
+      the ``occupancy_map.png`` / ``occupancy_map.yaml`` pair, without the
+      ``cuvslam_map/`` or ``cuvgl_map/`` folders. Generate it directly from the Isaac Sim scene with the
+      built-in **Occupancy Map Generator** (refer to
+      `Occupancy Map Generation <https://docs.isaacsim.omniverse.nvidia.com/latest/digital_twin/ext_isaacsim_asset_generator_occupancy_map.html>`__):
+
+      Pass the resulting ``occupancy_map.yaml`` to the robot launch as ``map``,
+      and copy ``occupancy_map.png`` / ``occupancy_map.yaml`` into the Mission
+      Control ``maps`` directory (``map_file`` / ``metadata_yaml``).
+
+Bring Up the Mission Control / Mission Dispatch Cloud Stack
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The robot connects to a fleet-management cloud stack over MQTT. The stack is
+defined in the
+`Isaac Mission Control <https://github.com/nvidia-isaac/isaac_mission_control>`__
+repository and includes the MQTT broker (Mosquitto), PostgreSQL, the mission
+database, Mission Dispatch, the waypoint-path generator, cuOpt, and the
+Mission Control service.
+
+#. On the cloud-stack host, clone the
+   `Isaac Mission Control <https://github.com/nvidia-isaac/isaac_mission_control>`__
+   repository and change into it:
+
+   .. code-block:: bash
+
+      git clone https://github.com/nvidia-isaac/isaac_mission_control.git
+      cd isaac_mission_control
+
+
+#. Configure Mission Control. The Mission Control service reads its config from
+   ``app/config/defaults.yaml`` (mounted into the container as
+   ``/tmp/config/defaults.yaml`` because ``CONFIG_DIR`` on the host is
+   bind-mounted to ``/tmp/config``). For the G1 you mainly need to update the **map references**
+   and the **robot name**:
+
+   .. code-block:: yaml
+
+      robots:
+        - name: "g1_0"
+          labels: ["test", "ros"]
+          heartbeat_timeout: 30
+      map:
+        map_file: "/tmp/config/maps/occupancy_map.png"
+        metadata_yaml: "/tmp/config/maps/occupancy_map.yaml"
+
+   .. note::
+
+      For the sample Isaac Sim scene, copy the :ir_repo:`carter_warehouse_navigation reference occupancy map <isaac_ros_cloud_control> <isaac_ros_vda5050_client_bringup/maps>`
+      into ``config/maps`` and use:
+
+      .. code-block:: yaml
+
+         map:
+           map_file: "/tmp/config/maps/carter_warehouse_navigation.png"
+           metadata_yaml: "/tmp/config/maps/carter_warehouse_navigation.yaml"
+
+   Set the robot ``name`` under ``robots:`` to match the ``serial_number`` you
+   launch with (``g1_0`` in this tutorial). The map directory ``config/maps`` on
+   the host is mounted at ``/tmp/config/maps`` in the container, so ``map_file``
+   and ``metadata_yaml`` must point at paths **under that mounted directory**
+   (``/tmp/config/maps/...``), not host paths. Place the ``occupancy_map.png``
+   and ``occupancy_map.yaml`` from your map folder there. Use the same map folder
+   you pass to the robot launch as ``map_dir`` / ``map`` (refer to
+   :ref:`Launch the Robot Stack <launch-the-robot-stack>`).
+
+#. From the root of the cloned repository, start the stack, including the
+   Mission Control service, with the ``enable_mission_control`` profile:
+
+   .. code-block:: bash
+
+      docker compose -f docker-compose/bringup_services.yaml \
+          --profile enable_mission_control up
+
+   This launches:
+
+   - **mosquitto** — the MQTT broker the robot connects to (TCP + WebSocket
+     listeners).
+   - **postgres** + **mission-database** — persistence and the database API.
+   - **mission-dispatch** — translates missions into VDA5050 Orders and tracks
+     robot/mission state.
+   - **wpg** + **cuopt** — waypoint-path generation and route optimization.
+   - **mission-control** — the orchestration service and UI
+     (``enable_mission_control`` profile).
+
+   .. note::
+
+      All services use ``network_mode: host``. Note the **IP address of this
+      host**. You pass it to the robot launch as ``mqtt_host_name`` so the
+      VDA5050 client connects to this broker. The robot host and the cloud-stack
+      host must be on the same reachable network.
+
+   .. note::
+
+      When you are finished with the tutorial, bring the stack down from the
+      root of the repository using the following command:
+
+      .. code-block:: bash
+
+         docker compose -f docker-compose/bringup_services.yaml \
+             --profile enable_mission_control down
+
+.. _launch-the-robot-stack:
+
+Launch the Robot Stack
+^^^^^^^^^^^^^^^^^^^^^^
+
+Inside the Isaac ROS environment, launch the cloud control stack. On the robot
+host, use this for real hardware. Alongside a running Isaac Sim instance, use
+it for simulation.
+
+.. tabs::
+
+   .. tab:: Real Robot
+
+      .. note::
+
+         In **every** terminal used for the real-robot procedure, source the ROS
+         environment before running any ``ros2 launch``, ``ros2 topic``, or
+         ``ros2 param`` command.
+
+         For a Debian package installation, source the ROS environment:
+
+         .. code-block:: bash
+
+            source /opt/ros/:ir_ros_distro:/setup.bash
+
+         If you followed **Build from Source**, source the workspace overlay:
+
+         .. code-block:: bash
+
+            source "${ISAAC_ROS_WS}/install/setup.bash"
+
+      .. note::
+
+         Set ``MAP_DIR`` to your map folder (the one holding ``cuvslam_map/``,
+         ``cuvgl_map/``, and ``occupancy_map.yaml``). Replace
+         ``<cloud-stack-host-ip>`` with the IP of your cloud-stack host, and
+         ``<network_interface>`` with the interface selected during the network
+         setup step (refer to Prerequisites). Set ``serial_number`` to your robot's
+         serial (``g1_0`` in this tutorial).
+
+      .. note::
+
+         If VGL reports that its TensorRT engine files cannot be found, follow
+         :ref:`Export TensorRT Engine Files <export_tensorrt_engine_files>` in
+         :doc:`Tutorial: Localization with cuVGL </concepts/visual_global_localization/tutorials/tutorial_cuvgl_localization>`
+         to build the engine files inside the Isaac ROS environment. Set
+         ``VGL_MODEL_DIR`` below to the same output directory used for
+         ``OUTPUT_MODEL_DIR`` in that tutorial. The cloud-control launch argument
+         ``vgl_model_dir`` must point to this directory when using the generated
+         engine files.
+
+      .. code-block:: bash
+
+         export MAP_DIR=/path/to/map_folder   # contains cuvslam_map/, cuvgl_map/, occupancy_map.yaml
+         export VGL_MODEL_DIR=/path/to/output_model_dir   # contains the generated VGL engine files
+
+         ros2 launch isaac_ros_unitree_g1_cloud_control_bringup unitree_g1_cloud_control.launch.py \
+             hardware_type:=real \
+             network_interface:=<network_interface> \
+             use_sim_time:=False \
+             enable_camera_localization:=true \
+             enable_vgl:=true \
+             enable_vslam:=true \
+             use_foxglove:=true \
+             camera_name:=realsense_d435_rgb \
+             map_dir:="$MAP_DIR" \
+             vgl_model_dir:="$VGL_MODEL_DIR" \
+             map:="$MAP_DIR"/occupancy_map.yaml \
+             enable_mission_client:=True \
+             mqtt_host_name:=<cloud-stack-host-ip> \
+             mqtt_port:=1883 \
+             serial_number:=g1_0
+
+      .. note::
+
+         During startup, ``visual_global_localization_node`` might report that it
+         cannot look up transforms between the RealSense optical frames and
+         ``pelvis`` because they are not yet part of the same TF tree. It is normal
+         to observe these messages for a few seconds while the camera transforms
+         become available; they stop after the TF tree is connected.
+
+      After launch, while both safety controllers are still disabled
+      (``blend_ratio=0.0``) and the robot is idle, open Foxglove Studio,
+      connect to the robot's ``foxglove_bridge`` (``ws://<robot-host-ip>:8765``),
+      and import the bundled layout
+      ``foxglove_layouts/foxglove_layout_cloud_control.json`` from this package
+      (**Layouts > Import from file…**). Use it to confirm the **RealSense
+      camera feed** is streaming and that the robot is **localized correctly**
+      (VSLAM/VGL has converged and the robot's pose on the occupancy map matches
+      its true position in the space) before enabling the policies or sending a
+      ``route``.
+
+   .. tab:: Isaac Sim
+
+      Start Isaac Sim **first** with the G1 navigation USD loaded through the Isaac
+      ROS Deploy Isaac Sim extension, then press **Play**. Then launch the
+      cloud control stack with ``hardware_type:=isaacsim``.
+
+      #. Set the Isaac Sim deploy-extension environment and point ``DEPLOY_USD``
+         at the production prebuilt G1 navigation USD. The prebuilt
+         USD already includes the Isaac ROS Deploy actuator and ROS 2 bridge graphs,
+         so you do not need to run the USD baker steps from the Isaac ROS Deploy
+         docs. To rebuild or customize the USD, refer to the Isaac Sim sections of
+         :doc:`Isaac ROS Deploy AGILE tutorial </repositories_and_packages/isaac_ros_deploy/tutorials/deploy_agile>`
+         and
+         :doc:`Isaac ROS Deploy Bring Your Own Embodiment guide </repositories_and_packages/isaac_ros_deploy/how_to_guides/bring_your_own_embodiment>`.
+
+         .. code-block:: bash
+
+            export DEPLOY_USD=https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Samples/ROS2/Scenario/g1_ros_navigation.usd
+            export PYTHONPATH=${ISAAC_ROS_WS}/src/isaac_ros_deploy/isaac_deploy/isaac_ros_deploy_isaac_sim_extension:$PYTHONPATH
+            export LD_LIBRARY_PATH=$ISAAC_PATH/exts/isaacsim.ros2.core/:ir_ros_distro:/lib:$LD_LIBRARY_PATH
+            export ROS_DISTRO=:ir_ros_distro:
+            export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+
+      #. Launch Isaac Sim with the deploy extension and the prebuilt deploy USD.
+         Point ``--ext-folder`` at the source extension
+         directory, ``${ISAAC_ROS_WS}/src/isaac_ros_deploy/isaac_deploy/isaac_ros_deploy_isaac_sim_extension``.
+
+         .. code-block:: bash
+
+            $ISAAC_PATH/isaac-sim.sh \
+                --ext-folder ${ISAAC_ROS_WS}/src/isaac_ros_deploy/isaac_deploy/isaac_ros_deploy_isaac_sim_extension \
+                --enable isaac_ros_deploy_isaac_sim_extension \
+                --/exts/isaac_ros_deploy_isaac_sim_extension/usd=${DEPLOY_USD}
+
+      #. Wait until the Isaac Sim log prints ``app ready``, then press
+         **Play**.
+
+         .. important::
+
+            Pressing **Play** starts the physics timeline and the ROS 2 bridge. Until
+            the timeline is running, the simulation clock does not advance, live
+            joint-state and IMU data are not produced, and the controllers may wait
+            or time out. The virtual gantry also applies support during physics
+            steps, so do not disengage it until the policy is active and balancing.
+
+      #. Open **another** sourced terminal and launch the cloud control stack:
+
+         .. note::
+
+            Replace ``<cloud-stack-host-ip>`` with the IP of your cloud-stack host,
+            and set ``map`` to the ``occupancy_map.yaml`` you generated from the sim
+            scene. ``use_sim_time:=True`` because Isaac Sim publishes ``/clock``.
+            Camera localization is off. Odometry is provided by Isaac Sim while the
+            launch publishes the static ``map→odom`` anchor at ``init_pose_*``
+            (set these to match where the robot spawns in the scene). Set
+            ``serial_number`` to your robot's serial (``g1_0`` in this tutorial).
+
+         .. code-block:: bash
+
+            ros2 launch isaac_ros_unitree_g1_cloud_control_bringup unitree_g1_cloud_control.launch.py \
+                hardware_type:=isaacsim \
+                use_sim_time:=True \
+                enable_camera_localization:=false \
+                use_static_tf:=True \
+                use_foxglove:=false \
+                enable_mission_client:=True \
+                map:=/path/to/occupancy_map.yaml \
+                mqtt_host_name:=<cloud-stack-host-ip> \
+                mqtt_port:=1883 \
+                serial_number:=g1_0 \
+                init_pose_x:=0.0 init_pose_y:=0.0 init_pose_yaw:=0.0
+
+      #. Open **another** sourced terminal and enable the AGILE locomotion policy:
+
+         .. code-block:: bash
+
+            ros2 param set /safety_controller_lower_body blend_ratio 1.0
+
+      #. Open **another** sourced terminal and send zero-velocity commands to
+         activate the AGILE inference controller and start balancing:
+
+         .. code-block:: bash
+
+            ros2 topic pub /cmd_vel geometry_msgs/msg/Twist '{}'
+
+         Verify that the policy is balancing the robot before proceeding.
+
+      #. After the policy is balancing, focus the Isaac Sim viewport and press
+         **G** to disengage the virtual gantry and let the robot stand on its
+         own. Stop the manual velocity publisher before submitting a cloud
+         navigation mission so that it does not compete with navigation
+         commands.
+
+Enable the Policies (Real Robot Only)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This stack uses the same two safety controllers as the GR00T deploy stack:
+``/safety_controller_lower_body`` gates the AGILE locomotion policy and
+``/safety_controller_upper_body`` gates the GR00T manipulation policy.
+
+On real hardware both safety controllers default to ``blend_ratio=0.0``
+(disabled). Review the real-hardware safety and abort guidance in
+:ref:`the GR00T deploy Launch section <isaac-ros-unitree-g1-gr00t-launch>`.
+
+.. note::
+
+   Navigation and manipulation cannot currently be combined or chained in the
+   same cloud mission. Submit them as separate mission runs:
+
+   * For a navigation run, leave the upper-body controller disabled and submit
+     only the navigation mission.
+   * For a manipulation run, complete the robot and workspace setup in
+     :ref:`Manipulation Missions <isaac-ros-unitree-g1-cloud-control-manipulation-policies>`,
+     enable the upper-body controller, and then submit only the manipulation
+     mission.
+
+Navigation Missions
+~~~~~~~~~~~~~~~~~~~
+
+Use this sequence only for navigation missions.
+
+#. Open **another** sourced terminal and enable the lower-body policy first:
+
+   .. code-block:: bash
+
+      ros2 param set /safety_controller_lower_body blend_ratio 1.0
+
+#. Open **another** sourced terminal and publish a zero twist to activate the
+   AGILE inference controller:
+
+   .. code-block:: bash
+
+      ros2 topic pub /cmd_vel geometry_msgs/msg/Twist '{}'
+
+   Leave this publisher running and confirm that the robot is stably balancing
+   before proceeding. Then stop the manual zero-twist publisher so that it does
+   not compete with cloud navigation commands.
+
+.. _isaac-ros-unitree-g1-cloud-control-manipulation-policies:
+
+Manipulation Missions
+~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+   Before enabling **either** controller for the bundled apple-to-plate
+   manipulation mission:
+
+   * Position G1 directly in front of the table with the workspace in reach.
+   * Rest the robot's hands flat on the tabletop and keep them above the table
+     edge while enabling the controllers.
+   * Place the apple and plate in front of the robot on the table.
+   * Confirm that the live RealSense view shows the apple, plate, and table within
+     reach.
+
+   Do not continue until the robot and workspace are in the required pose. For
+   complete safety and camera-verification guidance, refer to the
+   :ref:`GR00T real-robot launch instructions <isaac-ros-unitree-g1-gr00t-launch>`.
+
+#. Open **another** sourced terminal after completing that setup and enable the
+   lower-body policy:
+
+   .. code-block:: bash
+
+      ros2 param set /safety_controller_lower_body blend_ratio 1.0
+
+#. In the same sourced terminal, enable the upper-body policy:
+
+   .. code-block:: bash
+
+      ros2 param set /safety_controller_upper_body blend_ratio 1.0
+
+   Enabling the upper-body controller immediately gives the GR00T policy control
+   of the arms. After the manipulation mission completes, set the upper-body
+   ``blend_ratio`` back to ``0.0``:
+
+   .. code-block:: bash
+
+      ros2 param set /safety_controller_upper_body blend_ratio 0.0
+
+For Isaac Sim, cloud control supports navigation only.
+
+Submit a Mission
+^^^^^^^^^^^^^^^^
+
+With the cloud stack up and the robot registered and balancing, submit a
+mission.
+
+For a **navigation** mission in an open environment, such as the sample Isaac
+Sim scene, submit the destination directly to Mission Dispatch. This lets you
+send a goal pose without first defining a waypoint graph. For structured
+environments that use waypoint-based routing, refer to the Mission Control
+option below.
+
+Open the Mission Dispatch interactive API reference (Swagger) at
+``http://<host_ip>:5002/docs``, where ``<host_ip>`` is the cloud-stack host.
+Before submitting a mission, choose a destination pose on a free (non-obstacle)
+cell of the loaded map. The coordinates below are an example.
+
+Submit the route to the Mission Dispatch ``POST /mission`` endpoint:
+
+.. code-block:: json
+
+   {
+       "robot": "g1_0",
+       "mission_tree": [
+           {
+               "name": "goto",
+               "parent": "root",
+               "route": {
+                   "waypoints": [
+                       {
+                           "x": 2.0,
+                           "y": 0.0,
+                           "theta": 0.0,
+                           "map_id": "map"
+                       }
+                   ]
+               }
+           }
+       ],
+       "timeout": 300
+   }
+
+Set ``robot`` to the same value as the launch ``serial_number`` and update the
+waypoint pose for the desired destination.
+
+**Mission Control option:** Use Mission Control to plan and optimize a route through
+multiple waypoints. Use the **Waypoint Selection Tool** to select free cells on
+the loaded map and generate the route. The
+:doc:`Isaac Mission Control Tutorial </repositories_and_packages/isaac_ros_cloud_control/isaac_ros_mission_client/tutorial_isaac_mission_control>`
+walks through loading a map, selecting waypoints, visualizing the route, and
+submitting a mission.
+
+Submit the route through the Mission Control UI or to the
+``POST /mission/submit_mission`` endpoint. The Mission Control interactive API
+reference is at ``http://<host_ip>:8050/api/v1/docs``, where ``<host_ip>`` is
+the cloud-stack host. For example:
+
+.. code-block:: json
+
+   {
+       "route": [
+           {
+               "x": 2.0,
+               "y": 0.0
+           },
+           {
+               "x": 4.0,
+               "y": 2.0
+           }
+       ],
+       "iterations": 1,
+       "timeout": 3600,
+       "solver": "NVIDIA_CUOPT",
+       "teleop": []
+   }
+
+The coordinates are placeholders. Verify every waypoint against the loaded map
+before submitting the mission.
+
+For **real robot only**, a **manipulation** mission is exposed as a VDA5050
+``ACTION`` node with ``action_type: humanoid_manipulation``. Submit the
+Objective to the Mission Control ``POST /objective/submit_objective`` endpoint
+or through the Mission Control UI. Refer to the
+`Mission Control Objectives guide <https://github.com/nvidia-isaac/isaac_mission_control/blob/main/docs/objectives_doc.md>`__
+for the full schema. The Mission Control interactive API reference is at
+``http://<host_ip>:8050/api/v1/docs``, where ``<host_ip>`` is the cloud-stack
+host.
+
+Example request:
+
+.. code-block:: json
+
+   {
+       "node_class": "BEHAVIOR",
+       "node_type": "ACTION",
+       "parameters": {
+           "robot_name": "g1_0",
+           "action_type": "humanoid_manipulation",
+           "action_parameters": {
+               "task_category": "manipulation",
+               "task_id": "apple_to_plate",
+               "language_instruction": "pick up the apple and place it on the plate",
+               "timeout": "30.0"
+           }
+       }
+   }
+
+.. note::
+
+   GR00T manipulation tasks through cloud control are supported on real hardware
+   only. Isaac Sim supports navigation missions through cloud control.
+
+.. note::
+
+   In the current bridge, only ``timeout`` affects execution. It sets how long
+   the GR00T output gate stays open. ``task_category``, ``task_id``, and
+   ``language_instruction`` are carried through and logged (and echoed in action
+   feedback) but do **not** select or condition the policy: the active policy is
+   fixed by the ``controller_group`` launch argument. They are accepted for
+   forward compatibility, so keep them meaningful.
+
+
+API
+---
+
+Usage
+^^^^^
+
+.. code-block:: bash
+
+   ros2 launch isaac_ros_unitree_g1_cloud_control_bringup unitree_g1_cloud_control.launch.py
+
+Launch Arguments
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Type
+     - Default
+     - Description
+   * - ``hardware_type``
+     - ``string``
+     - ``mujoco``
+     - Hardware platform. Options: ``mujoco`` and ``isaacsim`` (simulation),
+       ``real`` (physical robot).
+   * - ``enable_viewer``
+     - ``bool``
+     - ``true``
+     - [MuJoCo only] Enable the MuJoCo viewer GUI.
+   * - ``network_interface``
+     - ``string``
+     - ``eno1``
+     - [Real hardware only] Network interface for G1 communication.
+   * - ``use_foxglove``
+     - ``bool``
+     - ``true``
+     - Start the Foxglove Studio bridge for visualization.
+   * - ``use_sim_time``
+     - ``bool``
+     - ``True``
+     - Use the simulation clock (``True`` for MuJoCo/Isaac Sim, ``False`` for
+       real hardware).
+   * - ``controller_group``
+     - ``string``
+     - ``gr00t_n17_apple_to_plate``
+     - Controller group from ``unitree_g1_bringup/config/controller_groups.yaml``.
+       Use ``agile_velocity`` for Isaac Sim navigation-only launches.
+   * - ``serial_number``
+     - ``string``
+     - ``g1_0``
+     - VDA5050 robot serial number (used to construct MQTT topics). Must match the
+       robot registered in the fleet system (for example, ``g1_0``).
+   * - ``base_frame``
+     - ``string``
+     - ``pelvis``
+     - Robot base frame for TF lookups and ``nav2``.
+   * - ``enable_mission_client``
+     - ``bool``
+     - ``True``
+     - Launch the VDA5050 mission client + MQTT bridge + ``nav2`` (and the
+       ``map_server`` feeding it). Set ``False`` to run the robot stack
+       standalone (GR00T/AGILE + gate + action server) with no cloud connection.
+   * - ``map``
+     - ``string``
+     - ``maps/carter_warehouse_navigation.yaml``
+     - Full path to the nav2 map file (occupancy map).
+   * - ``nav_params_file``
+     - ``string``
+     - ``humanoid_navigation.yaml``
+     - Full path to the ``nav2`` params file.
+   * - ``use_static_tf``
+     - ``bool``
+     - ``True``
+     - Publish a static ``map``→``odom`` TF (use ``True`` for a humanoid without
+       wheel odometry). Forced ``False`` when ``enable_camera_localization`` is
+       ``True`` (VSLAM owns ``map``→``odom``).
+   * - ``init_pose_x``
+     - ``double``
+     - ``0.0``
+     - Initial robot X position on the map (meters).
+   * - ``init_pose_y``
+     - ``double``
+     - ``0.0``
+     - Initial robot Y position on the map (meters).
+   * - ``init_pose_yaw``
+     - ``double``
+     - ``0.0``
+     - Initial robot yaw on the map (radians).
+   * - ``enable_camera_localization``
+     - ``bool``
+     - ``false``
+     - [Real hardware only] Launch the camera + VSLAM + VGL for camera-based
+       localization. Requires ``map_dir``.
+   * - ``camera_name``
+     - ``string``
+     - ``realsense_d435_rgb``
+     - [Camera localization] Camera name. Also used to find params under
+       ``params/<camera_name>/``.
+   * - ``localization_cameras``
+     - ``string``
+     - ``camera_name``
+     - [Camera localization] Comma-separated camera(s) feeding VSLAM/VGL.
+       Defaults to ``camera_name``. Set explicitly only for multi-camera
+       localization where the localizer inputs differ from ``camera_name``.
+   * - ``map_dir``
+     - ``string``
+     - ``""``
+     - [Camera localization] Folder containing ``cuvslam_map/`` and ``cuvgl_map/``.
+   * - ``enable_vslam``
+     - ``bool``
+     - ``true``
+     - [Camera localization] Enable VSLAM (visual odometry + optional SLAM).
+   * - ``enable_vgl``
+     - ``bool``
+     - ``true``
+     - [Camera localization] Enable Visual Global Localization.
+
+The included ``isaac_ros_vda5050_client.launch.py`` declares the following
+arguments, which the launch command reads:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Type
+     - Default
+     - Description
+   * - ``mqtt_host_name``
+     - ``string``
+     - ``localhost``
+     - IP/hostname of the MQTT broker (the cloud-stack host).
+   * - ``mqtt_port``
+     - ``int``
+     - ``1883``
+     - Port of the MQTT broker to connect to.
+
+Dependencies
+^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Package
+     - Role
+   * - ``unitree_g1_bringup``
+     - Controller manager, AGILE + GR00T inference graph.
+   * - ``isaac_ros_humanoid_task_server``
+     - GR00T output gate and humanoid task action server.
+   * - ``isaac_ros_unitree_g1_gr00t``
+     - GR00T deploy launch building blocks (also provides the RealSense driver dependency).
+   * - ``isaac_ros_deploy_isaac_sim_extension``
+     - Isaac Sim deploy extension used to load the prebuilt G1 navigation USD.
+   * - ``isaac_ros_vda5050_client_bringup``
+     - VDA5050 client, MQTT bridge, and ``nav2``.
+   * - ``isaac_ros_visual_slam`` / ``isaac_ros_visual_global_localization`` / ``isaac_ros_visual_mapping``
+     - Camera-based localization (when ``enable_camera_localization:=true``).
+
+Troubleshooting
+---------------
+
+Velocity Safety Check Triggers During Freeze Controller Switch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Problem
+~~~~~~~
+
+The safety controller can detect a joint velocity above its configured
+``max_velocity`` threshold while handing control to the emergency hold
+controller.
+
+Symptom
+~~~~~~~
+
+The launch logs a velocity safety failure, requests ``freeze_controller``, and
+then reports a successful controller switch:
+
+.. code-block:: text
+
+   Safety emergency latched: Velocity safety check failed: max velocity 35.72 rad/s exceeds threshold 35.00 rad/s in input 'joint_velocities'. Requesting emergency controller 'freeze_controller'
+   Activating controllers: [ freeze_controller ]
+   Deactivating controllers: [ joint_command_broadcaster safety_controller inference_controller upper_body_forward_joint_command_controller ]
+   FreezeController activated - holding 43 joints using impedance control
+   Successfully switched controllers!
+
+The final ``Successfully switched controllers!`` message means the emergency
+switch to ``freeze_controller`` succeeded. The launch is still in a latched
+safety state because the measured joint velocity exceeded ``max_velocity``.
+
+Solution
+~~~~~~~~
+
+If this happens while switching directly to ``freeze_controller`` and the spike
+is expected, increase only the installed safety velocity-threshold
+``max_velocity`` value in the ``unitree_g1_bringup`` controller configuration and
+relaunch:
+
+.. code-block:: bash
+
+   PKG_PREFIX=$(ros2 pkg prefix unitree_g1_bringup)
+   CONFIG="${PKG_PREFIX}/share/unitree_g1_bringup/config/controller_manager.yaml"
+
+   grep -n -A4 "velocity_threshold" "${CONFIG}"
+   sudo cp "${CONFIG}" "${CONFIG}.bak"
+   sudo sed -i 's/max_velocity: 35.0/max_velocity: 40.0/g' "${CONFIG}"
+
+In the ``safety_controller`` configuration block, update only
+``out_of_domain_detection.velocity_threshold.max_velocity``. For example, change
+``max_velocity: 35.0`` to ``max_velocity: 40.0``. If the log names
+``safety_controller_lower_body`` or ``safety_controller_upper_body`` instead,
+update the matching controller block.
+
+Only raise this threshold after confirming the velocity spike is caused by the
+expected controller transition and not by unstable robot or simulation behavior.
+Fully restart the launch after editing the file; changing the YAML on disk does
+not clear an already latched emergency.
+
+.. |package_name| replace:: ``isaac_ros_unitree_g1_cloud_control_bringup``

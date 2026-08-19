@@ -3544,7 +3544,7 @@ for <code class="docutils literal notranslate"><span class="pre">run_dev.sh</spa
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CONFIG_IMAGE_KEY</span><span class="o">=</span>ros2_humble.mine
 <span class="nv">CONFIG_DOCKER_SEARCH_DIRS</span><span class="o">=(</span>../ros_ws/src/isaac_ros_common/docker<span class="w"> </span>../lib/src/gxf/docker<span class="o">)</span>
 <span class="nv">CONFIG_CONTAINER_NAME_SUFFIX</span><span class="o">=</span>mysuffix
-<span class="nv">BASE_DOCKER_REGISTRY_NAMES</span><span class="o">=(</span><span class="s2">&quot;nvcr.io/isaac/ros&quot;</span><span class="w"> </span><span class="s2">&quot;some.other/image/name&quot;</span><span class="o">)</span>
+<span class="nv">BASE_DOCKER_REGISTRY_NAMES</span><span class="o">=(</span><span class="s2">"nvcr.io/isaac/ros"</span><span class="w"> </span><span class="s2">"some.other/image/name"</span><span class="o">)</span>
 </pre></div>
 </div>
 <p>For example, if you had the following directory structure:</p>
@@ -3570,7 +3570,7 @@ for <code class="docutils literal notranslate"><span class="pre">run_dev.sh</spa
 <p>You could then extend the base image launched as a container by
 <code class="docutils literal notranslate"><span class="pre">run_dev.sh</span></code> as follows.</p>
 <p><code class="docutils literal notranslate"><span class="pre">~/.isaac_ros_common-config</span></code></p>
-<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span>CONFIG_IMAGE_KEY<span class="p">=</span><span class="s2">&quot;ros2_humble.mine&quot;</span>
+<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span>CONFIG_IMAGE_KEY<span class="p">=</span><span class="s2">"ros2_humble.mine"</span>
 CONFIG_DOCKER_SEARCH_DIRS<span class="p">=(</span>workspaces<span class="sr">/isaac_ros-dev/</span>ros_ws/mystuff<span class="p">)</span>
 </pre></div>
 </div>
@@ -3592,7 +3592,7 @@ An example <code class="docutils literal notranslate"><span class="pre">.isaac_r
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CONFIG_IMAGE_KEY</span><span class="o">=</span>ros2_humble.mine
 <span class="nv">CONFIG_DOCKER_SEARCH_DIRS</span><span class="o">=(</span>../ros_ws/src/isaac_ros_common/docker<span class="w"> </span>../lib/src/gxf/docker<span class="o">)</span>
 <span class="nv">CONFIG_CONTAINER_NAME_SUFFIX</span><span class="o">=</span>mysuffix
-<span class="nv">BASE_DOCKER_REGISTRY_NAMES</span><span class="o">=(</span><span class="s2">&quot;nvcr.io/isaac/ros&quot;</span><span class="w"> </span><span class="s2">&quot;some.other/image/name&quot;</span><span class="o">)</span>
+<span class="nv">BASE_DOCKER_REGISTRY_NAMES</span><span class="o">=(</span><span class="s2">"nvcr.io/isaac/ros"</span><span class="w"> </span><span class="s2">"some.other/image/name"</span><span class="o">)</span>
 </pre></div>
 </div>
 </section>
@@ -3613,15 +3613,15 @@ You can also configure a launch file to run by default each time the container i
 There are more options for you to customize how the final build image will be assembled with your build products.</p>
 <p>For a complete description of arguments for <code class="docutils literal notranslate"><span class="pre">docker_deploy.sh</span></code>, see <a class="reference internal" href="../../repositories_and_packages/isaac_ros_common/index.html#api-docker-deploy-sh"><span class="std std-ref">here</span></a>.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span>PATH_TO_ISAAC_ROS_COMMON/scripts/docker_deploy.sh<span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>--base_image_key<span class="w"> </span><span class="s2">&quot;aarch64.ros2_humble&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>--custom_apt_source<span class="w"> </span><span class="s2">&quot;deb https://mycool-apt-get-server.com/ros-debian-local focal main&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>--install_debians<span class="w"> </span><span class="s2">&quot;mydebian01,libnvvpi3,tensorrt&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--base_image_key<span class="w"> </span><span class="s2">"aarch64.ros2_humble"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--custom_apt_source<span class="w"> </span><span class="s2">"deb https://mycool-apt-get-server.com/ros-debian-local focal main"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--install_debians<span class="w"> </span><span class="s2">"mydebian01,libnvvpi3,tensorrt"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>--include_dir<span class="w"> </span>/workspaces/isaac_ros-dev/tests<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>--include_dir<span class="w"> </span>/home/admin/scripts:/home/admin/scripts<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>--ros_ws<span class="w"> </span>/workspaces/isaac_ros-dev/ros_ws<span class="w">  </span><span class="se">\</span>
-<span class="w">   </span>--launch_package<span class="w"> </span><span class="s2">&quot;isaac_ros_image_proc&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>--launch_file<span class="w"> </span><span class="s2">&quot;isaac_ros_image_flip.launch.py&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>--name<span class="w"> </span><span class="s2">&quot;my_docker_registry.io/myimage&quot;</span>
+<span class="w">   </span>--launch_package<span class="w"> </span><span class="s2">"isaac_ros_image_proc"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--launch_file<span class="w"> </span><span class="s2">"isaac_ros_image_flip.launch.py"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--name<span class="w"> </span><span class="s2">"my_docker_registry.io/myimage"</span>
 </pre></div>
 </div>
 <p>In this example, a Docker image named <code class="docutils literal notranslate"><span class="pre">my_docker_registry.io/myimage</span></code> will be built by configuring one custom <code class="docutils literal notranslate"><span class="pre">apt</span></code> sources, installing three Debians packages, and packaging two host directories and a ROS workspace at <code class="docutils literal notranslate"><span class="pre">/workspaces/isaac_ros-dev/ros_ws</span></code> on top of a base image built using the key <code class="docutils literal notranslate"><span class="pre">aarch64.ros2_humble</span></code>.
@@ -3646,7 +3646,7 @@ Finally, a launch file and its package were configured to run by default when th
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2026, NVIDIA.
-      <span class="lastupdated">Last updated on Jul 08, 2026.
+      <span class="lastupdated">Last updated on Aug 18, 2026.
       </span></p>
   </div>
 
@@ -3683,12 +3683,13 @@ Finally, a launch file and its package were configured to run by default when th
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
+            <dd><a href="index.html">release-3.2</a></dd>
             <dd><a href="../../../release-4.4/index.html">release-4.4</a></dd>
             <dd><a href="../../../release-4.5/index.html">release-4.5</a></dd>
+            <dd><a href="../../../release-4.6/index.html">release-4.6</a></dd>
             <dd><a href="../../../../index.html">latest</a></dd>
             <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
             <dd><a href="../../../release-3.1/concepts/docker_devenv/index.html">release-3.1</a></dd>
-            <dd><a href="index.html">release-3.2</a></dd>
             <dd><a href="../../../release-4.0/index.html">release-4.0</a></dd>
             <dd><a href="../../../release-4.1/index.html">release-4.1</a></dd>
             <dd><a href="../../../release-4.2/index.html">release-4.2</a></dd>

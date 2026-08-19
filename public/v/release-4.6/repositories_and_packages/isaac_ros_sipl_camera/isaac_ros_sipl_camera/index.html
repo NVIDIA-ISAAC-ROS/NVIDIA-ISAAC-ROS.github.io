@@ -1,0 +1,2026 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>isaac_ros_sipl_camera &#8212; Isaac ROS</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css?v=a5c4661c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/isaac.css?v=177ef1d8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=01823362"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script src="../../../_static/tabs.js?v=3030b3cb"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script>mermaid.initialize({"startOnLoad": true})</script>
+    <link rel="icon" href="../../../_static/isaac_ros_logo.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Isaac ROS Teleop" href="../../isaac_ros_teleop/index.html" />
+    <link rel="prev" title="Isaac ROS SIPL Camera" href="../index.html" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../getting_started/index.html">Getting Started</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../getting_started/compute/index.html">Compute Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/compute/jetson_storage.html">Jetson Storage Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/compute/preempt_setup.html">PREEMPT_RT Kernel for Jetson</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../getting_started/sensors/index.html">Sensors Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/realsense_setup.html">Isaac ROS RealSense Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/zed_setup.html">Isaac ROS ZED Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/eagle_setup.html">Isaac ROS Eagle CoE Stereo Camera Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/hawk_setup.html">Isaac ROS Hawk GMSL Stereo Camera Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/camera_calibration.html">Monocular Camera Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/isaac_for_manipulation_camera_calibration.html">Isaac for Manipulation Camera Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting_started/sensors/amr_extrinsic_calibration.html">Extrinsic Calibration for Mobile Robots</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference_workflows/index.html">Reference Workflows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/index.html">Isaac for Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/reference_architecture.html">Isaac for Manipulation Reference Architecture</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper.html">Setup Hardware and Software for Real Robot with Isaac ROS Manipulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_guide_isaac_sim.html">Setup for Simulated Robot in Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html">Guide for the Various Tests Inside of Isaac ROS Manipulation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorials.html">Isaac for Manipulation Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_e2e.html">Tutorial for Obstacle Avoidance and Object Following Using cuMotion with Perception</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_pick_and_place.html">Multi-Object Pick and Place Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">Tutorial for Multi-Object Pick and Place using cuMotion with Perception</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place_from_cloud_service.html">Tutorial for Multi-Object Pick and Place from Isaac Cloud Service</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_sim_to_real.html">Sim-to-Real Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_sim_to_real.html">Tutorial for Training and Deploying an RL Policy from Isaac Lab to a Real Robot</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_gear_assembly.html">Tutorial for Gear Assembly with Contact Rich Insertion Policy and cuMotion</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_bring_your_own_robot.html">Bring Your Own Robot</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim.html">Isaac for Manipulation Tutorials with Isaac Sim</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pose_to_pose.html">Pose to Pose Planning</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_object_following.html">Object Following</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_pick_and_place.html">Pick and Place with Isaac ROS Manipulation in Isaac Sim</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_grasp_authoring.html">Grasp Authoring</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_gear_insertion_policy.html">Gear Insertion Policy</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_isaac_sim_gear_assembly.html">Gear Assembly Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_asset_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_asset_bringup</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_bringup</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_bringup/manipulation_workflow_config_guide.html">Manipulation Workflow Configuration Guide</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_dnn_policy/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_dnn_policy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_gear_assembly/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_gear_assembly</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_orchestration/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_orchestration</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_orchestration/behavior_reference.html">Behavior Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_orchestration/blackboard_reference.html">Blackboard Reference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_pick_and_place/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_pick_and_place</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_pick_and_place/api_reference.html">API Reference and Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_pick_and_place/configuration_guide.html">Configuration Guide</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_ros_python_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_ros_python_utils</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_manipulation/packages/isaac_ros_manipulation_servers/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_servers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_ros_manipulation/packages/isaac_ros_manipulation_object_following/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_object_following</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_ros_manipulation/packages/isaac_ros_manipulation_pose_to_pose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_pose_to_pose</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_workflows/isaac_for_mobility/index.html">Isaac for Mobility</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/index.html">Isaac for Physical AI</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/reference_architecture.html">Reference Architecture</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/tutorials/tutorials.html">GR00T Reference Workflow for Unitree G1</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_teleop.html">Teleoperate the Unitree G1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_record.html">Record Demonstrations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_convert.html">Convert MCAP Bags to a LeRobot Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_finetune.html">Fine-Tune GR00T N</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_leapp_export.html">Export the Policy with LEAPP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_deploy.html">Deploy the Fine-Tuned Policy</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../performance/index.html">Performance Summary</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../concepts/index.html">Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/benchmarking/index.html">Benchmarking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/cloud_control/index.html">Cloud Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/dev_env/index.html">Isaac ROS Development Environment</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/dnn_inference/index.html">DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/dnn_inference/model_preparation.html">Preparing Deep Learning Models for Isaac ROS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/dnn_inference/tensorrt_and_triton_info.html">Isaac ROS Triton and TensorRT Nodes for DNN Inference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/jetson_stats/index.html">Jetson Stats</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/manipulation/index.html">Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/orchestration.html">Manipulation Orchestration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/pick_and_place.html">Multi-Object Pick and Place</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/xrdf.html">Extended Robot Description Format (XRDF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/isaac_grasp.html">Isaac Grasp File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/cumotion_moveit/tutorial_custom_manipulator.html">Tutorial for Integrating Custom Manipulators with cuMotion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/manipulation/cumotion_moveit/tutorial_isaac_sim.html">Tutorial for cuMotion MoveIt Plugin with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/nitros/index.html">NITROS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/nitros/cuda_with_nitros.html">CUDA with NITROS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/nitros/pynitros/index.html">PyNITROS</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/object_detection/index.html">Object Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/object_detection/detectnet/index.html">DetectNet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/object_detection/grounding_dino/index.html">Grounding DINO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/object_detection/rtdetr/index.html">RT-DETR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/object_detection/yolov8/index.html">YOLOv8</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/pose_estimation/index.html">Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/pose_estimation/centerpose/index.html">CenterPose</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/pose_estimation/dope/index.html">DOPE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/index.html">FoundationPose</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/scene_reconstruction/index.html">Scene Reconstruction</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/index.html">Nvblox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/technical_details.html">Technical Details</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_isaac_sim.html">Isaac Sim Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_realsense.html">RealSense Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_multi_realsense.html">Multi-RealSense Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_zed.html">ZED Camera Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/scene_reconstruction/nvblox/tutorials/tutorial_os1.html">Ouster OS1 LiDAR Examples</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segformer/index.html">Segformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segformer/tutorial_isaac_sim.html">Tutorial for People Segmentation with Segformer and Isaac Sim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segformer/tutorial_tensorrt.html">Tutorial for People Segmentation with Segformer and TensorRT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segment_anything/index.html">Segment Anything</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/segment_anything/tutorial_isaac_sim.html">Tutorial for Segment Anything with Isaac Sim</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/segmentation/unet/tutorial_isaac_sim.html">Tutorial for DNN Image Segmentation with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/stereo_depth/index.html">Stereo Depth</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/stereo_depth/foundationstereo/index.html">FoundationStereo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/stereo_depth/ess/index.html">ESS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/stereo_depth/sgm/index.html">SGM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/stereo_dnn/index.html">Stereo DNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../concepts/teleop/index.html">Teleoperation</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/visual_global_localization/index.html">Visual Global Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/visual_global_localization/tutorials/tutorial_map_creation.html">Tutorial: End-to-End Visual and Occupancy Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/visual_global_localization/tutorials/tutorial_cuvgl_map_creation.html">Tutorial: cuVGL Map Creation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/visual_global_localization/tutorials/tutorial_cuvgl_localization.html">Tutorial: Localization with cuVGL</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/visual_slam/index.html">Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/index.html">cuVSLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_isaac_sim.html">Tutorial for Visual SLAM with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_realsense.html">Tutorial for Visual SLAM Using a RealSense Camera with Integrated IMU</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_realsense_rgbd.html">Tutorial for Visual SLAM Using a RealSense Camera in RGBD mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_multi_realsense.html">Tutorial for Multi-camera Visual SLAM Using RealSense Cameras</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_cuvslam_mask.html">Tutorial for Isaac ROS Visual SLAM with Segmentation Masks</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../concepts/visualization/index.html">Visualization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../concepts/visualization/foxglove.html">Foxglove Visualization</a></li>
+
+
+
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">Repositories and Packages</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_apriltag/index.html">Isaac ROS AprilTag</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_apriltag/isaac_ros_apriltag/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_apriltag</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/fiducials/apriltag/tutorial_usb_cam.html">Tutorial with a USB camera</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/fiducials/apriltag/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_benchmark/index.html">Isaac ROS Benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_benchmark/isaac_ros_benchmark/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_benchmark</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_benchmark/benchmarks/isaac_ros_moveit_benchmark/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_moveit_benchmark</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_cloud_control/index.html">Isaac ROS Cloud Control</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_mission_client/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_mission_client</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_mission_client/isaac_ros_mission_client.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_mission_client/tutorial_isaac_mission_control.html">Mission Control Tutorial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_mission_client/tutorial_isaac_cloud_mcp_mission_control.html">Mission Control MCP in Cursor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_mission_client/tutorial_isaac_cloud_mcp_mission_dispatch.html">Mission Dispatch MCP in Cursor</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cloud_control/vda5050_action_handler/index.html"><code class="docutils literal notranslate"><span class="pre">vda5050_action_handler</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_humanoid_task_server/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_humanoid_task_server</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cloud_control/isaac_ros_scene_recorder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_scene_recorder</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../isaac_ros_common/index.html">Isaac ROS Common</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_compression/index.html">Isaac ROS Compression</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_compression/isaac_ros_h264_decoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_decoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_compression/isaac_ros_h264_encoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_cumotion/index.html">Isaac ROS cuMotion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_cumotion/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_cumotion_moveit/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_moveit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_cumotion_object_attachment/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_object_attachment</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_cumotion/isaac_ros_cumotion_robot_segmenter/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_robot_segmenter</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_data_tools/index.html">Isaac ROS Data Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_data_tools/isaac_ros_mcap_lerobot_converter/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_mcap_lerobot_converter</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_deploy/index.html">Isaac ROS Deploy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_deploy/tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/tutorials/deploy_agile.html">Tutorial: Deploying AGILE WBC on the Unitree G1</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_deploy/how_to_guides/index.html">How-to guides</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/how_to_guides/bring_your_own_policy.html">How to bring your own policy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/how_to_guides/bring_your_own_embodiment.html">How to bring your own embodiment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/how_to_guides/add_custom_converter.html">How to add custom converters</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_deploy/concepts/index.html">Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/concepts/how_it_works.html">How It Works</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/concepts/ros2_control_runtime.html">ROS2 Control LEAPP Runtime</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/concepts/ros2_nodes_runtime.html">ROS2 Node LEAPP Runtime</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/concepts/converters.html">Converters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/concepts/safety.html">Safety Controller</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_deploy/reference/index.html">Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/reference/package_reference.html">Package Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/reference/converter_catalog.html">Converter Catalog</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_deploy/reference/converter_interfaces.html">Converter Extension Reference</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_dnn_inference/index.html">Isaac ROS DNN Inference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dnn_image_encoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_inference/isaac_ros_tensor_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_tensor_proc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_inference/isaac_ros_tensor_rt/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_tensor_rt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_inference/isaac_ros_triton/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_triton</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_dnn_stereo_depth/index.html">Isaac ROS DNN Stereo Depth</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_dnn_stereo_depth/isaac_ros_dnn_stereo_decoder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dnn_stereo_decoder</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_dnn_stereo_depth/isaac_ros_ess/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_ess</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/ess/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/ess/visualize_image.html">Visualize ESS Disparity Output</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_dnn_stereo_depth/isaac_ros_foundationstereo/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationstereo</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/foundationstereo/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/foundationstereo/visualize_image.html">Visualize FoundationStereo Disparity Output</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_image_pipeline/index.html">Isaac ROS Image Pipeline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_depth_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_depth_image_proc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_image_pipeline/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_pipeline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_image_proc</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_stereo_image_proc/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_stereo_image_proc</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/stereo_depth/sgm/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_image_segmentation/index.html">Isaac ROS Image Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_segformer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segformer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/segmentation/segformer/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/segmentation/segformer/tutorial_tensorrt.html">Tutorial with TensorRT</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_segment_anything/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/segmentation/segment_anything/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_segment_anything2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_segment_anything2_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_segment_anything2_interfaces</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_image_segmentation/isaac_ros_unet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unet</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/segmentation/unet/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_jetson/index.html">Isaac ROS Jetson</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_jetson/isaac_ros_jetson_stats/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_jetson_stats</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_jetson/isaac_ros_jetson_stats_services/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_jetson_stats_services</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_mapping_ros</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_occupancy_grid_localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_ros_pointcloud_utils/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pointcloud_utils</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_global_localization</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_mapping_and_localization/isaac_ros_visual_mapping/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_mapping</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_nitros/index.html">Isaac ROS NITROS</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nitros/isaac_ros_managed_nitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_managed_nitros</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nitros/isaac_ros_nitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_nitros/isaac_ros_nitros_bridge/index.html">Isaac ROS NITROS Bridge</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/nitros_bridge/tutorial_isaac_sim.html">Tutorial for NITROS Bridge with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nitros/isaac_ros_nitros_bridge/isaac_ros_nitros_bridge_ros2/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_bridge_ros2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nitros/isaac_ros_nitros_topic_tools/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_topic_tools</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nitros/isaac_ros_nitros_type/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nitros_type</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_nitros/isaac_ros_pynitros/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_pynitros</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/nitros/pynitros/tutorial_pynitros.html">Tutorial to use PyNITROS with NITROS</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_nvblox/index.html">Isaac ROS Nvblox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_nvblox</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/api/parameters.html">ROS Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/api/topics_and_services.html">ROS Topics and Services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_isaac_sim.html">Isaac Sim Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_realsense.html">RealSense Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../isaac_ros_nvblox/isaac_ros_nvblox/troubleshooting/troubleshooting_nvblox_ros_communication.html">ROS Communication Issues</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/multi_realsense_emitter_synchronizer/index.html"><code class="docutils literal notranslate"><span class="pre">multi_realsense_emitter_synchronizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_examples_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_examples_bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_image_padding/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_image_padding</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_msgs/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_msgs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_nav2/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_nav2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_ros/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_ros</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_ros_common/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_ros_common</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/nvblox_rviz_plugin/index.html"><code class="docutils literal notranslate"><span class="pre">nvblox_rviz_plugin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/realsense_splitter/index.html"><code class="docutils literal notranslate"><span class="pre">realsense_splitter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_nvblox/semantic_label_conversion/index.html"><code class="docutils literal notranslate"><span class="pre">semantic_label_conversion</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_object_detection/index.html">Isaac ROS Object Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_object_detection/isaac_ros_detectnet/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_detectnet</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/object_detection/detectnet/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/object_detection/detectnet/tutorial_custom_model.html">Tutorial with Custom Model</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_object_detection/isaac_ros_grounding_dino/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_grounding_dino</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_object_detection/isaac_ros_rtdetr/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_rtdetr</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/object_detection/rtdetr/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_object_detection/isaac_ros_yolov8/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_yolov8</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_physical_ai/index.html">Isaac ROS Physical AI</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unitree_g1_teleop_bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unitree_g1_recorder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unitree_g1_gr00t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_unitree_g1_cloud_control_bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_physical_ai/isaac_ros_data_flywheel/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_data_flywheel</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_pose_estimation/index.html">Isaac ROS Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_centerpose</span></code></a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_pose_estimation/isaac_ros_dope/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_dope</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/dope/tutorial_triton.html">Tutorial with Triton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/dope/tutorial_custom_model.html">Tutorial with Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/dope/tutorial_custom_size.html">Tutorial with Custom Size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/dope/dope_verification.html">Verifying DOPE Accuracy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_pose_estimation/isaac_ros_foundationpose/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_foundationpose</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_tracking.html">Tutorial to launch FoundationPose Tracking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_create_your_own_mesh.html">Tutorial to create your own 3D object mesh in .obj</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_usd_to_obj.html">Tutorial to convert a 3D mesh from .usd to .obj using Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_simplify_mesh.html">Tutorial to simplify a 3D mesh using Meshlab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/pose_estimation/foundationpose/tutorial_switch_mesh_runtime.html">Tutorial to switch the mesh during runtime</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_robots/index.html">Isaac ROS Robots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_robots/franka_fr3_ros2_control/index.html"><code class="docutils literal notranslate"><span class="pre">franka_fr3_ros2_control</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_robots/unitree_g1_bridge/index.html"><code class="docutils literal notranslate"><span class="pre">unitree_g1_bridge</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">Isaac ROS SIPL Camera</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">isaac_ros_sipl_camera</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_teleop/index.html">Isaac ROS Teleop</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_teleop/isaac_ros_teleop/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_teleop</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../isaac_ros_visual_slam/index.html">Isaac ROS Visual SLAM</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../isaac_ros_visual_slam/isaac_ros_visual_slam/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/validating_cuvslam_setup.html">Validating cuVSLAM Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_realsense.html">Tutorial with RealSense</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../concepts/visual_slam/cuvslam/tutorial_multi_realsense.html">Tutorial with multiple RealSenses</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../isaac_ros_visual_slam/isaac_ros_visual_slam_interfaces/index.html"><code class="docutils literal notranslate"><span class="pre">isaac_ros_visual_slam_interfaces</span></code></a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../robots/index.html">Robots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../robots/sensor_mounting_rig/index.html">Sensor Mounting Rig</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">Multi-Camera RealSense Hardware Assembly Guide for Jetson Thor Developer Kit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../robots/isaac_urdf_requirements/index.html">Calibration File Requirements for Isaac</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../robots/universal_robots/index.html">Universal Robots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../robots/flexiv/index.html">Flexiv Robots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../troubleshooting/index.html">Troubleshooting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../troubleshooting/dev_env.html">Developer Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../troubleshooting/hardware_setup.html">Hardware Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../troubleshooting/deep_learning.html">Deep Learning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../blog/index.html">Blogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../releases/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../about/index.html">About</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../about/license.html">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../about/contact.html">Contact</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac ROS - Home"/>
+    <img src="../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac ROS - Home"/>
+  
+  
+    <p class="title logo__title">Isaac ROS</p>
+  
+</a></div>
+      <div class="sidebar-primary-item"><div class="version-switcher__container dropdown">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    release-4.6
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <dl>
+        <dd><a href="../../../../release-3.2/index.html">release-3.2</a></dd>
+        <dd><a href="../../../../release-4.4/repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index.html">release-4.4</a></dd>
+        <dd><a href="../../../../release-4.5/repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index.html">release-4.5</a></dd>
+        <dd><a href="index.html">release-4.6</a></dd>
+        <dd><a href="../../../../../repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index.html">latest</a></dd>
+        <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
+        <dd><a href="../../../../release-3.1/index.html">release-3.1</a></dd>
+        <dd><a href="../../../../release-4.0/index.html">release-4.0</a></dd>
+        <dd><a href="../../../../release-4.1/index.html">release-4.1</a></dd>
+        <dd><a href="../../../../release-4.2/index.html">release-4.2</a></dd>
+        <dd><a href="../../../../release-4.3/repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index.html">release-4.3</a></dd>
+    </dl>
+  </div>
+</div></div>
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Repositories and Packages</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Isaac ROS SIPL Camera</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><code class="docutils literal notranslate"><span class="pre">isaac_ros_sipl_camera</span></code></span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="package-name">
+<h1><code class="docutils literal notranslate"><span class="pre">isaac_ros_sipl_camera</span></code><a class="headerlink" href="#package-name" title="Link to this heading">#</a></h1>
+<p><p>Source code available on <a class="reference isaac-github-icon" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_sipl_camera/tree/release-4.6/isaac_ros_sipl_camera" target="_blank" rel="noopener noreferrer">GitHub</a>.</p></p>
+<section id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
+<section id="set-up-development-environment">
+<h3>Set Up Development Environment<a class="headerlink" href="#set-up-development-environment" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Set up your development environment by following the instructions in <a class="reference internal" href="../../../getting_started/index.html"><span class="doc">getting started</span></a>.</p></li>
+<li><p>(Optional) Install dependencies for any sensors you want to use by following the <a class="reference internal" href="../../../getting_started/sensors/index.html"><span class="doc">sensor-specific guides</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We strongly recommend installing all sensor dependencies <strong>before</strong> starting any quickstarts.
+Some sensor dependencies require restarting the development environment during installation, which will interrupt the quickstart process.</p>
+</div>
+</li>
+</ol>
+<p>The SIPL headers are expected to be installed on the host with NVIDIA SDK Manager when flashing the JetPack BSP.
+When installing with SDK Manager, select all available optional packages.
+For installation instructions, see the <a class="reference external" href="https://developer.nvidia.com/embedded/jetpack/downloads" rel="noreferrer" target="_blank">JetPack Installation Guide</a>.</p>
+<p>If JetPack 7.2 was installed using an ISO image or with OTA updates, you can also install the SIPL and Multimedia APIs as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://developer.nvidia.com/downloads/embedded/L4T/r39_Release_v2.0/release/Jetson_SIPL_API_R39.2.0_aarch64.tbz2
+wget<span class="w"> </span>https://developer.nvidia.com/downloads/embedded/L4T/r39_Release_v2.0/release/Jetson_Multimedia_API_R39.2.0_aarch64.tbz2
+sudo<span class="w"> </span>tar<span class="w"> </span>xjf<span class="w"> </span>Jetson_SIPL_API_R39.2.0_aarch64.tbz2<span class="w"> </span>-C<span class="w"> </span>/
+sudo<span class="w"> </span>tar<span class="w"> </span>xjf<span class="w"> </span>Jetson_Multimedia_API_R39.2.0_aarch64.tbz2<span class="w"> </span>-C<span class="w"> </span>/
+</pre></div>
+</div>
+<p>JetPack 7.2 requires the <code class="docutils literal notranslate"><span class="pre">isaac_ros_sipl_camera</span></code> package from Isaac ROS 4.6 or later.
+These package versions are not backward compatible with JetPack 7.1 or earlier.
+For JetPack 7.1, use the package from Isaac ROS 4.3 through 4.5.</p>
+</section>
+</section>
+<section id="supported-cameras">
+<h2>Supported Cameras<a class="headerlink" href="#supported-cameras" title="Link to this heading">#</a></h2>
+<p>As of the JetPack 7.2 release, this package supports the following SIPL cameras:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Camera</p></th>
+<th class="head"><p>Transport</p></th>
+<th class="head"><p>Host Setup</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://leopardimaging.com/product/depth-sensing/stereoscopic-cameras/li-vb1940-stxxx-10gige/li-vb1940-vcl-st80-10gige-120h-poe/" rel="noreferrer" target="_blank">Leopard Imaging Eagle Stereo Camera</a></p></td>
+<td><p>Camera-over-Ethernet (CoE)</p></td>
+<td><p><a class="reference internal" href="../../../getting_started/sensors/eagle_setup.html"><span class="doc">Eagle Stereo Camera Setup</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://leopardimaging.com/leopard-imaging-hawk-stereo-cameras/" rel="noreferrer" target="_blank">Leopard Imaging Hawk Stereo Camera</a></p></td>
+<td><p>GMSL2</p></td>
+<td><p><a class="reference internal" href="../../../getting_started/sensors/hawk_setup.html"><span class="doc">Hawk Stereo Camera Setup</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="build-package-name">
+<h3>Build <code class="docutils literal notranslate"><span class="pre">isaac_ros_sipl_camera</span></code><a class="headerlink" href="#build-package-name" title="Link to this heading">#</a></h3>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Binary Package</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Build from Source</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Install the prebuilt Debian package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-isaac-ros-sipl-camera
+</pre></div>
+</div>
+</li>
+</ol>
+</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Install Git LFS:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>git-lfs<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>lfs<span class="w"> </span>install
+</pre></div>
+</div>
+</li>
+<li><p>Clone this repository under <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/src</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>release-4.6<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_sipl_camera.git<span class="w"> </span>isaac_ros_sipl_camera
+</pre></div>
+</div>
+</li>
+<li><p>Activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">rosdep</span></code> to install the package’s dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rosdep<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_sipl_camera/isaac_ros_sipl_camera<span class="w"> </span>--ignore-src<span class="w"> </span>-y
+</pre></div>
+</div>
+</li>
+<li><p>(Optional) Replace the mock calibration files if you have the camera’s calibration data. See section on <a class="reference internal" href="#camera-calibration-overrides">Camera Calibration Overrides</a> for more details. The configuration uses mock calibration files by default.</p></li>
+<li><p>Build the package from source:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--packages-up-to<span class="w"> </span>isaac_ros_sipl_camera<span class="w"> </span>--base-paths<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_sipl_camera/isaac_ros_sipl_camera
+</pre></div>
+</div>
+</li>
+<li><p>Source the ROS workspace:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure to repeat this step in <strong>every</strong> terminal created inside the Isaac ROS environment.</p>
+<p>Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package’s contents.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</li>
+</ol>
+</div></div>
+</section>
+<section id="run-launch-file">
+<h3>Run Launch File<a class="headerlink" href="#run-launch-file" title="Link to this heading">#</a></h3>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">Monocular Camera</button><button aria-controls="panel-1-1-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-1-1-1" name="1-1" role="tab" tabindex="-1">Eagle Stereo Camera</button><button aria-controls="panel-1-1-2" aria-selected="false" class="sphinx-tabs-tab" id="tab-1-1-2" name="1-2" role="tab" tabindex="-1">Hawk Stereo Camera</button><button aria-controls="panel-1-1-3" aria-selected="false" class="sphinx-tabs-tab" id="tab-1-1-3" name="1-3" role="tab" tabindex="-1">Eagle Stereo Camera with RGB8 Conversion and Rectification</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Launch the monocular camera node with default native NV12 output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_sipl_camera<span class="w"> </span>sipl_camera.launch.py
+</pre></div>
+</div>
+</li>
+</ol>
+</div><div aria-labelledby="tab-1-1-1" class="sphinx-tabs-panel" hidden="true" id="panel-1-1-1" name="1-1" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Launch the Eagle stereo camera with default native NV12 output:</p>
+<p>The default parameter file targets the Eagle VB1940 camera with <code class="docutils literal notranslate"><span class="pre">eagle_stereo.yaml</span></code> so no argument is needed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The SIPL <code class="docutils literal notranslate"><span class="pre">VB1940_Stereo</span></code> platform configuration enables hardware stereo pairing, but a known bug with SIPL release distributed with JetPack 7.2.0 corrupts the right edge of the image. To avoid this issue, <code class="docutils literal notranslate"><span class="pre">eagle_stereo.yaml</span></code> sets <code class="docutils literal notranslate"><span class="pre">platform_config</span></code> to <code class="docutils literal notranslate"><span class="pre">VB1940</span></code> and runs the sensors as independent pipelines. This issue is fixed in JetPack 7.2.1.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_sipl_camera<span class="w"> </span>sipl_stereo_camera.launch.py
+</pre></div>
+</div>
+</li>
+</ol>
+</div><div aria-labelledby="tab-1-1-2" class="sphinx-tabs-panel" hidden="true" id="panel-1-1-2" name="1-2" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Launch the Hawk stereo camera with default native NV12 output and stereo frame-pair gating enabled:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">hawk_stereo.yaml</span></code> parameter file defaults to <code class="docutils literal notranslate"><span class="pre">0x0001</span></code>, which assumes the Hawk is connected to <strong>channel 0</strong>. See <a class="reference internal" href="#gmsl-parameters">GMSL Parameters</a> for more details.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_sipl_camera<span class="w"> </span>sipl_stereo_camera.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>param_file:<span class="o">=</span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>isaac_ros_sipl_camera<span class="k">)</span>/share/isaac_ros_sipl_camera/config/hawk_stereo.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>enforce_stereo_pairs:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div><div aria-labelledby="tab-1-1-3" class="sphinx-tabs-panel" hidden="true" id="panel-1-1-3" name="1-3" role="tabpanel" tabindex="0"><ol class="arabic">
+<li><p>Launch the stereo camera with RGB8 format conversion and image rectification:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_sipl_camera<span class="w"> </span>sipl_stereo_camera.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>encoding_desired:<span class="o">=</span>rgb8<span class="w"> </span>enable_rectify:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div></div>
+</section>
+<section id="visualize-results">
+<h3>Visualize Results<a class="headerlink" href="#visualize-results" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Open a <strong>new</strong> terminal and activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Verify that the camera topics are publishing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>list
+ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/left/camera_info
+</pre></div>
+</div>
+<p>Example output for Hawk stereo with rectification enabled (<code class="docutils literal notranslate"><span class="pre">enable_rectify:=true</span></code>):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/left/camera_info
+/left/camera_info_unsynced
+/left/camera_info_rect
+/left/image_converted
+/left/image_raw
+/left/image_raw_unsynced
+/left/image_rect
+/right/camera_info
+/right/camera_info_unsynced
+/right/camera_info_rect
+/right/image_converted
+/right/image_raw
+/right/image_raw_unsynced
+/right/image_rect
+/tf_static
+average rate: 28.127
+min: 0.000s max: 0.334s std dev: 0.05718s window: 30
+...
+</pre></div>
+</div>
+</li>
+<li><p>Visualize the stereo camera streams with your preferred tool:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+rqt_image_view</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-rqt-image-view
+<span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
+ros2<span class="w"> </span>run<span class="w"> </span>rqt_image_view<span class="w"> </span>rqt_image_view<span class="w"> </span>/left/image_raw
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Foxglove Studio</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-foxglove-bridge
+<span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
+ros2<span class="w"> </span>run<span class="w"> </span>foxglove_bridge<span class="w"> </span>foxglove_bridge<span class="w"> </span>--ros-args<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span>port:<span class="o">=</span><span class="m">9090</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span>send_buffer_limit:<span class="o">=</span><span class="m">30000000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span>max_qos_depth:<span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="w"> </span>use_compression:<span class="o">=</span><span class="nb">false</span>
+</pre></div>
+</div>
+<p>This configuration is recommended for high-rate camera streams:
+<code class="docutils literal notranslate"><span class="pre">max_qos_depth</span></code> bounds per-topic queue growth, and <code class="docutils literal notranslate"><span class="pre">send_buffer_limit</span></code> helps avoid dropped
+messages under burst load.</p>
+<p>Open <a class="reference external" href="https://foxglove.dev/" rel="noreferrer" target="_blank">Foxglove Studio</a>, connect to your ROS 2 bridge,
+and add Image panels for <code class="docutils literal notranslate"><span class="pre">/left/image_raw</span></code> and <code class="docutils literal notranslate"><span class="pre">/right/image_raw</span></code>.</p>
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+RViz2</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-jazzy-rviz2
+<span class="nb">source</span><span class="w"> </span>/opt/ros/jazzy/setup.bash
+rviz2
+</pre></div>
+</div>
+<p>In RViz2, add <strong>Image</strong> displays and set the topics to
+<code class="docutils literal notranslate"><span class="pre">/left/image_raw</span></code> and <code class="docutils literal notranslate"><span class="pre">/right/image_raw</span></code>.</p>
+</div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="data-flow">
+<h2>Data Flow<a class="headerlink" href="#data-flow" title="Link to this heading">#</a></h2>
+<p>The optional nodes shown below are added by the example launch files based on launch
+arguments. See <a class="reference internal" href="#launch-files">Launch Files</a> for details.</p>
+<div class="mermaid" align="center">
+flowchart TD
+   Camera["Camera / Stereo Camera"] -->|"GMSL2 or Ethernet (CoE)"| ISP["HW accelerated ISP"]
+   ISP -->|"NvSciBuf (NVMM buffer)"| SiplCameraNode["SiplCameraNode /<br/>SiplStereoCameraNode"]
+   SiplCameraNode -->|"NITROS, aligned stereo timestamps"| SyncOrDrop["NitrosCameraDropNode<br/>(stereo pair gating, optional)"]
+   SiplCameraNode -.->|"NITROS (gating disabled)"| Raw(["image_raw / camera_info"])
+   SyncOrDrop -->|"NITROS, complete pairs only"| Raw
+   Raw -->|"NITROS (CUDA buffer)"| Converter["ImageFormatConverterNode<br/>(optional)"]
+   Raw -->|"NITROS (CUDA buffer)"| Encoder["H.264 EncoderNode<br/>(optional, image_compressed)"]
+   Converter -->|"NITROS (CUDA buffer)"| Rectify["RectifyNode<br/>(optional)"]
+   Converter -->|"NITROS (CUDA buffer)"| Downstream["Downstream Nodes<br/>(SLAM, ESS, etc.)"]
+   Rectify -->|"NITROS (CUDA buffer)"| Downstream
+</div><section id="message-timestamps">
+<h3>Message Timestamps<a class="headerlink" href="#message-timestamps" title="Link to this heading">#</a></h3>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">use_hw_timestamp</span></code> is set to <code class="docutils literal notranslate"><span class="pre">true</span></code> and each image and its matching <code class="docutils literal notranslate"><span class="pre">CameraInfo</span></code>
+message are stamped with the capture start-of-frame (SOF) timestamp that SIPL APIs provides in the
+Tegra timestamp counter (TSC) time domain.</p>
+<p>The node uses a periodically calibrated offset to convert the timestamp from the TSC time domain to
+the time domain of the node’s ROS clock.</p>
+<p>SOF and EOF in this context denote transport frame boundaries, not sensor exposure boundaries.
+SOF occurs after exposure has started, but its exact relationship to exposure timing depends on the
+sensor, shutter mode, and transport.
+This SOF timestamp marks when the leading part of one transmitted image reaches the Jetson capture
+path before the image payload and ISP processing.</p>
+<ul class="simple">
+<li><p>For GMSL2, the Video Input (VI)/NVCSI path records SOF as the image begins arriving from the
+deserializer.</p></li>
+<li><p>For CoE, the MGBE/RCE path records SOF as the first Ethernet packet marked as frame start arrives.</p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">use_hw_timestamp</span></code> is <code class="docutils literal notranslate"><span class="pre">false</span></code>, the node instead stamps with the current ROS clock time after
+receiving the full frame after ISP processing.</p>
+<p>For the transport paths, refer to the NVIDIA <a class="reference external" href="https://docs.nvidia.com/jetson/archives/r39.2/DeveloperGuide/SD/CameraDevelopment/SIPLFramework/SIPL-for-L4T/GMSL/GMSL-Architecture-Overview.html" rel="noreferrer" target="_blank">GMSL architecture overview</a>
+and <a class="reference external" href="https://docs.nvidia.com/jetson/archives/r39.2/DeveloperGuide/SD/CameraDevelopment/SIPLFramework/SIPL-for-L4T/CoE/CoE-Solution-Overview.html" rel="noreferrer" target="_blank">Camera-over-Ethernet overview</a>.</p>
+</section>
+</section>
+<section id="package-architecture">
+<h2>Package Architecture<a class="headerlink" href="#package-architecture" title="Link to this heading">#</a></h2>
+<section id="nodes">
+<h3>Nodes<a class="headerlink" href="#nodes" title="Link to this heading">#</a></h3>
+<section id="siplcameranode">
+<h4><code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code><a class="headerlink" href="#siplcameranode" title="Link to this heading">#</a></h4>
+<p>Base node for monocular cameras. See <a class="reference internal" href="#ros-topics-published">ROS Topics Published</a> and <a class="reference internal" href="#ros-parameters">ROS Parameters</a>
+for the full interface specification.</p>
+</section>
+<section id="siplstereocameranode">
+<h4><code class="docutils literal notranslate"><span class="pre">SiplStereoCameraNode</span></code><a class="headerlink" href="#siplstereocameranode" title="Link to this heading">#</a></h4>
+<p>Stereo camera node that extends <code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code>. See <a class="reference internal" href="#ros-topics-published">ROS Topics Published</a> and
+<a class="reference internal" href="#ros-parameters">ROS Parameters</a> for the full interface specification.</p>
+<p>When running launch files, additional topics may be published depending on the launch arguments.
+See the launch files section below for more details.</p>
+</section>
+</section>
+<section id="launch-files">
+<h3>Launch Files<a class="headerlink" href="#launch-files" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">sipl_camera.launch.py</span></code> and <code class="docutils literal notranslate"><span class="pre">sipl_stereo_camera.launch.py</span></code> launch files
+conditionally add format conversion, rectification, H.264 encoding, and (for stereo)
+frame-pair gating nodes based on launch arguments. The format conversion and
+rectification nodes are from the <a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_image_proc/index.html"><span class="doc">isaac_ros_image_proc</span></a> package, and the encoder node is from the <a class="reference internal" href="../../isaac_ros_compression/isaac_ros_h264_encoder/index.html"><span class="doc">isaac_ros_h264_encoder</span></a> package.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">encoding_desired</span></code> is set to a non-native format (anything other than
+<code class="docutils literal notranslate"><span class="pre">nv12</span></code> or <code class="docutils literal notranslate"><span class="pre">nv24</span></code>), the launch file adds an <code class="docutils literal notranslate"><span class="pre">ImageFormatConverterNode</span></code> to
+convert the output.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">enable_rectify</span></code> is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, the launch file adds a
+<code class="docutils literal notranslate"><span class="pre">RectifyNode</span></code> and automatically forces <code class="docutils literal notranslate"><span class="pre">encoding_desired</span></code> to <code class="docutils literal notranslate"><span class="pre">rgb8</span></code> if a
+native format (<code class="docutils literal notranslate"><span class="pre">nv12</span></code>/<code class="docutils literal notranslate"><span class="pre">nv24</span></code>) was specified, because <code class="docutils literal notranslate"><span class="pre">RectifyNode</span></code>
+requires a standard image encoding.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">enable_encoding</span></code> is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, the launch file adds an
+<code class="docutils literal notranslate"><span class="pre">EncoderNode</span></code> that H.264-encodes the camera output and publishes it on
+<code class="docutils literal notranslate"><span class="pre">image_compressed</span></code> (per eye for stereo). The encoder consumes the same
+<code class="docutils literal notranslate"><span class="pre">image_raw</span></code> output as the other downstream nodes.</p>
+<section id="color-conversion-limitation">
+<h4>Color Conversion Limitation<a class="headerlink" href="#color-conversion-limitation" title="Link to this heading">#</a></h4>
+<p>When the launch files convert native <code class="docutils literal notranslate"><span class="pre">nv12</span></code> output to a packed RGB or BGR
+format, <code class="docutils literal notranslate"><span class="pre">ImageFormatConverterNode</span></code> uses <code class="docutils literal notranslate"><span class="pre">yuv_color_spec=bt709</span></code>. SIPL ISP
+buffers are allocated with <code class="docutils literal notranslate"><span class="pre">NvSciColorStd_REC709_ER</span></code>, which is a full-range
+BT.709 color standard. CV-CUDA <code class="docutils literal notranslate"><span class="pre">AdvCvtColor</span></code> supports the BT.709 color matrix,
+but does not currently support the full-range <code class="docutils literal notranslate"><span class="pre">REC709_ER</span></code> variant. As a
+result, converted images can have slightly different luma contrast than a true
+full-range conversion. Native <code class="docutils literal notranslate"><span class="pre">nv12</span></code> and <code class="docutils literal notranslate"><span class="pre">nv24</span></code> output is unaffected.</p>
+<p>If exact full-range color reproduction is required, subscribe to the native
+camera output and convert it with a pipeline that supports <code class="docutils literal notranslate"><span class="pre">REC709_ER</span></code>.</p>
+</section>
+<section id="sipl-camera-launch-py">
+<h4><code class="docutils literal notranslate"><span class="pre">sipl_camera.launch.py</span></code><a class="headerlink" href="#sipl-camera-launch-py" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Launch Argument</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">param_file</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eagle_mono.yaml</span></code></p></td>
+<td><p>Path to the YAML parameter file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">encoding_desired</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> (native)</p></td>
+<td><p>Output encoding: <code class="docutils literal notranslate"><span class="pre">nv12</span></code>/<code class="docutils literal notranslate"><span class="pre">nv24</span></code> (native) or <code class="docutils literal notranslate"><span class="pre">rgb8</span></code>, <code class="docutils literal notranslate"><span class="pre">mono8</span></code>, etc. (converted)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">target_container</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sipl_camera_container</span></code></p></td>
+<td><p>Component container name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">camera_namespace</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> (root)</p></td>
+<td><p>ROS namespace for the camera node and its topics. Set a distinct value per camera (along with a distinct <code class="docutils literal notranslate"><span class="pre">target_container</span></code>) to run multiple cameras without topic or node-name collisions.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">enable_rectify</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Enable image rectification through <code class="docutils literal notranslate"><span class="pre">RectifyNode</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">enable_encoding</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Enable H.264 accelerated encoding to <code class="docutils literal notranslate"><span class="pre">image_compressed</span></code> through the <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> <code class="docutils literal notranslate"><span class="pre">EncoderNode</span></code>. <code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Pipeline variants</strong>:</p>
+<ul class="simple">
+<li><p><strong>Native output</strong> (default): <code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code></p></li>
+<li><p><strong>Format conversion</strong>: <code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code> → <code class="docutils literal notranslate"><span class="pre">ImageFormatConverterNode</span></code></p></li>
+<li><p><strong>Rectification</strong>: <code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code> → <code class="docutils literal notranslate"><span class="pre">ImageFormatConverterNode</span></code> → <code class="docutils literal notranslate"><span class="pre">RectifyNode</span></code></p></li>
+<li><p><strong>Encoding</strong>: <code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code> → <code class="docutils literal notranslate"><span class="pre">EncoderNode</span></code> (publishes <code class="docutils literal notranslate"><span class="pre">image_compressed</span></code>)</p></li>
+</ul>
+</section>
+<section id="sipl-stereo-camera-launch-py">
+<h4><code class="docutils literal notranslate"><span class="pre">sipl_stereo_camera.launch.py</span></code><a class="headerlink" href="#sipl-stereo-camera-launch-py" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Launch Argument</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">param_file</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eagle_stereo.yaml</span></code></p></td>
+<td><p>Path to the YAML parameter file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">encoding_desired</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> (native)</p></td>
+<td><p>Output encoding: <code class="docutils literal notranslate"><span class="pre">nv12</span></code>/<code class="docutils literal notranslate"><span class="pre">nv24</span></code> (native) or <code class="docutils literal notranslate"><span class="pre">rgb8</span></code>, <code class="docutils literal notranslate"><span class="pre">mono8</span></code>, etc. (converted)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">target_container</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sipl_camera_container</span></code></p></td>
+<td><p>Component container name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">camera_namespace</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> (root)</p></td>
+<td><p>ROS namespace for the camera node and its topics. Set a distinct value per camera (along with a distinct <code class="docutils literal notranslate"><span class="pre">target_container</span></code>) to run multiple cameras without topic or node-name collisions.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">enable_rectify</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Enable image rectification through <code class="docutils literal notranslate"><span class="pre">RectifyNode</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">enforce_stereo_pairs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Align left/right capture timestamps and gate stereo frame pairs (drop the pair if one of left/right never arrives). Enables the camera node’s <code class="docutils literal notranslate"><span class="pre">align_stereo_timestamps</span></code> parameter and toggles the synchronization drop node. <code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">enable_encoding</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Enable H.264 accelerated encoding of the left and right images to <code class="docutils literal notranslate"><span class="pre">image_compressed</span></code> through the <code class="docutils literal notranslate"><span class="pre">isaac_ros_h264_encoder</span></code> <code class="docutils literal notranslate"><span class="pre">EncoderNode</span></code>. <code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Pipeline variants</strong>:</p>
+<ul class="simple">
+<li><p><strong>Native output</strong> (default): <code class="docutils literal notranslate"><span class="pre">SiplStereoCameraNode</span></code></p></li>
+<li><p><strong>Format conversion</strong>: <code class="docutils literal notranslate"><span class="pre">SiplStereoCameraNode</span></code> → <code class="docutils literal notranslate"><span class="pre">ImageFormatConverterNode</span></code> (left and right)</p></li>
+<li><p><strong>Rectification</strong>: <code class="docutils literal notranslate"><span class="pre">SiplStereoCameraNode</span></code> → <code class="docutils literal notranslate"><span class="pre">ImageFormatConverterNode</span></code> (left and right) → <code class="docutils literal notranslate"><span class="pre">RectifyNode</span></code> (left and right)</p></li>
+<li><p><strong>Encoding</strong>: <code class="docutils literal notranslate"><span class="pre">SiplStereoCameraNode</span></code> → <code class="docutils literal notranslate"><span class="pre">EncoderNode</span></code> (left and right, publishes <code class="docutils literal notranslate"><span class="pre">image_compressed</span></code>)</p></li>
+</ul>
+<p><strong>Stereo frame-pair gating with enforce_stereo_pairs enabled</strong>:</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">enforce_stereo_pairs</span></code> is enabled, the launch inserts a <code class="docutils literal notranslate"><span class="pre">NitrosCameraDropNode</span></code> (stereo mode)
+that exact-time-synchronizes the aligned left/right <code class="docutils literal notranslate"><span class="pre">image_raw</span></code> and <code class="docutils literal notranslate"><span class="pre">camera_info</span></code> set and
+republishes only complete pairs. If one of the pair’s frames is missing, both are dropped, so only
+matched pairs are published. The camera’s raw output is moved to <code class="docutils literal notranslate"><span class="pre">*_unsynced</span></code> topics, and the
+synced pair keeps the canonical <code class="docutils literal notranslate"><span class="pre">left/image_raw</span></code>, <code class="docutils literal notranslate"><span class="pre">right/image_raw</span></code>, <code class="docutils literal notranslate"><span class="pre">left/camera_info</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">right/camera_info</span></code> topic names.</p>
+</section>
+</section>
+</section>
+<section id="tf-frame-tree">
+<h2>TF Frame Tree<a class="headerlink" href="#tf-frame-tree" title="Link to this heading">#</a></h2>
+<p>The default frame names produce the following tree structures.</p>
+<div class="mermaid" align="center">
+flowchart TD
+   Camera["camera"] --> CameraOptical["camera_optical"]
+   StereoCamera["stereo_camera"] --> LeftCamera["stereo_camera_left"]
+   LeftCamera --> LeftOptical["stereo_camera_left_optical"]
+   StereoCamera --> RightCamera["stereo_camera_right"]
+   RightCamera --> RightOptical["stereo_camera_right_optical"]
+</div></section>
+<section id="verifying-stereo-camera-calibration">
+<h2>Verifying Stereo Camera Calibration<a class="headerlink" href="#verifying-stereo-camera-calibration" title="Link to this heading">#</a></h2>
+<p>Given the camera’s calibration data, you may use the epipolar test <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline/blob/release-4.6/isaac_ros_image_proc/test/isaac_ros_rectify_stereo_epipolar_test.py" rel="noreferrer" target="_blank">isaac_ros_rectify_stereo_epipolar_test.py</a> in
+<a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_image_proc/index.html"><span class="doc">isaac_ros_image_proc</span></a>
+package to validate that your stereo camera calibration produces accurately rectified
+images based on epipolar line tests.</p>
+<p>Several files are required to run the test and should be placed in the <code class="docutils literal notranslate"><span class="pre">rectify_stereo</span></code> test cases directory of the <code class="docutils literal notranslate"><span class="pre">isaac_ros_image_proc</span></code> package.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/
+</pre></div>
+</div>
+<ol class="arabic">
+<li><p>Refer to the quickstart section for the <a class="reference internal" href="../../isaac_ros_image_pipeline/isaac_ros_image_proc/index.html"><span class="doc">isaac_ros_image_proc</span></a> package on how to clone and build the package.</p></li>
+<li><p>Capture one left/right raw image pair of PNG files that contains a visible checkerboard pattern. For example, <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline/blob/release-4.6/isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/image_raw_right.png" rel="noreferrer" target="_blank">image_raw_right.png</a></p></li>
+<li><p>Create test configuration JSON files for the left and right camera respectively: <code class="docutils literal notranslate"><span class="pre">image_raw_left.json</span></code> and <code class="docutils literal notranslate"><span class="pre">image_raw_right.json</span></code>. These files should reference the PNG files and include the checkerboard inner-corner grid size (rows x columns). For example, <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline/blob/release-4.6/isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/image_raw_right.json" rel="noreferrer" target="_blank">image_raw_right.json</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The checkerboard size must use inner-corner counts (for example, a 10x7
+square grid uses a 9x6 inner-corner size).</p>
+</div>
+</li>
+<li><p>Create camera info JSON files for left and right camera respectively: <code class="docutils literal notranslate"><span class="pre">camera_info_left.json</span></code> and <code class="docutils literal notranslate"><span class="pre">camera_info_right.json</span></code>. For example, <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_image_pipeline/blob/release-4.6/isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/camera_info_right.json" rel="noreferrer" target="_blank">camera_info_right.json</a></p></li>
+<li><p>Place all the PNG and JSON files in the <code class="docutils literal notranslate"><span class="pre">rectify_stereo</span></code> test cases directory of the <code class="docutils literal notranslate"><span class="pre">isaac_ros_image_proc</span></code>
+package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From the workspace root</span>
+mkdir<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/sipl_stereo_camera
+cp<span class="w"> </span>&lt;your_files&gt;<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/sipl_stereo_camera
+</pre></div>
+</div>
+</li>
+<li><p>Build the <code class="docutils literal notranslate"><span class="pre">isaac_ros_image_proc</span></code> package after placing all the files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>colcon<span class="w"> </span>build<span class="w"> </span>--packages-up-to<span class="w"> </span>isaac_ros_image_proc
+<span class="nb">source</span><span class="w"> </span>install/setup.bash
+</pre></div>
+</div>
+</li>
+<li><p>Run the test:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>colcon<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--packages-select<span class="w"> </span>isaac_ros_image_proc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--event-handlers<span class="w"> </span>console_direct+<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--ctest-args<span class="w"> </span>-R<span class="w"> </span>isaac_ros_rectify_stereo_epipolar_test
+</pre></div>
+</div>
+</li>
+<li><p>Verify the test results. Passing the test indicates that the calibration accuracy is satisfactory. If the test fails, downstream packages that consume the rectified images may still function, but with degraded performance depending on your application’s requirements.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A well-rectified pair has horizontal epipolar lines with sub-pixel mean error (less than 0.5 px) and max error under
+approximately 1-2 px.</p>
+</div>
+<p>Below are example outputs of the test with the epipolar lines drawn.</p>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-column docutils">
+<figure class="align-center" id="id11">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.6/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/left_image_rect.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.6/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/left_image_rect.jpg/" />
+<figcaption>
+<p><span class="caption-text">Left Rectified</span><a class="headerlink" href="#id11" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+<div class="sd-col sd-d-flex-column docutils">
+<figure class="align-center" id="id12">
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.6/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/right_image_rect.jpg/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.6/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/right_image_rect.jpg/" />
+<figcaption>
+<p><span class="caption-text">Right Rectified</span><a class="headerlink" href="#id12" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading">#</a></h2>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_sipl_camera<span class="w"> </span>sipl_camera.launch.py<span class="w"> </span>param_file:<span class="o">=</span>&lt;path_to_yaml&gt;<span class="w"> </span>encoding_desired:<span class="o">=</span>&lt;encoding&gt;
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_sipl_camera<span class="w"> </span>sipl_stereo_camera.launch.py<span class="w"> </span>param_file:<span class="o">=</span>&lt;path_to_yaml&gt;<span class="w"> </span>encoding_desired:<span class="o">=</span>&lt;encoding&gt;<span class="w"> </span>enable_rectify:<span class="o">=</span>&lt;true<span class="p">|</span>false&gt;
+</pre></div>
+</div>
+</section>
+<section id="ros-topics-published">
+<h3>ROS Topics Published<a class="headerlink" href="#ros-topics-published" title="Link to this heading">#</a></h3>
+<section id="id1">
+<h4><code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code><a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>ROS Topic</p></th>
+<th class="head"><p>Interface</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">image_raw</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/ros2/common_interfaces/blob/jazzy/sensor_msgs/msg/Image.msg" rel="noreferrer" target="_blank">sensor_msgs/Image</a></p></td>
+<td><p>Raw camera image in <code class="docutils literal notranslate"><span class="pre">nv12</span></code> or <code class="docutils literal notranslate"><span class="pre">nv24</span></code> encoding.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">camera_info</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/ros2/common_interfaces/blob/jazzy/sensor_msgs/msg/CameraInfo.msg" rel="noreferrer" target="_blank">sensor_msgs/CameraInfo</a></p></td>
+<td><p>Camera intrinsic calibration data.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/tf_static</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg" rel="noreferrer" target="_blank">tf2_msgs/TFMessage</a></p></td>
+<td><p>Static transform from camera link to optical frame.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id2">
+<h4><code class="docutils literal notranslate"><span class="pre">SiplStereoCameraNode</span></code><a class="headerlink" href="#id2" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>ROS Topic</p></th>
+<th class="head"><p>Interface</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">left/image_raw</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/ros2/common_interfaces/blob/jazzy/sensor_msgs/msg/Image.msg" rel="noreferrer" target="_blank">sensor_msgs/Image</a></p></td>
+<td><p>Left camera raw image in <code class="docutils literal notranslate"><span class="pre">nv12</span></code> or <code class="docutils literal notranslate"><span class="pre">nv24</span></code> encoding.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">right/image_raw</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/ros2/common_interfaces/blob/jazzy/sensor_msgs/msg/Image.msg" rel="noreferrer" target="_blank">sensor_msgs/Image</a></p></td>
+<td><p>Right camera raw image in <code class="docutils literal notranslate"><span class="pre">nv12</span></code> or <code class="docutils literal notranslate"><span class="pre">nv24</span></code> encoding.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">left/camera_info</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/ros2/common_interfaces/blob/jazzy/sensor_msgs/msg/CameraInfo.msg" rel="noreferrer" target="_blank">sensor_msgs/CameraInfo</a></p></td>
+<td><p>Left camera intrinsic calibration data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">right/camera_info</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/ros2/common_interfaces/blob/jazzy/sensor_msgs/msg/CameraInfo.msg" rel="noreferrer" target="_blank">sensor_msgs/CameraInfo</a></p></td>
+<td><p>Right camera intrinsic calibration data.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/tf_static</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg" rel="noreferrer" target="_blank">tf2_msgs/TFMessage</a></p></td>
+<td><p>Static transforms from stereo rig base to left/right optical frames.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="ros-parameters">
+<h3>ROS Parameters<a class="headerlink" href="#ros-parameters" title="Link to this heading">#</a></h3>
+<section id="common-parameters">
+<h4>Common Parameters<a class="headerlink" href="#common-parameters" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>ROS Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">platform_config</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">VB1940_Camera</span></code></p></td>
+<td><p>SIPL platform configuration name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hsb_name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hsb_0</span></code></p></td>
+<td><p>Holoscan Sensor Bridge (HSB) name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hsb_id</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Holoscan Sensor Bridge ID</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">interface_name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mgbe0_0</span></code></p></td>
+<td><p>Network interface for the CoE camera</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ip_address</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+<td><p>Camera IP override (empty uses the platform default)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mac_address</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+<td><p>Camera MAC override (empty uses the platform default)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">encoding_desired</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nv12</span></code></p></td>
+<td><p>Native ISP output encoding: <code class="docutils literal notranslate"><span class="pre">nv12</span></code> or <code class="docutils literal notranslate"><span class="pre">nv24</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_hw_timestamp</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>Use the capture SOF TSC timestamp converted to ROS time. See <a class="reference internal" href="#message-timestamps">Message
+Timestamps</a>. When <code class="docutils literal notranslate"><span class="pre">false</span></code>, use the ROS clock when the node processes the frame.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">first_frame_timeout_s</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.0</span></code></p></td>
+<td><p>Seconds expected to have received each sensor’s first frame after capture starts before timing out and terminating. Set to <code class="docutils literal notranslate"><span class="pre">0</span></code> to disable the check.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">camera_info_url</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+<td><p>Path to camera calibration file (left camera in stereo mode)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="monocular-parameters">
+<h4>Monocular Parameters<a class="headerlink" href="#monocular-parameters" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>ROS Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">camera_link_frame_name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">camera</span></code></p></td>
+<td><p>Camera link frame name</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="stereo-parameters">
+<h4>Stereo Parameters<a class="headerlink" href="#stereo-parameters" title="Link to this heading">#</a></h4>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>ROS Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">camera_link_frame_name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">stereo_camera</span></code></p></td>
+<td><p>Stereo rig base frame</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">left_camera_frame_name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">stereo_camera_left</span></code></p></td>
+<td><p>Left camera frame</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">right_camera_frame_name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">stereo_camera_right</span></code></p></td>
+<td><p>Right camera frame</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">right_camera_info_url</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+<td><p>Path to right camera calibration file</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">align_stereo_timestamps</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>When <code class="docutils literal notranslate"><span class="pre">true</span></code>, the timestamp for hardware-synced stereo left/right pairs (capture times within <code class="docutils literal notranslate"><span class="pre">max_timestamp_diff_us</span></code>) is overridden with the earlier timestamp of the pair in order to stamp with identical timestamps. This is lock-free without blocking. Requires stereo cameras and <code class="docutils literal notranslate"><span class="pre">use_hw_timestamp</span></code> true.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max_timestamp_diff_us</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">500.0</span></code></p></td>
+<td><p>In-sync window (microseconds) for <code class="docutils literal notranslate"><span class="pre">align_stereo_timestamps</span></code>. Pairs farther apart keep their own timestamps and are deemed out of sync. This should be less than half the frame interval. Camera config and transport dependent threshold.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">expected_fps</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">30.0</span></code></p></td>
+<td><p>Expected capture frame rate, used only to bound the out-of-sync detection window for <code class="docutils literal notranslate"><span class="pre">align_stereo_timestamps</span></code>. Does not change the publish rate.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="gmsl-parameters">
+<h4>GMSL Parameters<a class="headerlink" href="#gmsl-parameters" title="Link to this heading">#</a></h4>
+<p>These parameters apply when the platform configuration uses a GMSL transport (for example, the Hawk stereo camera).</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>ROS Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">link_mask</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x0001</span></code></p></td>
+<td><p>Each connected camera occupies one link: <code class="docutils literal notranslate"><span class="pre">0x0001</span></code> = channel 0,
+<code class="docutils literal notranslate"><span class="pre">0x0002</span></code> = channel 1, <code class="docutils literal notranslate"><span class="pre">0x0004</span></code> = channel 2, <code class="docutils literal notranslate"><span class="pre">0x0008</span></code> = channel 3.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Only one GMSL camera can stream at a time.</strong> <code class="docutils literal notranslate"><span class="pre">link_mask</span></code> must select
+exactly one link, and only one SIPL camera node can run on the system at
+once — a second concurrent node fails during SIPL platform configuration
+(<code class="docutils literal notranslate"><span class="pre">SetPlatformCfg</span></code>). Enabling multiple links in a single node is also not
+supported. Switch cameras by changing <code class="docutils literal notranslate"><span class="pre">link_mask</span></code> and relaunching.</p>
+</div>
+</section>
+</section>
+<section id="camera-calibration-overrides">
+<h3>Camera Calibration Overrides<a class="headerlink" href="#camera-calibration-overrides" title="Link to this heading">#</a></h3>
+<p>Provide calibration files using <code class="docutils literal notranslate"><span class="pre">package://</span></code> or <code class="docutils literal notranslate"><span class="pre">file://</span></code> URLs. Example
+calibration files are available in the package <code class="docutils literal notranslate"><span class="pre">config/</span></code> directory for quick
+testing.</p>
+<p>The following example shows how to set the calibration file in a YAML
+parameter file:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">sipl_camera</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">camera_info_url</span><span class="p">:</span><span class="w"> </span><span class="s">"package://isaac_ros_sipl_camera/config/mock_mono_camera_info.yaml"</span>
+</pre></div>
+</div>
+</section>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h3>
+<section id="environment">
+<h4>Environment<a class="headerlink" href="#environment" title="Link to this heading">#</a></h4>
+<p>When you use <code class="docutils literal notranslate"><span class="pre">isaac-ros</span> <span class="pre">activate</span></code>, the environment for SIPL development will be prepared automatically.</p>
+<p>If you need to build on the host directly, you may need to also install the SIPL headers <code class="docutils literal notranslate"><span class="pre">/usr/src/jetson_sipl_api</span></code>. For installation instructions, see the
+<a class="reference external" href="https://docs.nvidia.com/jetson/archives/r39.2/DeveloperGuide/SD/CameraDevelopment/SIPLFramework/SIPL-for-L4T/SIPL-App-Development-Guide.html#installation" rel="noreferrer" target="_blank">SIPL Application Development Guide</a>.</p>
+<p>The following paths and libraries are necessary for building and running SIPL.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Path</p></th>
+<th class="head"><p>Contents</p></th>
+<th class="head"><p>Needed For</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/aarch64-linux-gnu/nvidia</span></code></p></td>
+<td><p>Core SIPL runtime libraries (<code class="docutils literal notranslate"><span class="pre">libnvsipl*.so</span></code>, <code class="docutils literal notranslate"><span class="pre">libnvsci*.so</span></code>)</p></td>
+<td><p>Runtime libraries for SIPL</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/usr/src/jetson_sipl_api</span></code></p></td>
+<td><p>SIPL development headers</p></td>
+<td><p>Compilation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/nvsipl_drv</span></code></p></td>
+<td><p>Camera sensor driver plugins</p></td>
+<td><p>Runtime (camera detection)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/nvsipl_uddf</span></code></p></td>
+<td><p>UDDF driver libraries</p></td>
+<td><p>Runtime</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/var/nvidia/nvcam</span></code></p></td>
+<td><p>NITO platform configuration files (<code class="docutils literal notranslate"><span class="pre">.nito</span></code> files)</p></td>
+<td><p>Runtime (camera ISP initialization)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/dev/coe-chan-*</span></code></p></td>
+<td><p>CoE device nodes</p></td>
+<td><p>Runtime (camera device files)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Library</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Location (Jetson Thor)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">libnvsipl.so</span></code></p></td>
+<td><p>SIPL camera API</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/aarch64-linux-gnu/nvidia/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">libnvsipl_query.so</span></code></p></td>
+<td><p>SIPL query API</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/aarch64-linux-gnu/nvidia/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">libnvsipl_pipeline.so</span></code></p></td>
+<td><p>SIPL pipeline API</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/aarch64-linux-gnu/nvidia/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">libnvscibuf.so</span></code></p></td>
+<td><p>NvSci buffer</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/aarch64-linux-gnu/nvidia/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">libnvscisync.so</span></code></p></td>
+<td><p>NvSci sync</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/aarch64-linux-gnu/nvidia/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">libnvscicommon.so</span></code></p></td>
+<td><p>NvSci common</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/aarch64-linux-gnu/nvidia/</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
+<section id="isaac-ros-troubleshooting">
+<h3>Isaac ROS Troubleshooting<a class="headerlink" href="#isaac-ros-troubleshooting" title="Link to this heading">#</a></h3>
+<p>For solutions to problems with Isaac ROS, see <a class="reference internal" href="../../../troubleshooting/index.html"><span class="doc">troubleshooting</span></a>.</p>
+</section>
+<section id="sipl-coe-camera-not-found">
+<h3>SIPL CoE Camera Not Found<a class="headerlink" href="#sipl-coe-camera-not-found" title="Link to this heading">#</a></h3>
+<p>For any issues with CoE camera detection, see the
+<a class="reference internal" href="../../../getting_started/sensors/eagle_setup.html"><span class="doc">Eagle CoE Stereo Camera Setup</span></a> guide.</p>
+</section>
+<section id="sipl-gmsl-camera-produces-no-frames">
+<h3>SIPL GMSL Camera Produces No Frames<a class="headerlink" href="#sipl-gmsl-camera-produces-no-frames" title="Link to this heading">#</a></h3>
+<section id="symptom">
+<h4>Symptom<a class="headerlink" href="#symptom" title="Link to this heading">#</a></h4>
+<p>The SIPL camera node initializes (<code class="docutils literal notranslate"><span class="pre">SIPL</span> <span class="pre">Camera</span> <span class="pre">initialized</span></code>) but no frames arrive, and after
+<code class="docutils literal notranslate"><span class="pre">first_frame_timeout_s</span></code> (default 5 s) the node fails with:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[FATAL] [sipl_stereo_camera]: [left] No frames from sensor 0 within 5.0s. Verify the camera connection.
+</pre></div>
+</div>
+</section>
+<section id="solution">
+<h4>Solution<a class="headerlink" href="#solution" title="Link to this heading">#</a></h4>
+<p>The Jetson might not be booted with the correct camera device tree. Re-run the readiness checks in
+the <a class="reference internal" href="../../../getting_started/sensors/hawk_setup.html"><span class="doc">Hawk GMSL Stereo Camera Setup</span></a> guide and confirm
+that <code class="docutils literal notranslate"><span class="pre">v4l2-ctl</span> <span class="pre">--list-devices</span></code> reports <code class="docutils literal notranslate"><span class="pre">ar0234</span></code>. Also confirm that the GMSL distribution board
+has 12 V power and that the camera is on the channel corresponding to the <code class="docutils literal notranslate"><span class="pre">link_mask</span></code> parameter.</p>
+</section>
+</section>
+<section id="hsb-fails-to-initialize-with-error-address-already-in-use">
+<h3>HSB fails to initialize with error “Address already in use”<a class="headerlink" href="#hsb-fails-to-initialize-with-error-address-already-in-use" title="Link to this heading">#</a></h3>
+<section id="id3">
+<h4>Symptom<a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
+<p>Unable to bind to initialize HSB and configure the HSB transport driver. You see the following error message:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>HSB<span class="o">]</span><span class="w"> </span>Error<span class="w"> </span>configuring<span class="w"> </span>driver:<span class="w"> </span><span class="nb">bind</span><span class="w"> </span>failed<span class="w"> </span>with<span class="w"> </span><span class="nv">errno</span><span class="o">=</span><span class="m">98</span>:<span class="w"> </span><span class="s2">"Address already in use"</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h4>Solution<a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
+<p>Another Holoscan instance may still be running. Check and stop it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>hololink
+</pre></div>
+</div>
+<p>If there is output, kill the process if it is safe to do so:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">kill</span><span class="w"> </span>-9<span class="w"> </span>&lt;pid&gt;
+</pre></div>
+</div>
+</section>
+</section>
+<section id="sipl-headers-or-libraries-not-found">
+<h3>SIPL Headers or Libraries Not Found<a class="headerlink" href="#sipl-headers-or-libraries-not-found" title="Link to this heading">#</a></h3>
+<section id="id5">
+<h4>Symptom<a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
+<p>You see the following error message when building the package:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CMake Error: SIPL headers not found at: /usr/src/jetson_sipl_api/sipl/include
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h4>Solution<a class="headerlink" href="#id6" title="Link to this heading">#</a></h4>
+<ol class="arabic">
+<li><p>Install the SIPL libraries through NVIDIA SDK Manager.</p></li>
+<li><p>Verify that the SIPL libraries and headers are present:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>/usr/lib/aarch64-linux-gnu/nvidia/libnvsipl*
+ls<span class="w"> </span>/usr/src/jetson_sipl_api/sipl/include/
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="invalid-mac-or-ip-address-format">
+<h3>Invalid MAC or IP Address Format<a class="headerlink" href="#invalid-mac-or-ip-address-format" title="Link to this heading">#</a></h3>
+<section id="id7">
+<h4>Symptom<a class="headerlink" href="#id7" title="Link to this heading">#</a></h4>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Invalid MAC address format, expected XX:XX:XX:XX:XX:XX
+Invalid IP address format, expected XXX.XXX.XXX.XXX
+</pre></div>
+</div>
+</section>
+<section id="id8">
+<h4>Solution<a class="headerlink" href="#id8" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p>Make sure to retrieve the CoE camera’s specific MAC and IP addresses. Refer to the <a class="reference internal" href="../../../getting_started/sensors/eagle_setup.html"><span class="doc">Eagle CoE Stereo Camera Setup</span></a> guide for instructions.</p></li>
+<li><p>Use colon-separated hex format for MAC addresses: <code class="docutils literal notranslate"><span class="pre">8c:1f:64:6d:70:03</span></code></p></li>
+<li><p>Use dotted decimal format for IP addresses: <code class="docutils literal notranslate"><span class="pre">192.168.1.2</span></code></p></li>
+<li><p>Verify that the addresses match the camera documentation or EEPROM data.</p></li>
+</ul>
+</section>
+</section>
+<section id="hsb-id-mismatch">
+<h3>HSB ID Mismatch<a class="headerlink" href="#hsb-id-mismatch" title="Link to this heading">#</a></h3>
+<section id="id9">
+<h4>Symptom<a class="headerlink" href="#id9" title="Link to this heading">#</a></h4>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>No matching transport found for override: hsb_id=X
+No matching camera found for override: hsb_id=X
+</pre></div>
+</div>
+</section>
+<section id="id10">
+<h4>Solution<a class="headerlink" href="#id10" title="Link to this heading">#</a></h4>
+<ol class="arabic simple">
+<li><p>Verify that the <code class="docutils literal notranslate"><span class="pre">hsb_id</span></code> parameter matches the platform configuration.</p></li>
+<li><p>Check the HSB ID in the camera system config.</p></li>
+<li><p>For VB1940, the default HSB ID is typically <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p>Verify that the HSB ID matches across transport and camera configuration.</p></li>
+</ol>
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Isaac ROS SIPL Camera</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../isaac_ros_teleop/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Isaac ROS Teleop</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quickstart">Quickstart</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-development-environment">Set Up Development Environment</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-cameras">Supported Cameras</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-package-name">Build <code class="docutils literal notranslate"><span class="pre">isaac_ros_sipl_camera</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-launch-file">Run Launch File</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-results">Visualize Results</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-flow">Data Flow</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#message-timestamps">Message Timestamps</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#package-architecture">Package Architecture</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nodes">Nodes</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#siplcameranode"><code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#siplstereocameranode"><code class="docutils literal notranslate"><span class="pre">SiplStereoCameraNode</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#launch-files">Launch Files</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#color-conversion-limitation">Color Conversion Limitation</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sipl-camera-launch-py"><code class="docutils literal notranslate"><span class="pre">sipl_camera.launch.py</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sipl-stereo-camera-launch-py"><code class="docutils literal notranslate"><span class="pre">sipl_stereo_camera.launch.py</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tf-frame-tree">TF Frame Tree</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-stereo-camera-calibration">Verifying Stereo Camera Calibration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api">API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ros-topics-published">ROS Topics Published</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">SiplCameraNode</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2"><code class="docutils literal notranslate"><span class="pre">SiplStereoCameraNode</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ros-parameters">ROS Parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#common-parameters">Common Parameters</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#monocular-parameters">Monocular Parameters</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#stereo-parameters">Stereo Parameters</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gmsl-parameters">GMSL Parameters</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#camera-calibration-overrides">Camera Calibration Overrides</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#environment">Environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">Troubleshooting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#isaac-ros-troubleshooting">Isaac ROS Troubleshooting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sipl-coe-camera-not-found">SIPL CoE Camera Not Found</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sipl-gmsl-camera-produces-no-frames">SIPL GMSL Camera Produces No Frames</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#symptom">Symptom</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#solution">Solution</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hsb-fails-to-initialize-with-error-address-already-in-use">HSB fails to initialize with error “Address already in use”</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Symptom</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Solution</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sipl-headers-or-libraries-not-found">SIPL Headers or Libraries Not Found</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Symptom</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Solution</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#invalid-mac-or-ip-address-format">Invalid MAC or IP Address Format</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Symptom</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Solution</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hsb-id-mismatch">HSB ID Mismatch</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Symptom</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../../../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../../../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Manage My Privacy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/preferences/start/">Do Not Sell or Share My Data</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2023-2026 NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on Aug 18, 2026.
+  <br/>
+</p></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
+  </body>
+</html>

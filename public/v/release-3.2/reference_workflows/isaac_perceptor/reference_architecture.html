@@ -3731,11 +3731,11 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 </figure>
 <p>In this variation, besides running a navigation stack, you can execute additional tasks such as Large Language Models (LLMs) or Vision-Language Models (VLMs) on the x86 system or on an additional Jetson AGX Orin.</p>
 <p>NVIDIA provides a sample config for the Carter robot using Cyclone DDS below. If you are using a Carter robot, add this profile to carter-dev/docker/middleware_profiles:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;CycloneDDS</span><span class="w"> </span><span class="na">xmlns=</span><span class="s">&quot;https://cdds.io/config&quot;</span><span class="w"> </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><span class="w"> </span><span class="na">xsi:schemaLocation=</span><span class="s">&quot;https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd&quot;</span><span class="nt">&gt;</span>
-<span class="nt">&lt;Domain</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;any&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;CycloneDDS</span><span class="w"> </span><span class="na">xmlns=</span><span class="s">"https://cdds.io/config"</span><span class="w"> </span><span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span><span class="w"> </span><span class="na">xsi:schemaLocation=</span><span class="s">"https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;Domain</span><span class="w"> </span><span class="na">id=</span><span class="s">"any"</span><span class="nt">&gt;</span>
 <span class="w">  </span><span class="nt">&lt;General&gt;</span>
 <span class="w">  </span><span class="nt">&lt;Interfaces&gt;</span>
-<span class="w">   </span><span class="nt">&lt;NetworkInterface</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;eth0&quot;</span><span class="w">  </span><span class="na">multicast=</span><span class="s">&quot;false&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">   </span><span class="nt">&lt;NetworkInterface</span><span class="w"> </span><span class="na">name=</span><span class="s">"eth0"</span><span class="w">  </span><span class="na">multicast=</span><span class="s">"false"</span><span class="w"> </span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/Interfaces&gt;</span>
 <span class="w">  </span><span class="nt">&lt;AllowMulticast&gt;</span>false<span class="nt">&lt;/AllowMulticast&gt;</span>
 <span class="w">  </span><span class="nt">&lt;EnableMulticastLoopback&gt;</span>false<span class="nt">&lt;/EnableMulticastLoopback&gt;</span>
@@ -3744,8 +3744,8 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 <span class="w"> </span><span class="nt">&lt;Discovery&gt;</span>
 <span class="w"> </span><span class="cm">&lt;!-- Replace ips with robot and visualization machine ip --&gt;</span>
 <span class="w">  </span><span class="nt">&lt;Peers&gt;</span>
-<span class="w">    </span><span class="nt">&lt;Peer</span><span class="w"> </span><span class="na">address=</span><span class="s">&quot;192.168.1.100&quot;</span><span class="nt">/&gt;</span>
-<span class="w">   </span><span class="nt">&lt;Peer</span><span class="w"> </span><span class="na">address=</span><span class="s">&quot;192.168.1.101&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;Peer</span><span class="w"> </span><span class="na">address=</span><span class="s">"192.168.1.100"</span><span class="nt">/&gt;</span>
+<span class="w">   </span><span class="nt">&lt;Peer</span><span class="w"> </span><span class="na">address=</span><span class="s">"192.168.1.101"</span><span class="nt">/&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/Peers&gt;</span>
 <span class="w">  </span><span class="nt">&lt;ParticipantIndex&gt;</span>auto<span class="nt">&lt;/ParticipantIndex&gt;</span>
 <span class="w">  </span><span class="nt">&lt;MaxAutoParticipantIndex&gt;</span>200<span class="nt">&lt;/MaxAutoParticipantIndex&gt;</span>
@@ -3766,7 +3766,7 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 </pre></div>
 </div>
 <p><strong>Command 2</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>nova_carter_bringup<span class="w"> </span>navigation.launch.py<span class="w"> </span>enable_navigation:<span class="o">=</span>True<span class="w"> </span>enable_nvblox_costmap:<span class="o">=</span>True<span class="w"> </span>stereo_camera_configuration:<span class="o">=</span>no_cameras<span class="w"> </span>enable_3d_lidar_costmap:<span class="o">=</span>False<span class="w"> </span>enabled_2d_lidars:<span class="o">=</span><span class="s1">&#39;front_2d_lidar,back_2d_lidar&#39;</span><span class="w"> </span>enable_2d_lidar_costmap:<span class="o">=</span>True<span class="w"> </span>enable_wheel_odometry:<span class="o">=</span>True<span class="w"> </span>run_foxglove:<span class="o">=</span>False<span class="w"> </span>enable_global_navigation:<span class="o">=</span>True<span class="w"> </span>map_yaml_path:<span class="o">=</span>&lt;absolute-path-to-map-yaml-file&gt;<span class="w"> </span>enable_3d_lidar_localization:<span class="o">=</span>False
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>nova_carter_bringup<span class="w"> </span>navigation.launch.py<span class="w"> </span>enable_navigation:<span class="o">=</span>True<span class="w"> </span>enable_nvblox_costmap:<span class="o">=</span>True<span class="w"> </span>stereo_camera_configuration:<span class="o">=</span>no_cameras<span class="w"> </span>enable_3d_lidar_costmap:<span class="o">=</span>False<span class="w"> </span>enabled_2d_lidars:<span class="o">=</span><span class="s1">'front_2d_lidar,back_2d_lidar'</span><span class="w"> </span>enable_2d_lidar_costmap:<span class="o">=</span>True<span class="w"> </span>enable_wheel_odometry:<span class="o">=</span>True<span class="w"> </span>run_foxglove:<span class="o">=</span>False<span class="w"> </span>enable_global_navigation:<span class="o">=</span>True<span class="w"> </span>map_yaml_path:<span class="o">=</span>&lt;absolute-path-to-map-yaml-file&gt;<span class="w"> </span>enable_3d_lidar_localization:<span class="o">=</span>False
 </pre></div>
 </div>
 </section>
@@ -3807,7 +3807,7 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023-2026, NVIDIA.
-      <span class="lastupdated">Last updated on Jul 08, 2026.
+      <span class="lastupdated">Last updated on Aug 18, 2026.
       </span></p>
   </div>
 
@@ -3844,12 +3844,13 @@ Here is a list of RGBD cameras along with pointers on how to integrate them with
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
+            <dd><a href="reference_architecture.html">release-3.2</a></dd>
             <dd><a href="../../../release-4.4/index.html">release-4.4</a></dd>
             <dd><a href="../../../release-4.5/index.html">release-4.5</a></dd>
+            <dd><a href="../../../release-4.6/index.html">release-4.6</a></dd>
             <dd><a href="../../../../index.html">latest</a></dd>
             <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
             <dd><a href="../../../release-3.1/index.html">release-3.1</a></dd>
-            <dd><a href="reference_architecture.html">release-3.2</a></dd>
             <dd><a href="../../../release-4.0/index.html">release-4.0</a></dd>
             <dd><a href="../../../release-4.1/index.html">release-4.1</a></dd>
             <dd><a href="../../../release-4.2/index.html">release-4.2</a></dd>

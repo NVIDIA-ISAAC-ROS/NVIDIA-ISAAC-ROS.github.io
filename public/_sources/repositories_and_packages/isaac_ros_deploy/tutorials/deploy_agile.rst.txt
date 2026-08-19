@@ -1,0 +1,294 @@
+===============================================
+Tutorial: Deploying AGILE WBC on the Unitree G1
+===============================================
+
+This tutorial will guide you through deploying the AGILE Whole-Body Control
+policy on a Unitree G1 using Isaac ROS Deploy. It will cover deployment on both
+real robots and simulated robots.
+
+.. note::
+
+   To deploy a different custom policy, refer to
+   :doc:`../how_to_guides/bring_your_own_policy`. To deploy to a different
+   custom robot, refer to
+   :doc:`../how_to_guides/bring_your_own_embodiment`.
+
+Overview
+--------
+
+AGILE WBC is a locomotion policy trained in Isaac Lab. We use
+`LEAPP <https://github.com/nvidia-isaac/leapp>`__ to export the policy and
+deploy it with Isaac ROS Deploy. AGILE is a purely proprioceptive policy,
+namely, it only uses joint and IMU measurements as inputs. Due to this, we run
+it with the :doc:`ros2_control LEAPP runtime <../concepts/ros2_control_runtime>`.
+
+Set Up Development Environment
+------------------------------
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Install and Build
+-----------------
+
+Choose the installation method that matches your deployment.
+
+.. note::
+
+   If you plan to deploy in Isaac Sim, follow the **Build from Source** path
+   because the Isaac Sim extension is released as source only.
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the G1 bringup package and its Isaac ROS Deploy runtime
+         dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-unitree-g1-bringup
+            source /opt/ros/:ir_ros_distro:/setup.bash
+
+   .. tab:: Build from Source
+
+      #. Clone the ``isaac_ros_deploy`` and ``isaac_ros_robots`` repositories
+         under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_deploy>` && \
+               git clone :ir_clone:`<isaac_ros_robots>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the repositories' dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths \
+               ${ISAAC_ROS_WS}/src/isaac_ros_deploy \
+               ${ISAAC_ROS_WS}/src/isaac_ros_robots --ignore-src -y
+
+      #. Build the G1 bringup and its source dependencies:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to unitree_g1_bringup
+
+      #. Source the workspace (repeat in **every** terminal):
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Deploy
+------
+
+We recommend validating in simulation before deploying to the real robot.
+
+.. tabs::
+
+   .. tab:: MuJoCo
+
+      #. Launch the controller manager with MuJoCo and the AGILE policy:
+
+         .. code:: bash
+
+            ros2 launch unitree_g1_bringup unitree_g1_controller_manager.launch.py \
+                hardware_type:=mujoco \
+                initial_controller_group:=agile_velocity
+
+         This will open a MuJoCo viewer. A virtual gantry will hold the robot
+         upright during startup; press ``G`` to toggle it, ``[`` / ``]`` to
+         shorten / lengthen the rope.
+
+         The controller waits for its first reference twist command before it
+         activates. Continue with :ref:`agile-send-velocity-commands`.
+
+   .. tab:: Isaac Sim
+
+      .. note::
+
+         This deployment path requires the **Build from Source** installation
+         above because ``isaac_ros_deploy_isaac_sim_extension`` is source-only.
+
+      We will first have to bake a deploy USD for the G1, then launch Isaac Sim
+      with the deploy extension, and then launch the controller manager with
+      AGILE WBC. Refer to the Isaac Sim section of
+      :doc:`../how_to_guides/bring_your_own_embodiment` for more details on the
+      bake step.
+
+      #. Build the deploy extension:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to isaac_ros_deploy_isaac_sim_extension
+            source install/setup.bash
+
+      #. Bake the G1 deploy USD:
+
+         .. code:: bash
+
+            export PYTHONPATH=${ISAAC_ROS_WS}/src/isaac_ros_deploy/isaac_deploy/isaac_ros_deploy_isaac_sim_extension:$PYTHONPATH
+            export LD_LIBRARY_PATH=$ISAAC_PATH/exts/isaacsim.ros2.core/jazzy/lib:$LD_LIBRARY_PATH
+            export ROS_DISTRO=jazzy
+            export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+            PKG=isaac_ros_deploy_isaac_sim_extension.scripts
+
+            # The multiphysics G1 USD, on the Isaac assets server:
+            $ISAAC_PATH/python.sh -m $PKG.add_newton_actuators_to_robot \
+                --usd https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/Unitree/G1/g1.usda \
+                --out ${ISAAC_ROS_WS}/g1_actuators.usd
+            $ISAAC_PATH/python.sh -m $PKG.add_ros2_bridge_to_robot \
+                --usd ${ISAAC_ROS_WS}/g1_actuators.usd --out ${ISAAC_ROS_WS}/g1_deploy.usd
+
+      #. Launch Isaac Sim with the deploy extension and the baked USD, then
+         press **Play**. Point ``--ext-folder`` at the extension's installed
+         ``site-packages`` (created by the build above, under
+         ``${ISAAC_ROS_WS}/install/isaac_ros_deploy_isaac_sim_extension/``):
+
+         .. code:: bash
+
+            $ISAAC_PATH/isaac-sim.sh \
+                --ext-folder <ext-package-dir> \
+                --enable isaac_ros_deploy_isaac_sim_extension \
+                --/exts/isaac_ros_deploy_isaac_sim_extension/usd=${ISAAC_ROS_WS}/g1_deploy.usd
+
+      #. In the Isaac ROS environment, bring up the AGILE controllers bound to
+         the Isaac Sim topics:
+
+         .. code:: bash
+
+            ros2 launch unitree_g1_bringup unitree_g1_controller_manager.launch.py \
+                hardware_type:=isaacsim \
+                initial_controller_group:=agile_velocity
+
+         ``hardware_type:=isaacsim`` binds the hardware interface to the
+         ``/isaac_sim_*`` topics, runs the controllers on Isaac Sim's clock, and
+         selects the stock ``controller_manager`` node.
+
+         The controller waits for its first reference twist command before it
+         activates. Continue with :ref:`agile-send-velocity-commands`.
+
+   .. tab:: Real Robot
+
+      .. warning::
+
+         Before operating on real hardware:
+
+         #. Ensure the working area is clear of people and other hazards.
+         #. Be prepared to quickly disable the robot by setting the
+            ``blend_ratio`` to ``0.0`` if something goes wrong.
+
+      #. Set up the host network on the machine physically connected to the G1.
+         Run the network setup command in the environment where
+         ``isaac_ros_robots_tools`` is installed:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_robots_tools setup_network.py
+
+         The script interactively guides you through network setup. Select the
+         network interface physically connected to the G1.
+
+         .. note::
+
+            If multiple people or robots are working on the same network, set a
+            unique ``ROS_DOMAIN_ID`` in every terminal before launching.
+            Otherwise, DDS cross-talk may cause unexpected robot behavior.
+
+      #. Launch the AGILE policy on hardware. Replace ``<your_interface>`` with
+         the interface selected in the previous step:
+
+         .. code:: bash
+
+            ros2 launch unitree_g1_bringup unitree_g1_controller_manager.launch.py \
+                hardware_type:=real \
+                network_interface:=<your_interface> \
+                initial_controller_group:=agile_velocity
+
+         The controller waits for its first reference twist command before it
+         activates. Continue with :ref:`agile-send-velocity-commands`.
+
+.. _agile-send-velocity-commands:
+
+Send Velocity Commands
+~~~~~~~~~~~~~~~~~~~~~~
+
+After launch, the controller remains inactive until it receives its first
+reference twist command. Open a new terminal in the Isaac ROS environment and
+publish a twist command:
+
+.. code:: bash
+
+   ros2 topic pub /cmd_vel geometry_msgs/msg/Twist {}
+
+This activates the controller.
+
+The policy is still gated at this point: ``blend_ratio`` defaults to ``0.0``.
+Enable the policy by setting ``blend_ratio`` to ``1.0`` *after* the twist
+command above:
+
+.. note::
+
+   Raise ``blend_ratio`` only after the controller is active. Enabling the policy
+   at full authority before it activates applies its first inference in one step,
+   and the resulting transient can trip the velocity safety check.
+
+.. code:: bash
+
+   ros2 param set /safety_controller blend_ratio 1.0
+
+Sending the zero twist command from above will make the robot balance. To make
+it walk, you can send other non-zero twist commands or connect another twist
+command source, for example
+`teleop_twist_keyboard <https://docs.ros.org/en/rolling/p/teleop_twist_keyboard/>`__.
+
+Once done with testing, set the blend ratio back to zero to disable the policy:
+
+.. code:: bash
+
+   ros2 param set /safety_controller blend_ratio 0.0
+
+Use an Exported AGILE Bundle
+----------------------------
+
+By default, the AGILE LEAPP bundle shipped with ``unitree_g1_bringup`` is used.
+If you modify the AGILE WBC code or have a custom policy you want to deploy,
+generate the LEAPP bundle yourself. For the G1 velocity policy, export the
+``Velocity-G1-History-v0`` task.
+
+Follow the `AGILE WBC repository documentation
+<https://nvidia-isaac.github.io/WBC-AGILE/deploy-policies.html#example-export-the-g1-velocity-policy>`__
+to export the LEAPP bundle from a checkpoint.
+
+The export produces a directory containing YAML configuration, ONNX models, and
+optional safetensors. Keep the folder together and copy it to the machine that
+you are using to deploy the policy.
+
+To use the exported bundle, pass the path to the LEAPP bundle's YAML file with
+the launch argument ``inference_controller_config_path``. For example:
+
+.. code:: bash
+
+   ros2 launch unitree_g1_bringup unitree_g1_controller_manager.launch.py \
+       hardware_type:=mujoco \
+       initial_controller_group:=agile_velocity \
+       inference_controller_config_path:=/path/to/Velocity-G1-History-v0/Velocity-G1-History-v0.yaml

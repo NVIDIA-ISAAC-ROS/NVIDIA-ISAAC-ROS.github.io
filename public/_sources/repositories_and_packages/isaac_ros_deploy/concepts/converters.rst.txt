@@ -1,0 +1,41 @@
+==========
+Converters
+==========
+
+A LEAPP policy operates only on tensors. It takes tensors as inputs and
+produces tensors as outputs. On a real robot, though, the data usually lives in
+other formats: ROS messages, or ``ros2_control`` state and command interfaces.
+
+Converters bridge that gap: they automatically convert those formats into the
+tensors a policy expects, and convert the policy's output tensors back. Each
+input/output term in a LEAPP bundle carries a semantic ``kind``, and the runtime
+uses that ``kind`` to automatically choose the right converter for the term.
+
+Isaac ROS Deploy ships converters for the commonly used input/output ``kind``
+values. If your application needs a ``kind`` that is missing, you can add your
+own converter. Refer to :doc:`../how_to_guides/add_custom_converter`.
+
+Two kinds of converters
+-----------------------
+
+There are two kinds of converters:
+
+- **Message converters** convert between ROS messages and tensors
+  (message ↔ tensor). Both the :doc:`ROS2 Node LEAPP Runtime <ros2_nodes_runtime>`
+  and the :doc:`ROS2 Control LEAPP Runtime <ros2_control_runtime>` can use them.
+- **Interface converters** convert between ``ros2_control`` state and command
+  interfaces and tensors (interface ↔ tensor). Only the ROS2 Control LEAPP
+  Runtime can use them.
+
+Note that converters only convert the data to tensors. They do not reorder the
+tensors. This is done by the core logic in Isaac ROS Deploy.
+
+Also refer to
+-------------
+
+- :doc:`../reference/converter_catalog` - every built-in ``kind`` and the ROS
+  message or interface it maps to.
+- :doc:`../how_to_guides/add_custom_converter` - add a converter for a signal not
+  in the catalog.
+- :doc:`ros2_control_runtime`, :doc:`ros2_nodes_runtime` - how each runtime uses
+  converters.

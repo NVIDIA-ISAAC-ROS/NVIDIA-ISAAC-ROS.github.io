@@ -1,0 +1,61 @@
+Tutorial for DNN Image Segmentation with Isaac Sim
+==================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/segmentation/unet/Isaac_sim_peoplesemsegnet_shuffleseg_rqt.png>`
+    :align: center
+
+Overview
+------------
+
+This tutorial walks you through a graph for :ir_repo:`Image Segmentation <isaac_ros_image_segmentation>`
+of people using images from Isaac Sim.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the :ref:`quickstart <repositories_and_packages/isaac_ros_image_segmentation/isaac_ros_unet/index:quickstart>` until the ``Prepare PeopleSemSegnet Model`` section.
+2.  Activate the Isaac ROS environment:
+
+    .. code:: bash
+
+       isaac-ros activate
+
+3.  Install and launch Isaac Sim following the steps in the :ref:`Isaac ROS Isaac Sim Setup Guide <gs_isaac_sim>`.
+4.  Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 600px
+
+5. Run the following launch files to start the inferencing:
+
+    .. code:: bash
+
+           ros2 launch isaac_ros_unet isaac_ros_unet_tensor_rt_isaac_sim.launch.py engine_file_path:=${ISAAC_ROS_WS}/isaac_ros_assets/models/peoplesemsegnet/deployable_quantized_vanilla_unet_onnx_v2.0/1/model.plan input_binding_names:=['input_1:0']
+
+6.  In another terminal, install and launch ``rqt_image_view``:
+
+    .. code:: bash
+
+       isaac-ros activate
+
+    .. code:: bash
+
+       sudo apt-get install -y ros-:ir_ros_distro:-rqt-image-view
+
+    Then launch ``rqt_image_view``:
+
+    .. code:: bash
+
+           ros2 run rqt_image_view rqt_image_view
+
+    To view a colorized segmentation
+    mask, inside the ``rqt_image_view`` GUI, change the topic to
+    ``/unet/colored_segmentation_mask``.
+
+    .. note::
+
+        The raw segmentation is also published to
+        ``/unet/raw_segmentation_mask``. However, the raw pixels correspond
+        to the class labels and so the output is unsuitable for human visual
+        inspection.

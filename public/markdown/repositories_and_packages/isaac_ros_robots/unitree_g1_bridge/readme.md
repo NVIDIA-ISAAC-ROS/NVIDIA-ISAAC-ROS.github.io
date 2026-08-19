@@ -27,4 +27,4 @@ Visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/repositor
 
 ## Latest
 
-Update 2026-07-06: Updated default topic names and renamed some frames
+Update 2026-08-18: Compatibility and integration updates for the Isaac ROS 4.6.0 release

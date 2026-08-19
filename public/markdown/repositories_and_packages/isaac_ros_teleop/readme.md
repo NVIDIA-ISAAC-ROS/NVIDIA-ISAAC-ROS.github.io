@@ -2,7 +2,7 @@
 
 NVIDIA-accelerated teleoperation solutions for robot data collection.
 
-<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.5/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/unitree-g1-teleop-hero.gif/"><img alt="Isaac ROS Teleop with Unitree G1" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.5/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/unitree-g1-teleop-hero.gif/" width="520px"/></a></div>
+<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.6/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/unitree-g1-teleop-hero.gif/"><img alt="Isaac ROS Teleop with Unitree G1" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.6/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/unitree-g1-teleop-hero.gif/" width="520px"/></a></div>
 
 ## Overview
 
@@ -33,4 +33,4 @@ Refer to the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/reposi
 
 ## Latest
 
-Update 2026-07-06: Support CloudXR without Docker, flipped PoseArray hand order and exposed raw controller data
+Update 2026-08-18: Support auto-launching CloudXR via the node and publish head pose.

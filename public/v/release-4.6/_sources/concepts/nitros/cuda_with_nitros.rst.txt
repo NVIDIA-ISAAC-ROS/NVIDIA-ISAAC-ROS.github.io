@@ -1,0 +1,109 @@
+CUDA with NITROS
+================
+
+
+Overview
+--------
+
+CUDA is a parallel computing programming model and helps robotic applications to implement functions
+that would otherwise be too slow on a CPU.
+
+CUDA implemented in a ROS 2 node can take advantage of NITROS, the Isaac ROS implementation of type
+adaptation & type negotiation which enables accelerated computing in ROS 2.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/nitros/system_diagram.png>`
+    :width: 800px
+    :align: center
+
+By using the NITROS publisher, CUDA code in a ROS node can share its output in GPU accelerated memory
+to NITROS enabled Isaac ROS nodes. This improves performance by avoiding CPU memory copies, and increasing
+the parallel compute between the GPU compute and CPU processing. NITROS maintains compatibility with
+other ROS nodes subscribing to the topic such as RViz.
+
+By using the NITROS subscriber, CUDA code in a ROS node can receive its input in GPU accelerated memory
+from a NITROS enabled Isaac ROS node, or another CUDA enabled ROS node publishing by using a NITROS subscriber.
+This has the same benefits of reducing CPU memory copies and increasing parallel computing between the GPU
+and CPU.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/nitros/subscriber_publisher_diagram.png>`
+    :width: 800px
+    :align: center
+
+NITROS publisher and NITROS subscriber enable many design patterns compatible with Isaac ROS accelerate
+computing nodes, and traditional CPU nodes.  For example publishing from a CUDA node directly to an Isaac ROS
+node, or visa-versa from an Isaac ROS node to a CUDA node. A CUDA node can be inserted between two Isaac ROS
+nodes, or even use multiple CUDA nodes in succession, all with the benefit of CUDA accelerated computing in each
+node. This creates more modular software designs, as CUDA accelerated functions can be packaged in individual
+nodes, instead of packing them together into a larger single node.
+
+Core Concepts
+-------------
+
+Managed NITROS Publisher
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Managed NITROS Publisher provides a familiar interface
+for publishing messages into NITROS-enabled graphs. The API is
+comparable to the standard ``rclcpp::Publisher`` API, making it easy to
+add a Managed NITROS Publisher to an existing ROS 2 node.
+
+Managed NITROS Publishers are specifically designed to publish
+NITROS-typed messages. These NITROS types are listed under the
+``isaac_ros_nitros_types`` subfolder.
+
+.. note::
+
+   Currently, the Managed NITROS Publisher is compatible
+   with the ``isaac_ros_nitros_tensor_list_type``, ``isaac_ros_nitros_image_type``, and
+   ``isaac_ros_nitros_point_cloud_type``. These types enable you to send and receive tensors, images, and point clouds
+   to and from packages in Isaac ROS DNN Inference and other CUDA-accelerated applications.
+
+Managed NITROS Subscriber
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Managed NITROS Subscriber is analogous to the Managed NITROS
+Publisher, offering a straightforward, ``rclcpp::Subscriber``-like
+interface for subscribing to messages from NITROS-enabled graphs.
+
+Managed NITROS Subscribers are specifically designed to receive
+NITROS-typed messages. These NITROS types are listed under the
+``isaac_ros_nitros_types`` subfolder.
+
+.. note::
+
+   Currently, the Managed NITROS Subscriber is compatible
+   with the ``isaac_ros_nitros_tensor_list_type``, ``isaac_ros_nitros_image_type``, and
+   ``isaac_ros_nitros_point_cloud_type``.
+
+NITROS Builders
+~~~~~~~~~~~~~~~
+
+NITROS Builders are a series of utility classes that streamline the
+process of creating a NITROS-typed message. These classes offer a
+builder-style interface, allowing developers to specify relevant fields
+for object construction one at a time:
+
+.. code:: cpp
+
+   using namespace nvidia::isaac_ros::nitros;
+   NitrosTensorList tensor_list = NitrosTensorListBuilder()
+       .WithHeader(ros_header)
+       .AddTensor("tensor_1", foo_tensor)
+       .AddTensor("tensor_2", bar_tensor)
+       .Build();
+
+The collection of NITROS Builders also includes additional builders that
+construct individual components of the broader NITROS types. For
+example, a ``NitrosTensorBuilder`` can be used to produce a
+``NitrosTensor`` that is subsequently consumed by a
+``NitrosTensorListBuilder``, and a ``NitrosPointCloudBuilder`` can be used to
+create point cloud messages with CUDA data.
+
+NITROS Views
+~~~~~~~~~~~~
+
+NITROS Views are a series of utility classes that simplify the process
+of accessing fields of a NITROS-typed message. These classes offer an
+analogous interface to the NITROS Builder, allowing developers to
+retrieve specific portions of a composite structure and process them
+accordingly.

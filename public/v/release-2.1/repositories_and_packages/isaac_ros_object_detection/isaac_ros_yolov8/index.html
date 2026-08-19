@@ -1747,8 +1747,8 @@ pip3<span class="w"> </span>install<span class="w"> </span>onnx
 </div>
 <p>Then within <code class="docutils literal notranslate"><span class="pre">python3</span></code>, export the model:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ultralytics</span><span class="w"> </span><span class="kn">import</span> <span class="n">YOLO</span>
-<span class="o">&gt;&gt;</span> <span class="n">model</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="s1">&#39;yolov8s.pt&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="n">model</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;onnx&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">model</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="s1">'yolov8s.pt'</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">model</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">'onnx'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If you are planning on using Jetson, copy the generated <code class="docutils literal notranslate"><span class="pre">.onnx</span></code>
@@ -1775,7 +1775,7 @@ docker<span class="w"> </span>cp<span class="w"> </span>yolov8s.onnx<span class=
 </ol>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/workspaces/isaac_ros-dev<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_yolov8<span class="w"> </span>isaac_ros_yolov8_visualize.launch.py<span class="w"> </span>model_file_path:<span class="o">=</span>/tmp/yolov8s.onnx<span class="w"> </span>engine_file_path:<span class="o">=</span>/tmp/yolov8s.plan<span class="w"> </span>input_binding_names:<span class="o">=[</span><span class="s1">&#39;images&#39;</span><span class="o">]</span><span class="w"> </span>output_binding_names:<span class="o">=[</span><span class="s1">&#39;output0&#39;</span><span class="o">]</span><span class="w"> </span>network_image_width:<span class="o">=</span><span class="m">640</span><span class="w"> </span>network_image_height:<span class="o">=</span><span class="m">640</span><span class="w"> </span>force_engine_update:<span class="o">=</span>False<span class="w"> </span>image_mean:<span class="o">=[</span><span class="m">0</span>.0,0.0,0.0<span class="o">]</span><span class="w"> </span>image_stddev:<span class="o">=[</span><span class="m">1</span>.0,1.0,1.0<span class="o">]</span><span class="w"> </span>input_image_width:<span class="o">=</span><span class="m">640</span><span class="w"> </span>input_image_height:<span class="o">=</span><span class="m">640</span><span class="w"> </span>confidence_threshold:<span class="o">=</span><span class="m">0</span>.25<span class="w"> </span>nms_threshold:<span class="o">=</span><span class="m">0</span>.45
+<span class="w">   </span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_yolov8<span class="w"> </span>isaac_ros_yolov8_visualize.launch.py<span class="w"> </span>model_file_path:<span class="o">=</span>/tmp/yolov8s.onnx<span class="w"> </span>engine_file_path:<span class="o">=</span>/tmp/yolov8s.plan<span class="w"> </span>input_binding_names:<span class="o">=[</span><span class="s1">'images'</span><span class="o">]</span><span class="w"> </span>output_binding_names:<span class="o">=[</span><span class="s1">'output0'</span><span class="o">]</span><span class="w"> </span>network_image_width:<span class="o">=</span><span class="m">640</span><span class="w"> </span>network_image_height:<span class="o">=</span><span class="m">640</span><span class="w"> </span>force_engine_update:<span class="o">=</span>False<span class="w"> </span>image_mean:<span class="o">=[</span><span class="m">0</span>.0,0.0,0.0<span class="o">]</span><span class="w"> </span>image_stddev:<span class="o">=[</span><span class="m">1</span>.0,1.0,1.0<span class="o">]</span><span class="w"> </span>input_image_width:<span class="o">=</span><span class="m">640</span><span class="w"> </span>input_image_height:<span class="o">=</span><span class="m">640</span><span class="w"> </span>confidence_threshold:<span class="o">=</span><span class="m">0</span>.25<span class="w"> </span>nms_threshold:<span class="o">=</span><span class="m">0</span>.45
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1887,7 +1887,7 @@ A sample image (<code class="docutils literal notranslate"><span class="pre">peo
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, NVIDIA.
-      <span class="lastupdated">Last updated on Jul 08, 2026.
+      <span class="lastupdated">Last updated on Aug 18, 2026.
       </span></p>
   </div>
 
@@ -1924,12 +1924,13 @@ A sample image (<code class="docutils literal notranslate"><span class="pre">peo
     <div class="rst-other-versions">
         <dl>
             <dt>Releases</dt>
+            <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-3.2</a></dd>
             <dd><a href="../../../../release-4.4/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-4.4</a></dd>
             <dd><a href="../../../../release-4.5/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-4.5</a></dd>
+            <dd><a href="../../../../release-4.6/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-4.6</a></dd>
             <dd><a href="../../../../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">latest</a></dd>
             <dd><a href="index.html">release-2.1</a></dd>
             <dd><a href="../../../../release-3.1/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-3.1</a></dd>
-            <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-3.2</a></dd>
             <dd><a href="../../../../release-4.0/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-4.0</a></dd>
             <dd><a href="../../../../release-4.1/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-4.1</a></dd>
             <dd><a href="../../../../release-4.2/repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html">release-4.2</a></dd>

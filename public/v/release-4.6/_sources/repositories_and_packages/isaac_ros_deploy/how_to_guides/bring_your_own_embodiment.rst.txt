@@ -1,0 +1,206 @@
+================================
+How to bring your own embodiment
+================================
+
+Isaac ROS Deploy uses ``ros2_control`` to interface with robot hardware. This
+guide shows how to create the required package skeletons, add the
+``SystemInterface`` implementations for the real and simulated robot, and add
+the corresponding launch and configuration files.
+
+Prerequisites
+=============
+
+Before you begin, make sure you have:
+
+- A URDF description of the robot
+- A simulator asset (USD or MJCF) for each simulation platform that you plan
+  to support
+- A C++ robot SDK for the real hardware
+
+Use the Unitree G1 integration as a working example while following the steps:
+
+- :ir_github:`<isaac_ros_robots> <unitree_g1/unitree_g1_description>` contains
+  the robot descriptions and platform-specific ``ros2_control`` xacros.
+- :ir_github:`<isaac_ros_robots> <unitree_g1/unitree_g1_ros2_control>` contains
+  the real-hardware ``SystemInterface`` plugin.
+- :ir_github:`<isaac_ros_robots> <unitree_g1/unitree_g1_bringup>` contains the
+  controller configuration and launch files.
+
+1. Create the package layout
+============================
+
+Create three packages for the new robot, following the G1 split:
+
+``<robot>_description``
+   Owns URDF or xacro descriptions and simulator assets.
+
+``<robot>_ros2_control``
+   Owns the real-hardware ``SystemInterface`` plugin.
+
+``<robot>_bringup``
+   Owns controller configuration, policy groups, and launch files.
+
+
+2. Define the ROS 2 Control interfaces
+======================================
+
+Next, determine which ROS 2 Control state and command interfaces the new
+embodiment should expose. Use the same interfaces for the real and simulated
+``SystemInterface`` implementations.
+
+For each target platform, add a ``ros2_control`` xacro to
+the ``<robot>_description`` package. Each xacro must define:
+
+- The platform-specific hardware plugin and its parameters
+- The command and state interfaces for each joint
+- The state interfaces for each IMU or other sensor
+
+The G1 integration provides an example for each platform:
+
+- MuJoCo:
+  :ir_repo:`g1_ros2_control.urdf.xacro <isaac_ros_robots> <unitree_g1/unitree_g1_description/urdf/g1_ros2_control.urdf.xacro>`
+- Isaac Sim:
+  :ir_repo:`g1_isaacsim_ros2_control.urdf.xacro <isaac_ros_robots> <unitree_g1/unitree_g1_description/urdf/g1_isaacsim_ros2_control.urdf.xacro>`
+- Real robot:
+  :ir_repo:`g1_real_ros2_control.urdf.xacro <isaac_ros_robots> <unitree_g1/unitree_g1_description/urdf/g1_real_ros2_control.urdf.xacro>`
+
+3. Add each target platform
+===========================
+
+Implement only the tabs needed by the new robot.
+
+.. tabs::
+
+   .. tab:: MuJoCo
+
+      You don't need to implement a new ``SystemInterface`` for MuJoCo. Reuse
+      ``mujoco_ros2_control`` and its ``MujocoSystemInterface``, and configure
+      it with the robot's MJCF model. Provide:
+
+      #. A MuJoCo MJCF model.
+      #. A ``mujoco_pid.yaml`` parameter file. Pass this file to the controller
+         manager. When a controller claims the ``position``, ``kp``, and ``kd``
+         interfaces, ``MujocoSystemInterface`` uses the commanded gains instead
+         of the values under ``pid_gains``. The file can also configure optional
+         MuJoCo plugins, such as a virtual gantry.
+      #. A ``ros2_control`` xacro that selects ``MujocoSystemInterface`` and
+         declares the shared interface contract from step 2.
+
+      The result is a robot description that the controller manager can load
+      with the MuJoCo hardware plugin.
+
+   .. tab:: Isaac Sim
+
+      You don't need to implement a new ``SystemInterface`` for Isaac Sim.
+      Reuse the ``TopicBasedSystemInterface`` provided by Isaac ROS Deploy to
+      communicate with Isaac Sim over ROS 2 topics. Start with a USD file for
+      the robot. Modify the USD to include the appropriate actuator models and
+      OmniGraph nodes for communicating with ``ros2_control``. Isaac ROS Deploy
+      provides bake scripts that add these components automatically.
+
+      Set ``ISAAC_PATH`` to the root of the Isaac Sim installation. This
+      directory must contain ``python.sh`` and ``isaac-sim.sh``. Then set up the
+      Isaac Sim environment for the bake scripts:
+
+      .. code:: bash
+
+         export PYTHONPATH=${ISAAC_ROS_WS}/src/isaac_ros_deploy/isaac_deploy/isaac_ros_deploy_isaac_sim_extension:$PYTHONPATH
+         export LD_LIBRARY_PATH=$ISAAC_PATH/exts/isaacsim.ros2.core/jazzy/lib:$LD_LIBRARY_PATH
+         export ROS_DISTRO=jazzy
+         export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+         PKG=isaac_ros_deploy_isaac_sim_extension.scripts
+
+      Then prepare the USD in two stages:
+
+      #. Add one Newton PD actuator per joint and remove competing native drive
+         gains:
+
+         .. code:: bash
+
+            $ISAAC_PATH/python.sh -m $PKG.add_newton_actuators_to_robot \
+                --usd <robot.usd or assets-root URL> --out <actuators.usd>
+
+         Every joint must define a finite ``physics:maxForce`` effort limit.
+         The baker uses that value to clamp actuator effort. It also replaces a
+         zero armature with a small positive value for the explicit PD actuator.
+
+      #. Add the OmniGraph nodes for the default joint-state, IMU, clock, and
+         joint-command ROS 2 topics:
+
+         .. code:: bash
+
+            $ISAAC_PATH/python.sh -m $PKG.add_ros2_bridge_to_robot \
+                --usd <actuators.usd> --out <deploy.usd>
+
+         Add more publishers or subscribers manually when the policy requires
+         signals outside this default bridge.
+
+      Start Isaac Sim with the baked USD before starting the controller
+      manager:
+
+      .. code:: bash
+
+         $ISAAC_PATH/isaac-sim.sh \
+             --ext-folder <ext-package-dir> \
+             --enable isaac_ros_deploy_isaac_sim_extension \
+             --/exts/isaac_ros_deploy_isaac_sim_extension/usd=<deploy.usd>
+
+      For a complete Isaac Sim deployment example, follow the
+      :doc:`AGILE WBC deployment tutorial <../tutorials/deploy_agile>`.
+
+   .. tab:: Real robot
+
+      To interface with real hardware, implement a new C++ class derived from
+      ``hardware_interface::SystemInterface`` in ``<robot>_ros2_control``:
+
+      #. Implement lifecycle, interface export, ``read()``, ``write()``, and
+         command-mode switching for the robot SDK.
+      #. Map URDF joint names to vendor SDK motor indices. Do not rely on the
+         controller and SDK using the same joint order.
+      #. Register the class with ``pluginlib`` and reference that plugin from the
+         real-hardware ``ros2_control`` xacro.
+
+      Use
+      :ir_repo:`unitree_g1_system_interface.cpp <isaac_ros_robots> <unitree_g1/unitree_g1_ros2_control/src/unitree_g1_system_interface.cpp>`
+      and
+      :ir_repo:`unitree_g1_system_interface_plugin.xml <isaac_ros_robots> <unitree_g1/unitree_g1_ros2_control/unitree_g1_system_interface_plugin.xml>`
+      as concrete examples. The upstream ``ros2_control`` guide also explains
+      `how to write a hardware component
+      <https://control.ros.org/rolling/doc/ros2_control/hardware_interface/doc/writing_new_hardware_component.html>`__.
+
+4. Configure controllers and policy groups
+===========================================
+
+Add two files to ``<robot>_bringup``:
+
+``controller_manager.yaml``
+   Declares controller plugins, joints, gains, and controller-specific
+   parameters.
+
+``controller_groups.yaml``
+   Groups the controllers that run together. A policy group identifies the
+   LEAPP bundle, source-to-topic mappings, command-interface prefix and suffix,
+   and controller activation order.
+
+Use the G1
+:ir_repo:`controller_manager.yaml <isaac_ros_robots> <unitree_g1/unitree_g1_bringup/config/controller_manager.yaml>`
+and
+:ir_repo:`controller_groups.yaml <isaac_ros_robots> <unitree_g1/unitree_g1_bringup/config/controller_groups.yaml>`
+files as a starting point. Remove G1-specific joints, controllers, and thresholds
+instead of carrying them into the new robot unchanged.
+
+5. Validate one layer at a time
+===============================
+
+Validate the integration in this order on every supported platform:
+
+#. The robot description expands without xacro or URDF errors.
+#. The controller manager loads the selected hardware plugin.
+#. State interfaces update with the expected joint and sensor names.
+#. A simple test controller can claim and write the expected command interfaces.
+#. The configured controller group loads with the LEAPP runtime selected for the
+   policy.
+
+Start with simulation. Move to real hardware only after the description,
+interface names, controller configuration, and policy tensor ordering match the
+simulation integration.

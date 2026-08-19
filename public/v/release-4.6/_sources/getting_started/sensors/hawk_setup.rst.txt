@@ -1,0 +1,251 @@
+=======================================
+Isaac ROS Hawk GMSL Stereo Camera Setup
+=======================================
+
+The `Leopard Imaging Hawk <https://leopardimaging.com/product/automotive-cameras/cameras-by-interface/adi-gmsl2-cameras/li-ar0234cs-stereo-gmsl2/li-ar0234cs-stereo-gmsl2-30/>`__
+is a GMSL2 stereo camera built around two synchronized 1920x1200 AR0234 global-shutter sensors.
+It is supported by NVIDIA's Sensor Interface Processing Library (SIPL) framework and integrated to ROS through the
+``isaac_ros_sipl_camera`` package.
+
+For more information on the SIPL framework, see:
+
+* `SIPL Application Development Guide <https://docs.nvidia.com/jetson/archives/r39.2/DeveloperGuide/SD/CameraDevelopment/SIPLFramework/SIPL-for-L4T/SIPL-App-Development-Guide.html>`__
+* `GMSL UDDF Driver Guide <https://docs.nvidia.com/jetson/archives/r39.2/DeveloperGuide/SD/CameraDevelopment/SIPLFramework/SIPL-for-L4T/GMSL/GMSL-UDDF-Driver-Guide.html>`__
+
+Host System Compatibility
+--------------------------
+
+Only the **Jetson AGX Orin Developer Kit** on **JetPack 7.2.0** (R39.2.0) with a **Leopard Imaging Hawk**
+camera attached over GMSL with a **P3762_A03** GMSL board was validated together with the Isaac ROS ``isaac_ros_sipl_camera`` package. Other platforms may also be compatible.
+
+Hardware Requirements
+---------------------
+
+* **Jetson AGX Orin Developer Kit** with JetPack 7.2 installed.
+* **Leopard Imaging Hawk stereo camera** (dual AR0234, GMSL2).
+* A **GMSL camera distribution board** for the Orin AGX (e.g. Leopard Imaging ``P3762_A03`` GMSL board. Older revisions of ``P3762`` and ``E3653`` boards are not currently supported.), with a dedicated **12 V power input** and one or more camera channels.
+* The FAKRA/coax cabling that ships with the camera kit.
+
+.. note::
+
+   The GMSL distribution board requires its **own 12 V power supply, separate from the Jetson**. The
+   board in turn delivers power to the cameras over the coax.
+
+Setup Instructions
+------------------
+
+This tutorial assumes you have completed the instructions in
+:doc:`Developer Environment Setup </getting_started/index>`.
+
+#. If the Hawk camera is not connected, power off the Jetson to connect the Hawk camera to the GMSL distribution board. Connect the
+   distribution board to the Jetson, supply the board's 12 V power, and turn the Jetson back on.
+
+   .. note::
+
+      A single Hawk stereo pair on channel 0 corresponds to the default ``link_mask: 0x0001`` in ``hawk_stereo.yaml``.
+      After power-up, verify that the corresponding channel LED on the ``P3762`` distribution board is green.
+      An orange LED indicates that the camera is not powered or the link is not established; check the power and
+      connections at the board and camera before continuing.
+
+#. Install the V4L2 utilities, which provide the ``v4l2-ctl`` tool used by the readiness checks
+   below (the base image does not include it):
+
+   .. code:: bash
+
+      sudo apt-get update && sudo apt-get install -y v4l-utils
+
+#. Run the readiness checks.
+
+   **Check 1: capture subsystem up** (the camera-agnostic path SIPL captures over):
+
+   .. code:: bash
+
+      lsmod | grep -E 'tegra_camera_rtcpu|capture_ivc'
+      ls /dev/capture-vi-channel0 /dev/capture-isp-channel0
+
+   Both modules and both nodes must be present. If not, the capture subsystem (or RCE firmware)
+   did not come up. Fix this first. These channels are a fixed pool and say nothing about whether
+   a camera is attached.
+
+   **Check 2: Hawk overlay applied and links locked.** The Hawk overlay binds the ``max96712``
+   kernel driver and exposes a V4L2 device per locked sensor:
+
+   .. code:: bash
+
+      lsmod | grep max96712
+      cat /proc/device-tree/tegra-camera-platform/modules/module0/badge
+      v4l2-ctl --list-devices
+
+   Expect ``max96712`` listed, an ``ar0234_*`` badge, and one or more ``vi-output, ar0234
+   <bus>-00xx`` entries (two ``/dev/video*`` nodes per stereo camera).
+
+#. If Check 2 fails, configure the AGX CSI connector for the ``P3762`` and Hawk camera device-tree
+   overlay with Jetson-IO, then reboot.
+
+   List the camera configurations available on the target:
+
+   .. code:: bash
+
+      sudo python3 /opt/nvidia/jetson-io/config-by-hardware.py -l
+
+   Select the Hawk configuration that best matches your setup:
+
+   .. code:: bash
+
+      sudo python3 /opt/nvidia/jetson-io/config-by-hardware.py \
+         -n '2=Jetson Camera 1-Hawk p3762 module' && sudo reboot
+
+   Jetson-IO creates a boot entry containing both the explicit base ``FDT`` and the Hawk
+   ``OVERLAYS`` directive.
+
+   If Jetson-IO tool fails with ``RuntimeError: No DTB found``, apply the overlay manually as described in
+   `Jetson-IO Cannot Find a Base DTB`_ section.
+
+   After the target restarts, repeat the readiness checks in the previous steps.
+
+.. note::
+
+   On Orin/R39.2 the Hawk overlay binds the kernel ``max96712``/``nv_hawk_owl`` drivers and creates
+   ``/dev/video*`` nodes. SIPL does not stream through these, but they are a convenient way to
+   confirm the overlay is applied and the GMSL links are locked. This guide targets **Jetson AGX
+   Orin / JetPack 7.2 (R39.2)**; other releases may not create ``/dev/video*`` nodes.
+
+Visualize the Camera Streams
+----------------------------
+
+Use the ``isaac_ros_sipl_camera`` package to publish the Hawk stereo streams over ROS 2.
+Refer to the :doc:`Isaac ROS SIPL Camera </repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index>`
+documentation for instructions on how to install, launch the camera driver nodes (GMSL launch
+tab), and visualize the camera streams. The Hawk publishes ``/left/image_raw`` and
+``/right/image_raw`` at 1920x1200 @ 30 fps.
+
+Troubleshooting
+---------------
+
+This section covers problems bringing up the camera hardware and device tree. For problems running
+the camera nodes, refer to the troubleshooting section of the
+:doc:`Isaac ROS SIPL Camera </repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index>`
+documentation.
+
+Jetson-IO Cannot Find a Base DTB
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+``config-by-hardware.py`` exits before it lists or applies any configuration:
+
+.. code:: text
+
+   RuntimeError: No DTB found for NVIDIA Jetson AGX Orin Developer Kit!
+
+Jetson-IO searches ``/boot/dtb`` for a kernel device tree blob whose ``compatible`` and ``model``
+properties both match the running board exactly. This error means the directory holds no matching
+blob, so the tool exits before it can list or apply anything.
+
+Solution
+""""""""
+
+Add the base device tree and the camera overlay to ``/boot/extlinux/extlinux.conf`` manually. The
+boot entry must name an explicit ``FDT``. Adding only an ``OVERLAYS`` line to an entry that boots
+the firmware-supplied device tree does not apply the camera nodes.
+
+#. Install the device tree compiler, which provides the ``fdtget`` tool:
+
+   .. code:: bash
+
+      sudo apt-get update && sudo apt-get install -y device-tree-compiler
+
+#. Identify the base DTB that matches the running board. The kernel always exposes the booted
+   board's ``compatible`` property, which identifies the Jetson carrier and module, not the
+   camera. Print it, then list the device trees in ``/boot`` that declare the same string:
+
+   .. code:: bash
+
+      board=$(tr '\0' ' ' < /proc/device-tree/compatible | sed 's/ *$//'); echo "$board"
+      for f in /boot/*.dtb; do
+         if [ "$(fdtget -t s "$f" / compatible)" = "$board" ]; then
+            echo "$f"
+         fi
+      done
+
+   The command matches on the ``compatible`` property rather than the file name because the two do
+   not always agree.
+
+   An AGX Orin Developer Kit with a ``p3701-0005`` module reports ``compatible`` string as
+   ``nvidia,p3737-0000+p3701-0005 nvidia,p3701-0005 nvidia,tegra234`` and matches
+   ``/boot/tegra234-p3737-0000+p3701-0005-nv.dtb``. When several files match, use the ``-nv``
+   variant, which is the device tree the flashing tools install as the kernel DTB. The same device
+   tree can also appear with a ``kernel_`` prefix. These copies are expected to be identical, so
+   either path works.
+
+#. Identify the Hawk overlay for the number of cameras attached to the board:
+
+   .. code:: bash
+
+      ls /boot/*3762*.dtbo
+
+   The one-Hawk configuration uses ``/boot/tegra234-p3737-camera-p3762-a00-1Hawk-overlay.dtbo``.
+
+#. Back up the boot configuration:
+
+   .. code:: bash
+
+      sudo cp /boot/extlinux/extlinux.conf /boot/extlinux/extlinux.conf.bak
+
+#. Add the ``FDT`` and ``OVERLAYS`` lines to the ``primary`` entry in
+   ``/boot/extlinux/extlinux.conf``, leaving the existing ``APPEND`` line unchanged:
+
+   .. code:: text
+
+      LABEL primary
+            MENU LABEL primary kernel
+            LINUX /boot/Image
+            INITRD /boot/initrd
+            APPEND ${cbootargs} ...
+            FDT /boot/tegra234-p3737-0000+p3701-0005-nv.dtb
+            OVERLAYS /boot/tegra234-p3737-camera-p3762-a00-1Hawk-overlay.dtbo
+
+   Use one ``OVERLAYS`` directive per boot entry. If the entry already has an overlay, append the Hawk
+   overlay to it as a comma-separated list and no spaces.
+
+#. Reboot and repeat the readiness checks in `Setup Instructions`_:
+
+   .. code:: bash
+
+      sudo reboot
+
+.. note::
+
+   An incorrect ``FDT`` can leave the target unable to boot. Have a
+   `serial console <https://developer.nvidia.com/embedded/learn/jetson-agx-orin-devkit-user-guide/developer_kit_layout.html>`__
+   available so you can restore ``/boot/extlinux/extlinux.conf.bak`` if the target does not come up.
+
+Verifying GMSL Link Lock
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use Check 2 (``v4l2-ctl --list-devices``) from `Setup Instructions`_ to see which links locked.
+Each connected Hawk shows as a ``vi-output, ar0234 <bus>-00xx`` group; the lowest-numbered link is
+``link_mask: 0x0001``, the next ``0x0002``, and so on.
+
+The boot log can give more detail:
+
+.. code:: bash
+
+   sudo dmesg | grep -iE "ar0234|max96712|hawk"
+
+The log ring buffer can rotate, so an empty grep is not itself proof of a problem. Treat
+``v4l2-ctl --list-devices`` as authoritative.
+
+.. note::
+
+   Only single-link GMSL camera capture has been proven to work as of the Jetson Linux (L4T) R39.2
+   release. Select a single link with ``link_mask``. Concurrent multi-link capture is not yet
+   supported by the SIPL framework and driver level.
+
+Frame Drop / Discontinuity Warnings at Startup
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A short burst of ``ICP Frame drop detected`` and ``Frame discontinuity ... frame 0`` warnings at
+node startup is expected as the pipeline fills. The stream settles to a steady 30 fps; these
+startup warnings can be ignored.

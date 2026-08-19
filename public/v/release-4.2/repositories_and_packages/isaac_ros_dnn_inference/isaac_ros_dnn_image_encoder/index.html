@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -686,12 +686,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.4/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-4.4</a></dd>
         <dd><a href="../../../../release-4.5/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-4.5</a></dd>
+        <dd><a href="../../../../release-4.6/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-4.6</a></dd>
         <dd><a href="../../../../../repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">latest</a></dd>
         <dd><a href="../../../../release-2.1/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-2.1</a></dd>
         <dd><a href="../../../../release-3.1/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-3.1</a></dd>
-        <dd><a href="../../../../release-3.2/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.0/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-4.0</a></dd>
         <dd><a href="../../../../release-4.1/repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index.html">release-4.1</a></dd>
         <dd><a href="index.html">release-4.2</a></dd>
@@ -768,21 +769,21 @@ whereas another model may expect only resizing.</p>
 <div><ol class="arabic">
 <li><p>Open a launch file where the <code class="docutils literal notranslate"><span class="pre">DNNImageEncoderNode</span></code> is used. We assume that your launch file has code that looks along the lines of:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encoder_node</span> <span class="o">=</span> <span class="n">ComposableNode</span><span class="p">(</span>
-  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;encoder_node&#39;</span><span class="p">,</span>
-  <span class="n">package</span><span class="o">=</span><span class="s1">&#39;isaac_ros_dnn_image_encoder&#39;</span><span class="p">,</span>
-  <span class="n">plugin</span><span class="o">=</span><span class="s1">&#39;nvidia::isaac_ros::dnn_inference::DnnImageEncoderNode&#39;</span><span class="p">,</span>
+  <span class="n">name</span><span class="o">=</span><span class="s1">'encoder_node'</span><span class="p">,</span>
+  <span class="n">package</span><span class="o">=</span><span class="s1">'isaac_ros_dnn_image_encoder'</span><span class="p">,</span>
+  <span class="n">plugin</span><span class="o">=</span><span class="s1">'nvidia::isaac_ros::dnn_inference::DnnImageEncoderNode'</span><span class="p">,</span>
   <span class="n">parameters</span><span class="o">=</span><span class="p">[{</span>
-    <span class="s1">&#39;input_image_width&#39;</span><span class="p">:</span> <span class="n">input_image_width</span><span class="p">,</span>
-    <span class="s1">&#39;input_image_height&#39;</span><span class="p">:</span> <span class="n">input_image_height</span><span class="p">,</span>
-    <span class="s1">&#39;network_image_width&#39;</span><span class="p">:</span> <span class="n">network_image_width</span><span class="p">,</span>
-    <span class="s1">&#39;network_image_height&#39;</span><span class="p">:</span> <span class="n">network_image_height</span><span class="p">,</span>
-    <span class="s1">&#39;image_mean&#39;</span><span class="p">:</span> <span class="n">encoder_image_mean</span><span class="p">,</span>
-    <span class="s1">&#39;image_stddev&#39;</span><span class="p">:</span> <span class="n">encoder_image_stddev</span><span class="p">,</span>
-    <span class="s1">&#39;num_blocks&#39;</span><span class="p">:</span> <span class="n">num_blocks</span><span class="p">,</span>
+    <span class="s1">'input_image_width'</span><span class="p">:</span> <span class="n">input_image_width</span><span class="p">,</span>
+    <span class="s1">'input_image_height'</span><span class="p">:</span> <span class="n">input_image_height</span><span class="p">,</span>
+    <span class="s1">'network_image_width'</span><span class="p">:</span> <span class="n">network_image_width</span><span class="p">,</span>
+    <span class="s1">'network_image_height'</span><span class="p">:</span> <span class="n">network_image_height</span><span class="p">,</span>
+    <span class="s1">'image_mean'</span><span class="p">:</span> <span class="n">encoder_image_mean</span><span class="p">,</span>
+    <span class="s1">'image_stddev'</span><span class="p">:</span> <span class="n">encoder_image_stddev</span><span class="p">,</span>
+    <span class="s1">'num_blocks'</span><span class="p">:</span> <span class="n">num_blocks</span><span class="p">,</span>
   <span class="p">}],</span>
   <span class="n">remappings</span><span class="o">=</span><span class="p">[</span>
-    <span class="p">(</span><span class="s1">&#39;encoded_tensor&#39;</span><span class="p">,</span> <span class="s1">&#39;tensor_pub&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">'encoded_tensor'</span><span class="p">,</span> <span class="s1">'tensor_pub'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">'image'</span><span class="p">,</span> <span class="s1">'img'</span><span class="p">),</span>
   <span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
@@ -796,24 +797,24 @@ whereas another model may expect only resizing.</p>
 </div>
 </li>
 <li><p>Go to the section where the <code class="docutils literal notranslate"><span class="pre">encoder_node</span></code> is defined and replace it with:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encoder_dir</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">&#39;isaac_ros_dnn_image_encoder&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encoder_dir</span> <span class="o">=</span> <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">'isaac_ros_dnn_image_encoder'</span><span class="p">)</span>
 <span class="n">encoder_launch</span> <span class="o">=</span> <span class="n">IncludeLaunchDescription</span><span class="p">(</span>
   <span class="n">PythonLaunchDescriptionSource</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">encoder_dir</span><span class="p">,</span> <span class="s1">&#39;launch&#39;</span><span class="p">,</span> <span class="s1">&#39;dnn_image_encoder.launch.py&#39;</span><span class="p">)]</span>
+    <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">encoder_dir</span><span class="p">,</span> <span class="s1">'launch'</span><span class="p">,</span> <span class="s1">'dnn_image_encoder.launch.py'</span><span class="p">)]</span>
   <span class="p">),</span>
   <span class="n">launch_arguments</span><span class="o">=</span><span class="p">{</span>
-    <span class="s1">&#39;input_image_width&#39;</span><span class="p">:</span> <span class="n">input_image_width</span><span class="p">,</span>
-    <span class="s1">&#39;input_image_height&#39;</span><span class="p">:</span> <span class="n">input_image_height</span><span class="p">,</span>
-    <span class="s1">&#39;network_image_width&#39;</span><span class="p">:</span> <span class="n">network_image_width</span><span class="p">,</span>
-    <span class="s1">&#39;network_image_height&#39;</span><span class="p">:</span> <span class="n">network_image_height</span><span class="p">,</span>
-    <span class="s1">&#39;image_mean&#39;</span><span class="p">:</span> <span class="n">encoder_image_mean</span><span class="p">,</span>
-    <span class="s1">&#39;image_stddev&#39;</span><span class="p">:</span> <span class="n">encoder_image_stddev</span><span class="p">,</span>
-    <span class="s1">&#39;attach_to_shared_component_container&#39;</span><span class="p">:</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;component_container_name&#39;</span><span class="p">:</span> <span class="s1">&#39;my_container&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;dnn_image_encoder_namespace&#39;</span><span class="p">:</span> <span class="s1">&#39;my_encoder_namespace&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;image_input_topic&#39;</span><span class="p">:</span> <span class="s1">&#39;/image&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;camera_info_input_topic&#39;</span><span class="p">:</span> <span class="s1">&#39;/camera_info&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;tensor_output_topic&#39;</span><span class="p">:</span> <span class="s1">&#39;/tensor_pub&#39;</span><span class="p">,</span>
+    <span class="s1">'input_image_width'</span><span class="p">:</span> <span class="n">input_image_width</span><span class="p">,</span>
+    <span class="s1">'input_image_height'</span><span class="p">:</span> <span class="n">input_image_height</span><span class="p">,</span>
+    <span class="s1">'network_image_width'</span><span class="p">:</span> <span class="n">network_image_width</span><span class="p">,</span>
+    <span class="s1">'network_image_height'</span><span class="p">:</span> <span class="n">network_image_height</span><span class="p">,</span>
+    <span class="s1">'image_mean'</span><span class="p">:</span> <span class="n">encoder_image_mean</span><span class="p">,</span>
+    <span class="s1">'image_stddev'</span><span class="p">:</span> <span class="n">encoder_image_stddev</span><span class="p">,</span>
+    <span class="s1">'attach_to_shared_component_container'</span><span class="p">:</span> <span class="s1">'True'</span><span class="p">,</span>
+    <span class="s1">'component_container_name'</span><span class="p">:</span> <span class="s1">'my_container'</span><span class="p">,</span>
+    <span class="s1">'dnn_image_encoder_namespace'</span><span class="p">:</span> <span class="s1">'my_encoder_namespace'</span><span class="p">,</span>
+    <span class="s1">'image_input_topic'</span><span class="p">:</span> <span class="s1">'/image'</span><span class="p">,</span>
+    <span class="s1">'camera_info_input_topic'</span><span class="p">:</span> <span class="s1">'/camera_info'</span><span class="p">,</span>
+    <span class="s1">'tensor_output_topic'</span><span class="p">:</span> <span class="s1">'/tensor_pub'</span><span class="p">,</span>
   <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
 <span class="p">)</span>
 </pre></div>
@@ -1151,7 +1152,7 @@ with this name.</p></td>
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       

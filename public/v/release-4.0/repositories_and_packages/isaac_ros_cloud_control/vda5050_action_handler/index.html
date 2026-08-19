@@ -63,7 +63,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Jul 08, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 18, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -676,12 +676,13 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
+        <dd><a href="../../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../../release-4.4/repositories_and_packages/isaac_ros_cloud_control/vda5050_action_handler/index.html">release-4.4</a></dd>
         <dd><a href="../../../../release-4.5/repositories_and_packages/isaac_ros_cloud_control/vda5050_action_handler/index.html">release-4.5</a></dd>
+        <dd><a href="../../../../release-4.6/repositories_and_packages/isaac_ros_cloud_control/vda5050_action_handler/index.html">release-4.6</a></dd>
         <dd><a href="../../../../../repositories_and_packages/isaac_ros_cloud_control/vda5050_action_handler/index.html">latest</a></dd>
         <dd><a href="../../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../../release-3.1/index.html">release-3.1</a></dd>
-        <dd><a href="../../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="index.html">release-4.0</a></dd>
         <dd><a href="../../../../release-4.1/repositories_and_packages/isaac_ros_cloud_control/vda5050_action_handler/index.html">release-4.1</a></dd>
         <dd><a href="../../../../release-4.2/repositories_and_packages/isaac_ros_cloud_control/vda5050_action_handler/index.html">release-4.2</a></dd>
@@ -800,7 +801,7 @@ to handle the action.</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">Initialize</span><span class="p">(</span><span class="n">Vda5050ClientNode</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">client_node</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">YAML</span><span class="o">::</span><span class="n">Node</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">config</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">client_node_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client_node</span><span class="p">;</span>
 <span class="w">  </span><span class="n">some_action_client_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rclcpp_action</span><span class="o">::</span><span class="n">create_client</span><span class="o">&lt;</span><span class="n">SomeAction</span><span class="o">&gt;</span><span class="p">(</span>
-<span class="w">    </span><span class="n">client_node_</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;some_action&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">client_node_</span><span class="p">,</span><span class="w"> </span><span class="s">"some_action"</span><span class="p">);</span>
 <span class="w">  </span><span class="p">...</span>
 <span class="p">}</span>
 </pre></div>
@@ -818,9 +819,9 @@ typically, updates to <code class="docutils literal notranslate"><span class="pr
 </pre></div>
 </div>
 <p>Create a <code class="docutils literal notranslate"><span class="pre">plugins.xml</span></code> file in your package and add the plugin declaration to it:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;library</span><span class="w"> </span><span class="na">path=</span><span class="s">&quot;vda5050_action_handler_plugins&quot;</span><span class="nt">&gt;</span>
-<span class="w">  </span><span class="nt">&lt;class</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;&lt;your_action_handler_class_name&gt;&quot;</span>
-<span class="w">    </span><span class="na">base_class_type=</span><span class="s">&quot;isaac_ros::mission_client::Vda5050ActionHandlerBase&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;library</span><span class="w"> </span><span class="na">path=</span><span class="s">"vda5050_action_handler_plugins"</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;class</span><span class="w"> </span><span class="na">type=</span><span class="s">"&lt;your_action_handler_class_name&gt;"</span>
+<span class="w">    </span><span class="na">base_class_type=</span><span class="s">"isaac_ros::mission_client::Vda5050ActionHandlerBase"</span><span class="nt">&gt;</span>
 <span class="w">    </span><span class="nt">&lt;description&gt;</span><span class="w"> </span>action<span class="w"> </span>handler<span class="w"> </span>description<span class="w"> </span><span class="nt">&lt;/description&gt;</span>
 <span class="w">  </span><span class="nt">&lt;/class&gt;</span>
 <span class="nt">&lt;/library&gt;</span>
@@ -893,14 +894,14 @@ and creates plugin instances for each action handler.</p>
 <h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
 <ol class="arabic">
 <li><p>Plugin class not found:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>According<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>loaded<span class="w"> </span>plugin<span class="w"> </span>descriptions<span class="w"> </span>the<span class="w"> </span>class<span class="w"> </span>&lt;plugin<span class="w"> </span>class<span class="w"> </span>name&gt;<span class="w"> </span>with<span class="w"> </span>base<span class="w"> </span>class<span class="w"> </span><span class="nb">type</span><span class="w"> </span>isaac_ros::mission_client::Vda5050ActionHandlerBase<span class="w"> </span>does<span class="w"> </span>not<span class="w"> </span>exist.<span class="s2">&quot;,</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>According<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>loaded<span class="w"> </span>plugin<span class="w"> </span>descriptions<span class="w"> </span>the<span class="w"> </span>class<span class="w"> </span>&lt;plugin<span class="w"> </span>class<span class="w"> </span>name&gt;<span class="w"> </span>with<span class="w"> </span>base<span class="w"> </span>class<span class="w"> </span><span class="nb">type</span><span class="w"> </span>isaac_ros::mission_client::Vda5050ActionHandlerBase<span class="w"> </span>does<span class="w"> </span>not<span class="w"> </span>exist.<span class="s2">",</span>
 </pre></div>
 </div>
 <p>Verify that you have a plugin declaration in <code class="docutils literal notranslate"><span class="pre">plugins.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>.</p>
 </li>
 <li><p>Plugin library not created or loaded:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>MultiLibraryClassLoader:<span class="w"> </span>Could<span class="w"> </span>not<span class="w"> </span>create<span class="w"> </span>object<span class="w"> </span>of<span class="w"> </span>class<span class="w"> </span><span class="nb">type</span><span class="w"> </span>&lt;plugin<span class="w"> </span>class<span class="w"> </span>name&gt;<span class="w"> </span>as<span class="w"> </span>no<span class="w"> </span>factory<span class="w"> </span>exists<span class="w"> </span><span class="k">for</span><span class="w"> </span>it.
-Make<span class="w"> </span>sure<span class="w"> </span>that<span class="w"> </span>the<span class="w"> </span>library<span class="w"> </span>exists<span class="w"> </span>and<span class="w"> </span>was<span class="w"> </span>explicitly<span class="w"> </span>loaded<span class="w"> </span>through<span class="w"> </span>MultiLibraryClassLoader::loadLibrary<span class="o">()</span><span class="s2">&quot;</span>
+Make<span class="w"> </span>sure<span class="w"> </span>that<span class="w"> </span>the<span class="w"> </span>library<span class="w"> </span>exists<span class="w"> </span>and<span class="w"> </span>was<span class="w"> </span>explicitly<span class="w"> </span>loaded<span class="w"> </span>through<span class="w"> </span>MultiLibraryClassLoader::loadLibrary<span class="o">()</span><span class="s2">"</span>
 </pre></div>
 </div>
 <p>Verify that you have exported the plugin in your source code.</p>
@@ -1062,7 +1063,7 @@ Make<span class="w"> </span>sure<span class="w"> </span>that<span class="w"> </s
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Jul 08, 2026.
+  Last updated on Aug 18, 2026.
   <br/>
 </p></div>
       
