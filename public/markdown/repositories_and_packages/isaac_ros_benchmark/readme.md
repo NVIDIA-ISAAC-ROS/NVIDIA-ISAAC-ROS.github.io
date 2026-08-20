@@ -49,7 +49,7 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-08-13: Refreshed x86-5090 benchmark results, including ros2_benchmark reference benchmarks
+Update 2026-08-18: Refreshed x86-5090 benchmark results, including ros2_benchmark reference benchmarks
 
 ## Performance
 
