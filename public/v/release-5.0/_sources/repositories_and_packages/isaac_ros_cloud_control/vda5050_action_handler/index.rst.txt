@@ -1,0 +1,180 @@
+==========================
+|package name|
+==========================
+
+:ir_github:`<isaac_ros_cloud_control> <vda5050_action_handler>`
+
+Overview
+--------
+
+VDA5050 supports user-defined actions. To support this extensibility, ``vda5050_action_handler`` provides a basic C++ plugin
+interface so that you can extend :doc:`Isaac ROS Mission Client </repositories_and_packages/isaac_ros_cloud_control/isaac_ros_mission_client/index>` with your own action implementations. This allows you to handle arbitrary
+actions without changing Mission Client core code.
+
+Interface
+---------
+
+To create a custom action handler, you must implement the abstract base class ``Vda5050ActionHandlerBase`` and override the following methods:
+
+  .. code-block:: c++
+
+    // Initialize the action handler given the client node and configuration
+    virtual void Initialize(
+      Vda5050ClientNode * client_node,
+      const YAML::Node & config) = 0;
+
+    // Execute an action. Update to RUNNING, and later FINISHED/FAILED when done
+    virtual void Execute(const vda5050_msgs::msg::Action & vda5050_action) = 0;
+
+    // Optional: interrupt an ongoing action and set state to FAILED
+    virtual void Cancel(const std::string & action_id) {}
+
+    // Optional: support pausing/resuming
+    virtual void Pause(const std::string & action_id) {}
+    virtual void Resume(const std::string & action_id) {}
+
+
+- ``Initialize``: Must be implemented. It is called once in the VDA5050 Client node constructor. It has two parameters: a pointer to the client node and a YAML node. The action handler can call public methods of the client node with a pointer to the client node. The YAML node contains the configuration from the config file.
+- ``Execute``: Must be implemented. It is called when the action is executed. The action state, typically, updates to ``RUNNING`` when the action is executed and sets the action state to ``FINISHED`` or ``FAILED`` when the action is done.
+- ``Cancel``: Optional. It is called when the action is canceled.
+- ``Pause``: Optional. It is called when the action is paused.
+- ``Resume``: Optional. It is called when the action is resumed.
+
+``Vda5050ClientNode`` provides the following helper methods:
+
+- ``UpdateActionState(...)``: Update the state of an action.
+- ``UpdateActionStateById(...)``: Update the state of an action by action ID.
+- ``CreateError(...)`` and ``AddError(...)``: Add errors to VDA5050 order state.
+- ``ActionResponseCallback(...)``: A template function that helps handle ROS 2 action response. If the goal is rejected, the action state is set to ``FAILED``.
+- ``ActionResultCallback(...)``: A template function that helps handle the ROS 2 action result. It updates the action state based on the result.
+
+Usage
+-----
+Steps to Create a Custom Action Handler
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This section walks through the steps used to create a custom action handler. It is recommended that you read the 
+`ROS2 plugin tutorial <https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Pluginlib.html>`__ 
+to understand the basic concept of ``pluginlib``. More examples of action handlers can be found in the ``vda5050_action_handler_plugins`` package.
+
+1. Create a new package for your action handler or add it to the existing ``vda5050_action_handler_plugins`` package.
+2. Implement the ``Vda5050ActionHandlerBase`` class.
+
+   In ``Initialize``, you can create the necessary service or action clients that are required
+   to handle the action.
+
+   .. code-block:: c++
+
+      void Initialize(Vda5050ClientNode * client_node, const YAML::Node & config) override {
+        client_node_ = client_node;
+        some_action_client_ = rclcpp_action::create_client<SomeAction>(
+          client_node_, "some_action");
+        ...
+      }
+
+
+   In ``Execute``, process the action and update the action state using methods provided by ``Vda5050ClientNode``. The action state
+   typically, updates to ``FINISHED`` when the action is done and ``FAILED`` if the action fails.
+   ``Cancel``, ``Pause``, and ``Resume`` are optional.
+
+3. Register the action handler.
+
+   At the end of your ``cpp`` file, export the action handler using the following macro:
+
+   .. code-block:: c++
+
+      #include <pluginlib/class_list_macros.hpp>
+
+      PLUGINLIB_EXPORT_CLASS(<your_action_handler_class_name>,
+        isaac_ros::mission_client::Vda5050ActionHandlerBase)
+
+
+   Create a ``plugins.xml`` file in your package and add the plugin declaration to it:
+
+   .. code-block:: xml
+    
+    <library path="vda5050_action_handler_plugins">
+      <class type="<your_action_handler_class_name>"
+        base_class_type="isaac_ros::mission_client::Vda5050ActionHandlerBase">
+        <description> action handler description </description>
+      </class>
+    </library>
+
+
+   Export your plugins using ``CMakeLists.txt``:
+
+   .. code-block:: cmake
+    
+      find_package(pluginlib REQUIRED)
+      pluginlib_export_plugin_description_file(<your_package_name> plugins.xml)
+
+4. Add the action handler to Mission Client config file.
+
+   The Mission Client loads action handlers according to a YAML configuration file.
+   On startup, it reads the config file from the path specified by the parameter ``config_file``
+   and creates plugin instances for each action handler.
+
+Here is the schema of the config file:
+
++--------------------+-----------------------------------------------------------------------------------------------------------------------------------+
+| Field              | Description                                                                                                                       |
++====================+===================================================================================================================================+
+| ``action_handlers``| A list of action handler names. For each name defined in this list, a corresponding section with the name as the key is required. |
++--------------------+-----------------------------------------------------------------------------------------------------------------------------------+
+| ``<handler_name>`` | Configuration for the action handler. ``<handler_name>`` should be a name defined in the ``action_handler`` list.                 |
++--------------------+-----------------------------------------------------------------------------------------------------------------------------------+
+
+
+Schema for each action handler section:
+
+
++-------------------+----------------------------------------------------------------------------------------------------+
+| Field             | Description                                                                                        |
++===================+====================================================================================================+
+| ``plugin``        | The fully qualified C++ type of the action handler.                                                |
++-------------------+----------------------------------------------------------------------------------------------------+
+| ``action_types``  | A list of action types that the handler supports.                                                  |
++-------------------+----------------------------------------------------------------------------------------------------+
+| additional fields | Any additional configuration. The whole section will be passed to Initialize() through YAML::Node. |
++-------------------+----------------------------------------------------------------------------------------------------+
+
+
+.. code-block:: yaml
+
+  action_handlers:
+    - <handler_name_1>
+    - <handler_name_2>
+
+  <handler_name_1>:
+    plugin: <fully qualified C++ type>
+    action_types:
+      - <action_type_string_1>
+      - <action_type_string_2>
+    # Any additional configuration. The section <handler_name_1> will be passed to Initialize() via YAML::Node.
+
+Troubleshooting
+---------------
+
+1. Plugin class not found:
+
+   .. code-block:: bash
+
+      According to the loaded plugin descriptions the class <plugin class name> with base class type isaac_ros::mission_client::Vda5050ActionHandlerBase does not exist.",
+   
+   Verify that you have a plugin declaration in ``plugins.xml`` and ``CMakeLists.txt``.
+
+2. Plugin library not created or loaded:
+
+   .. code-block:: bash
+
+      MultiLibraryClassLoader: Could not create object of class type <plugin class name> as no factory exists for it.
+      Make sure that the library exists and was explicitly loaded through MultiLibraryClassLoader::loadLibrary()"
+
+
+   Verify that you have exported the plugin in your source code.
+
+   .. code-block:: c++
+
+      PLUGINLIB_EXPORT_CLASS(isaac_ros::mission_client::<plugin class name>,
+        isaac_ros::mission_client::Vda5050ActionHandlerBase)
+
+.. |package name| replace:: ``vda5050_action_handler``

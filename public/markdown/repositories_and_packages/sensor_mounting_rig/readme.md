@@ -10,4 +10,4 @@ Please see [the guide](https://nvidia-isaac-ros.github.io/robots/sensor_mounting
 
 ## Latest
 
-Update 2026-08-18: Compatibility and integration updates for the Isaac ROS 4.6.0 release
+Update 2026-09-21: Compatibility and integration updates for the Isaac ROS 5.0.0 release

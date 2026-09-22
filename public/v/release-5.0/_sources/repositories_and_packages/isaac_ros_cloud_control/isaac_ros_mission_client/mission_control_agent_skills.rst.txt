@@ -1,0 +1,58 @@
+============================
+Mission Control Agent Skills
+============================
+
+Instead of following the manual tutorial steps, you can drive Mission
+Control through an AI coding assistant (Claude Code, Cursor, Codex, and
+other tools in the `Agent Skills client showcase
+<https://agentskills.io/#where-can-i-use-agent-skills>`__) using its agent
+skills. It is known to work with GPT 5.6 Sol xhigh.
+
+The Mission Control repository publishes several skills, one per task.
+Install any of them with:
+
+.. code:: bash
+
+   :ic_skill_repo:`<mission-control>` --skill <skill-name> --yes
+
+.. list-table::
+   :header-rows: 1
+   :widths: 18 52 30
+
+   * - Skill
+     - Functionality
+     - Sample Prompt
+   * - ``bring-up-cloud-stack``
+     - Start the Mission Control cloud services (mosquitto, postgres,
+       mission-database, mission-dispatch, wpg, cuopt, mission-control)
+       from the repository compose stack.
+     - "Bring up the Mission Control cloud stack and confirm all services
+       are healthy."
+   * - ``change-map``
+     - Change the map Mission Control loads on startup — switch among
+       bundled maps, or point at an uploaded file, a URI, or an S3 object.
+     - "Switch the map to NVIDIA's Galileo map and restart the cloud stack
+       to apply it."
+   * - ``change-fleet-composition``
+     - Add, remove, rename, or relabel Mission Control robots, including
+       which robots the simulator boots with.
+     - "Add a third simulated Carter to the fleet and restart the cloud
+       stack to apply it."
+   * - ``change-stack-version``
+     - Change the image (registry path or tag) of any Mission Control
+       stack service, such as mission-control, mission-dispatch, or wpg.
+     - "Pin the mission-control service to tag 4.6.0, then pull and
+       recreate the stack."
+   * - ``submit-and-monitor-mission``
+     - Submit a Mission Control mission and verify it completes end to
+       end — not just that the robot goes idle.
+     - "Submit a route mission to carter01 and prove it actually
+       completed."
+
+You can also combine several skills in one request. For example:
+
+.. code:: text
+
+   Change the map to NVIDIA's Galileo map, add an AMR and restart the
+   cloud stack with bring-up-cloud-stack. Then do a health check and
+   verify our new fleet is present and that we've enabled the new map.

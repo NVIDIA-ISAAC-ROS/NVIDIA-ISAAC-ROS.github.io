@@ -1,0 +1,124 @@
+==========================
+LEAPP Bundle Load Failures
+==========================
+
+Both LEAPP runtimes serve the policy's ONNX graph through NVIDIA Triton, and both
+build a Triton model repository from the bundle's YAML before inference starts.
+A bundle that is incomplete, or that has been separated from its ONNX files,
+fails at that point. The failures below all happen during startup, before the
+policy runs.
+
+The Bundle Was Not Exported With the ONNX Backend
+--------------------------------------------------
+
+The bundle YAML declares a model whose ``parameters.backend`` is missing, or is
+set to something other than ``onnx``. The
+:doc:`ROS2 Node LEAPP Runtime <../concepts/ros2_nodes_runtime>` serves ONNX
+models only.
+
+Symptom
+~~~~~~~
+
+.. code:: text
+
+   Model '<name>' parameters.backend is missing. Export the LEAPP graph with the ONNX backend.
+
+or:
+
+.. code:: text
+
+   Model '<name>' backend '<backend>' is not supported by create_triton_model_repo. Export the LEAPP graph with the ONNX backend.
+
+Solution
+~~~~~~~~
+
+Re-export the bundle with the ONNX backend selected. Then confirm that every
+entry under ``models:`` in the YAML carries ``backend: onnx``.
+
+The ONNX File Cannot Be Found Next to the Bundle YAML
+------------------------------------------------------
+
+A model's ``parameters.model_path`` is resolved relative to the directory that
+contains the bundle YAML. Copying the YAML on its own, or moving it out of the
+exported directory, breaks that relative path even though the YAML itself is
+still valid.
+
+Symptom
+~~~~~~~
+
+.. code:: text
+
+   ONNX model not found: <path>
+
+Solution
+~~~~~~~~
+
+Copy the whole exported directory to the deployment machine and point
+``config_path`` (or ``inference_controller_config_path``) at the YAML inside it,
+as described in
+:doc:`Bring Your Own Policy <../how_to_guides/bring_your_own_policy>`.
+
+The Path Points at the Wrong YAML
+-----------------------------------
+
+The controller configuration files, ``controller_manager.yaml`` and
+``controller_groups.yaml``, are a common mix-up with the bundle configuration.
+
+Symptom
+~~~~~~~
+
+.. code:: text
+
+   Config file <path> is missing required 'models' section
+
+Solution
+~~~~~~~~
+
+Point the runtime at the bundle YAML, which is the one whose top level is a
+``models:`` mapping named after the exported task.
+
+A CPU Model Name Does Not Match the Bundle
+--------------------------------------------
+
+A name passed in the ``triton_cpu_models`` launch argument does not match any key
+under ``models:``. Model names are the exported task names and are case
+sensitive.
+
+Symptom
+~~~~~~~
+
+.. code:: text
+
+   CPU model(s) not found in LEAPP config: <names>
+
+Solution
+~~~~~~~~
+
+Read the exact keys from the bundle YAML and pass those.
+
+The Runtime Cannot Create Its Temporary Model Repository
+--------------------------------------------------------
+
+The :doc:`ROS2 Control LEAPP Runtime <../concepts/ros2_control_runtime>` builds
+its model repository under the system temporary directory and symlinks the ONNX
+file into it.
+
+Symptom
+~~~~~~~
+
+.. code:: text
+
+   Failed to create model repo directory: <reason>
+
+or:
+
+.. code:: text
+
+   Failed to symlink model file: <reason>
+
+Solution
+~~~~~~~~
+
+These come from the filesystem, not from the bundle: the temporary directory is
+full, is mounted read-only, or is on a filesystem that does not support symbolic
+links. Check this first in a container with an unusual ``/tmp`` mount.

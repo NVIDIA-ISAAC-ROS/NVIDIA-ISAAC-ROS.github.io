@@ -1,0 +1,37 @@
+========================
+Robot Description Issues
+========================
+
+The controller manager launch expands a xacro file into the robot description
+before it starts anything else. If that expansion fails the launch aborts before
+any controller loads, and the error comes from ``xacro`` rather than from Isaac
+ROS Deploy.
+
+The Launch Aborts With a xacro or URDF Error
+--------------------------------------------
+
+Symptom
+~~~~~~~
+
+The launch exits during startup and no controller is loaded. The error text names
+``xacro`` or a URDF parsing problem, and is easy to lose among the rest of the
+launch output.
+
+Solution
+~~~~~~~~
+
+Reproduce the expansion by hand to see the error on its own. Inspect the
+controller manager launch file to identify the xacro file and arguments selected
+for the active hardware type, then run the equivalent command:
+
+.. code:: bash
+
+   xacro /path/to/robot_description.urdf.xacro \
+       argument_name:=argument_value
+
+A successful run prints the expanded URDF to standard output. Run this check
+against each hardware-specific ``ros2_control`` xacro. This is the first of the
+validation steps in
+:doc:`How to bring your own embodiment <../how_to_guides/bring_your_own_embodiment>`.
+Passing it is what lets you attribute a later failure to the controller
+configuration rather than to the description.

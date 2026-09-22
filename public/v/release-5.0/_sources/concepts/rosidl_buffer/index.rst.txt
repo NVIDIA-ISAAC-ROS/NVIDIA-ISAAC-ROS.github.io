@@ -1,0 +1,89 @@
+======================================
+``rosidl::Buffer`` and Buffer Backends
+======================================
+
+ROS 2 Lyrical includes ``rosidl::Buffer`` as a native ROS 2 feature. It is a
+C++ container for variable-length primitive array fields in generated ROS
+messages. A field such as ``uint8[] data`` remains unchanged in the ``.msg``
+definition, but its generated C++ representation is
+``rosidl::Buffer<uint8_t>`` instead of ``std::vector<uint8_t>``.
+
+By default, a ``rosidl::Buffer`` uses CPU storage and behaves like the vector
+that existing ROS 2 code expects. A buffer backend can provide storage in a
+different memory domain, such as GPU memory, without defining a different ROS
+message type.
+
+The CUDA buffer backend is built on top of this ROS 2 container and backend
+architecture. Neither ``rosidl::Buffer`` nor its buffer backend mechanism is
+specific to Isaac ROS.
+
+Refer to the upstream `ROS 2 buffer backend concepts
+<https://docs.ros.org/en/lyrical/Concepts/Intermediate/About-Buffer-Backends.html>`__
+for the complete architecture and current middleware support.
+
+Why Buffer Backends
+-------------------
+
+Accelerators often produce large payloads directly in device memory. Copying
+those bytes to a CPU vector only to publish them, and then copying them back to
+the device in a subscriber, adds latency and consumes CPU and memory bandwidth.
+
+A buffer backend lets the ROS middleware transport a small descriptor for
+compatible endpoints and reconstruct access to the original storage on the
+subscriber side. If a backend cannot serve a connection, the middleware can
+fall back to ordinary CPU serialization. The exact zero-copy and fallback
+behavior is defined by each backend.
+
+The Three Layers
+----------------
+
+It is useful to separate the message, conversion, and storage layers:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Layer
+     - Responsibility
+     - Typical user
+   * - ROS message
+     - Defines portable data semantics. Primitive array fields use
+       ``rosidl::Buffer`` in generated C++ code.
+     - Every ROS 2 application
+   * - Conversion package
+     - Converts between a ROS message and a domain-native object such as an
+       image, tensor, or point cloud.
+     - Most accelerated-application developers
+   * - Buffer backend
+     - Allocates storage and transports it between compatible endpoints.
+     - Backend authors and advanced developers needing direct memory access
+
+Which Interface Should You Use?
+-------------------------------
+
+Most users should use a conversion package. It presents APIs in terms of the
+data model the application understands and can work with CPU or accelerated
+storage without exposing backend-specific allocation and synchronization.
+
+Use the CUDA buffer backend directly only when custom CUDA code must control
+device allocation, raw pointers, stream synchronization, or buffer lifetime.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Goal
+     - Start here
+   * - Exchange framework-native images, tensors, or other supported objects
+     - :doc:`Conversion Packages <conversion_packages>`
+   * - Read or write CUDA memory directly from custom kernels
+     - :doc:`CUDA Buffer Backend <cuda_buffer_backend>`
+   * - Update code that uses NITROS APIs or types
+     - :doc:`From NITROS to rosidl::Buffer <nitros_migration>`
+   * - Use ordinary ROS messages with CPU storage
+     - Continue using the standard ROS 2 publisher and subscription APIs
+
+.. toctree::
+   :maxdepth: 1
+
+   conversion_packages
+   cuda_buffer_backend
+   nitros_migration

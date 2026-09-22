@@ -1,0 +1,86 @@
+========================
+Safety Controller Issues
+========================
+
+The :doc:`SafetyController <../concepts/safety>` sits between the policy and the
+hardware. When its out-of-domain detection fails a check it latches an emergency,
+asks the controller manager to switch to the configured emergency controller, and
+stops writing new commands to hardware.
+
+The Policy Stopped After an Out-of-Domain Check Failed
+-------------------------------------------------------
+
+Symptom
+~~~~~~~
+
+The robot stops accepting policy commands, and the controller manager logs:
+
+.. code:: text
+
+   Safety emergency latched: <reason>. Requesting emergency controller '<name>'
+
+The reason names the check that failed. For a velocity-threshold detector, it
+reports the joint velocity that exceeded
+``out_of_domain_detection.velocity_threshold.max_velocity`` or
+``mean_velocity``.
+
+Solution
+~~~~~~~~
+
+The latch is a one-shot. After it fires, the safety controller does not re-arm
+for as long as it stays active, so raising ``blend_ratio`` again has no effect
+and no further emergency switch is requested. The latch is cleared only when the
+safety controller is deactivated and activated again.
+
+Stop the controller manager and relaunch. This deactivates and reactivates the
+safety controller, which clears the latch. Then bring the policy back up in the
+documented order: publish a twist command first, and only then raise
+``blend_ratio``.
+
+.. warning::
+
+   Treat a latch as a real event, not as something to clear and retry. Establish
+   why the robot left the policy's domain before you re-enable it. On hardware,
+   put the robot back into a safe pose before relaunching.
+
+The Policy Trips the Latch Immediately at Startup
+-------------------------------------------------
+
+Symptom
+~~~~~~~
+
+The emergency latches within the first control cycles after you enable the
+policy, before the robot has done anything.
+
+Solution
+~~~~~~~~
+
+Raising ``blend_ratio`` to ``1.0`` before the controller is active applies the
+policy's first inference in a single step, and the resulting transient can exceed
+the velocity threshold.
+
+Publish the first twist command, confirm the controller has activated, and only
+then raise ``blend_ratio``.
+
+The Detector Never Triggers
+---------------------------
+
+Symptom
+~~~~~~~
+
+The robot clearly leaves its safe operating range, but no emergency is latched
+and no controller switch is requested. Nothing is reported at startup either.
+
+Solution
+~~~~~~~~
+
+Out-of-domain detection is enabled only when
+``out_of_domain_detection.emergency_controller`` is set to a non-empty controller
+name **and** at least one of ``max_velocity`` or ``mean_velocity`` is greater than
+zero. Leaving the emergency controller empty disables the detector entirely,
+without an error.
+
+Joints matched by ``out_of_domain_detection.velocity_threshold.excluded_joints``
+are zeroed before both checks, so they can never trigger a latch. Exclude joints
+that should not participate in the safety check. Refer to
+:doc:`Safety Controller <../concepts/safety>` for every parameter and its default.

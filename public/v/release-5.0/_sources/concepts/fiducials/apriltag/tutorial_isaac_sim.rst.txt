@@ -1,0 +1,65 @@
+==============================================
+Tutorial for AprilTag Detection with Isaac Sim
+==============================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/fiducials/apriltag/Rviz_apriltag_output.png>`
+    :align: center
+    :width: 800px
+
+Overview
+------------
+
+This tutorial walks you through a graph to estimate the 6DOF pose of
+:ir_repo:`AprilTags <isaac_ros_apriltag>`
+using images from Isaac Sim.
+
+Tutorial Walkthrough
+--------------------
+
+1.  Complete the quickstart :ref:`here <repositories_and_packages/isaac_ros_apriltag/isaac_ros_apriltag/index:quickstart>`.
+2.  Activate the Isaac ROS environment:
+
+    .. code:: bash
+
+       isaac-ros activate
+
+3.  Launch the pre-composed graph launch file:
+
+    .. code:: bash
+
+       ros2 launch isaac_ros_apriltag isaac_ros_apriltag_isaac_sim_pipeline.launch.py
+
+4.  Install and launch Isaac Sim following the steps in the :ref:`Isaac ROS Isaac Sim Setup Guide <gs_isaac_sim>`
+5.  Press **Play** to start publishing data from the Isaac Sim.
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/getting_started/isaac_sim_sample_scene.png>`
+        :align: center
+        :width: 800px
+
+6.  In a separate terminal, install and run RViz to visualize the AprilTag
+    detections:
+
+    .. code:: bash
+
+       sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+       source /opt/ros/:ir_ros_distro:/setup.bash
+
+    .. code:: bash
+
+       rviz2 -d $(ros2 pkg prefix isaac_ros_apriltag --share)/rviz/default.rviz
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/fiducials/apriltag/Rviz_apriltag_output.png>`
+        :align: center
+        :width: 800px
+
+7.  If you prefer to observe the AprilTag output in text form, echo the
+    contents of the ``/tag_detections`` topic with the following command
+    in a separate terminal:
+
+    .. code:: bash
+
+       ros2 topic echo /tag_detections
+
+    .. figure:: :ir_lfs:`<resources/isaac_ros_docs/concepts/fiducials/apriltag/Terminal_output.png>`
+        :align: center
+        :width: 600px

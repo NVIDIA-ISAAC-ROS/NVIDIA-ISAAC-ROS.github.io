@@ -1,0 +1,45 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_image_pipeline> <isaac_ros_depth_image_proc>`
+
+API
+----
+
+Overview
+^^^^^^^^
+
+The ``isaac_ros_depth_image_proc`` package offers functionality for
+processing depth images and producing a point cloud. It largely replaces
+the ``depth_image_proc`` package.
+
+Available Components
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Component
+     - Topics Subscribed
+     - Topics Published
+     - Parameters
+   * - ``PointCloudXyzNode``
+     - ``image_rect``, ``camera_info``: The depth image and the associated camera info with it
+     - ``points``: The resultant XYZ point cloud
+     - ``skip``: Skips ``skip`` number of depth pixels in order to limit the number of pixels converted to points. ``output_height`` The output height of the point cloud. This should be equivalent to the height of the image. ``output_width`` The output width of the point cloud. This should be equivalent to the width of the image.
+   * - ``PointCloudXyzrgbNode``
+     - ``depth_registered/image_rect``: The depth image ``rgb/image_rect_color``: The RGB image associated with the depth image ``rgb/camera_info``: The camera info associated with the RGB image and depth image
+     - ``points`` The resultant XYZRGB point cloud
+     - ``skip``: Skips ``skip`` number of depth pixels in order to limit the number of pixels converted to points. ``output_height`` The output height of the point cloud. This should be equivalent to the height of the image. ``output_width`` The output width of the point cloud. This should be equivalent to the width of the image.
+   * - ``AlignDepthToColorNode``
+     - ``depth_image``, ``camera_info_depth``, ``camera_info_color``: The depth image, depth camera info, and color camera info.
+     - ``aligned_depth``: The aligned depth image.
+     - ``sync_queue_size``: The size of the queue for the synchronized subscribers. ``input_qos``: The input QoS for the subscribers. ``output_qos``: The output QoS for the publisher. ``use_cached_camera_info``: If true, using cached camera info and remove synchronization. ``enable_performance_logging``: If true, enable performance logging.
+   * - ``ConvertMetricNode``
+     - ``image_raw``: The depth image in MONO16 format (millimeters).
+     - ``image``: The depth image in 32FC1 format (meters).
+     - ``input_qos``: The input QoS for the subscriber. ``output_qos``: The output QoS for the publisher.
+
+
+.. |package_name| replace:: ``isaac_ros_depth_image_proc``

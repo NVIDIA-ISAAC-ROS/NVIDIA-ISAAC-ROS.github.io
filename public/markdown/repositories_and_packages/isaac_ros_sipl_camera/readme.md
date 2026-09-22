@@ -3,7 +3,7 @@
 ROS 2 camera driver nodes for NVIDIA SIPL cameras with zero-copy GPU-accelerated
 image publishing through NITROS.
 
-<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.6/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/eagle_stereo_rectify_foxglove_visual.jpg/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-4.6/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/eagle_stereo_rectify_foxglove_visual.jpg/" width="800px"/></a></div>
+<div align="center"><a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/eagle_stereo_rectify_foxglove_visual.jpg/"><img alt="image" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/eagle_stereo_rectify_foxglove_visual.jpg/" width="800px"/></a></div>
 
 ---
 
@@ -11,7 +11,8 @@ image publishing through NITROS.
 
 Isaac ROS SIPL Camera provides ROS 2 camera
 driver nodes for NVIDIA SIPL (Safe Image Processing Library) cameras with
-zero-copy GPU-accelerated image publishing through NITROS.
+zero-copy GPU-accelerated image publishing using ROS 2
+`rosidl::Buffer`-backed messages and the CUDA buffer backend.
 
 SIPL is NVIDIA’s modular camera framework for Jetson, providing a unified API
 and driver model that exposes hardware accelerated ISP for continuous
@@ -42,7 +43,9 @@ Key features include:
 
 - **Hardware-accelerated ISP with no host copy** from capture through the Jetson on-chip ISP to CUDA-accessible memory
 - **Mono and stereo camera support** with independent capture threads per sensor
-- **No GPU-to-host copy publisher subscriber** with [NITROS](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_nitros/isaac_ros_nitros/index.html), keeping image data on the GPU between ROS nodes
+- **No GPU-to-host copy between publisher and subscriber** with ROS 2
+  `rosidl::Buffer`-backed messages, keeping image data on the GPU between
+  compatible ROS nodes
 - **Camera calibration importing** to publish accurate intrinsics in ROS `camera_info` for rectification and downstream perception
 - **REP-103 static TF publication** to define camera and optical frames based on imported calibration data
 
@@ -81,11 +84,11 @@ this repository.
 
 ## Latest
 
-Update 2026-08-18: Added SIPL support for the Leopard Imaging Hawk GMSL2 stereo camera with paired stereo output with aligned timestamps
+Update 2026-09-21: Migrated the SIPL camera driver from NITROS to rosidl::Buffer with the CUDA buffer backend for zero-copy GPU image publishing
 
 ## Supported Platforms
 
-This package is designed and tested to be compatible with ROS 2 Jazzy running on [Jetson](https://developer.nvidia.com/embedded-computing).
+This package is designed and tested to be compatible with ROS 2 Lyrical running on [Jetson](https://developer.nvidia.com/embedded-computing).
 
 | Platform   | Hardware                                                                                                                                                                                        | Software                                                     | Storage          | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 |------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
