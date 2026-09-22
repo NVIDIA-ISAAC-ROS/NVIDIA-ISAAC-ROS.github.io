@@ -1,0 +1,116 @@
+=======================
+ROS2 Node LEAPP Runtime
+=======================
+
+The ROS2 Node LEAPP Runtime runs a LEAPP bundle as standalone composable nodes. All data flows
+via ROS topics, enabling multi-model bundles and feedback self-loops.
+
+Architecture
+------------
+
+.. mermaid::
+
+   flowchart LR
+       subgraph IG [Inference Graph]
+           direction LR
+           B[InputBuilderNode] --> C[TritonNode]
+           C --> D[OutputBuilderNode]
+       end
+       i1(( )) --> B
+       i2(( )) --> B
+       D --> o1(( ))
+       D --> o2(( ))
+
+Key Components
+--------------
+
+InputBuilderNode
+~~~~~~~~~~~~~~~~
+
+Subscribes to external ROS topics and converts messages to tensors using the
+``MessageToTensorConverter`` registry. Runs the core ``InputBuilder`` for preprocessing
+(reordering, history stacking, reshaping) and publishes a bundled ``TensorList`` message.
+
+TritonNode
+~~~~~~~~~~
+
+Runs all neural network models via Triton Inference Server. The TritonNode supports Triton
+Ensembles, meaning it can run inference on a graph of ONNX files. The bundle configuration YAML
+is used to automatically generate the Triton model repository with individual ONNX model
+configurations and an ensemble ``config.pbtxt``.
+
+The model repository structure:
+
+.. code-block:: text
+
+   model_repo/
+   ├── model_a/
+   │   ├── config.pbtxt
+   │   └── 1/model.onnx
+   ├── model_b/
+   │   ├── config.pbtxt
+   │   └── 1/model.onnx
+   └── ensemble/
+       └── config.pbtxt
+
+OutputBuilderNode
+~~~~~~~~~~~~~~~~~
+
+Subscribes to the output ``TensorList`` from TritonNode, runs the core ``OutputBuilder``
+for postprocessing, and publishes typed ROS messages using the
+``TensorToMessageConverter`` registry.
+
+Topic Connections
+-----------------
+
+The launch file automatically sets up the topic connections:
+
+- ``InputBuilderNode`` publishes on ``input_tensors``
+- ``TritonNode`` subscribes to ``input_tensors``, runs ensemble inference, publishes on
+  ``output_tensors``
+- ``OutputBuilderNode`` subscribes to ``output_tensors``
+
+Parameters
+----------
+
+InputBuilderNode
+~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Default
+     - Description
+   * - ``config_path``
+     - ``string``
+     - ``""``
+     - Path to the LEAPP bundle configuration YAML (required).
+   * - ``publish_rate``
+     - ``double``
+     - ``50.0``
+     - Rate at which tensors are published in Hz.
+   * - ``source_to_topic.<source>``
+     - ``string``
+     - ``<source>``
+     - Map an input source name to a ROS topic.
+
+OutputBuilderNode
+~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Default
+     - Description
+   * - ``config_path``
+     - ``string``
+     - ``""``
+     - Path to the LEAPP bundle configuration YAML (required).
+   * - ``output_to_topic.<name>``
+     - ``string``
+     - ``<name>``
+     - Map an output name to a ROS topic.

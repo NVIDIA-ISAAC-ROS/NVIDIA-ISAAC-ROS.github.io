@@ -1,0 +1,115 @@
+=============================
+Converter Extension Reference
+=============================
+
+Isaac ROS Deploy exposes four C++ extension interfaces for converting between
+LEAPP tensors and ROS 2 transports. Use this page to look up the interface
+contract. Follow :doc:`How to add custom converters
+<../how_to_guides/add_custom_converter>` for the implementation workflow.
+
+Topic Input Converters
+======================
+
+Topic input converters belong to ``isaac_ros_deploy_converters`` and derive from
+``MessageToTensorConverter``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 28 72
+
+   * - Member
+     - Contract
+   * - ``get_kind()``
+     - Return the LEAPP semantic kind produced by the converter.
+   * - ``get_message_type()``
+     - Return the fully qualified ROS message type consumed by the converter.
+   * - ``convert()``
+     - Convert one serialized ROS message and return a tensor in message order.
+   * - ``get_tensor_spec()``
+     - Optionally return element names in message order. The runtime uses them
+       to reorder elements into bundle order.
+
+Register factories in ``initialize_input_converters()``. A factory receives the
+input source name. The first message type registered for a kind is its default.
+
+Source:
+:ir_repo:`message_to_tensor_converter.hpp <isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_converters/include/isaac_ros_deploy_converters/converters/message_to_tensor_converter.hpp>`
+
+Topic Output Converters
+=======================
+
+Topic output converters belong to ``isaac_ros_deploy_converters``. Derive from
+``TypedOutputConverter<MsgT>`` to reuse message allocation and serialization.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 28 72
+
+   * - Member
+     - Contract
+   * - ``get_kind()``
+     - Return the LEAPP semantic kind consumed by the converter.
+   * - ``get_message_type()``
+     - Return the fully qualified ROS message type produced by the converter.
+   * - ``write()``
+     - Write tensor values and shared metadata into the typed message.
+
+Register factories in ``initialize_output_converters()``. A factory receives
+the bundle-declared tensor shape and may return ``nullptr`` when it does not
+support that rank.
+
+Source:
+:ir_repo:`tensor_to_message_converter.hpp <isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_converters/include/isaac_ros_deploy_converters/converters/tensor_to_message_converter.hpp>`
+
+ROS 2 Control State Interface Converters
+========================================
+
+State interface converters belong to ``isaac_ros_deploy_ros2_control`` and
+derive from ``StateInterfaceConverter``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 38 62
+
+   * - Member
+     - Contract
+   * - ``get_required_state_interfaces()``
+     - Return the hardware state-interface names to claim for the bundle's
+       element names.
+   * - ``get_tensor_spec()``
+     - Return element names in hardware order so the runtime can reorder them.
+   * - ``read()``
+     - Optionally override the default scalar reader. The default writes one
+       claimed interface value to each element of a pre-allocated ``[1, N]``
+       tensor.
+
+Register factories in ``initialize_state_interface_converters()``.
+
+Source:
+:ir_repo:`state_interface_converter.hpp <isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_ros2_control/include/isaac_ros_deploy_ros2_control/converters/state_interface_converter.hpp>`
+
+ROS 2 Control Command Interface Converters
+==========================================
+
+Command interface converters belong to ``isaac_ros_deploy_ros2_control`` and
+derive from ``CommandInterfaceConverter``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 38 62
+
+   * - Member
+     - Contract
+   * - ``get_required_command_interfaces()``
+     - Return the hardware command-interface names to claim for the bundle's
+       element names, prefix, and suffix.
+   * - ``get_tensor_spec()``
+     - Return element names in hardware order so the runtime can reorder them.
+   * - ``write()``
+     - Optionally override the default scalar writer. The default flattens the
+       tensor and writes one value to each claimed command interface.
+
+Register factories in ``initialize_command_interface_converters()``.
+
+Source:
+:ir_repo:`command_interface_converter.hpp <isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_ros2_control/include/isaac_ros_deploy_ros2_control/converters/command_interface_converter.hpp>`

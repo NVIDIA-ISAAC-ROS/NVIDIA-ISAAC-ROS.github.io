@@ -1,0 +1,178 @@
+=========================
+GPU Partitioning Tutorial
+=========================
+
+This tutorial shows you how to install, launch, and test
+``isaac_ros_gpu_partitioning``.
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Before continuing, verify that the system has an NVIDIA GPU that supports static
+NVIDIA CUDA Multi-Process Service (MPS) streaming multiprocessor (SM) partitioning.
+Stop other workloads that use CUDA MPS.
+
+Verify that the installed MPS control binary reports version ``13010`` or later:
+
+.. code:: bash
+
+   nvidia-cuda-mps-control -v
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-gpu-partitioning
+
+   .. tab:: Build from Source
+
+      #. Clone the Isaac ROS Common repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_common>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && \
+               rosdep install --from-paths \
+               ${ISAAC_ROS_WS}/src/isaac_ros_common/isaac_ros_gpu_partitioning \
+               --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install \
+               --packages-up-to isaac_ros_gpu_partitioning \
+               --base-paths \
+               ${ISAAC_ROS_WS}/src/isaac_ros_common/isaac_ros_gpu_partitioning
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Repeat this step in every terminal in the Isaac ROS environment.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Install and Verify the NVML Python Package
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The GPU partition manager imports ``pynvml`` from the NVIDIA
+``nvidia-ml-py`` package. The binary package and ``rosdep`` install the
+``python3-pynvml-pip-shim`` dependency automatically.
+
+#. Confirm that the Debian package is available:
+
+   .. code:: bash
+
+      sudo apt-get update
+      apt-cache policy python3-pynvml-pip-shim
+
+#. Install the package if it is not already installed:
+
+   .. code:: bash
+
+      sudo apt-get install -y python3-pynvml-pip-shim
+
+#. Verify that the ROS Python interpreter can import ``pynvml``:
+
+   .. code:: bash
+
+      /usr/bin/python3 -c "import pynvml; print(pynvml.__file__)"
+
+Run the Launch File
+^^^^^^^^^^^^^^^^^^^
+
+#. Run the example that creates GPU partitions from a YAML configuration:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_gpu_partitioning partitioning_config.launch.py
+
+#. Open **another** terminal in the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. List the MPS partitions:
+
+   .. code:: bash
+
+      export CUDA_MPS_PIPE_DIRECTORY=/tmp/nvidia-mps
+      export CUDA_MPS_LOG_DIRECTORY=/tmp/nvidia-mps
+      nvidia-cuda-mps-control lspart
+
+The output lists each partition ID, allocated chunk count, and SM count.
+
+Run the Tests
+^^^^^^^^^^^^^
+
+#. Run the launch tests with ``colcon``:
+
+   .. code:: bash
+
+      colcon test \
+        --packages-select isaac_ros_gpu_partitioning \
+        --event-handlers console_direct+
+
+#. Display the test results:
+
+   .. code:: bash
+
+      colcon test-result --verbose
+
+Each test starts MPS, creates one or more static SM partitions, loads a test
+component, and verifies the SM count reported by the component.
+
+Stop the MPS Server
+^^^^^^^^^^^^^^^^^^^
+
+#. Stop the launch process with :kbd:`Ctrl+C`.
+
+#. After all component containers exit, stop the MPS server:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_gpu_partitioning stop_cuda_mps.sh
+
+Do not stop MPS while a component container uses a partition. The MPS control command
+waits for active clients to exit.
+
+.. |package_name| replace:: ``isaac_ros_gpu_partitioning``

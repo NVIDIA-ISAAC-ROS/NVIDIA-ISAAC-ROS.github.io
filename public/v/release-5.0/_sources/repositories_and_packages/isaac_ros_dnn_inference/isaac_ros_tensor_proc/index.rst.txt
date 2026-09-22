@@ -1,0 +1,79 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_dnn_inference> <isaac_ros_tensor_proc>`
+
+API
+---
+
+Overview
+^^^^^^^^
+
+The ``isaac_ros_tensor_proc`` package offers functionality for processing tensors, such as normalizing tensors, converting images to tensors,
+reshaping tensors and more. The main use case of this package is for preprocessing or postprocessing tensors following DNN model inference.
+One major use case of this package can be found in :doc:`Isaac ROS DNN Image Encoder </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_dnn_image_encoder/index>`.
+The operations performed aim to be analogous to operations available in the PyTorch library.
+
+Available Components
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Component 
+     - Topics Subscribed
+     - Topics Published
+     - Parameters
+
+   * - ``ImageTensorNormalizeNode``
+     - ``tensor`` The input tensor. This should originate from an image
+     - ``normalized_tensor`` The tensor that has been normalized
+     - | ``mean``: The mean of the images per channel that will be used for normalization
+       | ``stddev``: The standard deviation of the images per channel that will be used for normalization
+       | ``input_tensor_name``: The name of the input tensor to extract
+       | ``output_tensor_name``: The name of the output tensor to publish
+
+   * - ``ImageToTensorNode``
+     - ``image`` The input image.
+     - ``tensor`` The resultant tensor, created using the input image
+     - | ``scale``: Whether to scale the image by 255 or not
+       | ``tensor_name``: The name of the output tensor to publish
+
+   * - ``InterleavedToPlanarNode``
+     - ``interleaved_tensor`` A tensor that's in interleaved (e.g. HWC) format
+     - ``planar_tensor`` A tensor that's in planar (e.g. CHW) format
+     - | ``input_tensor_shape``: The shape of the ``interleaved_tensor``
+       | ``num_blocks``: The number of blocks to preallocate
+       | ``output_tensor_name``: The name of the output tensor to publish
+  
+   * - ``NormalizeNode``
+     - ``image`` The input image.
+     - ``normalized_tensor`` The tensor that has been created using the input image and then normalized.
+     - | ``image_mean``: The mean of the images per channel that will be used for normalization
+       | ``image_stddev``: The standard deviation of the images per channel that will be used for normalization
+       | ``input_image_width``: The input image width
+       | ``input_image_height``: The input image height
+       | ``num_blocks``: The number of blocks to preallocate
+       | ``output_tensor_name``: The name of the output tensor to publish
+  
+   * - ``ReshapeNode``
+     - ``tensor`` The tensor whose dimensions will be reshaped
+     - ``reshaped_tensor`` The reshaped tensor
+     - | ``output_tensor_name``: The name of the output tensor to publish
+       | ``input_tensor_shape``: The shape of the input tensor, ``tensor``
+       | ``output_tensor_shape``: The desired shape of the output tensor, ``reshaped_tensor``
+       | ``num_blocks``: The number of blocks to preallocate
+
+   * - ``TensorPairSyncNode``
+     - | ``tensor1`` The first input tensor
+       | ``tensor2`` The second input tensor
+     - ``tensor_pub`` The synchronized output containing both tensors
+     - | ``input_tensor1_name``: The name of the first input tensor to extract
+       | ``input_tensor2_name``: The name of the second input tensor to extract
+       | ``output_tensor1_name``: The name for the first tensor in the output
+       | ``output_tensor2_name``: The name for the second tensor in the output
+       | ``input_qos``: QoS settings for input topics
+       | ``output_qos``: QoS settings for output topics
+
+.. |package_name| replace:: ``isaac_ros_tensor_proc``

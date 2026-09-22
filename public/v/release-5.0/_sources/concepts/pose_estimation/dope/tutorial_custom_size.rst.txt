@@ -1,0 +1,48 @@
+Using DOPE at Different Image Resolutions
+===============================================
+
+Overview
+------------
+
+The DOPE network architecture, as outlined in the `original
+paper <https://arxiv.org/abs/1809.10790>`__, can receive input images of
+arbitrary size and subsequently produce output belief maps of the
+corresponding dimensions.
+
+However, the ONNX format used to run this network on Triton or TensorRT
+is not as flexible, and an ONNX-exported model **does NOT** support
+arbitrary image sizes at inference time. Instead, the desired input
+image dimensions must be explicitly specified when preparing the ONNX
+file using the ``dope_converter.py`` script, as referenced in the
+:doc:`quickstart </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`.
+
+Tutorial Walkthrough
+--------------------
+
+#. Complete until ``Run Launch File`` of the quickstart :doc:`here </repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index>`.
+
+#. Under the ``Run Launch File`` section, run the ``dope_converter.py`` script with the two
+   additional arguments ``row`` and ``col`` specifying the desired input
+   image size:
+
+   .. code:: bash
+
+      ros2 run isaac_ros_dope dope_converter.py --format onnx \
+         --input ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.pth --output ${ISAAC_ROS_WS}/isaac_ros_assets/models/dope/Ketchup.onnx \
+         --row 1080 --col 1920
+
+#. Continuing in the quickstart's ``Run Launch File`` section, complete the data source-specific setup.
+   Then, launch the data source-specific ``isaac_ros_examples.launch.py`` file with two additional arguments
+   ``network_image_height`` and ``network_image_width`` specifying the
+   desired input image size.
+
+   For example:
+
+   .. code-block:: bash
+      :class: no-copybutton
+
+      ros2 launch isaac_ros_examples isaac_ros_examples.launch.py <data source-specific arguments> ... \
+         network_image_height:=1080 network_image_width:=1920  # Add these arguments to the launch command
+
+#. Continue with the rest of the quickstart. You should now be able to
+   detect poses in images of your desired size.

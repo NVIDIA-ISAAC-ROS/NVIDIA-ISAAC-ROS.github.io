@@ -31,5 +31,5 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-08-18: Added Isaac Sim 6.0 deployment support for Unitree G1 AGILE locomotion
-policies
+Update 2026-09-21: Added optional InferenceController debug topics for flattened model inputs and the selected output tensor, and added LEAPP runtime, robot description, ROS communication, and safety controller troubleshooting guides.
+Isaac Sim deployment support is not included in this release.
