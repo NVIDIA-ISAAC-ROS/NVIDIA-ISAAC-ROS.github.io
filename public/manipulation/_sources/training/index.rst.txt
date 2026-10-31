@@ -1,0 +1,88 @@
+IsaacLab Training
+=================
+
+Reusable downstream Isaac Lab training repository for custom task formulations,
+shared MDP terms, and policy export workflows.
+
+.. note::
+
+   To train a simulation policy for your specific robot, first generate a calibrated robot USD
+   from its kinematics, as described in
+   :ir_docs:`Generate a Calibrated USD for Isaac Lab Training <robots/flexiv/index.html#generate-a-calibrated-usd-for-isaac-lab-training>`.
+   Then pass it to training with ``env.scene.robot.spawn.usd_path``.
+
+Get Started
+-----------
+
+#. :doc:`setup_training`: install the training package with Isaac Sim and run a short training test.
+#. :doc:`tasks/displayport_insertion`: train the DisplayPort insertion policy, export it with LEAPP,
+   and deploy it with Isaac ROS. It also lists :ref:`training times and recommended settings
+   <training-time-and-recommended-settings>`.
+
+Trainable Policies
+------------------
+
+This repository currently packages DisplayPort cable insertion policies for the
+Flexiv Rizon 4s arm with a Grav parallel gripper.
+
+.. list-table::
+   :widths: 35 45 20
+   :header-rows: 1
+
+   * - Policy
+     - Task ID
+     - Notes
+   * - DisplayPort task-space insertion (PhysX)
+     - ``IsaacTraining-DisplayPortInsertion-Rizon4s-TaskSpace-ROS-Inference``
+     - Recommended. More stable training and the best results in real-robot deployment.
+   * - DisplayPort task-space insertion (Newton)
+     - ``IsaacTraining-DisplayPortInsertion-Rizon4s-TaskSpace-Newton-ROS-Inference``
+     - Experimental. Newton 1.6 MJWarp profile; nominal by default with a calibrated-USD override.
+
+.. note::
+
+   PhysX training is more stable, while Newton training is still experimental. We recommend the PhysX-trained
+   policy for the best results in real-robot deployment.
+
+For visualization and evaluation, play a training task id directly: the play scripts apply the
+configuration's :meth:`play_mode` overrides (fewer environments, wider spacing, observation
+corruption disabled). Pass ``--train_env_cfg`` to play the training configuration unchanged.
+Use the plain non-ROS-inference tasks for ablations you do not intend to deploy directly.
+
+Repository Architecture
+-----------------------
+
+The repository separates reusable Isaac Lab infrastructure from concrete task
+formulations.
+
+.. list-table::
+   :widths: 35 65
+   :header-rows: 1
+
+   * - Path
+     - Purpose
+   * - ``src/isaaclab_training/mdp/``
+     - Shared actions, observations, rewards, events, terminations, and noise models.
+   * - ``src/isaaclab_training/tasks/``
+     - Registered task formulations. DisplayPort insertion is the first task.
+   * - ``src/isaaclab_training/cli/``
+     - Policy export and policy I/O validation commands.
+   * - ``src/isaaclab_training/export/``
+     - LEAPP export helpers used by the generic exporter.
+   * - ``tests/``
+     - Lightweight checks for task registration and export-specific tensor semantics.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Guides
+   :hidden:
+
+   setup_training
+   repo_structure
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Tasks
+   :hidden:
+
+   tasks/displayport_insertion

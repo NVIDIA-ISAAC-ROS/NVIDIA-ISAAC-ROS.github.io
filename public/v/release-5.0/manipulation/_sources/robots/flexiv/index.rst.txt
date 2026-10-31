@@ -1,0 +1,220 @@
+:orphan:
+
+
+=============
+Flexiv Robots
+=============
+
+Set Up Flexiv Robot
+~~~~~~~~~~~~~~~~~~~
+
+#. Complete the hardware setup and boot up the robot by following the `Set Up the Robot <https://www.flexiv.com/software/rdk/manual/v1.x/set_up_the_robot.html>`__ guide in the Flexiv RDK documentation.
+
+#. Connect the UI tablet (teach pendant) and verify you can enable the robot using Flexiv Elements.
+
+#. `Activate the RDK Server <https://www.flexiv.com/software/rdk/manual/v1.x/activate_rdk_server.html>`__ on the robot.
+
+#. `Enter Remote mode <https://www.flexiv.com/software/rdk/manual/v1.x/enter_and_exit_remote_mode.html>`__ by setting the robot to ``Auto (Remote)`` mode on the teach pendant.
+
+#. `Connect the user computer <https://www.flexiv.com/software/rdk/manual/v1.x/connect_user_computer.html>`__ to the same network as the robot and verify connectivity.
+
+#. Note the robot serial number (e.g., ``Rizon4s-062839``). This is required for all launch commands and should be
+   substituted for ``<ROBOT_SN>`` in the instructions below.
+
+.. note::
+
+   The following Flexiv Rizon models have been tested with Isaac ROS Manipulation:
+
+   * **Rizon 4s** with Grav gripper (Flexiv-GN01)
+
+   The following software versions have been tested:
+
+   * **Flexiv Software Package**: v3.11
+   * **Flexiv Elements Studio**: v3.11
+
+   Other versions may work but have not been verified.
+
+Build Flexiv Drivers from Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /reference_workflows/isaac_for_manipulation/tutorials/_snippets/isaac_ros_manipulation_flexiv_drivers.rst
+
+Configure Grav Gripper
+~~~~~~~~~~~~~~~~~~~~~~
+
+The Flexiv Grav gripper is automatically initialized when launching the Flexiv driver with the ``load_gripper:=true`` argument.
+
+#. Verify the gripper is physically attached to the Flexiv Rizon robot.
+
+#. Open **another** terminal and start the Zenoh router. Leave it running. The Flexiv
+   driver uses ``rmw_zenoh_cpp``, which requires a running router; without it, the
+   launch command in the next step does not work:
+
+   .. code:: bash
+
+      isaac-ros activate
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      ros2 run rmw_zenoh_cpp rmw_zenohd
+
+   Keep the router running for the remaining steps on this page.
+
+#. Open **another** terminal and launch the Flexiv driver with the gripper:
+
+   .. code:: bash
+
+      isaac-ros activate
+      source ${ISAAC_ROS_WS}/install/setup.bash
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      ros2 launch flexiv_bringup rizon.launch.py robot_sn:=<ROBOT_SN> load_gripper:=true
+
+   Replace ``<ROBOT_SN>`` with your robot's serial number.
+
+#. In Flexiv Elements, confirm that the active tool frame is set to the gripper TCP, not the
+   flange. Insertion policies and grasp poses are defined relative to the gripper TCP.
+
+Sync the Robot-Specific Kinematics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The nominal Flexiv description does not contain the calibrated kinematic parameters of a physical
+robot. On a Rizon 4s the difference reaches several millimeters at the flange, and because it
+accumulates along the kinematic chain it varies with pose and cannot be removed by a fixed TCP
+offset.
+
+``flexiv_calibration`` reads the measured parameters from a connected robot and writes them to a
+kinematics YAML. Write it under ``isaac_ros_assets`` so it is keyed by serial number and survives
+re-cloning ``flexiv_description``:
+
+.. code:: bash
+
+   mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/<ROBOT_SN>
+   ros2 launch flexiv_calibration calibration_correction.launch.py \
+      robot_sn:=<ROBOT_SN> \
+      target_filename:=${ISAAC_ROS_WS}/isaac_ros_assets/<ROBOT_SN>/<ROBOT_SN>_kinematics.yaml
+
+Replace ``<ROBOT_SN>`` with the serial number of the connected robot, for example
+``Rizon4s-063867``. The robot must be powered on, reachable on the network, and in ``Auto (Remote)``
+mode, and ``ISAAC_ROS_WS`` must be set. The Zenoh router from :ref:`robots/flexiv/index:Configure
+Grav Gripper` must be running. In this terminal, source ``${ISAAC_ROS_WS}/install/setup.bash`` and export
+``RMW_IMPLEMENTATION=rmw_zenoh_cpp``. On success the node reports the joints it synced:
+
+.. code:: text
+
+   Connected to [Rizon4s-063867], model [Rizon4s], software [v3.11.2], license [RDK-Professional...]
+   Synced 8 joints of [Rizon4s-063867] into [.../Rizon4s-063867_kinematics.yaml]
+
+Run this once per robot, and again only after Flexiv performs a recalibration.
+
+.. note::
+
+   Reading kinematic parameters requires an RDK professional license. The node reports the license
+   it validated on connection.
+
+Manipulation workflows pick the file up automatically from that path: both the driver's robot
+description and the cuMotion planning description are generated from it, so the planner and the
+published TF share one kinematic model. Set ``flexiv_calibrated_kinematics_path`` only if the file
+is stored elsewhere; when it is absent, both fall back to the nominal description.
+
+When retraining is required, generate a calibrated USD robot asset as described in
+`Generate a Calibrated USD for Isaac Lab Training`_ and train the insertion policy with it.
+
+Generate a Calibrated USD for Isaac Lab Training
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Isaac Lab training uses the nominal Rizon 4s with Grav USD by default. To train a simulation policy
+for a specific robot, ``generate_calibrated_usd.py`` from ``flexiv_calibration`` writes a copy of
+that USD with the arm joint frames taken from the robot's calibrated URDF. The gripper, meshes, and
+dynamics are kept unchanged.
+
+.. note::
+
+   ``generate_calibrated_usd.py`` needs the OpenUSD Python packages, which are only available for
+   **x86_64**, so it does not run on Jetson. Run it on the x86 machine with the Isaac Lab training
+   environment: the training package's ``uv sync`` already installs OpenUSD. On another x86_64
+   Python environment, install it with ``pip install usd-core==26.8``.
+
+Complete `Sync the Robot-Specific Kinematics`_ first, then:
+
+#. In the Isaac ROS environment where the kinematics file was synced, with
+   ``${ISAAC_ROS_WS}/install/setup.bash`` sourced, generate the calibrated arm URDF. Do not load the
+   gripper; the gripper is taken from the reference USD. Replace ``<ROBOT_SN>`` with the robot's
+   serial number:
+
+   .. code:: bash
+
+      export ROBOT_ASSET_DIR=${ISAAC_ROS_WS}/isaac_ros_assets/<ROBOT_SN>
+      xacro $(ros2 pkg prefix --share flexiv_description)/urdf/flexiv.urdf.xacro \
+         robot_type:=Rizon4s \
+         kinematics_parameters_file:=${ROBOT_ASSET_DIR}/<ROBOT_SN>_kinematics.yaml \
+         > ${ROBOT_ASSET_DIR}/<ROBOT_SN>_calibrated.urdf
+
+#. Copy ``<ROBOT_SN>_calibrated.urdf`` to the x86 training machine, and set ``ROBOT_ASSET_DIR`` there
+   to the directory that holds it. The remaining steps run on that machine.
+
+#. Get ``generate_calibrated_usd.py`` from the NVIDIA Isaac ROS fork of ``flexiv_ros2``. Skip the
+   clone if that machine already has the checkout from :ref:`robots/flexiv/index:Build Flexiv Drivers
+   from Source`:
+
+   .. code:: bash
+
+      git clone -b nvidia/lyrical-rdk-v1.9.4 https://github.com/NVIDIA-ISAAC-ROS/flexiv_ros2
+      export FLEXIV_ROS2_DIR=$(pwd)/flexiv_ros2
+
+#. Download the reference Rizon 4s with Grav USD that Isaac Lab training uses:
+
+   .. code:: bash
+
+      curl -fL -o ${ROBOT_ASSET_DIR}/rizon4s_with_grav.usd \
+         https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Robots/Flexiv/Rizon4s/rizon4s_with_grav.usd
+
+#. From the Isaac Lab training package directory (``isaac_ros_manipulation/isaaclab_training``),
+   generate the calibrated USD in the training environment:
+
+   .. code:: bash
+
+      uv run python ${FLEXIV_ROS2_DIR}/flexiv_calibration/scripts/generate_calibrated_usd.py \
+         --reference-usd ${ROBOT_ASSET_DIR}/rizon4s_with_grav.usd \
+         --urdf ${ROBOT_ASSET_DIR}/<ROBOT_SN>_calibrated.urdf \
+         --output ${ROBOT_ASSET_DIR}/<ROBOT_SN>_with_Grav_calibrated.usd
+
+   The script prints a JSON report whose ``changed_properties`` lists the patched arm joint frames.
+   It does not overwrite an existing output file unless you pass ``--force``.
+
+#. Train with the calibrated USD by appending its absolute path as a Hydra override to the Isaac Lab
+   training, play, and export commands:
+
+   .. code:: bash
+
+      env.scene.robot.spawn.usd_path=${ROBOT_ASSET_DIR}/<ROBOT_SN>_with_Grav_calibrated.usd
+
+   Use the same calibrated USD for training, policy export, and evaluation of a given robot.
+
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+**The Flexiv driver fails to connect to the robot**
+
+#. Verify that the robot is in ``Auto (Remote)`` mode on the teach pendant.
+#. Ensure the workstation and robot are on the same subnet and the robot can be pinged from the workstation.
+#. Verify the robot serial number is correct and does not contain spaces (e.g., ``Rizon4s-062839``).
+
+**The gripper does not respond**
+
+#. Ensure the gripper is physically connected and the gripper is lighting up.
+#. Check that the gripper model name matches your hardware. The default is ``Flexiv-GN01`` (Grav gripper).
+
+**Controller errors during DisplayPort cable insertion**
+
+#. Ensure the robot is running in an impedance control mode when running the DisplayPort cable
+   insertion workflow. The impedance mode provides the compliant behavior required for contact-rich
+   tasks.
+#. If you see overshooting or unstable behavior, verify that the LEAPP export used by
+   Isaac ROS Deploy matches the trained policy's observation layout, action representation, and TCP
+   offset.
+
+**End-effector pose does not match the trained policy**
+
+#. At a safe, fixed joint configuration, compare the end-effector pose computed using forward
+   kinematics from the nominal URDF with the pose reported by RDK or Flexiv Elements. Make sure both
+   poses use the same base frame, tool frame or TCP, units, and orientation convention.
+#. If the poses do not match, follow `Sync the Robot-Specific Kinematics`_ and use the calibrated model
+   to generate the corresponding USD asset and retrain the policy in Isaac Lab.

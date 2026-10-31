@@ -1,0 +1,89 @@
+================================================================================
+Check the DisplayPort Setup
+================================================================================
+
+Use the checks for the DisplayPort workflow you are running. Complete
+:doc:`setup_with_gripper` before physical-robot tests and use the configuration
+from :doc:`../sim_to_real/tutorial_displayport` for your robot, cameras, and objects.
+Physical-robot tests can command motion. Complete the setup guide's safety checks.
+
+Simulation Checks
+-----------------
+
+Follow :doc:`../isaac_sim/tutorial_displayport_task_space_isaac_sim` to start the
+DisplayPort scene and its ROS components. Verify that the scene is playing and
+that the clock and robot state topics are available:
+
+.. code:: bash
+
+   export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+   ros2 topic echo /clock --once
+   ros2 topic echo /rizon_joint_states --once
+
+Use the tutorial's action-server and policy troubleshooting steps if a component
+is unavailable. Keep the middleware and domain settings consistent in all terminals.
+
+.. _driver_and_hardware_tests:
+
+Driver and Hardware Tests
+-------------------------
+
+The Flexiv driver test uses the Rizon 4s and Grav gripper configuration. Point the
+configuration variable at your edited DisplayPort YAML before launching it:
+
+.. code:: bash
+
+   source ${ISAAC_ROS_WS}/install/setup.bash
+   export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+   export ENABLE_MANIPULATOR_TESTING=on_robot
+   export ISAAC_ROS_MANIPULATION_TEST_CONFIG=/path/to/flexiv_rizon4s_grav_displayport_cable_insertion.yaml
+
+.. include:: /reference_workflows/isaac_for_manipulation/tutorials/_snippets/zenoh_router_note.rst
+
+.. code:: bash
+
+   launch_test $(ros2 pkg prefix --share isaac_ros_manipulation_bringup)/test/flexiv_drivers_test.py
+
+This exercises the ``robot_launch_file_path`` driver plugin. Do not launch a second
+driver if the DisplayPort workflow already controls the robot.
+
+Perception Checks
+-----------------
+
+For perception-derived poses, complete the FoundationPose and Segment Anything (SAM) model setup
+in :doc:`setup_with_gripper`. Follow the camera selection and point-input procedure
+in :doc:`../sim_to_real/tutorial_displayport`. Confirm that SAM is loaded, the plug
+and socket masks match the selected objects, and the estimated poses align with
+the scene before confirming robot motion.
+
+For camera calibration, follow
+:doc:`the calibration validation procedure </getting_started/sensors/isaac_for_manipulation_camera_calibration>`.
+That guide runs ``run_calibration_validation.sh`` with the Flexiv target dimensions
+and your measured camera transforms.
+
+DisplayPort Insertion Check
+--------------------------------------------------------------------------------
+
+The manual-pose orchestrator test uses measured plug and socket poses. Configure
+those poses in your DisplayPort YAML, then run:
+
+.. code:: bash
+
+   export ENABLE_MANIPULATOR_TESTING=manual_on_robot
+   launch_test $(ros2 pkg prefix --share isaac_ros_manipulation_bringup)/test/test_displayport_insertion_orchestrator_manual_poses.py
+
+Use the tutorial's workspace and robot safety checks before triggering insertion.
+
+Troubleshooting
+---------------
+
+* Source the workspace in each terminal and check that the configuration path exists.
+* Verify the robot serial number, network connection, and remote-control mode.
+* If a test exits without checking anything, inspect its ``RUN_TEST`` condition and
+  ensure ``ENABLE_MANIPULATOR_TESTING`` matches the test's mode.
+* To inspect the data flow, enable diagnostics before launching components:
+
+  .. code:: bash
+
+     export ENABLE_GLOBAL_NITROS_DIAGNOSTICS=1
+     ros2 run isaac_ros_nitros diagnostic_viewer.py

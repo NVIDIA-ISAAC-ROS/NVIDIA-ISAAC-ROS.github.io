@@ -1,0 +1,129 @@
+# Setup
+
+This page installs the Isaac Lab training package and runs a short training job to confirm that
+the setup works. For full training, policy export, and deployment, follow the
+{doc}`DisplayPort training workflow <tasks/displayport_insertion>`.
+
+The package is a downstream Isaac Lab project. It provides the DisplayPort task, reusable MDP terms,
+and export utilities, while Isaac Lab provides the simulator integration, training entry points, and
+RSL-RL runner.
+
+## Prerequisites
+
+- Linux x86_64 workstation or cluster node with an NVIDIA GPU. See
+  {ref}`training-time-and-recommended-settings` for GPU memory and run-time guidance.
+- `uv` for Python environment management. `uv` installs the required Python 3.12 if it is not
+  already available:
+
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ```
+
+## Install the Training Package
+
+Clone the release branch and install the package together with Isaac Sim:
+
+```bash
+git clone --branch release-manipulation-2026.09 --single-branch https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation.git
+cd isaac_ros_manipulation/isaaclab_training
+uv sync --group sim
+```
+
+`uv sync --group sim` installs the package in editable mode, the Isaac Lab revision pinned in
+`uv.lock`, and Isaac Sim, which both physics backends need. Run every command on this page and in the
+training workflow from this `isaaclab_training` directory.
+
+The first Isaac Sim launch asks you to accept the NVIDIA Omniverse license agreement. For
+non-interactive runs, such as cluster jobs, accept it with an environment variable:
+
+```bash
+export OMNI_KIT_ACCEPT_EULA=YES
+```
+
+## Verify the Install
+
+Confirm that Isaac Lab discovers the DisplayPort tasks:
+
+```bash
+uv run python -c 'import gymnasium as gym; import isaaclab_training.tasks; print([s.id for s in gym.registry.values() if s.id.startswith("IsaacTraining-")])'
+```
+
+The command lists the registered `IsaacTraining-DisplayPortInsertion-*` task IDs.
+
+## Run a Short Training Test
+
+Run a short training job with a viewer to confirm that Isaac Sim launches and the robot, plug, and
+socket scene looks correct. This is only a setup check; for full-scale training, see the
+{doc}`DisplayPort training workflow <tasks/displayport_insertion>`.
+
+:::::{tab-set}
+:sync-group: physics-backend
+
+::::{tab-item} PhysX
+:sync: physx
+
+```bash
+uv run isaaclab train --rl_library rsl_rl \
+  --task IsaacTraining-DisplayPortInsertion-Rizon4s-TaskSpace-ROS-Inference \
+  --num_envs 16 \
+  --max_iterations 100 \
+  --viz kit
+```
+::::
+
+::::{tab-item} Newton
+:sync: newton
+
+:::{warning}
+Newton training is experimental. PhysX training is more stable, and we recommend the PhysX-trained
+policy for the best results in real-robot deployment.
+:::
+
+```bash
+uv run isaaclab train --rl_library rsl_rl \
+  --task IsaacTraining-DisplayPortInsertion-Rizon4s-TaskSpace-Newton-ROS-Inference \
+  --num_envs 16 \
+  --max_iterations 100 \
+  --viz kit \
+  physics=newton_sdf
+```
+
+The Newton task ID together with `physics=newton_sdf` selects the Newton backend.
+::::
+:::::
+
+The recurrent PPO configuration uses 16 minibatches, so use at least 16 environments. Training logs
+and checkpoints are written under `logs/rsl_rl/`. Stop the test with `Ctrl+C` once the scene looks
+correct.
+
+## Train for Your Robot
+
+Both backends spawn Isaac Lab's nominal Rizon 4s with Grav USD by default. To train a policy for a
+specific robot, generate a calibrated USD for it as described in
+{ir_docs}`Generate a Calibrated USD for Isaac Lab Training <robots/flexiv/index.html#generate-a-calibrated-usd-for-isaac-lab-training>`,
+then append its absolute path as a Hydra override to the training, play, and export commands:
+
+```text
+env.scene.robot.spawn.usd_path=/absolute/path/to/calibrated_rizon4s.usd
+```
+
+## Common Options
+
+- `--task`: registered task ID.
+- `--rl_library rsl_rl`: selects the RSL-RL backend used by these configurations.
+- `--num_envs`: parallel environments per GPU.
+- `--max_iterations`: number of training iterations.
+- `--viz none` / `--viz kit`: run headless, or open the Isaac Sim viewer.
+- `--video --video_length ... --video_interval ...`: record training videos.
+
+## Troubleshooting
+
+- `Isaac Sim is not installed or not found on PYTHONPATH`: run `uv sync --group sim` from the
+  `isaaclab_training` directory.
+- `` version `GLIBCXX_3.4.30' not found `` when Isaac Sim starts: the environment was created from a
+  Python with an older `libstdc++`, such as a Conda Python. Load the system library first, or recreate
+  the environment with `uv`'s managed Python:
+
+  ```bash
+  export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
+  ```

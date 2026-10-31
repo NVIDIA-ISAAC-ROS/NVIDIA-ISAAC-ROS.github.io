@@ -1,0 +1,144 @@
+================================================
+Set Up the Workspace and Developer Environment
+================================================
+
+Complete this shared prerequisite before either the **simulation** or
+**real-robot** DisplayPort tutorial. Use the **Isaac ROS release-5.0** setup
+instructions to create your workspace, configure the development environment,
+and initialize the Isaac ROS CLI.
+
+First review :doc:`requirements`. Run the applicable setup steps on each machine:
+the x86 simulation workstation, the robot deployment device, and the x86 model
+preparation host if using FoundationPose and Segment Anything (SAM).
+
+.. Preserve links to the setup sections that previously appeared on this page.
+
+.. _initialize-compute:
+.. _create-a-workspace:
+.. _configure-isaac-ros-apt-repository:
+.. _select-environment-isolation-mode:
+.. _initialize-isaac-ros-cli:
+
+Complete the `Isaac ROS release-5.0 workspace and developer environment setup
+<https://nvidia-isaac-ros.github.io/v/release-5.0/getting_started/index.html>`__.
+
+Follow that guide through compute initialization, workspace creation, repository
+configuration, environment selection, and CLI initialization. Then complete the
+workspace checks and container configuration below before building the
+DisplayPort workflow packages from source. Refer to :doc:`/concepts/dev_env/index`
+for activating and sourcing the built workspace.
+
+Verify the Workspace Variable
+-----------------------------
+
+The Isaac ROS setup adds an ``export ISAAC_ROS_WS=...`` line to ``~/.bashrc``.
+After running that ``export`` command and sourcing ``~/.bashrc``, confirm that
+the variable points at your workspace. The Isaac ROS CLI reads the workspace
+configuration file in the next section only when ``ISAAC_ROS_WS`` is set.
+
+.. code:: bash
+
+   source ~/.bashrc
+   echo "${ISAAC_ROS_WS}"
+   test -d "${ISAAC_ROS_WS}/src" && echo "ISAAC_ROS_WS is set correctly"
+
+The output must show your workspace path followed by
+``ISAAC_ROS_WS is set correctly``. If the second line is missing, the variable is
+unset or does not point at a workspace that contains a ``src`` directory.
+
+.. note::
+
+   The ``~/.bashrc`` line uses ``${ISAAC_ROS_WS:-<default path>}``, so a value
+   already exported in the current shell takes precedence over the default. If
+   the path is wrong, correct the line in ``~/.bashrc``, then run
+   ``unset ISAAC_ROS_WS`` (or open a **new** terminal) and repeat the check.
+
+.. _configure-the-workspace-container:
+
+Configure the Workspace Container
+---------------------------------
+
+The Isaac ROS CLI reads Docker settings from several configuration files. Put the
+DisplayPort container settings in the workspace configuration file,
+``${ISAAC_ROS_WS}/.isaac-ros-cli/config.yaml``. Settings in this file apply only
+to this workspace and override the same settings in your user file,
+``~/.config/isaac-ros-cli/config.yaml``.
+
+#. Create the workspace configuration file:
+
+   .. code:: bash
+
+      mkdir -p "${ISAAC_ROS_WS}/.isaac-ros-cli"
+      touch "${ISAAC_ROS_WS}/.isaac-ros-cli/config.yaml"
+
+#. Give this workspace's container its own name:
+
+   .. code:: yaml
+
+      version: 2
+
+      docker:
+        run:
+          container_name: isaac_manipulation_container
+
+   Every workspace uses the container name ``isaac_ros_dev_container`` by
+   default. The ``isaac-ros activate`` command attaches to a running container
+   with the configured name without checking which workspace or image it was
+   started with. A unique name makes ``isaac-ros activate`` start a new container for
+   this workspace instead of attaching to a container from another workspace.
+   Your other containers keep running. Choose a name that does not contain
+   ``isaac_ros_dev_container``, because Docker also matches any container whose
+   name contains the configured name.
+
+#. For the real-robot workflow, also add the ``realsense`` image layer so the
+   container includes the RealSense SDK and ``realsense-ros``. The simulation
+   workflow does not need this layer. The complete file is then:
+
+   .. code:: yaml
+
+      version: 2
+
+      docker:
+        image:
+          additional_image_keys:
+            - realsense
+        run:
+          container_name: isaac_manipulation_container
+
+   .. note::
+
+      A list in the workspace file replaces the same list from your user file. It
+      does not extend it. If your user file already lists image keys, repeat every
+      key you need in the workspace file.
+
+#. Build the image with the new layer and start the container:
+
+   .. code:: bash
+
+      isaac-ros activate --build-local
+
+   ``--build-local`` builds the image locally when it is not already available.
+   Without this flag, ``isaac-ros activate`` only tries to pull a prebuilt image
+   and exits with an ``image not found`` error if none with the ``realsense``
+   layer is available. The first build can take several minutes. After the image
+   exists, use ``isaac-ros activate`` to start the container without rebuilding.
+
+Next Step
+---------
+
+With the workspace ready, choose the setup guide for your workflow:
+
+* :doc:`simulation`: configure Isaac Sim and Fast DDS, then build the simulation
+  packages from source.
+* :doc:`real_robot`: build the robot packages from source and configure the
+  hardware, middleware, and any required perception models.
+
+Shared Environment Reference
+----------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   compute/preempt_setup
+   compute/jetson_storage
+   /concepts/dev_env/index

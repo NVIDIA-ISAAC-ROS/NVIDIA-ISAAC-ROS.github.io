@@ -1,0 +1,76 @@
+========================
+Set Up a Simulated Robot
+========================
+
+Set up Isaac Sim, build the source workspace, and prepare the Flexiv Rizon 4s
+with the Grav gripper for DisplayPort pickup and task-space policy insertion.
+
+Before You Begin
+----------------
+
+First complete :doc:`Workspace and Developer Environment Setup <environment>`
+on your simulation workstation. This shared prerequisite creates
+``${ISAAC_ROS_WS}/src`` and prepares the environment used by the source builds below.
+
+Review :doc:`requirements`. The workflow requires at least
+25 GB GPU VRAM and 30 GB CPU RAM. Also review the
+`Isaac Sim 6.0 requirements <https://docs.isaacsim.omniverse.nvidia.com/6.0.0/installation/requirements.html>`__.
+
+The source-build steps are included below. This simulation uses configured poses,
+so you need the FoundationPose and Segment Anything (SAM) model setup only for
+the physical-robot perception workflow.
+
+.. _getting_started/index:Isaac Sim Setup:
+
+.. _gs_isaac_sim:
+
+Isaac Sim Setup
+---------------
+
+Install **Isaac Sim 6.0** using the
+`native workstation installation instructions <https://docs.isaacsim.omniverse.nvidia.com/6.0.0/installation/install_workstation.html>`__.
+The DisplayPort tutorial uses this version with its published scene from the
+Isaac Sim 6.1 asset path.
+
+Use the bundled **Jazzy ROS 2 libraries** in a fresh simulator terminal, separate
+from the Isaac ROS source workspace terminal. Set the installation path to your
+Isaac Sim directory and configure the bridge:
+
+.. code:: bash
+
+   export ISAAC_SIM_PACKAGE_PATH=${HOME}/isaacsim-6.0.0 # set to the path of your Isaac Sim package
+   export ROS_DISTRO=jazzy
+   export ROS_DOMAIN_ID=231
+   export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+   export FASTDDS_BUILTIN_TRANSPORTS=UDPv4
+   export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:${ISAAC_SIM_PACKAGE_PATH}/exts/isaacsim.ros2.core/${ROS_DISTRO}/lib"
+
+Refer to the `Isaac Sim ROS 2 bridge instructions
+<https://docs.isaacsim.omniverse.nvidia.com/6.0.0/installation/install_ros.html>`__
+for details. The DisplayPort launcher opens the required scene and starts the
+bridge. Follow the launch section below after building the workspace.
+
+Build the Simulation Workspace
+------------------------------
+
+Use a separate Isaac ROS terminal for the following steps. Set Fast DDS in
+every ROS terminal and use the same ``ROS_DOMAIN_ID`` as the simulator
+(``231`` in the example above).
+
+.. include:: /reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/_snippets/isaac_sim_requirements_and_setup.rst
+
+.. _simulation-topic-based-control:
+
+Build Topic-Based Control
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /reference_workflows/isaac_for_manipulation/tutorials/_snippets/isaac_ros_manipulation_topic_based_control.rst
+
+.. include:: /reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/_snippets/isaac_sim_configure_workflow_file.rst
+
+Run Your First Simulated Workflow
+---------------------------------
+
+.. include:: /reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/_snippets/isaac_sim_launch.rst
+
+.. include:: /reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/_snippets/isaac_sim_pfc_tests.rst

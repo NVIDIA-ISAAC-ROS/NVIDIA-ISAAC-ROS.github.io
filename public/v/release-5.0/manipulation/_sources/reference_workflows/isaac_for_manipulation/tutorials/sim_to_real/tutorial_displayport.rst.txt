@@ -1,0 +1,601 @@
+==================================================================
+DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion
+==================================================================
+
+Overview
+--------
+
+This tutorial runs the complete Isaac for Manipulation DisplayPort cable insertion workflow on a
+Flexiv Rizon 4s with a Grav gripper. The workflow can use FoundationPose with Segment Anything
+(SAM) for plug and socket pose estimation. It uses cuMotion to pick the cable and move to a socket
+hover pose, and then runs the learned DisplayPort insertion policy through Isaac ROS Deploy.
+
+For the lower-level policy-only path, where the cable is already grasped and you manually
+publish the socket goal pose and switch controllers, refer to :doc:`DisplayPort Task-Space
+Policy Deployment <tutorial_displayport_task_space_policy_deployment>`.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_sim.gif>`
+   :width: 100%
+   :alt: DisplayPort cable insertion workflow running in simulation
+
+   DisplayPort cable insertion in simulation.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_real_robot.gif>`
+   :width: 360px
+   :align: center
+   :alt: DisplayPort cable insertion workflow running on a Flexiv Rizon 4s robot
+
+   DisplayPort cable insertion on the real Flexiv Rizon 4s robot.
+
+The workflow performs the following operations:
+
+#. Uses cuMotion to pick up the cable and move it to a hover pose above the socket.
+#. Runs the DisplayPort insertion policy while keeping the cable grasped.
+
+The configuration file for this tutorial is:
+
+.. code:: text
+
+   $(ros2 pkg prefix --share isaac_ros_manipulation_bringup)/params/flexiv_rizon4s_grav_displayport_cable_insertion.yaml
+
+.. warning::
+
+   This workflow commands a physical robot. Verify the robot serial number, socket and plug poses,
+   Deploy configuration, grasp file, controller configuration, and collision scene before triggering
+   the action. Keep the emergency stop accessible and begin with a clear robot workspace.
+
+Prerequisites
+-------------
+
+Before following this tutorial:
+
+* Complete :doc:`Workspace and Developer Environment Setup
+  </getting_started/environment>` on the robot deployment device and the model
+  preparation host.
+* Complete :doc:`Set Up Hardware and Software for a Real Robot with Isaac ROS Manipulation
+  </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper>` for the Flexiv
+  Rizon 4s and Grav gripper.
+* Build the ``isaac_ros_manipulation_bringup``,
+  ``isaac_ros_manipulation_contact_rich_insertion``, ``isaac_ros_deploy``,
+  ``isaac_ros_deploy_reference_applications``, and Flexiv driver packages.
+* Copy the DisplayPort socket mesh, plug mesh, and Deploy configuration for the insertion policy to
+  the paths referenced by the workflow configuration. NVIDIA publishes pre-trained DisplayPort
+  insertion policies on NGC, and the manipulation asset setup downloads them, so you do not need to
+  train a policy to run this workflow. Refer to `Use the Pre-Trained Insertion Policy`_.
+  ``isaac_ros_manipulation_flexiv_robot_description`` provides the Flexiv Grav grasp YAML, which
+  you can replace with setup-specific grasp exports if needed.
+* Secure the DisplayPort socket and place the cable within the robot's reachable workspace.
+
+Configure the Workflow
+----------------------
+
+Open the following file before launching the workflow:
+
+.. code:: bash
+
+   $(ros2 pkg prefix --share isaac_ros_manipulation_bringup)/params/flexiv_rizon4s_grav_displayport_cable_insertion.yaml
+
+.. note::
+
+   If you have not already done so during robot setup, sync the robot-specific kinematics as
+   described in the :ir_docs:`Flexiv setup guide <robots/flexiv/index.html#sync-the-robot-specific-kinematics>`. In Flexiv
+   Elements, confirm that the active tool frame is set to the gripper tool center point (TCP), not
+   the flange, before running insertion inference.
+
+Robot Configuration
+~~~~~~~~~~~~~~~~~~~
+
+Update the robot-specific values for your setup:
+
+.. code:: yaml
+
+   workflow_type: DISPLAYPORT_CABLE_INSERTION
+   robot_type: FLEXIV
+   rizon_type: Rizon4s
+   gripper_type: grav
+   robot_ip: 192.56.1.2
+   robot_sn: 'Rizon4s-063459'
+   rdk_control_mode: joint_impedance
+
+``robot_sn`` must match the serial number of the connected Rizon robot. Update ``robot_ip`` if your
+Flexiv network configuration uses a different address. Keep
+``workflow_type: DISPLAYPORT_CABLE_INSERTION`` so bringup selects the DisplayPort workflow.
+
+Use Calibrated Kinematics with cuMotion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The kinematics synced during setup drive motion planning as well as the driver. When
+``${ISAAC_ROS_WS}/isaac_ros_assets/<robot_sn>/<robot_sn>_kinematics.yaml`` is present, bringup uses
+it twice:
+
+* ``flexiv_description`` generates the driver's robot description from it.
+* Bringup merges the same values into the cuMotion planning description.
+
+Both descriptions represent the same physical arm, so the planner and the published TF agree.
+
+No configuration change is required: that path is where
+:ir_docs:`Sync the Robot-Specific Kinematics <robots/flexiv/index.html#sync-the-robot-specific-kinematics>`
+writes the file. Set ``flexiv_calibrated_kinematics_path`` only if it is stored elsewhere. When the
+file is absent, both descriptions fall back to the nominal model and behavior is unchanged.
+
+cuMotion needs the merge because it plans from its own description in
+``isaac_ros_cumotion_robot_description`` rather than from the driver's. Only joint ``<origin>``
+values are replaced; link names, meshes, joint limits, and the Grav gripper sub-tree come from the
+shipped description, so the XRDF collision spheres and the ``gripper_frame`` tool frame stay valid.
+
+To confirm that the calibrated model is in use, check that
+``/tmp/flexiv_rizon4s_grav_calibrated.urdf`` exists after launching the workflow.
+
+Use the Pre-Trained Insertion Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+NVIDIA publishes two pre-trained DisplayPort insertion policies on NGC as part of the Isaac ROS
+Manipulation assets: the default policy, trained in Isaac Lab with the PhysX simulation backend,
+and a policy trained with the Newton simulation backend. Use either to run this workflow without
+training a policy:
+
+.. code:: bash
+
+   export MANIPULATOR_INSTALL_ASSETS=1
+   ros2 run isaac_ros_manipulation_asset_bringup setup_perception_models.py \
+      --models manipulation
+
+The download extracts both policy bundles, each containing the Deploy configuration YAML, the ONNX
+model, and the initial recurrent state:
+
+.. code:: bash
+
+   find ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion \
+      -maxdepth 2 -type f | sort
+
+The PhysX-trained policy is under ``flexiv_policy/`` and the Newton-trained policy is under
+``flexiv_policy_newton/``. Point ``displayport_insertion_deploy_config_path`` at the YAML from
+whichever bundle you want to run. The PhysX-trained policy is the default used in the example
+configuration in `Hover and Insertion Configuration`_.
+
+.. note::
+
+   The pre-trained policy was trained against a specific cell layout, so it transfers only if your
+   setup matches the conditions it was trained under. Before relying on it, confirm the following:
+
+   * The socket and plug poses fall within the ranges seen during training.
+   * The plug geometry and grasp convention match the shipped meshes and grasp file.
+   * The robot, gripper, and TCP offset match the ones the policy was trained with.
+
+   Insertion is a contact-rich, millimeter-scale task, so a cell that differs from the training
+   distribution can fail even when every topic is wired correctly. If your setup differs, train a
+   policy for it in Isaac Lab as described in `Train a Policy for Your Setup`_.
+
+Deploy Policy Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use a LEAPP-exported Isaac ROS Deploy configuration for the trained DisplayPort insertion policy:
+
+.. code:: text
+
+   $ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy/DisplayPortTaskSpace.yaml
+
+To use the Newton-trained policy instead, point ``displayport_insertion_deploy_config_path`` to
+the same file under ``flexiv_policy_newton/``:
+
+.. code:: text
+
+   $ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy_newton/DisplayPortTaskSpace.yaml
+
+The Deploy configuration must match the robot, joint order, topic inputs, quaternion convention, and
+action representation used during policy training. The workflow launch accepts this file through
+``displayport_insertion_deploy_config_path``, creates the Deploy controllers, and starts them
+inactive with zero policy authority. During insertion, the orchestrator activates Deploy, ramps the
+SafetyController blend ratio, and publishes the socket goal pose directly.
+
+Train a Policy for Your Setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Train a policy when your cell falls outside what the pre-trained policies cover, for example, a
+different plug or socket, a different gripper or TCP offset, or socket and plug poses outside the
+ranges they were trained on. You train policies for this workflow with
+`reinforcement learning in Isaac Lab
+<https://isaac-sim.github.io/IsaacLab/v3.0.0-beta2/source/policy_deployment/index.html>`__, using
+either the PhysX or Newton simulation backend, and export them for Isaac ROS Deploy with LEAPP.
+
+Train against a USD asset that matches the physical robot. If you synced the robot's kinematics as
+described in the :ir_docs:`Flexiv setup guide <robots/flexiv/index.html#sync-the-robot-specific-kinematics>`,
+generate the USD asset from the calibrated URDF so that the model used for training represents the
+arm the policy runs on.
+
+Mesh and Grasp Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Verify that the socket mesh, cable mesh, and Grav grasp file exist:
+
+.. code:: yaml
+
+   foundation_pose_mesh_file_path: $ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/dp_socket/dp_socket.obj
+   displayport_insertion_socket_mesh_file_path: $ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/dp_socket/dp_socket.obj
+   displayport_insertion_cable_mesh_file_path: $ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/dp_plug/dp_plug.obj
+   displayport_insertion_cable_grasps_file_path: $(ros2 pkg prefix --share isaac_ros_manipulation_flexiv_robot_description)/config/grav_grasps_dp_plug.yaml
+   grasps_file_path: $(ros2 pkg prefix --share isaac_ros_manipulation_flexiv_robot_description)/config/grav_grasps_dp_plug.yaml
+   attach_object_mesh_file_path: $ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/dp_plug/dp_plug.obj
+
+The socket mesh used for insertion must have its origin at the intended insertion target. The
+cable grasp file must use the same plug geometry and Grav grasp convention as the physical setup.
+
+Choose the Pose Source
+~~~~~~~~~~~~~~~~~~~~~~
+
+The workflow supports manual poses and perception-derived poses.
+
+Manual Poses
+^^^^^^^^^^^^
+
+The supplied configuration uses manual poses:
+
+.. code:: yaml
+
+   displayport_insertion_use_manual_poses: 'true'
+   displayport_insertion_manual_plug_pose: [0.484, -0.07, 0.03, 0.0, 0.0, 0.0, 1.0]
+   displayport_insertion_manual_socket_pose: [0.475, 0.125, 0.07, 0.5, 0.5, 0.5, -0.5]
+
+Each pose is ``[x, y, z, qx, qy, qz, qw]`` in the robot base frame. Measure and replace both poses
+for your robot cell.
+
+.. _displayport-measure-socket-pose:
+
+Measure the Socket Pose with the Robot
+""""""""""""""""""""""""""""""""""""""
+
+One way to measure the socket pose is to seat the plug in the socket with the robot and read the
+robot's pose:
+
+#. Grasp the plug with the Grav gripper the same way the workflow does: the plug centered between the
+   fingertips and aligned with the fingers.
+
+#. Switch the robot to floating (free-drive) mode from the teach pendant and guide the arm by hand
+   until the plug is fully and squarely seated in the socket.
+
+#. Without moving the arm, read the flange pose in the robot base frame, either on the teach pendant
+   or with the Flexiv RDK, which reports it as ``[x, y, z, qw, qx, qy, qz]``:
+
+   .. code:: python
+
+      import flexivrdk
+
+      robot = flexivrdk.Robot('<ROBOT_SN>')
+      print(robot.states().flange_pose)
+
+   The RDK reports poses in the robot's world frame. Confirm in Flexiv Elements that it coincides
+   with the robot base frame. If you read the TCP pose instead of the flange pose, check that the TCP
+   has no rotation relative to the flange.
+
+#. Convert the reading to the socket pose:
+
+   * **x and y:** Use the flange ``x`` and ``y``. With the plug seated, the flange sits directly above
+     the socket insertion point.
+   * **Rotation:** The flange and the socket use different axis conventions. The flange ``z`` axis points
+     down into the socket, while the socket frame's ``x`` axis is the outward opening normal. Rotate
+     the flange orientation by +90° about its own ``y`` axis, and reorder the RDK quaternion from
+     ``[qw, qx, qy, qz]`` to ``[qx, qy, qz, qw]``:
+
+     .. code:: python
+
+        from scipy.spatial.transform import Rotation
+
+        x, y, z, qw, qx, qy, qz = robot.states().flange_pose
+        flange_to_socket = Rotation.from_quat([0.0, 0.70710678, 0.0, 0.70710678])
+        socket_quat = (Rotation.from_quat([qx, qy, qz, qw]) * flange_to_socket).as_quat()
+        print(socket_quat)  # [qx, qy, qz, qw]
+
+     For example, a flange pointing straight down with orientation ``[0.7071, 0.7071, 0.0, 0.0]``
+     gives the socket orientation ``[0.5, 0.5, 0.5, -0.5]`` used in the supplied configuration. A
+     quaternion and its negation describe the same orientation.
+
+     If you read the orientation on the teach pendant instead, it shows Euler angles ``Rx``, ``Ry``, and
+     ``Rz`` in degrees about the fixed base axes. Convert them with the lowercase ``'xyz'`` sequence:
+
+     .. code:: python
+
+        flange = Rotation.from_euler('xyz', [rx, ry, rz], degrees=True)
+        socket_quat = (flange * flange_to_socket).as_quat()  # [qx, qy, qz, qw]
+
+     For example, a pendant reading of ``Rx = 0``, ``Ry = -180``, ``Rz = -90`` gives the socket
+     orientation ``[-0.5, -0.5, -0.5, 0.5]``, the same orientation as ``[0.5, 0.5, 0.5, -0.5]``.
+   * **z:** The flange height does not give the socket height, because the plug extends below the
+     flange. Measure the height of the socket rim, where the plug enters, above the robot base
+     mounting surface. A rough measurement is sufficient. As a quick check, expect the socket ``z`` to
+     be about 80 mm below the recorded flange ``z``, the approximate distance from the
+     flange to the plug tip with the Grav grasp.
+
+#. Set ``displayport_insertion_manual_socket_pose`` to ``[x, y, z, qx, qy, qz, qw]`` from these values.
+   The same pose is the socket insertion keypoint that
+   :doc:`tutorial_displayport_task_space_policy_deployment` publishes.
+
+Perception-Derived Poses
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. warning::
+
+   Vision-in-the-loop insertion is experimental. Insertion success depends heavily on the
+   accuracy of the estimated socket pose. The following table lists the insertion policy's success
+   rates under socket pose observation noise:
+
+   .. list-table::
+      :header-rows: 1
+
+      * - Socket pose noise
+        - Success rate
+      * - 1 mm
+        - 93.3%
+      * - 2 mm
+        - 63.3%
+      * - 3 mm
+        - 33.3%
+      * - 4 mm
+        - 23.3%
+
+   To improve real-world success rates under pose noise, refer to :doc:`tutorial_displayport_sparr`.
+
+To estimate the plug and socket poses with Segment Anything and
+FoundationPose, update the workflow configuration:
+
+.. code:: yaml
+
+   displayport_insertion_use_manual_poses: 'false'
+   displayport_insertion_manual_grasp_mode: 'false'
+   object_detection_type: SEGMENT_ANYTHING
+   segmentation_type: SEGMENT_ANYTHING
+   segment_anything_input_points_topic: input_points
+   depth_type: REALSENSE
+   enable_dnn_depth_in_realsense: 'false'
+   sam_model_repository_paths: ['$ISAAC_ROS_WS/isaac_ros_assets/models/triton']
+   pose_estimation_type: FOUNDATION_POSE
+
+Verify that ``foundation_pose_mesh_file_path``,
+``displayport_insertion_socket_mesh_file_path``, and
+``displayport_insertion_cable_mesh_file_path`` point to the correct socket and plug meshes. Also
+verify that the Segment Anything and FoundationPose model paths in the configuration exist.
+
+After launching the workflow, start the DisplayPort action as described in `Trigger Cable
+Insertion`_. The orchestrator logs when it is ready for each input. In ``rqt_image_view``:
+
+#. Select ``/camera_1/color/image_raw`` as the displayed image.
+#. Set the location topic to ``/input_points_debug``.
+#. When the orchestrator requests the socket input, click the center of the rim of the
+   DisplayPort socket. Segment Anything generates the mask and FoundationPose estimates the socket
+   pose using the configured socket mesh.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_socket_click.gif>`
+      :width: 360px
+      :align: center
+      :alt: Clicking the center of the DisplayPort socket rim in rqt_image_view
+
+      Click the center of the socket rim.
+
+#. When requested, click the center of the bottom edge of the plug's black housing, not the
+   metal connector or the cable. The same pipeline estimates the plug pose using the configured
+   plug mesh.
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_plug_click.gif>`
+      :width: 360px
+      :align: center
+      :alt: Clicking the center bottom of the black housing of the DisplayPort plug in rqt_image_view
+
+      Click the center bottom of the plug's black housing.
+
+#. Inspect the estimated poses and planned hover motion. When the orchestrator asks for confirmation
+   to start the Deploy policy, click only after confirming that the plug, socket, and approach are
+   correct and the workspace is clear.
+
+If ``rqt_image_view`` is not already running, start it in a sourced terminal:
+
+.. code:: bash
+
+   ros2 run rqt_image_view rqt_image_view
+
+Hover and Insertion Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Configure the socket-relative hover pose and insertion behavior:
+
+.. code:: yaml
+
+   displayport_insertion_use_joint_state_planner: 'false'
+   displayport_insertion_run_rl_inference: 'true'
+   displayport_insertion_deploy_config_path: $ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy/DisplayPortTaskSpace.yaml
+   displayport_insertion_goal_pose_topic: /displayport_insertion/goal_pose
+   displayport_insertion_goal_pose_publish_rate_hz: 30.0
+   displayport_insertion_deploy_decimation: 1
+   displayport_insertion_deploy_inference_controller_name: deploy_inference_controller
+   displayport_insertion_deploy_safety_controller_name: deploy_safety_controller
+   displayport_insertion_deploy_normal_controller_name: rizon_arm_controller
+   displayport_insertion_deploy_controller_switch_timeout_sec: 15.0
+   displayport_insertion_deploy_blend_ratio: 1.0
+   displayport_insertion_deploy_max_blend_ratio_speed: 1.0
+   displayport_insertion_deploy_pre_goal_wait_sec: 0.25
+   displayport_insertion_enable_controller_switching: 'true'
+   displayport_insertion_offset_for_hover_pose: 0.24
+   displayport_insertion_hover_pose_orientation: [0.7071067811865476, 0.7071067811865476, 0.0, 0.0]
+   displayport_insertion_timeout_for_insertion_action_call: 10.0
+   displayport_insertion_socket_tf_frame: displayport_socket_frame
+
+Keep ``displayport_insertion_use_joint_state_planner`` set to ``false`` because the hover target is
+computed relative to the socket pose. The hover orientation uses ``[qx, qy, qz, qw]`` order. Set it
+to ``[]`` to retain the socket orientation.
+
+Launch the Workflow
+-------------------
+
+Assign a ``ROS_DOMAIN_ID`` to avoid interference from other ROS systems on the network. For
+real-robot setups, use Zenoh, because it supports the GPU-resident message payloads that the
+perception pipelines publish and brings up the robot driver reliably.
+
+#. Power on the Flexiv robot, release the emergency stop, and put the robot in **Auto (Remote)**
+   mode.
+
+#. Open a terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Source the built workspace. Repeat this in **every** terminal you start, after
+   ``isaac-ros activate``:
+
+   .. code:: bash
+
+      source ${ISAAC_ROS_WS}/install/setup.bash
+
+#. Set the ROS domain and middleware in this terminal. Use the same values in every terminal:
+
+   .. code:: bash
+
+      export ROS_DOMAIN_ID=<ID_NUMBER>
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+
+
+   .. include:: /reference_workflows/isaac_for_manipulation/tutorials/_snippets/zenoh_router_note.rst
+
+#. Launch the workflow with the DisplayPort configuration:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_manipulation_bringup workflows.launch.py \
+         manipulator_workflow_config:=$(ros2 pkg prefix --share isaac_ros_manipulation_bringup)/params/flexiv_rizon4s_grav_displayport_cable_insertion.yaml
+
+   This launch command starts the Flexiv driver, cuMotion planning stack, manipulation action server,
+   DisplayPort insertion orchestrator, and inactive DisplayPort Deploy controllers. The
+   orchestrator activates Deploy, ramps the SafetyController blend ratio, publishes the socket goal
+   pose, and then restores the nominal controller during the DisplayPort action.
+
+#. Wait until the robot is connected, the configured controllers are available, and the terminal
+   reports that cuMotion is ready for planning queries.
+
+Trigger Cable Insertion
+-----------------------
+
+#. Open another terminal, activate Isaac ROS, source the workspace, and set the same ROS domain and
+   middleware:
+
+   .. code:: bash
+
+      isaac-ros activate
+      source ${ISAAC_ROS_WS}/install/setup.bash
+      export ROS_DOMAIN_ID=<ID_NUMBER>
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+
+#. Trigger one complete DisplayPort insertion cycle:
+
+   .. code:: bash
+
+      ros2 action send_goal /displayport_cable_insertion \
+         isaac_ros_manipulation_interfaces/action/DisplayPortCableInsertion {}
+
+#. Observe the robot closely while it picks the cable, moves to the configured hover pose, and runs
+   Deploy insertion. Stop the workflow if the plug slips, the approach direction is incorrect,
+   or the cable or gripper approaches an unexpected collision.
+
+Key Configuration Parameters
+----------------------------
+
+.. list-table:: DisplayPort workflow parameters
+   :header-rows: 1
+   :widths: 38 62
+
+   * - Parameter
+     - Description
+   * - ``workflow_type``
+     - Must be ``DISPLAYPORT_CABLE_INSERTION``.
+   * - ``robot_sn``
+     - Serial number used by the Flexiv driver and joint-name prefixing.
+   * - ``displayport_insertion_deploy_config_path``
+     - Path to the LEAPP-exported Isaac ROS Deploy configuration for the insertion policy.
+   * - ``displayport_insertion_use_manual_poses``
+     - Uses poses from the YAML when ``true``. Uses Segment Anything and FoundationPose when
+       ``false``.
+   * - ``displayport_insertion_manual_plug_pose``
+     - Plug pose in the robot base frame as ``[x, y, z, qx, qy, qz, qw]``.
+   * - ``displayport_insertion_manual_socket_pose``
+     - Socket insertion-target pose in the robot base frame using the same format.
+   * - ``displayport_insertion_offset_for_hover_pose``
+     - Vertical offset in meters applied to the socket pose before policy insertion.
+   * - ``displayport_insertion_hover_pose_orientation``
+     - Fixed hover quaternion in ``[qx, qy, qz, qw]`` order, or ``[]`` to use the socket
+       orientation.
+   * - ``displayport_insertion_run_rl_inference``
+     - Runs Deploy insertion after pick-and-hover when ``true``.
+   * - ``displayport_insertion_goal_pose_publish_rate_hz``
+     - Rate at which the orchestrator publishes the insertion goal pose while Deploy runs.
+   * - ``displayport_insertion_deploy_decimation``
+     - Deploy inference interval in ros2_control update cycles.
+   * - ``displayport_insertion_deploy_blend_ratio``
+     - Target SafetyController blend ratio for policy command authority.
+   * - ``displayport_insertion_deploy_pre_goal_wait_sec``
+     - Extra wait after the expected blend-ramp duration before publishing the goal pose.
+   * - ``displayport_insertion_policy_home_joint_position``
+     - Joint-space policy start pose used by the orchestrator for the insertion approach.
+   * - ``displayport_insertion_timeout_for_insertion_action_call``
+     - Duration for publishing the Deploy insertion goal pose.
+
+Troubleshooting
+---------------
+
+Workflow Configuration Not Found
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Confirm that ``ISAAC_ROS_WS`` is set and that the command points to
+``flexiv_rizon4s_grav_displayport_cable_insertion.yaml``. Do not split the filename across lines.
+
+Deploy Configuration Not Found or Cannot Be Loaded
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Update ``displayport_insertion_deploy_config_path`` to an existing LEAPP-exported Deploy
+configuration. Confirm that the configuration's model file, observation names, joint ordering,
+quaternion convention, and action representation match the DisplayPort policy.
+
+Robot or Controller Does Not Become Ready
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Verify ``robot_sn``, ``robot_ip``, ``rdk_control_mode: joint_impedance``, and the Flexiv network
+connection. Confirm that another driver or controller process is not already controlling the robot.
+
+Manual Pose Produces an Incorrect Approach
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Re-measure both manual poses in the robot base frame. Confirm that the quaternion is normalized and
+uses ``[qx, qy, qz, qw]`` order. Verify that the socket pose represents the insertion target rather than an
+unrelated mesh origin.
+
+Cable Pickup Fails
+~~~~~~~~~~~~~~~~~~
+
+Verify that ``displayport_insertion_cable_grasps_file_path``, ``grasps_file_path``, and
+``attach_object_mesh_file_path`` all refer to the same plug geometry. Confirm that the physical plug
+pose and Grav finger placement match the grasp definition.
+
+Insertion Times Out or Misses the Socket
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the socket target pose, hover offset, hover orientation, and Deploy decimation. Confirm
+that the policy was trained for the same robot, gripper, joint order, controller mode, and
+grasp pose. Also verify that ``gripper_max_effort`` is high enough to hold the plug tightly, and
+that Flexiv Elements is using the gripper TCP rather than the flange.
+
+.. note::
+
+   At a safe, fixed joint configuration, compare the end-effector pose from nominal URDF forward
+   kinematics with the pose reported by the RDK or Flexiv Elements. Use the same base frame, tool frame
+   or TCP, units, and orientation convention for both poses. A mismatch indicates that the
+   kinematic model used for policy training does not accurately represent the physical robot.
+
+   If the poses do not match, sync the robot-specific kinematics as described in the
+   :ir_docs:`Flexiv setup guide <robots/flexiv/index.html#sync-the-robot-specific-kinematics>`, generate the
+   corresponding USD asset from the calibrated URDF, and retrain the insertion policy with that
+   asset in Isaac Lab.
+
+   Refer to :ir_docs:`Isaac ROS Deploy <repositories_and_packages/isaac_ros_deploy/index.html>` for the
+   standalone Deploy runtime and controller configuration.
+
+RealSense Camera Issues
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If the RealSense camera used for perception is not detected, drops frames, or produces noisy
+depth, refer to :doc:`hardware troubleshooting </troubleshooting/hardware_setup>`.

@@ -1,0 +1,824 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Jetson Storage Setup &#8212; Isaac for Manipulation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-new-tab-link.css?v=d87cb1ac" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/isaac.css?v=af4c1f8d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/manipulation.css?v=000f0a76" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=1747932b"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=01823362"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started/compute/jetson_storage';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script>mermaid.initialize({"startOnLoad": true})</script>
+    <link rel="icon" href="../../_static/isaac_ros_logo.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Use a Source Workspace" href="../../concepts/dev_env/index.html" />
+    <link rel="prev" title="PREEMPT_RT Kernel for Jetson" href="preempt_setup.html" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2026.09" />
+    <meta name="docbuild:last-update" content="Oct 30, 2026"/>
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Get Started</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../requirements.html">System Requirements</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../environment.html">Workspace and Developer Environment</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="preempt_setup.html">PREEMPT_RT Kernel for Jetson</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Jetson Storage Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/dev_env/index.html">Use a Source Workspace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html">Install Packages and Perception Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation.html">Set Up a Simulated Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../real_robot.html">Set Up a Physical Robot</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../sensors/index.html">Cameras for Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../sensors/realsense_setup.html">Isaac ROS RealSense Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../sensors/camera_configuration.html">Configure Cameras for DisplayPort Insertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../sensors/isaac_for_manipulation_camera_calibration.html">Isaac for Manipulation Camera Calibration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../robots/index.html">Configure Your Robot</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../robots/flexiv/index.html">Flexiv Robots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../troubleshooting/index.html">Troubleshoot Your Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../troubleshooting/dev_env.html">Troubleshoot the Source Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../troubleshooting/hardware_setup.html">Hardware Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html">Check the DisplayPort Setup</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/index.html">DisplayPort Workflows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../training/index.html">Train in Isaac Lab</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../training/setup_training.html">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../training/repo_structure.html">Repository Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../training/tasks/displayport_insertion.html">Training a DisplayPort Cable Insertion Policy and ROS Deployment</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper.html">Set Up Hardware and Software for a Real Robot with Isaac ROS Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html">Check the DisplayPort Setup</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorials.html">DisplayPort Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim.html">DisplayPort Tutorial in Isaac Sim</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_displayport_task_space_isaac_sim.html">DisplayPort Task-Space Policy Pickup and Insertion in Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_sim_to_real.html">Sim-to-Real Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport.html">DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport_task_space_policy_deployment.html">DisplayPort Task-Space Policy Deployment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport_sparr.html">Improve Real-World Performance with SPARR (Experimental)</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a></div>
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Get Started with Manipulation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../environment.html" class="nav-link">Set Up the Workspace and Developer Environment</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Jetson Storage Setup</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="jetson-storage-setup">
+<h1>Jetson Storage Setup<a class="headerlink" href="#jetson-storage-setup" title="Link to this heading">#</a></h1>
+<p>If you are working on a Jetson developer kit, you’ll need a fast and
+large storage device to store container images and rosbag files. To add this storage capacity, install an NVMe SSD
+card in the Jetson developer kit’s carrier board.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Connecting an SSD over USB 3.x is generally <strong>not</strong>
+recommended, because it has slower write/read speed than an SSD
+connected over NVMe (PCIe) interface.</p>
+</div>
+<figure class="align-center" id="id1">
+<img alt="Read/Write Speed Comparison across Different Storage Medium including SSD" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/getting_started/graph_read-write-speed.png/" />
+<figcaption>
+<p><span class="caption-text">Read/Write Speed Comparison across Different Storage Medium including SSD</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>To properly configure your Jetson with an NVMe SSD choose one of the following:</p>
+<ul class="simple">
+<li><p>Physically install the NVMe SSD on a fresh Jetson developer kit, then use SDK Manager running on an Ubuntu PC to flash the entire L4T (Jetson Linux) on the SSD.</p></li>
+<li><p>Flash L4T onto the Jetson’s eMMC or on a microSD card, <strong>then</strong> physically install the NVMe SSD, and configure the SSD as optional storage for the ROS 2 workspace, and/or the Docker overlay files.</p></li>
+</ul>
+<p>The first option is most straightforward, but requires a willingness to
+reflash the entire Jetson developer kit and thus lose any files already
+present on the device.</p>
+<p>The second option requires more work, but saves the need to reflash the
+Jetson. The rest of this document explains how to configure an SSD using
+the second option. If you have a Jetson already set up and running
+without an NVMe SSD, follow the steps below.</p>
+<section id="ssd-setup">
+<h2>SSD Setup<a class="headerlink" href="#ssd-setup" title="Link to this heading">#</a></h2>
+<section id="physically-install-ssd-and-auto-mount">
+<h3>Physically Install SSD and Auto-Mount<a class="headerlink" href="#physically-install-ssd-and-auto-mount" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Unplug the power and any peripherals from the Jetson developer kit.</p></li>
+<li><p>Physically install an NVMe SSD card on the carrier board of your
+Jetson developer kit. You must properly seat the connector and
+secure it with the screw.</p></li>
+<li><p>Reinsert the power cable and any peripherals, and power on the
+Jetson developer kit.</p></li>
+<li><p>Verify that the system identifies a new memory controller on PCI bus:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lspci
+</pre></div>
+</div>
+<p>Typical output looks like the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">0007</span>:01:00.0<span class="w"> </span>Non-Volatile<span class="w"> </span>memory<span class="w"> </span>controller:<span class="w"> </span>Marvell<span class="w"> </span>Technology<span class="w"> </span>Group<span class="w"> </span>Ltd.<span class="w"> </span>Device<span class="w"> </span><span class="m">1322</span><span class="w"> </span><span class="o">(</span>rev<span class="w"> </span><span class="m">02</span><span class="o">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">lsblk</span></code> to find the device name.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lsblk
+</pre></div>
+</div>
+<p>Typical output looks like the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>NAME<span class="w">         </span>MAJ:MIN<span class="w"> </span>RM<span class="w">   </span>SIZE<span class="w"> </span>RO<span class="w"> </span>TYPE<span class="w"> </span>MOUNTPOINT
+loop0<span class="w">          </span><span class="m">7</span>:0<span class="w">    </span><span class="m">0</span><span class="w">    </span>16M<span class="w">  </span><span class="m">1</span><span class="w"> </span>loop
+mmcblk1<span class="w">      </span><span class="m">179</span>:0<span class="w">    </span><span class="m">0</span><span class="w">  </span><span class="m">59</span>.5G<span class="w">  </span><span class="m">0</span><span class="w"> </span>disk
+├─mmcblk1p1<span class="w">  </span><span class="m">179</span>:1<span class="w">    </span><span class="m">0</span><span class="w">    </span>58G<span class="w">  </span><span class="m">0</span><span class="w"> </span>part<span class="w"> </span>/
+├─mmcblk1p2<span class="w">  </span><span class="m">179</span>:2<span class="w">    </span><span class="m">0</span><span class="w">   </span>128M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p3<span class="w">  </span><span class="m">179</span>:3<span class="w">    </span><span class="m">0</span><span class="w">   </span>768K<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p4<span class="w">  </span><span class="m">179</span>:4<span class="w">    </span><span class="m">0</span><span class="w">  </span><span class="m">31</span>.6M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p5<span class="w">  </span><span class="m">179</span>:5<span class="w">    </span><span class="m">0</span><span class="w">   </span>128M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p6<span class="w">  </span><span class="m">179</span>:6<span class="w">    </span><span class="m">0</span><span class="w">   </span>768K<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p7<span class="w">  </span><span class="m">179</span>:7<span class="w">    </span><span class="m">0</span><span class="w">  </span><span class="m">31</span>.6M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p8<span class="w">  </span><span class="m">179</span>:8<span class="w">    </span><span class="m">0</span><span class="w">    </span>80M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p9<span class="w">  </span><span class="m">179</span>:9<span class="w">    </span><span class="m">0</span><span class="w">   </span>512K<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p10<span class="w"> </span><span class="m">179</span>:10<span class="w">   </span><span class="m">0</span><span class="w">    </span>64M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p11<span class="w"> </span><span class="m">179</span>:11<span class="w">   </span><span class="m">0</span><span class="w">    </span>80M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p12<span class="w"> </span><span class="m">179</span>:12<span class="w">   </span><span class="m">0</span><span class="w">   </span>512K<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+├─mmcblk1p13<span class="w"> </span><span class="m">179</span>:13<span class="w">   </span><span class="m">0</span><span class="w">    </span>64M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+└─mmcblk1p14<span class="w"> </span><span class="m">179</span>:14<span class="w">   </span><span class="m">0</span><span class="w"> </span><span class="m">879</span>.5M<span class="w">  </span><span class="m">0</span><span class="w"> </span>part
+zram0<span class="w">        </span><span class="m">251</span>:0<span class="w">    </span><span class="m">0</span><span class="w">   </span><span class="m">1</span>.8G<span class="w">  </span><span class="m">0</span><span class="w"> </span>disk<span class="w"> </span><span class="o">[</span>SWAP<span class="o">]</span>
+zram1<span class="w">        </span><span class="m">251</span>:1<span class="w">    </span><span class="m">0</span><span class="w">   </span><span class="m">1</span>.8G<span class="w">  </span><span class="m">0</span><span class="w"> </span>disk<span class="w"> </span><span class="o">[</span>SWAP<span class="o">]</span>
+zram2<span class="w">        </span><span class="m">251</span>:2<span class="w">    </span><span class="m">0</span><span class="w">   </span><span class="m">1</span>.8G<span class="w">  </span><span class="m">0</span><span class="w"> </span>disk<span class="w"> </span><span class="o">[</span>SWAP<span class="o">]</span>
+zram3<span class="w">        </span><span class="m">251</span>:3<span class="w">    </span><span class="m">0</span><span class="w">   </span><span class="m">1</span>.8G<span class="w">  </span><span class="m">0</span><span class="w"> </span>disk<span class="w"> </span><span class="o">[</span>SWAP<span class="o">]</span>
+nvme0n1<span class="w">      </span><span class="m">259</span>:0<span class="w">    </span><span class="m">0</span><span class="w"> </span><span class="m">238</span>.5G<span class="w">  </span><span class="m">0</span><span class="w"> </span>disk
+</pre></div>
+</div>
+<p>Identify the device corresponding to your SSD. In this example, it is
+<code class="docutils literal notranslate"><span class="pre">nvme0n1</span></code>.</p>
+</li>
+<li><p>Format the SSD, create a mount point, and mount it to the filesystem.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>mkfs.ext4<span class="w"> </span>/dev/nvme0n1
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/mnt/ssd
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>mount<span class="w"> </span>/dev/nvme0n1<span class="w"> </span>/mnt/ssd
+</pre></div>
+</div>
+</li>
+<li><p>To ensure that the mount persists after boot, add an entry
+to the <code class="docutils literal notranslate"><span class="pre">fstab</span></code> file:</p>
+<p>Identify the UUID for your SSD:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lsblk<span class="w"> </span>-f
+</pre></div>
+</div>
+<p>Add a new entry to the <code class="docutils literal notranslate"><span class="pre">fstab</span></code> file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>vi<span class="w"> </span>/etc/fstab
+</pre></div>
+</div>
+<p>Insert the following line, replacing the UUID with the value found
+from <code class="docutils literal notranslate"><span class="pre">lsblk</span> <span class="pre">-f</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>UUID=************-****-****-****-******** /mnt/ssd/ ext4 defaults 0 2
+</pre></div>
+</div>
+</li>
+<li><p>Change the ownership of the <code class="docutils literal notranslate"><span class="pre">/mnt/ssd</span></code> directory.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>chown<span class="w"> </span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span>:<span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="w"> </span>/mnt/ssd
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="migrate-docker-directory-to-ssd">
+<h3>Migrate Docker directory to SSD<a class="headerlink" href="#migrate-docker-directory-to-ssd" title="Link to this heading">#</a></h3>
+<p>After installing the SSD and making it available to your device, you can use
+the extra storage capacity to hold the space-heavy Docker directory.</p>
+<ol class="arabic">
+<li><p>Add the <code class="docutils literal notranslate"><span class="pre">nvidia</span></code> user to the docker group to enable using docker without sudo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add your user to the docker group</span>
+sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>docker<span class="w"> </span><span class="nv">$USER</span>
+<span class="c1"># Verify that command succeeded</span>
+id<span class="w"> </span><span class="nv">$USER</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>docker
+<span class="c1"># Log out and log in for the changes to take effect</span>
+newgrp<span class="w"> </span>docker
+</pre></div>
+</div>
+</li>
+<li><p>Stop the Docker socket, Docker, and containerd services.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>docker.socket<span class="w"> </span>docker<span class="w"> </span>containerd
+</pre></div>
+</div>
+</li>
+<li><p>Move the existing Docker and containerd data directories.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>du<span class="w"> </span>-csh<span class="w"> </span>/var/lib/docker/<span class="w"> </span>/var/lib/containerd/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/mnt/ssd/docker<span class="w"> </span>/mnt/ssd/containerd<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>rsync<span class="w"> </span>-axPS<span class="w"> </span>/var/lib/docker/<span class="w"> </span>/mnt/ssd/docker/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>rsync<span class="w"> </span>-axPS<span class="w"> </span>/var/lib/containerd/<span class="w"> </span>/mnt/ssd/containerd/<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>du<span class="w"> </span>-csh<span class="w"> </span>/mnt/ssd/docker/<span class="w"> </span>/mnt/ssd/containerd/
+</pre></div>
+</div>
+</li>
+<li><p>Use a text editor (e.g. Vi) to configure Docker and containerd.</p>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">/etc/docker/daemon.json</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>vi<span class="w"> </span>/etc/docker/daemon.json
+</pre></div>
+</div>
+<p>Insert <code class="docutils literal notranslate"><span class="pre">&quot;data-root&quot;</span></code> line similar to the following:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"runtimes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"nvidia"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nvidia-container-runtime"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"runtimeArgs"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"default-runtime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nvidia"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"data-root"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/mnt/ssd/docker"</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">/etc/containerd/config.toml</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-f<span class="w"> </span>/etc/containerd/config.toml<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>containerd<span class="w"> </span>config<span class="w"> </span>default<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/containerd/config.toml<span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+sudo<span class="w"> </span>vi<span class="w"> </span>/etc/containerd/config.toml
+</pre></div>
+</div>
+<p>Insert or update the <code class="docutils literal notranslate"><span class="pre">root</span></code> line similar to the following:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"/mnt/ssd/containerd"</span>
+</pre></div>
+</div>
+</li>
+<li><p>Rename the old Docker and containerd data directories.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>mv<span class="w"> </span>/var/lib/docker<span class="w"> </span>/var/lib/docker.old<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>mv<span class="w"> </span>/var/lib/containerd<span class="w"> </span>/var/lib/containerd.old
+</pre></div>
+</div>
+</li>
+<li><p>Restart containerd, the Docker socket, and the Docker daemon.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>containerd<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>docker.socket<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>docker<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w"> </span>docker
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="test-docker-on-ssd">
+<h3>Test Docker on SSD<a class="headerlink" href="#test-docker-on-ssd" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>[Terminal 1] Open a terminal to monitor the disk usage while
+pulling a Docker image.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>watch<span class="w"> </span>-n1<span class="w"> </span>df
+</pre></div>
+</div>
+</li>
+<li><p>[Terminal 2] Open a new terminal and begin the Docker pull.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>nvcr.io/nvidia/l4t-base:r35.2.1
+</pre></div>
+</div>
+</li>
+<li><p>[Terminal 1] Observe that the disk usage on <code class="docutils literal notranslate"><span class="pre">/mnt/ssd</span></code> goes up as the
+container image is downloaded and extracted.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~$<span class="w"> </span>docker<span class="w"> </span>image<span class="w"> </span>ls
+REPOSITORY<span class="w">                  </span>TAG<span class="w">       </span>IMAGE<span class="w"> </span>ID<span class="w">       </span>CREATED<span class="w">        </span>SIZE
+nvcr.io/nvidia/l4t-base<span class="w">     </span>r35.2.1<span class="w">   </span>dc07eb476a1d<span class="w">   </span><span class="m">7</span><span class="w"> </span>months<span class="w"> </span>ago<span class="w">   </span>713MB
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="final-verification">
+<h2>Final Verification<a class="headerlink" href="#final-verification" title="Link to this heading">#</a></h2>
+<p>Reboot your Jetson, and verify that you observe the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~$<span class="w"> </span>sudo<span class="w"> </span>blkid<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>nvme
+/dev/nvme0n1:<span class="w"> </span><span class="nv">UUID</span><span class="o">=</span><span class="s2">"9fc06de1-7cf3-43e2-928a-53a9c03fc5d8"</span><span class="w"> </span><span class="nv">TYPE</span><span class="o">=</span><span class="s2">"ext4"</span>
+
+~$<span class="w"> </span>df<span class="w"> </span>-h
+Filesystem<span class="w">      </span>Size<span class="w">  </span>Used<span class="w"> </span>Avail<span class="w"> </span>Use%<span class="w"> </span>Mounted<span class="w"> </span>on
+/dev/mmcblk1p1<span class="w">  </span>116G<span class="w">   </span>18G<span class="w">   </span>94G<span class="w">  </span><span class="m">16</span>%<span class="w"> </span>/
+none<span class="w">            </span><span class="m">3</span>.5G<span class="w">     </span><span class="m">0</span><span class="w">  </span><span class="m">3</span>.5G<span class="w">   </span><span class="m">0</span>%<span class="w"> </span>/dev
+tmpfs<span class="w">           </span><span class="m">3</span>.6G<span class="w">  </span>108K<span class="w">  </span><span class="m">3</span>.6G<span class="w">   </span><span class="m">1</span>%<span class="w"> </span>/dev/shm
+tmpfs<span class="w">           </span>734M<span class="w">   </span>35M<span class="w">  </span>699M<span class="w">   </span><span class="m">5</span>%<span class="w"> </span>/run
+tmpfs<span class="w">           </span><span class="m">5</span>.0M<span class="w">  </span><span class="m">4</span>.0K<span class="w">  </span><span class="m">5</span>.0M<span class="w">   </span><span class="m">1</span>%<span class="w"> </span>/run/lock
+tmpfs<span class="w">           </span><span class="m">3</span>.6G<span class="w">     </span><span class="m">0</span><span class="w">  </span><span class="m">3</span>.6G<span class="w">   </span><span class="m">0</span>%<span class="w"> </span>/sys/fs/cgroup
+tmpfs<span class="w">           </span>734M<span class="w">   </span>88K<span class="w">  </span>734M<span class="w">   </span><span class="m">1</span>%<span class="w"> </span>/run/user/1000
+/dev/nvme0n1<span class="w">    </span>458G<span class="w">  </span>824M<span class="w">  </span>434G<span class="w">   </span><span class="m">1</span>%<span class="w"> </span>/mnt/ssd
+
+~$<span class="w"> </span>docker<span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-e<span class="w"> </span><span class="s2">"Default Runtime"</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"Root"</span>
+<span class="w"> </span>Default<span class="w"> </span>Runtime:<span class="w"> </span>nvidia
+<span class="w"> </span>Docker<span class="w"> </span>Root<span class="w"> </span>Dir:<span class="w"> </span>/mnt/ssd/docker
+
+~$<span class="w"> </span>sudo<span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s1">'^root = '</span><span class="w"> </span>/etc/containerd/config.toml
+<span class="nv">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"/mnt/ssd/containerd"</span>
+
+~$<span class="w"> </span>sudo<span class="w"> </span>du<span class="w"> </span>-chs<span class="w"> </span>/mnt/ssd/docker/<span class="w"> </span>/mnt/ssd/containerd/
+752M<span class="w">    </span>/mnt/ssd/docker/
+752M<span class="w">    </span>/mnt/ssd/containerd/
+<span class="m">1</span>.5G<span class="w">    </span>total
+</pre></div>
+</div>
+<p>Your Jetson is now set up with the SSD!</p>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
+<p>Check out our <a class="reference internal" href="../../troubleshooting/dev_env.html"><span class="doc">troubleshooting</span></a> section for issues with setting up your development environment.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="preempt_setup.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">PREEMPT_RT Kernel for Jetson</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../concepts/dev_env/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Use a Source Workspace</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ssd-setup">SSD Setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#physically-install-ssd-and-auto-mount">Physically Install SSD and Auto-Mount</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#migrate-docker-directory-to-ssd">Migrate Docker directory to SSD</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#test-docker-on-ssd">Test Docker on SSD</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-verification">Final Verification</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Manage My Privacy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/preferences/start/">Do Not Sell or Share My Data</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2023-2026 NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on Oct 30, 2026.
+  <br/>
+</p></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
+  </body>
+</html>

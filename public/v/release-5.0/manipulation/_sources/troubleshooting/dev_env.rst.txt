@@ -1,0 +1,36 @@
+================================================================================
+Troubleshoot the Source Environment
+================================================================================
+
+Package Not Found
+-----------------
+
+Activate the Isaac ROS environment, rebuild the required package and its source
+dependencies, then source ``${ISAAC_ROS_WS}/install/setup.bash`` in each terminal.
+Check ``ros2 pkg prefix isaac_ros_manipulation_bringup`` and verify that it resolves
+to your source workspace. See :doc:`/concepts/dev_env/index`.
+
+Source Dependency Missing
+-------------------------
+
+Check that the dependency repository is present under ``${ISAAC_ROS_WS}/src`` and
+that its packages appear in ``colcon list``. Resolve system dependencies using
+``rosdep --ignore-src`` before rebuilding. Use the repository versions required
+by the DisplayPort tutorial and the Flexiv driver setup.
+
+Model Files Missing
+-------------------
+
+Source builds disable automatic asset installation. Complete the targeted
+FoundationPose and SAM preparation in :doc:`/getting_started/install` and verify
+the paths in your DisplayPort configuration. Export SAM on x86 and copy the
+complete Triton model directory to the deployment machine.
+
+Robot or Simulator Topics Missing
+----------------------------------
+
+Follow the :doc:`DisplayPort setup checks
+</reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator>`.
+Check the middleware settings and domain ID in each terminal. For the physical
+robot, start the Zenoh router and verify remote mode and network connectivity.
+For Isaac Sim, verify the scene is playing and its ROS bridge is running.

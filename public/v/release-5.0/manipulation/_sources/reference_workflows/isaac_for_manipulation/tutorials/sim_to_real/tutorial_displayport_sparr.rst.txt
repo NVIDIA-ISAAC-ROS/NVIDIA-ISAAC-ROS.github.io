@@ -1,0 +1,48 @@
+==============================================================
+Improve Real-World Performance with SPARR (Experimental)
+==============================================================
+
+.. note::
+
+   SPARR is an experimental research project and is not part of the supported Isaac for
+   Manipulation workflow.
+
+SPARR (Simulation-based Policies with Asymmetric Real-world Residuals) keeps the
+simulation-trained DisplayPort insertion policy as a base policy and learns a small residual
+policy on the real robot. The residual policy observes wrist camera images and the robot state,
+learns from a sparse success reward, and adds a correction to the base policy's action, so
+real-world training only has to close the sim-to-real gap. Use it to boost success rates on top
+of the simulation base policy, including harder settings with socket pose observation noise.
+
+The `SPARR repository <https://github.com/NVlabs/SPARR>`__
+implements this for DisplayPort insertion on a Flexiv Rizon 4s with two RealSense D405 wrist
+cameras. Its README covers installation, demonstration collection, residual training, and
+evaluation.
+
+Results
+-------
+
+The residual policy was trained for about 50 minutes on the robot, using about 150 to 200
+real-world demonstrations that were collected fully automatically. The following table compares
+the success rates of the base policy and SPARR under socket pose noise:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Socket pose noise
+     - Base policy success rate
+     - SPARR success rate
+   * - 1 mm
+     - 93.3%
+     - 100%
+   * - 2 mm
+     - 63.3%
+     - 91.1%
+   * - 3 mm
+     - 33.3%
+     - 77.7%
+
+SPARR also handles some offset in the robot's starting pose, such as when the plug starts above
+the socket but not perfectly aligned with it.
+
+For details on the method, refer to the `SPARR paper <https://arxiv.org/abs/2602.23253>`__.

@@ -1,0 +1,100 @@
+:orphan:
+
+.. _isaac-ros-segment-anything-prepare-model:
+
+Prepare Segment Anything ONNX Model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are two Segment Anything models available to select from in the steps below: SAM and Mobile SAM.
+`SAM <https://github.com/facebookresearch/segment-anything>`__ provides the full accuracy of Segment Anything but can consume over 8GB of GPU memory and take more computation effort for inference.
+`Mobile SAM <https://docs.ultralytics.com/models/mobile-sam/>`__, has been tuned to operate with a much smaller memory footprint and less computation overhead, but with some level of degradation in quality.
+Choose the model which will be the most effective for your use case.
+
+
+#.  Make a directory to place models (inside the Isaac ROS environment):
+
+    .. code:: bash
+
+       mkdir -p ${ISAAC_ROS_WS}/isaac_ros_assets/models/triton/segment_anything/1/
+
+#.  Create the ONNX file for SAM or for Mobile SAM.
+
+   .. note::
+
+      SAM is only supported with Triton using the ONNX backend. The following step is to be performed only on x86_64. You must copy the generated ONNX file to a Jetson, in case you want to run the package on the device.
+
+   .. note::
+      It is recommended to run SAM with at least 12GB+ GPU memory. Mobile SAM smaller version of SAM which can be used if GPU VRAM is not sufficient to run SAM.
+   .. tabs::
+
+      .. tab:: SAM
+         **Steps to use SAM**
+
+         To create ONNX file for SAM. Download the PyTorch weights from Segment Anything official `repository <https://github.com/facebookresearch/segment-anything#model-checkpoints>`__.
+         Then, copy the downloaded model weights into the container.
+         The model is expected to be downloaded to ``~/Downloads`` outside the
+         Isaac ROS environment.
+
+         Move this file to ``${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything/`` using a console outside of the container and then continue inside the container.
+
+         For example, if the model ``vit_b.pth`` was downloaded to ``~/Downloads``:
+
+         On ``x86_64``:
+
+         .. code:: bash
+
+            # Outside container
+            mv ~/Downloads/</path/to/vit_b> ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything/vit_b.pth
+
+         .. code:: bash
+
+            # Inside container
+            cd ${ISAAC_ROS_WS}
+            pip3 install --break-system-packages git+https://github.com/facebookresearch/segment-anything.git && \
+            pip3 install --break-system-packages torchvision
+
+         .. code:: bash
+
+            # Inside container
+            ros2 run isaac_ros_segment_anything torch_to_onnx.py \
+            --checkpoint ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything/vit_b.pth \
+            --output ${ISAAC_ROS_WS}/isaac_ros_assets/models/triton/segment_anything/1/model.onnx --model-type vit_b --sam-type SAM
+      .. tab:: MobileSAM
+         **Steps to use MobileSAM**
+         To create ONNX file for Mobile SAM. Download the PyTorch weights from Mobile SAM official `repository <https://github.com/ChaoningZhang/MobileSAM/tree/master/weights>`__.
+         Then, copy the downloaded model weights into the container.
+         The model is expected to be downloaded to ``~/Downloads`` outside the
+         Isaac ROS environment.
+
+         This example uses ``mobile_sam.pt``, which must be copied
+         into ``${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything`` inside the Isaac ROS environment:
+
+         On ``x86_64``:
+
+         .. code:: bash
+
+            # Outside container
+            mv ~/Downloads/mobile_sam.pt ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything/mobile_sam.pt
+
+         .. code:: bash
+
+            # Inside container
+            cd ${ISAAC_ROS_WS}
+            pip3 install --break-system-packages timm && \
+            pip3 install --break-system-packages git+https://github.com/ChaoningZhang/MobileSAM.git
+
+         .. code:: bash
+
+            # Inside container
+            ros2 run isaac_ros_segment_anything torch_to_onnx.py \
+            --checkpoint ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything/mobile_sam.pt \
+            --output ${ISAAC_ROS_WS}/isaac_ros_assets/models/triton/segment_anything/1/model.onnx --model-type vit_t --sam-type MobileSAM
+
+#.  Copy the config file:
+
+      .. code:: bash
+
+         cp ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_segment_anything/sam_config_onnx.pbtxt ${ISAAC_ROS_WS}/isaac_ros_assets/models/triton/segment_anything/config.pbtxt
+
+
+.. |package_name| replace:: ``isaac_ros_segment_anything``
