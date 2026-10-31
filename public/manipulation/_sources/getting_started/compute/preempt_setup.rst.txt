@@ -1,0 +1,34 @@
+:orphan:
+
+============================
+PREEMPT_RT Kernel for Jetson
+============================
+
+We provide a PREEMPT_RT kernel for ``JetPack :ir_jetpack_version:``. This kernel is recommended only for use with robot manipulators, as many manipulator manufacturers recommend a low-latency kernel for interfacing with their robots.
+
+Install PREEMPT_RT kernel from apt server
+-------------------------------------------
+
+1. Follow instructions from `Developer guide <https://docs.nvidia.com/jetson/archives/:ir_l4t_version:/DeveloperGuide/SD/Kernel/RealTimeKernel.html>`__
+   to install PREEMPT_RT kernel on Jetson.
+2. Check if PREEMPT_RT kernel is active by running the below command which should return text that
+   contains ``PREEMPT RT``.
+
+    .. code:: bash
+
+        uname -a
+
+Configure Docker Arguments for Real-Time Scheduling
+----------------------------------------------------
+
+If you are running Isaac ROS in Docker container mode, you must specify additional arguments to enable real-time scheduling support. These arguments are necessary for proper thread priority management for the robot control interface, enabling low-latency communication with manipulators.
+
+Run the following command on the host to persist the Docker arguments:
+
+.. code:: bash
+
+   sudo tee -a /etc/isaac-ros-cli/.isaac_ros_dev-dockerargs > /dev/null << 'EOF'
+   --cap-add=sys_nice
+   --ulimit rtprio=99
+   --ulimit memlock=-1
+   EOF

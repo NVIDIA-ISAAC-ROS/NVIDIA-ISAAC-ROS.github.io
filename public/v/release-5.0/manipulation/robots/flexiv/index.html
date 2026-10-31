@@ -1,0 +1,836 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Flexiv Robots &#8212; Isaac for Manipulation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-new-tab-link.css?v=d87cb1ac" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/isaac.css?v=af4c1f8d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/manipulation.css?v=000f0a76" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=1747932b"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=01823362"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'robots/flexiv/index';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script>mermaid.initialize({"startOnLoad": true})</script>
+    <link rel="icon" href="../../_static/isaac_ros_logo.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Troubleshoot Your Setup" href="../../troubleshooting/index.html" />
+    <link rel="prev" title="Configure Your Robot" href="../index.html" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2026.09" />
+    <meta name="docbuild:last-update" content="Oct 30, 2026"/>
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../getting_started/index.html">Get Started</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/requirements.html">System Requirements</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../getting_started/environment.html">Workspace and Developer Environment</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/compute/preempt_setup.html">PREEMPT_RT Kernel for Jetson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/compute/jetson_storage.html">Jetson Storage Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../concepts/dev_env/index.html">Use a Source Workspace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/install.html">Install Packages and Perception Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/simulation.html">Set Up a Simulated Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/real_robot.html">Set Up a Physical Robot</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../getting_started/sensors/index.html">Cameras for Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/realsense_setup.html">Isaac ROS RealSense Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/camera_configuration.html">Configure Cameras for DisplayPort Insertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/isaac_for_manipulation_camera_calibration.html">Isaac for Manipulation Camera Calibration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">Configure Your Robot</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Flexiv Robots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../troubleshooting/index.html">Troubleshoot Your Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../troubleshooting/dev_env.html">Troubleshoot the Source Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../troubleshooting/hardware_setup.html">Hardware Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html">Check the DisplayPort Setup</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/index.html">DisplayPort Workflows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../training/index.html">Train in Isaac Lab</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../training/setup_training.html">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../training/repo_structure.html">Repository Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../training/tasks/displayport_insertion.html">Training a DisplayPort Cable Insertion Policy and ROS Deployment</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper.html">Set Up Hardware and Software for a Real Robot with Isaac ROS Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/setup/testing_manipulator.html">Check the DisplayPort Setup</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorials.html">DisplayPort Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_isaac_sim.html">DisplayPort Tutorial in Isaac Sim</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_displayport_task_space_isaac_sim.html">DisplayPort Task-Space Policy Pickup and Insertion in Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/tutorial_sim_to_real.html">Sim-to-Real Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport.html">DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport_task_space_policy_deployment.html">DisplayPort Task-Space Policy Deployment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport_sparr.html">Improve Real-World Performance with SPARR (Experimental)</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a></div>
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../getting_started/index.html" class="nav-link">Get Started with Manipulation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Configure Your Robot</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Flexiv Robots</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="flexiv-robots">
+<h1>Flexiv Robots<a class="headerlink" href="#flexiv-robots" title="Link to this heading">#</a></h1>
+<section id="set-up-flexiv-robot">
+<h2>Set Up Flexiv Robot<a class="headerlink" href="#set-up-flexiv-robot" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Complete the hardware setup and boot up the robot by following the <a class="reference external" href="https://www.flexiv.com/software/rdk/manual/v1.x/set_up_the_robot.html" rel="noreferrer" target="_blank">Set Up the Robot</a> guide in the Flexiv RDK documentation.</p></li>
+<li><p>Connect the UI tablet (teach pendant) and verify you can enable the robot using Flexiv Elements.</p></li>
+<li><p><a class="reference external" href="https://www.flexiv.com/software/rdk/manual/v1.x/activate_rdk_server.html" rel="noreferrer" target="_blank">Activate the RDK Server</a> on the robot.</p></li>
+<li><p><a class="reference external" href="https://www.flexiv.com/software/rdk/manual/v1.x/enter_and_exit_remote_mode.html" rel="noreferrer" target="_blank">Enter Remote mode</a> by setting the robot to <code class="docutils literal notranslate"><span class="pre">Auto</span> <span class="pre">(Remote)</span></code> mode on the teach pendant.</p></li>
+<li><p><a class="reference external" href="https://www.flexiv.com/software/rdk/manual/v1.x/connect_user_computer.html" rel="noreferrer" target="_blank">Connect the user computer</a> to the same network as the robot and verify connectivity.</p></li>
+<li><p>Note the robot serial number (e.g., <code class="docutils literal notranslate"><span class="pre">Rizon4s-062839</span></code>). This is required for all launch commands and should be
+substituted for <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT_SN&gt;</span></code> in the instructions below.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following Flexiv Rizon models have been tested with Isaac ROS Manipulation:</p>
+<ul class="simple">
+<li><p><strong>Rizon 4s</strong> with Grav gripper (Flexiv-GN01)</p></li>
+</ul>
+<p>The following software versions have been tested:</p>
+<ul class="simple">
+<li><p><strong>Flexiv Software Package</strong>: v3.11</p></li>
+<li><p><strong>Flexiv Elements Studio</strong>: v3.11</p></li>
+</ul>
+<p>Other versions may work but have not been verified.</p>
+</div>
+</section>
+<section id="build-flexiv-drivers-from-source">
+<h2>Build Flexiv Drivers from Source<a class="headerlink" href="#build-flexiv-drivers-from-source" title="Link to this heading">#</a></h2>
+<p>This section describes how to build the Flexiv ROS 2 robot driver from source. The <code class="docutils literal notranslate"><span class="pre">flexiv_ros2</span></code> packages provide a hardware interface, gripper control, a streaming position controller, Cartesian motion-force control, and a MoveIt configuration for Flexiv Rizon robots.</p>
+<ol class="arabic">
+<li><p>Clone the NVIDIA Isaac ROS fork of <code class="docutils literal notranslate"><span class="pre">flexiv_ros2</span></code> under <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/src</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>nvidia/lyrical-rdk-v1.9.4<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/flexiv_ros2
+</pre></div>
+</div>
+</li>
+<li><p>Activate the Isaac ROS environment, and run the remaining steps on this page inside it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Import <code class="docutils literal notranslate"><span class="pre">flexiv_description</span></code> and <code class="docutils literal notranslate"><span class="pre">flexiv_rdk</span></code> at the versions the driver is released against:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-vcstool
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>vcs<span class="w"> </span>import<span class="w"> </span>src<span class="w"> </span>&lt;<span class="w"> </span>src/flexiv_ros2/flexiv.lyrical.repos<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>touch<span class="w"> </span>src/flexiv_rdk/COLCON_IGNORE
+</pre></div>
+</div>
+</li>
+<li><p>Install <code class="docutils literal notranslate"><span class="pre">ros2_control</span></code> and <code class="docutils literal notranslate"><span class="pre">ros2_controllers</span></code>, then resolve the remaining ROS dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>ros-lyrical-ros2-control<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>ros-lyrical-ros2-controllers
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>rosdep<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>rosdep<span class="w"> </span>install<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--from-paths<span class="w"> </span>src/flexiv_ros2<span class="w"> </span>src/flexiv_description<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--ignore-src<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--rosdistro<span class="w"> </span>lyrical<span class="w"> </span>-r<span class="w"> </span>-y
+</pre></div>
+</div>
+</li>
+<li><p>Install Zenoh and set it as the active RMW implementation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-lyrical-rmw-zenoh-cpp
+<span class="nb">source</span><span class="w"> </span>/opt/ros/lyrical/setup.bash
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
+</pre></div>
+</div>
+</li>
+<li><p>Select the Flexiv Robotic Development Kit (RDK) installation prefix:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">FLEXIV_RDK_PREFIX</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/rdk_install
+</pre></div>
+</div>
+</li>
+<li><p>Build and install <code class="docutils literal notranslate"><span class="pre">flexiv_rdk</span></code> and its dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/flexiv_rdk/thirdparty<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>bash<span class="w"> </span>build_and_install_dependencies.sh<span class="w"> </span><span class="si">${</span><span class="nv">FLEXIV_RDK_PREFIX</span><span class="si">}</span><span class="w"> </span><span class="k">$(</span>nproc<span class="k">)</span>
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/flexiv_rdk<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>cmake<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="si">${</span><span class="nv">FLEXIV_RDK_PREFIX</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-DCMAKE_PREFIX_PATH<span class="o">=</span><span class="si">${</span><span class="nv">FLEXIV_RDK_PREFIX</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>install<span class="w"> </span>--config<span class="w"> </span>Release
+</pre></div>
+</div>
+</li>
+<li><p>Build the Flexiv ROS 2 packages:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span><span class="nv">ISAAC_ROS_SKIP_ASSET_INSTALL</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">MANIPULATOR_INSTALL_ASSETS</span><span class="o">=</span><span class="m">0</span><span class="w"> </span>colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--cmake-args<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-DCMAKE_PREFIX_PATH<span class="o">=</span><span class="si">${</span><span class="nv">FLEXIV_RDK_PREFIX</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-DBUILD_TESTING<span class="o">=</span>OFF<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--packages-up-to-regex<span class="w"> </span><span class="s2">"flexiv_*"</span><span class="w"> </span>cartesian_motion_controller<span class="w"> </span>gpio_controller<span class="w"> </span>streaming_position_controller
+</pre></div>
+</div>
+</li>
+<li><p>Source the built workspace. Repeat this in <strong>every</strong> terminal you start, after
+<code class="docutils literal notranslate"><span class="pre">isaac-ros</span> <span class="pre">activate</span></code>, before running any Flexiv command on this page:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/install/setup.bash
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ensure the Flexiv robot has RDK enabled on the robot server and that the workstation PC can reach the robot over the network. Refer to the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/flexiv_ros2" rel="noreferrer" target="_blank">Flexiv RDK documentation</a> for network setup details.</p>
+</div>
+</section>
+<section id="configure-grav-gripper">
+<h2>Configure Grav Gripper<a class="headerlink" href="#configure-grav-gripper" title="Link to this heading">#</a></h2>
+<p>The Flexiv Grav gripper is automatically initialized when launching the Flexiv driver with the <code class="docutils literal notranslate"><span class="pre">load_gripper:=true</span></code> argument.</p>
+<ol class="arabic">
+<li><p>Verify the gripper is physically attached to the Flexiv Rizon robot.</p></li>
+<li><p>Open <strong>another</strong> terminal and start the Zenoh router. Leave it running. The Flexiv
+driver uses <code class="docutils literal notranslate"><span class="pre">rmw_zenoh_cpp</span></code>, which requires a running router; without it, the
+launch command in the next step does not work:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
+ros2<span class="w"> </span>run<span class="w"> </span>rmw_zenoh_cpp<span class="w"> </span>rmw_zenohd
+</pre></div>
+</div>
+<p>Keep the router running for the remaining steps on this page.</p>
+</li>
+<li><p>Open <strong>another</strong> terminal and launch the Flexiv driver with the gripper:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+<span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/install/setup.bash
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
+ros2<span class="w"> </span>launch<span class="w"> </span>flexiv_bringup<span class="w"> </span>rizon.launch.py<span class="w"> </span>robot_sn:<span class="o">=</span>&lt;ROBOT_SN&gt;<span class="w"> </span>load_gripper:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT_SN&gt;</span></code> with your robot’s serial number.</p>
+</li>
+<li><p>In Flexiv Elements, confirm that the active tool frame is set to the gripper TCP, not the
+flange. Insertion policies and grasp poses are defined relative to the gripper TCP.</p></li>
+</ol>
+</section>
+<section id="sync-the-robot-specific-kinematics">
+<h2>Sync the Robot-Specific Kinematics<a class="headerlink" href="#sync-the-robot-specific-kinematics" title="Link to this heading">#</a></h2>
+<p>The nominal Flexiv description does not contain the calibrated kinematic parameters of a physical
+robot. On a Rizon 4s the difference reaches several millimeters at the flange, and because it
+accumulates along the kinematic chain it varies with pose and cannot be removed by a fixed TCP
+offset.</p>
+<p><code class="docutils literal notranslate"><span class="pre">flexiv_calibration</span></code> reads the measured parameters from a connected robot and writes them to a
+kinematics YAML. Write it under <code class="docutils literal notranslate"><span class="pre">isaac_ros_assets</span></code> so it is keyed by serial number and survives
+re-cloning <code class="docutils literal notranslate"><span class="pre">flexiv_description</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/&lt;ROBOT_SN&gt;
+ros2<span class="w"> </span>launch<span class="w"> </span>flexiv_calibration<span class="w"> </span>calibration_correction.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>robot_sn:<span class="o">=</span>&lt;ROBOT_SN&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>target_filename:<span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/&lt;ROBOT_SN&gt;/&lt;ROBOT_SN&gt;_kinematics.yaml
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT_SN&gt;</span></code> with the serial number of the connected robot, for example
+<code class="docutils literal notranslate"><span class="pre">Rizon4s-063867</span></code>. The robot must be powered on, reachable on the network, and in <code class="docutils literal notranslate"><span class="pre">Auto</span> <span class="pre">(Remote)</span></code>
+mode, and <code class="docutils literal notranslate"><span class="pre">ISAAC_ROS_WS</span></code> must be set. The Zenoh router from <a class="reference internal" href="#configure-grav-gripper"><span class="std std-ref">Configure Grav Gripper</span></a> must be running. In this terminal, source <code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/install/setup.bash</span></code> and export
+<code class="docutils literal notranslate"><span class="pre">RMW_IMPLEMENTATION=rmw_zenoh_cpp</span></code>. On success the node reports the joints it synced:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Connected to [Rizon4s-063867], model [Rizon4s], software [v3.11.2], license [RDK-Professional...]
+Synced 8 joints of [Rizon4s-063867] into [.../Rizon4s-063867_kinematics.yaml]
+</pre></div>
+</div>
+<p>Run this once per robot, and again only after Flexiv performs a recalibration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Reading kinematic parameters requires an RDK professional license. The node reports the license
+it validated on connection.</p>
+</div>
+<p>Manipulation workflows pick the file up automatically from that path: both the driver’s robot
+description and the cuMotion planning description are generated from it, so the planner and the
+published TF share one kinematic model. Set <code class="docutils literal notranslate"><span class="pre">flexiv_calibrated_kinematics_path</span></code> only if the file
+is stored elsewhere; when it is absent, both fall back to the nominal description.</p>
+<p>When retraining is required, generate a calibrated USD robot asset as described in
+<a class="reference internal" href="#generate-a-calibrated-usd-for-isaac-lab-training">Generate a Calibrated USD for Isaac Lab Training</a> and train the insertion policy with it.</p>
+</section>
+<section id="generate-a-calibrated-usd-for-isaac-lab-training">
+<h2>Generate a Calibrated USD for Isaac Lab Training<a class="headerlink" href="#generate-a-calibrated-usd-for-isaac-lab-training" title="Link to this heading">#</a></h2>
+<p>Isaac Lab training uses the nominal Rizon 4s with Grav USD by default. To train a simulation policy
+for a specific robot, <code class="docutils literal notranslate"><span class="pre">generate_calibrated_usd.py</span></code> from <code class="docutils literal notranslate"><span class="pre">flexiv_calibration</span></code> writes a copy of
+that USD with the arm joint frames taken from the robot’s calibrated URDF. The gripper, meshes, and
+dynamics are kept unchanged.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">generate_calibrated_usd.py</span></code> needs the OpenUSD Python packages, which are only available for
+<strong>x86_64</strong>, so it does not run on Jetson. Run it on the x86 machine with the Isaac Lab training
+environment: the training package’s <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> already installs OpenUSD. On another x86_64
+Python environment, install it with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">usd-core==26.8</span></code>.</p>
+</div>
+<p>Complete <a class="reference internal" href="#sync-the-robot-specific-kinematics">Sync the Robot-Specific Kinematics</a> first, then:</p>
+<ol class="arabic">
+<li><p>In the Isaac ROS environment where the kinematics file was synced, with
+<code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/install/setup.bash</span></code> sourced, generate the calibrated arm URDF. Do not load the
+gripper; the gripper is taken from the reference USD. Replace <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT_SN&gt;</span></code> with the robot’s
+serial number:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ROBOT_ASSET_DIR</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/&lt;ROBOT_SN&gt;
+xacro<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>flexiv_description<span class="k">)</span>/urdf/flexiv.urdf.xacro<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>robot_type:<span class="o">=</span>Rizon4s<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>kinematics_parameters_file:<span class="o">=</span><span class="si">${</span><span class="nv">ROBOT_ASSET_DIR</span><span class="si">}</span>/&lt;ROBOT_SN&gt;_kinematics.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>&gt;<span class="w"> </span><span class="si">${</span><span class="nv">ROBOT_ASSET_DIR</span><span class="si">}</span>/&lt;ROBOT_SN&gt;_calibrated.urdf
+</pre></div>
+</div>
+</li>
+<li><p>Copy <code class="docutils literal notranslate"><span class="pre">&lt;ROBOT_SN&gt;_calibrated.urdf</span></code> to the x86 training machine, and set <code class="docutils literal notranslate"><span class="pre">ROBOT_ASSET_DIR</span></code> there
+to the directory that holds it. The remaining steps run on that machine.</p></li>
+<li><p>Get <code class="docutils literal notranslate"><span class="pre">generate_calibrated_usd.py</span></code> from the NVIDIA Isaac ROS fork of <code class="docutils literal notranslate"><span class="pre">flexiv_ros2</span></code>. Skip the
+clone if that machine already has the checkout from <a class="reference internal" href="#build-flexiv-drivers-from-source"><span class="std std-ref">Build Flexiv Drivers from Source</span></a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>-b<span class="w"> </span>nvidia/lyrical-rdk-v1.9.4<span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/flexiv_ros2
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLEXIV_ROS2_DIR</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/flexiv_ros2
+</pre></div>
+</div>
+</li>
+<li><p>Download the reference Rizon 4s with Grav USD that Isaac Lab training uses:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-fL<span class="w"> </span>-o<span class="w"> </span><span class="si">${</span><span class="nv">ROBOT_ASSET_DIR</span><span class="si">}</span>/rizon4s_with_grav.usd<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Robots/Flexiv/Rizon4s/rizon4s_with_grav.usd
+</pre></div>
+</div>
+</li>
+<li><p>From the Isaac Lab training package directory (<code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation/isaaclab_training</span></code>),
+generate the calibrated USD in the training environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span><span class="si">${</span><span class="nv">FLEXIV_ROS2_DIR</span><span class="si">}</span>/flexiv_calibration/scripts/generate_calibrated_usd.py<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--reference-usd<span class="w"> </span><span class="si">${</span><span class="nv">ROBOT_ASSET_DIR</span><span class="si">}</span>/rizon4s_with_grav.usd<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--urdf<span class="w"> </span><span class="si">${</span><span class="nv">ROBOT_ASSET_DIR</span><span class="si">}</span>/&lt;ROBOT_SN&gt;_calibrated.urdf<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--output<span class="w"> </span><span class="si">${</span><span class="nv">ROBOT_ASSET_DIR</span><span class="si">}</span>/&lt;ROBOT_SN&gt;_with_Grav_calibrated.usd
+</pre></div>
+</div>
+<p>The script prints a JSON report whose <code class="docutils literal notranslate"><span class="pre">changed_properties</span></code> lists the patched arm joint frames.
+It does not overwrite an existing output file unless you pass <code class="docutils literal notranslate"><span class="pre">--force</span></code>.</p>
+</li>
+<li><p>Train with the calibrated USD by appending its absolute path as a Hydra override to the Isaac Lab
+training, play, and export commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>env.scene.robot.spawn.usd_path<span class="o">=</span><span class="si">${</span><span class="nv">ROBOT_ASSET_DIR</span><span class="si">}</span>/&lt;ROBOT_SN&gt;_with_Grav_calibrated.usd
+</pre></div>
+</div>
+<p>Use the same calibrated USD for training, policy export, and evaluation of a given robot.</p>
+</li>
+</ol>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
+<p><strong>The Flexiv driver fails to connect to the robot</strong></p>
+<ol class="arabic simple">
+<li><p>Verify that the robot is in <code class="docutils literal notranslate"><span class="pre">Auto</span> <span class="pre">(Remote)</span></code> mode on the teach pendant.</p></li>
+<li><p>Ensure the workstation and robot are on the same subnet and the robot can be pinged from the workstation.</p></li>
+<li><p>Verify the robot serial number is correct and does not contain spaces (e.g., <code class="docutils literal notranslate"><span class="pre">Rizon4s-062839</span></code>).</p></li>
+</ol>
+<p><strong>The gripper does not respond</strong></p>
+<ol class="arabic simple">
+<li><p>Ensure the gripper is physically connected and the gripper is lighting up.</p></li>
+<li><p>Check that the gripper model name matches your hardware. The default is <code class="docutils literal notranslate"><span class="pre">Flexiv-GN01</span></code> (Grav gripper).</p></li>
+</ol>
+<p><strong>Controller errors during DisplayPort cable insertion</strong></p>
+<ol class="arabic simple">
+<li><p>Ensure the robot is running in an impedance control mode when running the DisplayPort cable
+insertion workflow. The impedance mode provides the compliant behavior required for contact-rich
+tasks.</p></li>
+<li><p>If you see overshooting or unstable behavior, verify that the LEAPP export used by
+Isaac ROS Deploy matches the trained policy’s observation layout, action representation, and TCP
+offset.</p></li>
+</ol>
+<p><strong>End-effector pose does not match the trained policy</strong></p>
+<ol class="arabic simple">
+<li><p>At a safe, fixed joint configuration, compare the end-effector pose computed using forward
+kinematics from the nominal URDF with the pose reported by RDK or Flexiv Elements. Make sure both
+poses use the same base frame, tool frame or TCP, units, and orientation convention.</p></li>
+<li><p>If the poses do not match, follow <a class="reference internal" href="#sync-the-robot-specific-kinematics">Sync the Robot-Specific Kinematics</a> and use the calibrated model
+to generate the corresponding USD asset and retrain the policy in Isaac Lab.</p></li>
+</ol>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Configure Your Robot</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../troubleshooting/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Troubleshoot Your Setup</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-flexiv-robot">Set Up Flexiv Robot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-flexiv-drivers-from-source">Build Flexiv Drivers from Source</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configure-grav-gripper">Configure Grav Gripper</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sync-the-robot-specific-kinematics">Sync the Robot-Specific Kinematics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-a-calibrated-usd-for-isaac-lab-training">Generate a Calibrated USD for Isaac Lab Training</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Manage My Privacy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/preferences/start/">Do Not Sell or Share My Data</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2023-2026 NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on Oct 30, 2026.
+  <br/>
+</p></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
+  </body>
+</html>

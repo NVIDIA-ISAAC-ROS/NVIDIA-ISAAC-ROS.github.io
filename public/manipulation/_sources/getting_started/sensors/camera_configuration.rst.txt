@@ -1,0 +1,50 @@
+================================================================================
+Configure Cameras for DisplayPort Insertion
+================================================================================
+
+#. Complete :doc:`realsense_setup`. Connect the camera using a USB 3 port and
+   cable, and position it so that the plug, socket, and robot workspace are visible.
+   Avoid reflective surfaces and verify the depth image before running perception.
+
+   .. note::
+
+      If you already added the ``realsense`` image layer to the workspace
+      configuration file in :ref:`Configure the Workspace Container
+      <configure-the-workspace-container>` and ran
+      ``isaac-ros activate --build-local``, skip the Docker configuration and
+      activation steps on that page.
+
+#. Identify each camera's serial number:
+
+   .. code:: bash
+
+      rs-enumerate-devices -S
+
+#. Choose a setup name. Copy
+   :ir_repo:`unspecified.yaml <isaac_ros_manipulation> <isaac_ros_manipulation_bringup/config/sensors/realsense_camera_ids/unspecified.yaml>`
+   to ``<SETUP_NAME>.yaml`` in the same source directory and fill in the serial numbers.
+
+#. Follow :doc:`isaac_for_manipulation_camera_calibration` for each camera.
+   Assign distinct frames, such as ``camera_1_link`` and ``camera_2_link``.
+
+#. In :ir_repo:`static_transforms.launch.py <isaac_ros_manipulation> <isaac_ros_manipulation_bringup/launch/include/static_transforms.launch.py>`,
+   add an entry named ``<SETUP_NAME>`` to ``calibrations_dict``. Copy the measured
+   translation and quaternion from the calibration result. Set ``parent_frame``
+   to the calibration's robot reference frame and ``child_frame`` to the matching
+   camera frame. Repeat for each camera.
+
+#. Set ``setup: <SETUP_NAME>`` in the DisplayPort workflow YAML. Use
+   ``depth_type: REALSENSE`` and ``enable_dnn_depth_in_realsense: 'false'`` so
+   FoundationPose receives the camera's depth stream. Rebuild the source package
+   and source the workspace after editing the configuration:
+
+   .. code:: bash
+
+      cd ${ISAAC_ROS_WS}
+      ISAAC_ROS_SKIP_ASSET_INSTALL=1 MANIPULATOR_INSTALL_ASSETS=0 \
+         colcon build --symlink-install --packages-select isaac_ros_manipulation_bringup
+      source install/setup.bash
+
+Continue with the :doc:`DisplayPort workflow
+</reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport>`
+for object meshes, model paths, and the plug and socket pose configuration.

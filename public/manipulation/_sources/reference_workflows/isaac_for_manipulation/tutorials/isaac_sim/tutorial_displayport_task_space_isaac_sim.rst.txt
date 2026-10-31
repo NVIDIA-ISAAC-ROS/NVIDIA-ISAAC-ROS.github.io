@@ -1,0 +1,306 @@
+================================================================
+DisplayPort Task-Space Policy Pickup and Insertion in Isaac Sim
+================================================================
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_task_space_isaac_sim.gif>`
+   :alt: DisplayPort task-space pickup and insertion in Isaac Sim.
+
+Overview
+--------
+
+This tutorial demonstrates DisplayPort pickup, hover, and learned task-space insertion with
+Isaac Sim as the robot simulator and Isaac ROS Deploy as the policy runtime.
+
+The tutorial uses two terminals:
+
+* The first terminal starts Isaac Sim with the DisplayPort pickup fixture Universal Scene
+  Description (USD) file. 
+* The second terminal starts the Isaac for Manipulation DisplayPort workflow and the task-space
+  Deploy policy path.
+
+The Isaac Sim script opens the USD, enables the ROS 2 bridge,
+initializes physics, and starts timeline playback.
+
+Workflow Architecture
+---------------------
+
+The DisplayPort orchestrator owns the high-level task sequence: pickup, approach, Cartesian
+pickup retract, task-space policy insertion, gripper release, and retreat.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_task_space_orchestrator_sequence.png>`
+   :alt: DisplayPort task-space Isaac Sim orchestrator sequence.
+
+The Isaac ROS Deploy path runs the learned task-space policy. Each inference tick converts the
+simulated flange and socket poses into policy input tensors, runs the LEAPP ONNX policy through
+Triton, and decodes the relative pose action into an absolute target pose for Isaac Sim.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_task_space_deploy_inference.png>`
+   :alt: Isaac ROS Deploy task-space inference loop for DisplayPort insertion.
+
+Prerequisites
+-------------
+
+* Complete :doc:`Workspace and Developer Environment Setup
+  </getting_started/environment>` on the simulation workstation. This creates
+  ``ISAAC_ROS_WS`` and initializes the environment used by the build commands.
+* Follow :doc:`Set Up a Simulated Robot </getting_started/simulation>` to install
+  Isaac Sim and prepare the source workspace.
+* Download the Isaac ROS Manipulation assets from NGC. These assets include the pre-trained
+  DisplayPort task-space policy bundle used by this Isaac Sim workflow.
+* Use the published DisplayPort Isaac Sim scene USD.
+
+This tutorial runs with Isaac Sim 6.0 and uses the published DisplayPort scene asset from the
+Isaac Sim 6.1 asset path.
+
+Build Required Packages
+-----------------------
+
+The :doc:`Set Up a Simulated Robot </getting_started/simulation>` prerequisite
+clones and builds ``isaac_ros_manipulation``. 
+
+#. Activate the Isaac ROS environment, select Fast DDS for the simulation, and
+   source the workspace built during setup:
+
+   .. code:: bash
+
+      isaac-ros activate
+      export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      source "${ISAAC_ROS_WS}/install/setup.bash"
+
+#. Confirm that the required source-built manipulation packages resolve from the
+   workspace:
+
+   .. code:: bash
+
+      ros2 pkg prefix --share isaac_ros_manipulation_bringup
+      ros2 pkg prefix --share isaac_ros_manipulation_asset_bringup
+
+   Each command must resolve to the source workspace's ``install`` directory
+   before continuing.
+
+Run the Tutorial
+----------------
+
+Use the same ``ROS_DOMAIN_ID`` in every terminal in this tutorial.
+
+Launch Isaac Sim
+~~~~~~~~~~~~~~~~
+
+#. Open a terminal on the host that can access Isaac Sim.
+
+#. Set ``DISPLAYPORT_SIM_LAUNCHER`` to the Isaac Sim launcher script.
+
+   Sparse-checkout the ``release-5.0`` launcher scripts on the host. The fetch
+   and checkout steps also update an existing launcher checkout to this release.
+
+   .. code:: bash
+
+      export ISAAC_ROS_DEPLOY_BRANCH=release-5.0
+      mkdir -p ${HOME}/displayport_isaac_sim_launcher
+      cd ${HOME}/displayport_isaac_sim_launcher
+      if [ ! -d isaac_ros_deploy ]; then
+        git clone --no-checkout --filter=blob:none \
+           --branch ${ISAAC_ROS_DEPLOY_BRANCH} https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_deploy.git isaac_ros_deploy
+      fi
+      cd isaac_ros_deploy
+      git sparse-checkout init --cone
+      git sparse-checkout set isaac_deploy/isaac_ros_deploy_reference_applications/scripts
+      git fetch origin "${ISAAC_ROS_DEPLOY_BRANCH}"
+      git checkout --detach FETCH_HEAD
+
+      export DISPLAYPORT_SIM_LAUNCHER_DIR=${PWD}/isaac_deploy/isaac_ros_deploy_reference_applications/scripts
+      export DISPLAYPORT_SIM_LAUNCHER=${DISPLAYPORT_SIM_LAUNCHER_DIR}/displayport_task_space_isaac_sim.sh
+
+#. Set the Isaac Sim path, ROS middleware, and published Isaac Sim scene URL.
+
+   .. code:: bash
+
+      export ISAAC_SIM_PACKAGE_PATH=${HOME}/isaacsim-6.0.0 # set to the path of your Isaac Sim package
+      export ROS_DISTRO=jazzy
+      export ROS_DOMAIN_ID=231
+      export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      export FASTDDS_BUILTIN_TRANSPORTS=UDPv4
+      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:${ISAAC_SIM_PACKAGE_PATH}/exts/isaacsim.ros2.core/${ROS_DISTRO}/lib"
+      export DISPLAYPORT_PLAY_USD=https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/Samples/ROS2/Scenario/flexiv_displayport_insertion.usd
+
+#. Start Isaac Sim through the tutorial launcher.
+
+   .. code:: bash
+
+      "${DISPLAYPORT_SIM_LAUNCHER}" \
+         --usd "${DISPLAYPORT_PLAY_USD}" \
+         --ros-domain-id "${ROS_DOMAIN_ID}" \
+         --camera wide_overview
+
+   The script keeps Isaac Sim running until the window is closed or the terminal receives
+   ``Ctrl+C``.
+
+Verify Isaac Sim Topics
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Open a **new** terminal, activate the Isaac ROS environment, and **source your
+   built workspace** using ``source "${ISAAC_ROS_WS}/install/setup.bash"`` in that
+   terminal.
+
+   .. include:: _snippets/displayport_task_space_ros_terminal.rst
+
+#. Confirm that the required Isaac Sim topics are visible.
+
+   .. code:: bash
+
+      ros2 topic list | grep -E 'clock|rizon_joint_states|sim_flange_pose'
+
+Launch the Workflow and Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Download the Isaac ROS Manipulation assets from NGC using the standard asset setup tool.
+
+   .. code:: bash
+
+      export MANIPULATOR_INSTALL_ASSETS=1
+      ros2 run isaac_ros_manipulation_asset_bringup setup_perception_models.py \
+         --models manipulation
+
+#. Confirm that the DisplayPort assets and Isaac Sim policy bundle were extracted.
+
+   .. code:: bash
+
+      find ${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion \
+         -maxdepth 2 -type f | sort
+
+   The extracted asset directory should include the Isaac Sim policy bundle:
+
+   .. code:: text
+
+      isaac_ros_manipulation/displayport_insertion/flexiv_isaacsim_policy/
+        DisplayPortTaskSpaceDiffIKModel500_SimPolicy.yaml
+        DisplayPortTaskSpaceDiffIKModel500_SimPolicy.onnx
+        DisplayPortTaskSpaceDiffIKModel500_SimPolicy_initial_values.safetensors
+
+   If an existing asset directory does not contain ``flexiv_isaacsim_policy``, rerun the asset setup
+   command with ``--force`` to refresh the NGC asset bundle.
+
+#. Set ``DISPLAYPORT_TASK_SPACE_CONFIG`` to the pre-trained Isaac Sim policy YAML from the NGC
+   asset bundle.
+
+   .. code:: bash
+
+      export DISPLAYPORT_TASK_SPACE_CONFIG=${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_isaacsim_policy/DisplayPortTaskSpaceDiffIKModel500_SimPolicy.yaml
+
+#. Launch the DisplayPort Isaac Sim tutorial workflow.
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_deploy_reference_applications \
+         displayport_task_space_isaac_sim_tutorial.launch.py \
+         config_path:=${DISPLAYPORT_TASK_SPACE_CONFIG} \
+         workflow_config:=$(ros2 pkg prefix --share isaac_ros_manipulation_bringup)/params/flexiv_rizon4s_grav_displayport_task_space_isaac_sim_tutorial.yaml
+
+   The ``workflow_config`` file contains the validated pickup, insertion, gripper, and retreat
+   settings for this Isaac Sim tutorial.
+
+   The launch reads the simulated flange pose from
+   ``/displayport_insertion/sim_flange_pose`` and publishes task-space targets to
+   ``/displayport_task_space_policy/target_pose``.
+
+Trigger Pickup and Insertion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Open a **new** terminal, activate the Isaac ROS environment, and **source your
+   built workspace** using ``source "${ISAAC_ROS_WS}/install/setup.bash"`` in that
+   terminal. This makes the workspace's packages and action definitions available
+   to the ``ros2 action send_goal`` command.
+
+   .. include:: _snippets/displayport_task_space_ros_terminal.rst
+
+#. After the launch reports that the task-space pose source, InputBuilder, and workflow action
+   server are ready, send the DisplayPort action goal.
+
+   .. code:: bash
+
+      ros2 action send_goal --feedback /displayport_cable_insertion \
+         isaac_ros_manipulation_interfaces/action/DisplayPortCableInsertion "{}"
+
+The workflow performs pickup, task-space policy insertion, gripper release, and Cartesian retreat
+using the tutorial workflow configuration.
+
+Expected Behavior
+-----------------
+
+Isaac Sim shows the robot picking up the DisplayPort plug from the fixture, moving to the
+socket hover pose, running task-space policy insertion, releasing the plug, and retreating from the
+socket.
+
+Troubleshooting
+---------------
+
+ROS Reports Package Not Found
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Complete :doc:`Set Up a Simulated Robot </getting_started/simulation>`, then
+activate the same Isaac ROS environment and source
+``${ISAAC_ROS_WS}/install/setup.bash`` in the current terminal. The host-side
+Isaac Sim launcher checkout does not install ROS packages inside the development
+environment.
+
+Task-Space Policy YAML Not Found
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Confirm that ``DISPLAYPORT_TASK_SPACE_CONFIG`` points to the LEAPP YAML and that the adjacent model
+files referenced by the YAML are present inside the Isaac ROS environment.
+
+Action Server Does Not Appear
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Confirm that the Isaac Sim scene is already playing and that ``/clock`` and ``/rizon_joint_states``
+are publishing in the Isaac ROS terminal. Each command must print a message. If one waits without
+output, press ``Ctrl+C`` and check that the scene is playing and that both terminals use the same
+``ROS_DOMAIN_ID``:
+
+.. code:: bash
+
+   ros2 topic echo --once /clock
+   ros2 topic echo --once /rizon_joint_states
+
+Isaac Sim Launcher Not Found
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Confirm that ``DISPLAYPORT_SIM_LAUNCHER`` points to
+``displayport_task_space_isaac_sim.sh``. If it does not, rerun the sparse-checkout step above.
+
+Launcher Reports That the HTTPS USD Does Not Exist
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An older launcher treats the scene URL as a local filename and reports
+``FileNotFoundError`` with a path beginning ``https:/``. Rerun the launcher
+sparse-checkout steps above to select ``release-5.0``, then launch again using
+the full ``https://`` scene URL. The release launcher opens the remote scene
+directly, so you do not need a separate USD download.
+
+Policy Path Does Not Publish Target Poses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Confirm that ``/displayport_insertion/sim_flange_pose`` is publishing. The following command
+must print a pose:
+
+.. code:: bash
+
+   ros2 topic echo --once /displayport_insertion/sim_flange_pose
+
+Also confirm that the LEAPP YAML declares task-space observation inputs with InputBuilder ``source``
+and ``kind`` metadata.
+
+Gripper Drops the Plug Before Insertion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check that the tutorial workflow config is in use and that the package grasp file
+``grav_grasps_dp_plug_isaac_sim.yaml`` is available.
+
+Other Tutorials
+---------------
+
+* :doc:`DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion
+  </reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport>`
+* :doc:`DisplayPort Task-Space Policy Deployment
+  </reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport_task_space_policy_deployment>`
+* :ir_docs:`Isaac ROS Deploy <repositories_and_packages/isaac_ros_deploy/index.html>`

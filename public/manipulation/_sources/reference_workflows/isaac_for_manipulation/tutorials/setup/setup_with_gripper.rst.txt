@@ -1,0 +1,79 @@
+==========================================================================
+Set Up Hardware and Software for a Real Robot with Isaac ROS Manipulation
+==========================================================================
+
+Overview
+--------
+
+This tutorial sets up the hardware and software for a real robot with Isaac ROS Manipulation.
+This guide covers the Flexiv Rizon robot and Grav gripper used for DisplayPort insertion.
+
+Tutorial
+--------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Complete :doc:`Workspace and Developer Environment Setup
+   </getting_started/environment>` on the robot deployment device and any model
+   preparation host before building the robot packages. The simulation tutorial
+   shares this prerequisite.
+
+#. Install dependencies for any sensors you want to use by following the
+   :ir_docs:`sensor-specific guides <getting_started/sensors/index.html>`.
+
+.. note::
+
+   If you are using the Isaac ROS Docker container, configure the required Docker arguments for real-time scheduling support.
+   Refer to :ir_docs:`Configure Docker Arguments for Real-Time Scheduling <getting_started/compute/preempt_setup.html#configure-docker-arguments-for-real-time-scheduling>` for instructions.
+
+Set Up Robot, Drivers, and Gripper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the setup guide for your robot. This includes hardware setup, building the robot driver from source, and configuring the gripper.
+
+Refer to the :ir_docs:`Flexiv Robots setup guide <robots/flexiv/index.html>`, which covers:
+
+- Setting up the Flexiv Rizon robot for remote control
+- :ir_docs:`Building Flexiv drivers from source <robots/flexiv/index.html#build-flexiv-drivers-from-source>`
+- :ir_docs:`Configuring the Grav gripper <robots/flexiv/index.html#configure-grav-gripper>`
+- :ir_docs:`Syncing robot-specific kinematics <robots/flexiv/index.html#sync-the-robot-specific-kinematics>`
+
+Set Up Cameras for the Robot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Refer to the :doc:`camera configuration guide </getting_started/sensors/camera_configuration>`.
+
+#. For perception-derived poses, use a calibrated RealSense camera with a clear view
+of the DisplayPort plug and socket. Check the RGB and depth images before running
+#. For perception-derived poses, use a calibrated RealSense camera with a clear view of the DisplayPort plug and socket. Check the RGB and depth images before running FoundationPose and Segment Anything (SAM). The manual-pose deployment path uses measured poses.
+
+Build Isaac ROS Manipulation Packages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the physical-robot workflow, configure Zenoh before building:
+
+#. Install Zenoh and set its environment variable:
+
+   .. code:: bash
+
+      sudo apt-get install -y ros-:ir_ros_distro:-rmw-zenoh-cpp
+      source /opt/ros/:ir_ros_distro:/setup.bash
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+
+   .. include:: /reference_workflows/isaac_for_manipulation/tutorials/_snippets/zenoh_router_note.rst
+
+.. include:: ../_snippets/isaac_ros_manipulation_build_instructions.rst
+
+.. _set-up-perception-deep-learning-models:
+
+Set Up Perception Deep Learning Models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../_snippets/isaac_ros_manipulation_perception_models.rst
+
+Run Preflight Tests on the Real Robot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These tests are optional but highly recommended. Follow the :doc:`Flexiv driver and DisplayPort checks <testing_manipulator>`.
+Use your edited DisplayPort configuration and run only the checks for your setup.

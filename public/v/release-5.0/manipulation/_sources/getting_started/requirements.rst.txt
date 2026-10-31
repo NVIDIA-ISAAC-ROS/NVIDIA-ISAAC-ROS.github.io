@@ -1,0 +1,50 @@
+.. _getting_started/index:System Requirements:
+
+===================
+System Requirements
+===================
+
+Documented Reference Configuration
+----------------------------------
+
+The physical-robot tutorial uses a **Flexiv Rizon 4s with a Grav gripper** and
+**Jetson AGX Thor**. Its perception configuration uses **one RealSense D455 camera**
+with FoundationPose and Segment Anything (SAM). The manual-pose path uses
+measured poses instead.
+Refer to the :doc:`DisplayPort workflow </reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport>`
+for the configuration and prerequisites.
+
+Isaac ROS supports additional platforms for its core packages. Those platforms
+are not automatically supported for an Isaac for Manipulation workflow.
+The dependency setup pages describe reusable procedures, not the product's
+supported hardware, operating systems, ROS distributions, or isolation modes.
+
+The 2026.09 release supports ``x86_64`` for model preparation and simulation,
+and ``aarch64.Thor`` for the documented physical-robot deployment. The workflow
+requirements below further constrain the supported configuration for each use
+case. Isaac ROS support for other platforms does not extend this product matrix.
+
+Model Preparation Host
+-----------------------
+
+The shared x86 :doc:`workspace and developer environment setup <environment>`
+targets **Ubuntu 24.04 (Noble)** for its host-side package installation steps,
+including the Isaac ROS CLI. Check the host OS before adding its apt repository,
+even when choosing Docker for the development environment.
+
+The :doc:`perception model preparation instructions <install>` require an
+**x86 machine** to convert SAM weights to ONNX. Copy the resulting
+models to the Jetson device as described there. This preparation requirement
+does not establish x86 support for physical-robot deployment.
+
+Simulation Workstation
+-----------------------
+
+The :doc:`simulation setup <simulation>`
+requires a workstation with **at least 25 GB GPU VRAM and 30 GB CPU RAM** to run
+Isaac Sim. The shared x86 environment setup above applies to this workstation too.
+Also review the simulator's version-specific requirements linked
+from that workflow. The supported simulator version for this release is
+Isaac Sim 6.0.
+
+Continue to :doc:`environment`, then choose :doc:`simulation` or :doc:`real_robot`.

@@ -1,0 +1,495 @@
+===================================================
+DisplayPort Task-Space Policy Deployment
+===================================================
+
+Overview
+--------
+
+This tutorial runs the task-space DisplayPort insertion policy on a Flexiv Rizon 4s using
+Isaac ROS Deploy. The exported policy observes the tool center point (TCP) pose and the socket
+insertion keypoint pose, and emits ``arm_action`` as a relative Cartesian pose delta.
+
+This tutorial uses the same node graph as the simulated task-space policy, plus the components
+that a physical arm needs:
+
+* ``displayport_task_space_policy.launch.py`` starts the policy graph nodes:
+
+  * ``task_space_pose_source`` derives the observed TCP and socket keypoint poses.
+  * ``input_builder`` converts them to model input tensors and carries recurrent feedback between
+    steps.
+  * Triton runs the export.
+  * ``cartesian_pose_delta_command_builder`` anchors each action to the observation it came from.
+  * ``cartesian_pose_delta_decoder`` converts the anchored action into an absolute Cartesian
+    target pose.
+
+* ``displayport_flexiv_task_space_passthrough.py`` forwards the target pose to the Flexiv Cartesian
+  command sink behind an explicit enable gate, a finite-pose check, bounded step and downward
+  motion checks, and a stale-command watchdog.
+* ``flexiv_task_space_repeated_insertion_loop.py`` optionally drives repeated reset-and-insert trials.
+
+``displayport_task_space_flexiv_robot.launch.py`` launches all of these components together.
+
+Use this tutorial when the DisplayPort cable is already grasped and you want to validate or debug
+the policy deployment path directly.
+
+.. warning::
+
+   This tutorial commands a physical robot. Verify the robot serial number, Deploy configuration,
+   socket pose, TCP offset, robot state, gripper state, and collision-free workspace before
+   enabling the passthrough. Keep the emergency stop accessible. On first bringup, start with a
+   small ``action_blend_ratio`` such as ``0.01`` and raise it toward the tuned value of ``0.1``
+   only after confirming that the approach direction is correct.
+
+Prerequisites
+-------------
+
+Before following this tutorial:
+
+* Complete :doc:`Workspace and Developer Environment Setup
+  </getting_started/environment>` on the robot deployment device before building
+  the driver and policy deployment packages.
+* Complete :doc:`Set Up Hardware and Software for a Real Robot with Isaac ROS Manipulation
+  </reference_workflows/isaac_for_manipulation/tutorials/setup/setup_with_gripper>` for the Flexiv
+  Rizon 4s and Grav gripper.
+* Build the Flexiv driver packages, ``isaac_ros_deploy``, and
+  ``isaac_ros_deploy_reference_applications``.
+* Provide the task-space DisplayPort Deploy configuration on the robot workstation. NVIDIA
+  publishes two pre-trained task-space policies on NGC, and the manipulation asset setup downloads
+  them, so you do not need to train a policy to run this tutorial:
+
+  .. code:: bash
+
+     export MANIPULATOR_INSTALL_ASSETS=1
+     ros2 run isaac_ros_manipulation_asset_bringup setup_perception_models.py \
+        --models manipulation
+
+  The bundle extracts to
+  ``$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy/``
+  for the default, PhysX-trained policy, and to
+  ``$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy_newton/``
+  for the Newton-trained policy. Each folder contains the Deploy configuration YAML, the ONNX
+  model, and the initial recurrent state. To use a policy you trained instead, copy its LEAPP
+  export to either location. Either way, the export must emit a 6D ``arm_action`` with relative
+  Cartesian pose semantics, and must declare InputBuilder ``source`` and ``kind`` metadata for
+  ``eef_pos``, ``eef_rot_6d``, ``socket_kp_pos``, and ``socket_kp_rot_6d``. The launch file
+  validates this contract at startup and refuses any export that does not match it.
+
+  .. note::
+
+     The pre-trained policy transfers only if your cell matches the conditions it was trained
+     under. Confirm that the socket keypoint and grasped-plug poses fall within the ranges seen
+     during training, and that the plug geometry, gripper, and TCP offset match. If your setup
+     differs, train a policy for it with `reinforcement learning in Isaac Lab
+     <https://isaac-sim.github.io/IsaacLab/v3.0.0-beta2/source/policy_deployment/index.html>`__
+     and export it with LEAPP.
+
+* Using Flexiv Elements, manually grasp the DisplayPort cable with the Grav gripper and place the
+  robot at the policy start configuration used during training.
+* Measure the socket insertion keypoint pose in the robot base frame, for example, by seating the plug
+  with the robot as described in :ref:`displayport-measure-socket-pose`.
+
+Configure Runtime Values
+------------------------
+
+Run the following commands in **every** terminal you start, after ``isaac-ros activate``. Sourcing the
+built workspace makes the workflow packages available in that terminal:
+
+.. code:: bash
+
+   source ${ISAAC_ROS_WS}/install/setup.bash
+   export ROBOT_SN=<ROBOT_SERIAL_NUMBER>
+   export ROS_DOMAIN_ID=<ID_NUMBER>
+   export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+   export DISPLAYPORT_TASK_SPACE_CONFIG=$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy/DisplayPortTaskSpace.yaml
+   export DISPLAYPORT_SOCKET_TOPIC=/displayport_socket_pose
+
+``DISPLAYPORT_TASK_SPACE_CONFIG`` must point to the LEAPP-exported YAML file for the trained
+task-space policy. The Deploy configuration must match the robot, TCP offset, quaternion
+convention, observation layout, and action representation used during training. To run the
+Newton-trained policy instead, point ``DISPLAYPORT_TASK_SPACE_CONFIG`` to
+``flexiv_policy_newton/DisplayPortTaskSpace.yaml``.
+
+Start the Flexiv Cartesian Driver
+---------------------------------
+
+This path commands the Flexiv Cartesian motion controller, so the driver must run in
+Cartesian mode.
+
+#. Power on the Flexiv robot, release the emergency stop, and put the robot in **Auto (Remote)**
+   mode.
+
+#. In the first terminal, start the Zenoh router and leave it running:
+
+   .. code:: bash
+
+      isaac-ros activate
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      ros2 run rmw_zenoh_cpp rmw_zenohd
+
+   .. important::
+
+      The router must be running before any other node starts.
+
+#. In the second terminal, activate Isaac ROS, source the workspace, and launch the driver:
+
+   .. code:: bash
+
+      isaac-ros activate
+      source ${ISAAC_ROS_WS}/install/setup.bash
+      export ROBOT_SN=<ROBOT_SERIAL_NUMBER>
+      export ROS_DOMAIN_ID=<ID_NUMBER>
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+
+      ros2 launch flexiv_bringup rizon.launch.py \
+         robot_sn:=${ROBOT_SN} \
+         robot_type:=Rizon4s \
+         start_rviz:=false \
+         rdk_control_mode:=cartesian_motion_force \
+         robot_controller:=cartesian_motion_controller \
+         kinematics_params_file:=${ISAAC_ROS_WS}/isaac_ros_assets/${ROBOT_SN}/${ROBOT_SN}_kinematics.yaml
+
+   ``kinematics_params_file`` points to the YAML written by
+   :ir_docs:`Sync the Robot-Specific Kinematics <robots/flexiv/index.html#sync-the-robot-specific-kinematics>`.
+   Unlike the manipulation workflow, this launch does not locate that file by serial number, so you
+   must pass it explicitly. Omitting it leaves the driver on the nominal description, which
+   differs from a physical arm by several millimeters at the flange. Drop the argument only if you
+   have not synced this robot.
+
+#. Wait for ``cartesian_motion_controller``, ``flexiv_robot_states_broadcaster``, and
+   ``joint_state_broadcaster`` to become active.
+
+Start the Task-Space Policy and Passthrough
+-------------------------------------------
+
+#. In a third terminal, activate Isaac ROS, source the workspace, and set the same runtime values.
+
+#. Launch the policy graph, the Flexiv passthrough, and the one-shot Cartesian impedance setup.
+   With ``require_socket_pose:=true``, the pose source holds its output until a socket pose arrives,
+   so no observations are built, no inference runs, and nothing is commanded when the launch comes
+   up. The run starts only when you publish the socket pose, as described in the following
+   sections:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_deploy_reference_applications \
+         displayport_task_space_flexiv_robot.launch.py \
+         robot_sn:=${ROBOT_SN} \
+         config_path:=${DISPLAYPORT_TASK_SPACE_CONFIG} \
+         socket_pose_topic:=${DISPLAYPORT_SOCKET_TOPIC} \
+         require_socket_pose:=true \
+         socket_pose_timeout_s:=0.2 \
+         publish_rate:=15.0 \
+         action_blend_ratio:=0.1 \
+         max_policy_input_output_delay_s:=0.5 \
+         tcp_offset:=0.0,0.0,0.1925 \
+         adapter_tcp_offset:=0.0,0.0,0.15 \
+         adapter_enabled_on_start:=true \
+         adapter_input_pose_reference:=flange \
+         adapter_stale_behavior:=hold_feedback_pose \
+         adapter_stale_command_timeout_s:=0.25 \
+         set_cartesian_impedance_on_start:=true \
+         cartesian_impedance_stiffness_mode:=nominal_scaled \
+         cartesian_impedance_stiffness_scale:=0.01
+
+   ``robot_sn`` supplies the defaults for ``flange_pose_topic``, ``robot_states_topic``, and
+   ``cartesian_impedance_service_name``. Override any of them explicitly if your topic or service
+   names differ.
+
+   .. important::
+
+      ``tcp_offset`` and ``adapter_tcp_offset`` are different frames, and you must set both:
+
+      * ``tcp_offset`` is the policy's control frame, which is the offset the policy was trained
+        against. The decoder uses the same value to convert its target back to a flange target.
+      * ``adapter_tcp_offset`` is the offset that the Flexiv driver applies for the active tool,
+        which is the frame the arm expects its Cartesian commands in.
+
+      If you leave ``adapter_tcp_offset`` empty, it falls back to ``tcp_offset``, and every command
+      is offset by the difference between the two frames. To measure the driver's value, run
+      ``ros2 topic echo`` on the flange and TCP pose topics and take the translation between them.
+
+   Set ``policy_csv_output_path`` to record one row per policy step, and
+   ``adapter_csv_output_path`` to record the forwarded commands, for offline sim-to-real
+   comparison. Setting ``policy_csv_output_path`` starts ``task_space_policy_io_logger``, which
+   otherwise does not run.
+
+   .. note::
+
+      ``action_blend_ratio`` is read once when the decoder starts. ``ros2 param set`` does not
+      change it at runtime. To raise or lower policy authority, stop the launch and restart it with
+      a new value.
+
+#. Confirm that the graph came up:
+
+   .. code:: bash
+
+      ros2 node list | grep -E 'task_space_pose_source|input_builder|cartesian_pose_delta|displayport_flexiv_task_space_passthrough'
+
+   Continue only when all nodes are present, Triton reports that it is live and ready, and the pose
+   source is logging that it is waiting for the socket pose. That last message confirms that
+   the graph is idle and the robot is not being commanded.
+
+``adapter_enabled_on_start`` determines how the policy receives command authority, and the rest of
+this tutorial splits into two routes accordingly. Follow one or the other:
+
+* **Route 1** (``adapter_enabled_on_start:=true``, as in the previous launch command): Authority
+  is live from the moment the launch comes up, and publishing the socket pose starts the run.
+  Nothing is commanded before that, because the pose source holds its output until the socket pose
+  arrives.
+* **Route 2** (``adapter_enabled_on_start:=false``): You still publish the socket pose, but the
+  policy path stays gated after it is streaming, so you can confirm the graph is healthy before the
+  robot is allowed to move. Then open and close the gate on a separate topic to start and stop
+  motion.
+
+Route 1: Publish the Socket Keypoint Pose to Start the Run
+----------------------------------------------------------
+
+.. warning::
+
+   With ``adapter_enabled_on_start:=true``, this step starts robot motion. Confirm that the arm is
+   at the policy start pose, the cable is grasped, the workspace is clear, and the emergency stop is
+   within reach before publishing.
+
+The pose source holds its observation output while the socket pose is missing or stale, which stops
+the whole graph. Publishing the socket pose therefore starts observations, inference, and motion
+together. Publish the measured socket insertion keypoint as a ``PoseStamped`` at the policy rate,
+using ``[x, y, z, qx, qy, qz, qw]`` ordering. Express the pose in the pose source's
+``base_frame``, which defaults to ``world``. Replace the example pose with the measured target for
+your robot cell:
+
+.. code:: bash
+
+   ros2 topic pub -r 30 ${DISPLAYPORT_SOCKET_TOPIC} \
+      geometry_msgs/msg/PoseStamped \
+      "{header: {frame_id: world}, pose: {position: {x: 0.475, y: 0.125, z: 0.07}, orientation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}}}"
+
+If the tracked socket pose is the connector root rather than the insertion keypoint, pass
+``socket_pose_is_keypoint:=false`` and set ``socket_root_to_keypoint_offset`` to the offset the
+policy was trained against.
+
+The first inference after the graph starts takes about a second while Triton warms up, so the
+command builder reports dropping that action for exceeding ``max_policy_input_output_delay_s``.
+Later steps settle to a few milliseconds. This happens once per launch and is expected.
+
+.. note::
+
+   The enable topic gates the policy nodes as well as the passthrough, and the rising edge restores
+   the recurrent state from the exported initial values. A recurrent policy is trained from that
+   state at the start of every episode, so each trial begins the way training did. With
+   ``adapter_enabled_on_start:=true``, that reset happens once, when the launch comes up.
+
+Route 2: Hand Over Authority Explicitly
+---------------------------------------
+
+Use this route when you want the graph running and verified before the robot can be
+commanded. The robot moves only while **both** conditions hold: the socket pose is streaming and
+the gate is open. Complete all of the following steps in order.
+
+Launch with the Gate Closed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the policy graph is already running with ``adapter_enabled_on_start:=true``, stop it with
+``Ctrl+C``. In the third terminal, run the launch command from
+`Start the Task-Space Policy and Passthrough`_ again with ``adapter_enabled_on_start:=false``:
+
+.. code:: bash
+
+   ros2 launch isaac_ros_deploy_reference_applications \
+      displayport_task_space_flexiv_robot.launch.py \
+      robot_sn:=${ROBOT_SN} \
+      config_path:=${DISPLAYPORT_TASK_SPACE_CONFIG} \
+      socket_pose_topic:=${DISPLAYPORT_SOCKET_TOPIC} \
+      require_socket_pose:=true \
+      socket_pose_timeout_s:=0.2 \
+      publish_rate:=15.0 \
+      action_blend_ratio:=0.1 \
+      max_policy_input_output_delay_s:=0.5 \
+      tcp_offset:=0.0,0.0,0.1925 \
+      adapter_tcp_offset:=0.0,0.0,0.15 \
+      adapter_enabled_on_start:=false \
+      adapter_input_pose_reference:=flange \
+      adapter_stale_behavior:=hold_feedback_pose \
+      adapter_stale_command_timeout_s:=0.25 \
+      set_cartesian_impedance_on_start:=true \
+      cartesian_impedance_stiffness_mode:=nominal_scaled \
+      cartesian_impedance_stiffness_scale:=0.01
+
+Confirm that the graph came up, as described in that section.
+
+Publish the Socket Keypoint Pose
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The socket pose is still required in this route. Opening the gate without it does nothing,
+because the pose source holds its output until a socket pose arrives. Open **another** terminal,
+publish the socket pose exactly as in Route 1, and leave it running. If you stopped the Route 1
+publisher, start it again:
+
+.. code:: bash
+
+   ros2 topic pub -r 30 ${DISPLAYPORT_SOCKET_TOPIC} \
+      geometry_msgs/msg/PoseStamped \
+      "{header: {frame_id: world}, pose: {position: {x: 0.475, y: 0.125, z: 0.07}, orientation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}}}"
+
+The robot does not move yet. While the gate is closed, no observations are published and no
+inference runs.
+
+Open the Gate to Start Motion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. warning::
+
+   Opening the gate starts robot motion. Confirm that the arm is at the policy start pose, the
+   cable is grasped, the workspace is clear, and the emergency stop is within reach before
+   publishing.
+
+With the socket pose still streaming, give the policy command authority:
+
+.. code:: bash
+
+   ros2 topic pub --once /displayport_task_space_policy/enable_passthrough \
+      std_msgs/msg/Bool "{data: true}"
+
+Publishing ``true`` opens the gate and resets the recurrent state, so the delay between starting the
+socket pose publisher and enabling the passthrough does not affect the state the policy starts from.
+This is the mechanism the repeated insertion loop uses to start each trial cleanly.
+
+Close the Gate to Stop Motion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To remove policy command authority, publish ``false`` on the same enable topic. Leave the socket
+pose publisher running if you plan to open the gate again:
+
+.. code:: bash
+
+   ros2 topic pub --once /displayport_task_space_policy/enable_passthrough \
+      std_msgs/msg/Bool "{data: false}"
+
+The passthrough stops forwarding immediately and the Flexiv Cartesian controller holds its last
+commanded pose. Stopping the socket pose publisher with ``Ctrl+C`` is a second stop path. After the
+pose is older than ``socket_pose_timeout_s``, the pose source stops emitting observations, so no
+new targets are produced. The passthrough then applies ``adapter_stale_behavior``. Use the
+robot emergency stop for immediate hardware safety.
+
+Because the passthrough only holds position, the robot stays where the policy left it. Return the
+robot to a safe pose through Flexiv Elements or the repeated insertion loop's reset before starting
+another trial.
+
+To start another trial, publish ``true`` on the enable topic again while the socket pose is
+streaming. If you stopped the socket pose publisher, start it again first. Each ``true`` resets the
+recurrent state, so the new trial starts from the same state as the first.
+
+Run Repeated Insertion Trials
+-----------------------------
+
+To evaluate the policy over many trials, use the repeated insertion loop instead of enabling the
+passthrough by hand. The loop disables the passthrough, commands a Cartesian reset pose, publishes
+the socket pose, enables the passthrough for a fixed insertion window, and then disables it again
+and holds the current TCP pose.
+
+Run it from a fourth terminal, with the driver and the task-space launch already running:
+
+.. code:: bash
+
+   ros2 run isaac_ros_deploy_reference_applications \
+      flexiv_task_space_repeated_insertion_loop.py --ros-args \
+      -p execute:=true \
+      -p cycles:=20 \
+      -p robot_sn:=${ROBOT_SN} \
+      -p reset_position:="[0.47328, 0.12733, 0.16729]" \
+      -p reset_orientation_xyzw:="[0.707622, 0.706583, 0.003391, -0.000232]" \
+      -p reset_duration_sec:=3.0 \
+      -p reset_hold_sec:=1.0 \
+      -p wait_for_user_after_reset:=true \
+      -p hold_reset_during_user_wait:=true \
+      -p socket_position:="[0.475, 0.128, 0.07]" \
+      -p socket_orientation_xyzw:="[-0.5, -0.5, -0.5, 0.5]" \
+      -p socket_publish_rate_hz:=30.0 \
+      -p insertion_duration_sec:=10.0 \
+      -p hold_current_after_trial_sec:=0.5
+
+Leave ``execute`` at its default of ``false`` for a dry run that prints the trial plan without
+commanding the robot or enabling the passthrough. With ``wait_for_user_after_reset`` set to
+``true``, the loop stops after each reset and waits for you to press **Enter** before starting insertion.
+
+Set ``record_bags`` to ``true`` to record one rosbag per trial. Setting ``robot_sn`` adds the
+``/<robot_sn>/flange_pose`` and ``/<robot_sn>/flexiv_robot_states`` topics to the recorded set.
+
+Troubleshooting
+---------------
+
+Deploy Configuration Not Found
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Confirm that ``DISPLAYPORT_TASK_SPACE_CONFIG`` points to an existing LEAPP-exported YAML file and
+that all model files referenced by that YAML are present on the robot workstation.
+
+Cartesian Driver or Flexiv Topics Not Available
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Confirm that ``rizon.launch.py`` is running and that ``cartesian_motion_controller``,
+``flexiv_robot_states_broadcaster``, and ``joint_state_broadcaster`` are active. The task-space
+launch derives ``flange_pose_topic``, ``robot_states_topic``, and ``cartesian_impedance_service_name``
+from ``robot_sn``, so a mismatched serial number leaves the graph waiting on topics that never
+publish. Verify with:
+
+.. code:: bash
+
+   ros2 topic hz /${ROBOT_SN}/flange_pose
+
+Launch Rejects the Deployment Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The launch file validates that the export declares InputBuilder ``source`` and ``kind`` metadata
+for ``eef_pos``, ``eef_rot_6d``, ``socket_kp_pos``, and ``socket_kp_rot_6d``. Confirm that
+``config_path`` points to the task-space export and that the observation input names in the YAML
+match the export used during training.
+
+Policy Target Output Pauses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The pose source pauses when the socket pose is older than ``socket_pose_timeout_s``, when
+``require_socket_pose`` is set and no socket pose has arrived, while it is still measuring the TCP
+offset from robot states, or when the enable gate is closed. Each case is logged. Confirm that the
+socket pose publisher is running at the policy rate and that the enable topic has been set to
+``true``.
+
+The command builder also drops an action whose observation is older than
+``max_policy_input_output_delay_s`` and asks the input builder to restart the recurrent state,
+rather than resuming a rollout with missing steps. Repeated drops mean inference is not keeping up
+with ``publish_rate``.
+
+Passthrough Drops Commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The passthrough logs the reason it rejects a command. ``disabled`` means the enable gate is off.
+A stale-command rejection means the policy target is older than ``adapter_max_command_age_s``.
+A non-finite-pose rejection means the decoded target contains ``NaN`` or ``inf``, which usually
+indicates a mismatched observation layout or TCP offset.
+
+The passthrough also clamps commands sent to the Flexiv Cartesian sink. A target that jumps more
+than ``max_flexiv_target_translation_delta_m`` (0.05 m by default) from the measured end-effector
+pose, or descends more than ``max_flexiv_target_downward_delta_m`` (0.03 m by default), is
+rejected. A ``missing_end_effector_feedback_pose_for_flexiv_safety`` rejection means this check
+could not run because no end-effector feedback pose has arrived yet. Confirm that the Flexiv robot
+states topic is publishing.
+
+Robot Moves Too Aggressively
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Stop the socket pose publisher, then lower ``action_blend_ratio`` and re-check ``tcp_offset``,
+``adapter_tcp_offset``, the socket keypoint pose, the base frame, and the quaternion convention
+against the training setup. ``action_blend_ratio`` scales the policy's raw delta directly, so
+halving it halves the commanded step.
+
+If every rejected command reports the same downward distance, the cause is a frame mismatch rather
+than the policy. The passthrough is comparing the target and the feedback pose in different frames.
+Confirm that ``adapter_tcp_offset`` matches the offset the driver applies, which is the translation
+between the flange and TCP pose topics, and that ``tcp_offset`` matches the policy's training frame.
+
+Related Resources
+-----------------
+
+* :doc:`DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion
+  <tutorial_displayport>`
+* :ir_docs:`Isaac ROS Deploy <repositories_and_packages/isaac_ros_deploy/index.html>`
+* :ir_docs:`Flexiv setup guide <robots/flexiv/index.html#set-up-flexiv-robot>`

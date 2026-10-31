@@ -1,0 +1,46 @@
+================================================================================
+Use a Source Workspace
+================================================================================
+
+Complete :doc:`the environment setup </getting_started/environment>` on each
+machine used for DisplayPort development. Keep the same ``ISAAC_ROS_WS`` workspace
+layout for the robot, model preparation, and simulation.
+
+Activate and Source the Workspace
+---------------------------------
+
+Open the Isaac ROS environment and source your built packages in each terminal:
+
+.. code:: bash
+
+   isaac-ros activate
+   source ${ISAAC_ROS_WS}/install/setup.bash
+
+Check that the workspace supplies the manipulation package:
+
+.. code:: bash
+
+   ros2 pkg prefix isaac_ros_manipulation_bringup
+
+The result should be under ``${ISAAC_ROS_WS}/install``. If it is not, rebuild the
+source workspace and source its setup script before launching the tutorial.
+
+Build Dependencies
+------------------
+
+Place the required Isaac ROS repositories and their source dependencies under
+``${ISAAC_ROS_WS}/src``. Resolve system dependencies with ``rosdep --ignore-src``
+so packages already present in the source workspace are built there.
+Follow :doc:`the package and model setup </getting_started/install>` for the
+source-build commands and targeted FoundationPose and Segment Anything (SAM)
+preparation.
+
+Keep Terminal Settings Consistent
+---------------------------------
+
+Use the same ``ROS_DOMAIN_ID`` and the tutorial's middleware settings in every
+terminal. Follow :doc:`the DisplayPort simulation tutorial
+</reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_displayport_task_space_isaac_sim>`
+for simulator settings, or :doc:`the physical-robot tutorial
+</reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport>`
+for Zenoh and robot configuration.

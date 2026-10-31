@@ -1,0 +1,886 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>DisplayPort Task-Space Policy Pickup and Insertion in Isaac Sim &#8212; Isaac for Manipulation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-new-tab-link.css?v=d87cb1ac" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/isaac.css?v=af4c1f8d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/manipulation.css?v=000f0a76" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../../../_static/documentation_options.js?v=1747932b"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=01823362"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference_workflows/isaac_for_manipulation/tutorials/isaac_sim/tutorial_displayport_task_space_isaac_sim';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script>mermaid.initialize({"startOnLoad": true})</script>
+    <link rel="icon" href="../../../../_static/isaac_ros_logo.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Sim-to-Real Tutorials" href="../tutorial_sim_to_real.html" />
+    <link rel="prev" title="DisplayPort Tutorial in Isaac Sim" href="../tutorial_isaac_sim.html" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2026.09" />
+    <meta name="docbuild:last-update" content="Oct 30, 2026"/>
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../getting_started/index.html">Get Started</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../getting_started/requirements.html">System Requirements</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../getting_started/environment.html">Workspace and Developer Environment</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/compute/preempt_setup.html">PREEMPT_RT Kernel for Jetson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/compute/jetson_storage.html">Jetson Storage Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../concepts/dev_env/index.html">Use a Source Workspace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../getting_started/install.html">Install Packages and Perception Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../getting_started/simulation.html">Set Up a Simulated Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../getting_started/real_robot.html">Set Up a Physical Robot</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../getting_started/sensors/index.html">Cameras for Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/sensors/realsense_setup.html">Isaac ROS RealSense Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/sensors/camera_configuration.html">Configure Cameras for DisplayPort Insertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/sensors/isaac_for_manipulation_camera_calibration.html">Isaac for Manipulation Camera Calibration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../robots/index.html">Configure Your Robot</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../robots/flexiv/index.html">Flexiv Robots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../troubleshooting/index.html">Troubleshoot Your Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../troubleshooting/dev_env.html">Troubleshoot the Source Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../troubleshooting/hardware_setup.html">Hardware Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup/testing_manipulator.html">Check the DisplayPort Setup</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">DisplayPort Workflows</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../training/index.html">Train in Isaac Lab</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../training/setup_training.html">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../training/repo_structure.html">Repository Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../training/tasks/displayport_insertion.html">Training a DisplayPort Cable Insertion Policy and ROS Deployment</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../setup/setup_with_gripper.html">Set Up Hardware and Software for a Real Robot with Isaac ROS Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup/testing_manipulator.html">Check the DisplayPort Setup</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../tutorials.html">DisplayPort Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="../tutorial_isaac_sim.html">DisplayPort Tutorial in Isaac Sim</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">DisplayPort Task-Space Policy Pickup and Insertion in Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../tutorial_sim_to_real.html">Sim-to-Real Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../sim_to_real/tutorial_displayport.html">DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../sim_to_real/tutorial_displayport_task_space_policy_deployment.html">DisplayPort Task-Space Policy Deployment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../sim_to_real/tutorial_displayport_sparr.html">Improve Real-World Performance with SPARR (Experimental)</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a></div>
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">DisplayPort Insertion Workflows</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../tutorials.html" class="nav-link">DisplayPort Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../tutorial_isaac_sim.html" class="nav-link">DisplayPort Tutorial in Isaac Sim</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DisplayPort Task-Space Policy Pickup and Insertion in Isaac Sim</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="displayport-task-space-policy-pickup-and-insertion-in-isaac-sim">
+<h1>DisplayPort Task-Space Policy Pickup and Insertion in Isaac Sim<a class="headerlink" href="#displayport-task-space-policy-pickup-and-insertion-in-isaac-sim" title="Link to this heading">#</a></h1>
+<figure class="align-default">
+<img alt="DisplayPort task-space pickup and insertion in Isaac Sim." src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_task_space_isaac_sim.gif/" />
+</figure>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>This tutorial demonstrates DisplayPort pickup, hover, and learned task-space insertion with
+Isaac Sim as the robot simulator and Isaac ROS Deploy as the policy runtime.</p>
+<p>The tutorial uses two terminals:</p>
+<ul class="simple">
+<li><p>The first terminal starts Isaac Sim with the DisplayPort pickup fixture Universal Scene
+Description (USD) file.</p></li>
+<li><p>The second terminal starts the Isaac for Manipulation DisplayPort workflow and the task-space
+Deploy policy path.</p></li>
+</ul>
+<p>The Isaac Sim script opens the USD, enables the ROS 2 bridge,
+initializes physics, and starts timeline playback.</p>
+</section>
+<section id="workflow-architecture">
+<h2>Workflow Architecture<a class="headerlink" href="#workflow-architecture" title="Link to this heading">#</a></h2>
+<p>The DisplayPort orchestrator owns the high-level task sequence: pickup, approach, Cartesian
+pickup retract, task-space policy insertion, gripper release, and retreat.</p>
+<figure class="align-default">
+<img alt="DisplayPort task-space Isaac Sim orchestrator sequence." src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_task_space_orchestrator_sequence.png/" />
+</figure>
+<p>The Isaac ROS Deploy path runs the learned task-space policy. Each inference tick converts the
+simulated flange and socket poses into policy input tensors, runs the LEAPP ONNX policy through
+Triton, and decodes the relative pose action into an absolute target pose for Isaac Sim.</p>
+<figure class="align-default">
+<img alt="Isaac ROS Deploy task-space inference loop for DisplayPort insertion." src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_task_space_deploy_inference.png/" />
+</figure>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Complete <a class="reference internal" href="../../../../getting_started/environment.html"><span class="doc">Workspace and Developer Environment Setup</span></a> on the simulation workstation. This creates
+<code class="docutils literal notranslate"><span class="pre">ISAAC_ROS_WS</span></code> and initializes the environment used by the build commands.</p></li>
+<li><p>Follow <a class="reference internal" href="../../../../getting_started/simulation.html"><span class="doc">Set Up a Simulated Robot</span></a> to install
+Isaac Sim and prepare the source workspace.</p></li>
+<li><p>Download the Isaac ROS Manipulation assets from NGC. These assets include the pre-trained
+DisplayPort task-space policy bundle used by this Isaac Sim workflow.</p></li>
+<li><p>Use the published DisplayPort Isaac Sim scene USD.</p></li>
+</ul>
+<p>This tutorial runs with Isaac Sim 6.0 and uses the published DisplayPort scene asset from the
+Isaac Sim 6.1 asset path.</p>
+</section>
+<section id="build-required-packages">
+<h2>Build Required Packages<a class="headerlink" href="#build-required-packages" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="../../../../getting_started/simulation.html"><span class="doc">Set Up a Simulated Robot</span></a> prerequisite
+clones and builds <code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation</span></code>.</p>
+<ol class="arabic">
+<li><p>Activate the Isaac ROS environment, select Fast DDS for the simulation, and
+source the workspace built during setup:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_fastrtps_cpp
+<span class="nb">source</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/install/setup.bash"</span>
+</pre></div>
+</div>
+</li>
+<li><p>Confirm that the required source-built manipulation packages resolve from the
+workspace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_bringup
+ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_asset_bringup
+</pre></div>
+</div>
+<p>Each command must resolve to the source workspace’s <code class="docutils literal notranslate"><span class="pre">install</span></code> directory
+before continuing.</p>
+</li>
+</ol>
+</section>
+<section id="run-the-tutorial">
+<h2>Run the Tutorial<a class="headerlink" href="#run-the-tutorial" title="Link to this heading">#</a></h2>
+<p>Use the same <code class="docutils literal notranslate"><span class="pre">ROS_DOMAIN_ID</span></code> in every terminal in this tutorial.</p>
+<section id="launch-isaac-sim">
+<h3>Launch Isaac Sim<a class="headerlink" href="#launch-isaac-sim" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Open a terminal on the host that can access Isaac Sim.</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">DISPLAYPORT_SIM_LAUNCHER</span></code> to the Isaac Sim launcher script.</p>
+<p>Sparse-checkout the <code class="docutils literal notranslate"><span class="pre">release-5.0</span></code> launcher scripts on the host. The fetch
+and checkout steps also update an existing launcher checkout to this release.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_DEPLOY_BRANCH</span><span class="o">=</span>release-5.0
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/displayport_isaac_sim_launcher
+<span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/displayport_isaac_sim_launcher
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>!<span class="w"> </span>-d<span class="w"> </span>isaac_ros_deploy<span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>git<span class="w"> </span>clone<span class="w"> </span>--no-checkout<span class="w"> </span>--filter<span class="o">=</span>blob:none<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>--branch<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_DEPLOY_BRANCH</span><span class="si">}</span><span class="w"> </span>https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_deploy.git<span class="w"> </span>isaac_ros_deploy
+<span class="k">fi</span>
+<span class="nb">cd</span><span class="w"> </span>isaac_ros_deploy
+git<span class="w"> </span>sparse-checkout<span class="w"> </span>init<span class="w"> </span>--cone
+git<span class="w"> </span>sparse-checkout<span class="w"> </span><span class="nb">set</span><span class="w"> </span>isaac_deploy/isaac_ros_deploy_reference_applications/scripts
+git<span class="w"> </span>fetch<span class="w"> </span>origin<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">ISAAC_ROS_DEPLOY_BRANCH</span><span class="si">}</span><span class="s2">"</span>
+git<span class="w"> </span>checkout<span class="w"> </span>--detach<span class="w"> </span>FETCH_HEAD
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">DISPLAYPORT_SIM_LAUNCHER_DIR</span><span class="o">=</span><span class="si">${</span><span class="nv">PWD</span><span class="si">}</span>/isaac_deploy/isaac_ros_deploy_reference_applications/scripts
+<span class="nb">export</span><span class="w"> </span><span class="nv">DISPLAYPORT_SIM_LAUNCHER</span><span class="o">=</span><span class="si">${</span><span class="nv">DISPLAYPORT_SIM_LAUNCHER_DIR</span><span class="si">}</span>/displayport_task_space_isaac_sim.sh
+</pre></div>
+</div>
+</li>
+<li><p>Set the Isaac Sim path, ROS middleware, and published Isaac Sim scene URL.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_SIM_PACKAGE_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/isaacsim-6.0.0<span class="w"> </span><span class="c1"># set to the path of your Isaac Sim package</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DISTRO</span><span class="o">=</span>jazzy
+<span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span><span class="m">231</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_fastrtps_cpp
+<span class="nb">export</span><span class="w"> </span><span class="nv">FASTDDS_BUILTIN_TRANSPORTS</span><span class="o">=</span>UDPv4
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="k">:-</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">ISAAC_SIM_PACKAGE_PATH</span><span class="si">}</span><span class="s2">/exts/isaacsim.ros2.core/</span><span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span><span class="s2">/lib"</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">DISPLAYPORT_PLAY_USD</span><span class="o">=</span>https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/Samples/ROS2/Scenario/flexiv_displayport_insertion.usd
+</pre></div>
+</div>
+</li>
+<li><p>Start Isaac Sim through the tutorial launcher.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="s2">"</span><span class="si">${</span><span class="nv">DISPLAYPORT_SIM_LAUNCHER</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--usd<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">DISPLAYPORT_PLAY_USD</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--ros-domain-id<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">ROS_DOMAIN_ID</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--camera<span class="w"> </span>wide_overview
+</pre></div>
+</div>
+<p>The script keeps Isaac Sim running until the window is closed or the terminal receives
+<code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code>.</p>
+</li>
+</ol>
+</section>
+<section id="verify-isaac-sim-topics">
+<h3>Verify Isaac Sim Topics<a class="headerlink" href="#verify-isaac-sim-topics" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Open a <strong>new</strong> terminal, activate the Isaac ROS environment, and <strong>source your
+built workspace</strong> using <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">&quot;${ISAAC_ROS_WS}/install/setup.bash&quot;</span></code> in that
+terminal.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+<span class="nb">source</span><span class="w"> </span>/opt/ros/lyrical/setup.bash
+<span class="c1"># Source the packages built in your workspace in this new terminal.</span>
+<span class="nb">source</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/install/setup.bash"</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span><span class="m">231</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_fastrtps_cpp
+<span class="nb">export</span><span class="w"> </span><span class="nv">FASTDDS_BUILTIN_TRANSPORTS</span><span class="o">=</span>UDPv4
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">install/setup.bash</span></code> is missing, complete <strong>Build Required Packages</strong> in
+this tutorial before continuing. Creating or cloning the workspace does not
+install its ROS packages.</p>
+</li>
+<li><p>Confirm that the required Isaac Sim topics are visible.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>list<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s1">'clock|rizon_joint_states|sim_flange_pose'</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="launch-the-workflow-and-policy">
+<h3>Launch the Workflow and Policy<a class="headerlink" href="#launch-the-workflow-and-policy" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Download the Isaac ROS Manipulation assets from NGC using the standard asset setup tool.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MANIPULATOR_INSTALL_ASSETS</span><span class="o">=</span><span class="m">1</span>
+ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_manipulation_asset_bringup<span class="w"> </span>setup_perception_models.py<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--models<span class="w"> </span>manipulation
+</pre></div>
+</div>
+</li>
+<li><p>Confirm that the DisplayPort assets and Isaac Sim policy bundle were extracted.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>find<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-maxdepth<span class="w"> </span><span class="m">2</span><span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort
+</pre></div>
+</div>
+<p>The extracted asset directory should include the Isaac Sim policy bundle:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>isaac_ros_manipulation/displayport_insertion/flexiv_isaacsim_policy/
+  DisplayPortTaskSpaceDiffIKModel500_SimPolicy.yaml
+  DisplayPortTaskSpaceDiffIKModel500_SimPolicy.onnx
+  DisplayPortTaskSpaceDiffIKModel500_SimPolicy_initial_values.safetensors
+</pre></div>
+</div>
+<p>If an existing asset directory does not contain <code class="docutils literal notranslate"><span class="pre">flexiv_isaacsim_policy</span></code>, rerun the asset setup
+command with <code class="docutils literal notranslate"><span class="pre">--force</span></code> to refresh the NGC asset bundle.</p>
+</li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">DISPLAYPORT_TASK_SPACE_CONFIG</span></code> to the pre-trained Isaac Sim policy YAML from the NGC
+asset bundle.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">DISPLAYPORT_TASK_SPACE_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_isaacsim_policy/DisplayPortTaskSpaceDiffIKModel500_SimPolicy.yaml
+</pre></div>
+</div>
+</li>
+<li><p>Launch the DisplayPort Isaac Sim tutorial workflow.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_deploy_reference_applications<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>displayport_task_space_isaac_sim_tutorial.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>config_path:<span class="o">=</span><span class="si">${</span><span class="nv">DISPLAYPORT_TASK_SPACE_CONFIG</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>workflow_config:<span class="o">=</span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_bringup<span class="k">)</span>/params/flexiv_rizon4s_grav_displayport_task_space_isaac_sim_tutorial.yaml
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">workflow_config</span></code> file contains the validated pickup, insertion, gripper, and retreat
+settings for this Isaac Sim tutorial.</p>
+<p>The launch reads the simulated flange pose from
+<code class="docutils literal notranslate"><span class="pre">/displayport_insertion/sim_flange_pose</span></code> and publishes task-space targets to
+<code class="docutils literal notranslate"><span class="pre">/displayport_task_space_policy/target_pose</span></code>.</p>
+</li>
+</ol>
+</section>
+<section id="trigger-pickup-and-insertion">
+<h3>Trigger Pickup and Insertion<a class="headerlink" href="#trigger-pickup-and-insertion" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Open a <strong>new</strong> terminal, activate the Isaac ROS environment, and <strong>source your
+built workspace</strong> using <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">&quot;${ISAAC_ROS_WS}/install/setup.bash&quot;</span></code> in that
+terminal. This makes the workspace’s packages and action definitions available
+to the <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">action</span> <span class="pre">send_goal</span></code> command.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+<span class="nb">source</span><span class="w"> </span>/opt/ros/lyrical/setup.bash
+<span class="c1"># Source the packages built in your workspace in this new terminal.</span>
+<span class="nb">source</span><span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="s2">/install/setup.bash"</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span><span class="m">231</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_fastrtps_cpp
+<span class="nb">export</span><span class="w"> </span><span class="nv">FASTDDS_BUILTIN_TRANSPORTS</span><span class="o">=</span>UDPv4
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">install/setup.bash</span></code> is missing, complete <strong>Build Required Packages</strong> in
+this tutorial before continuing. Creating or cloning the workspace does not
+install its ROS packages.</p>
+</li>
+<li><p>After the launch reports that the task-space pose source, InputBuilder, and workflow action
+server are ready, send the DisplayPort action goal.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>send_goal<span class="w"> </span>--feedback<span class="w"> </span>/displayport_cable_insertion<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>isaac_ros_manipulation_interfaces/action/DisplayPortCableInsertion<span class="w"> </span><span class="s2">"{}"</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The workflow performs pickup, task-space policy insertion, gripper release, and Cartesian retreat
+using the tutorial workflow configuration.</p>
+</section>
+</section>
+<section id="expected-behavior">
+<h2>Expected Behavior<a class="headerlink" href="#expected-behavior" title="Link to this heading">#</a></h2>
+<p>Isaac Sim shows the robot picking up the DisplayPort plug from the fixture, moving to the
+socket hover pose, running task-space policy insertion, releasing the plug, and retreating from the
+socket.</p>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
+<section id="ros-reports-package-not-found">
+<h3>ROS Reports Package Not Found<a class="headerlink" href="#ros-reports-package-not-found" title="Link to this heading">#</a></h3>
+<p>Complete <a class="reference internal" href="../../../../getting_started/simulation.html"><span class="doc">Set Up a Simulated Robot</span></a>, then
+activate the same Isaac ROS environment and source
+<code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/install/setup.bash</span></code> in the current terminal. The host-side
+Isaac Sim launcher checkout does not install ROS packages inside the development
+environment.</p>
+</section>
+<section id="task-space-policy-yaml-not-found">
+<h3>Task-Space Policy YAML Not Found<a class="headerlink" href="#task-space-policy-yaml-not-found" title="Link to this heading">#</a></h3>
+<p>Confirm that <code class="docutils literal notranslate"><span class="pre">DISPLAYPORT_TASK_SPACE_CONFIG</span></code> points to the LEAPP YAML and that the adjacent model
+files referenced by the YAML are present inside the Isaac ROS environment.</p>
+</section>
+<section id="action-server-does-not-appear">
+<h3>Action Server Does Not Appear<a class="headerlink" href="#action-server-does-not-appear" title="Link to this heading">#</a></h3>
+<p>Confirm that the Isaac Sim scene is already playing and that <code class="docutils literal notranslate"><span class="pre">/clock</span></code> and <code class="docutils literal notranslate"><span class="pre">/rizon_joint_states</span></code>
+are publishing in the Isaac ROS terminal. Each command must print a message. If one waits without
+output, press <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> and check that the scene is playing and that both terminals use the same
+<code class="docutils literal notranslate"><span class="pre">ROS_DOMAIN_ID</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>--once<span class="w"> </span>/clock
+ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>--once<span class="w"> </span>/rizon_joint_states
+</pre></div>
+</div>
+</section>
+<section id="isaac-sim-launcher-not-found">
+<h3>Isaac Sim Launcher Not Found<a class="headerlink" href="#isaac-sim-launcher-not-found" title="Link to this heading">#</a></h3>
+<p>Confirm that <code class="docutils literal notranslate"><span class="pre">DISPLAYPORT_SIM_LAUNCHER</span></code> points to
+<code class="docutils literal notranslate"><span class="pre">displayport_task_space_isaac_sim.sh</span></code>. If it does not, rerun the sparse-checkout step above.</p>
+</section>
+<section id="launcher-reports-that-the-https-usd-does-not-exist">
+<h3>Launcher Reports That the HTTPS USD Does Not Exist<a class="headerlink" href="#launcher-reports-that-the-https-usd-does-not-exist" title="Link to this heading">#</a></h3>
+<p>An older launcher treats the scene URL as a local filename and reports
+<code class="docutils literal notranslate"><span class="pre">FileNotFoundError</span></code> with a path beginning <code class="docutils literal notranslate"><span class="pre">https:/</span></code>. Rerun the launcher
+sparse-checkout steps above to select <code class="docutils literal notranslate"><span class="pre">release-5.0</span></code>, then launch again using
+the full <code class="docutils literal notranslate"><span class="pre">https://</span></code> scene URL. The release launcher opens the remote scene
+directly, so you do not need a separate USD download.</p>
+</section>
+<section id="policy-path-does-not-publish-target-poses">
+<h3>Policy Path Does Not Publish Target Poses<a class="headerlink" href="#policy-path-does-not-publish-target-poses" title="Link to this heading">#</a></h3>
+<p>Confirm that <code class="docutils literal notranslate"><span class="pre">/displayport_insertion/sim_flange_pose</span></code> is publishing. The following command
+must print a pose:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span><span class="nb">echo</span><span class="w"> </span>--once<span class="w"> </span>/displayport_insertion/sim_flange_pose
+</pre></div>
+</div>
+<p>Also confirm that the LEAPP YAML declares task-space observation inputs with InputBuilder <code class="docutils literal notranslate"><span class="pre">source</span></code>
+and <code class="docutils literal notranslate"><span class="pre">kind</span></code> metadata.</p>
+</section>
+<section id="gripper-drops-the-plug-before-insertion">
+<h3>Gripper Drops the Plug Before Insertion<a class="headerlink" href="#gripper-drops-the-plug-before-insertion" title="Link to this heading">#</a></h3>
+<p>Check that the tutorial workflow config is in use and that the package grasp file
+<code class="docutils literal notranslate"><span class="pre">grav_grasps_dp_plug_isaac_sim.yaml</span></code> is available.</p>
+</section>
+</section>
+<section id="other-tutorials">
+<h2>Other Tutorials<a class="headerlink" href="#other-tutorials" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../sim_to_real/tutorial_displayport.html"><span class="doc">DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion</span></a></p></li>
+<li><p><a class="reference internal" href="../sim_to_real/tutorial_displayport_task_space_policy_deployment.html"><span class="doc">DisplayPort Task-Space Policy Deployment</span></a></p></li>
+<li><p><a class="reference external" href="https://nvidia-isaac-ros.github.io/v/release-5.0/repositories_and_packages/isaac_ros_deploy/index.html" rel="noreferrer" target="_blank">Isaac ROS Deploy</a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tutorial_isaac_sim.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">DisplayPort Tutorial in Isaac Sim</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../tutorial_sim_to_real.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Sim-to-Real Tutorials</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow-architecture">Workflow Architecture</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-required-packages">Build Required Packages</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-tutorial">Run the Tutorial</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#launch-isaac-sim">Launch Isaac Sim</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-isaac-sim-topics">Verify Isaac Sim Topics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#launch-the-workflow-and-policy">Launch the Workflow and Policy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trigger-pickup-and-insertion">Trigger Pickup and Insertion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expected-behavior">Expected Behavior</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">Troubleshooting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ros-reports-package-not-found">ROS Reports Package Not Found</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#task-space-policy-yaml-not-found">Task-Space Policy YAML Not Found</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#action-server-does-not-appear">Action Server Does Not Appear</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#isaac-sim-launcher-not-found">Isaac Sim Launcher Not Found</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#launcher-reports-that-the-https-usd-does-not-exist">Launcher Reports That the HTTPS USD Does Not Exist</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#policy-path-does-not-publish-target-poses">Policy Path Does Not Publish Target Poses</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gripper-drops-the-plug-before-insertion">Gripper Drops the Plug Before Insertion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-tutorials">Other Tutorials</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../../../../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../../../../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Manage My Privacy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/preferences/start/">Do Not Sell or Share My Data</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2023-2026 NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on Oct 30, 2026.
+  <br/>
+</p></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
+  </body>
+</html>

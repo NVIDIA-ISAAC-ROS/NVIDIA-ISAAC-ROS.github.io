@@ -1,0 +1,56 @@
+=====================
+Sim-to-Real Tutorials
+=====================
+
+Overview
+--------
+
+These tutorials deploy DisplayPort insertion policies to physical robots. First
+complete :doc:`Workspace and Developer Environment Setup
+</getting_started/environment>`, then :doc:`the real-robot setup
+<setup/setup_with_gripper>`.
+
+.. figure:: :ir_lfs:`<resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_real_robot.gif>`
+   :width: 360px
+   :align: center
+   :alt: DisplayPort cable insertion on a Flexiv Rizon 4s robot
+
+Available Tutorials
+-------------------
+
+DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 1
+
+   sim_to_real/tutorial_displayport
+
+Use this tutorial when you want the complete Isaac for Manipulation workflow. It launches the
+workflow bringup and can use FoundationPose with Segment Anything for pose estimation. It then
+uses cuMotion to pick the cable and move to the socket hover pose, and runs the DisplayPort
+insertion policy through Isaac ROS Deploy.
+
+DisplayPort Task-Space Policy Deployment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 1
+
+   sim_to_real/tutorial_displayport_task_space_policy_deployment
+
+Use this tutorial when the cable is already grasped and you want to exercise only the learned
+insertion policy path. It starts the Flexiv driver and the DisplayPort task-space Deploy launch
+directly and asks you to publish the measured socket keypoint pose. It also includes a repeated
+insertion loop for multi-trial evaluation.
+
+Improve Real-World Performance with SPARR (Experimental)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 1
+
+   sim_to_real/tutorial_displayport_sparr
+
+Use this research workflow to learn a real-world residual policy on top of the simulation-trained
+insertion policy and raise success rates when the socket pose is noisy.

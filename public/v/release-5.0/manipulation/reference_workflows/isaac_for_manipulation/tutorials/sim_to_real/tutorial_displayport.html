@@ -1,0 +1,1166 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion &#8212; Isaac for Manipulation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-new-tab-link.css?v=d87cb1ac" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/isaac.css?v=af4c1f8d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/manipulation.css?v=000f0a76" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../../../_static/documentation_options.js?v=1747932b"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=01823362"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference_workflows/isaac_for_manipulation/tutorials/sim_to_real/tutorial_displayport';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script>mermaid.initialize({"startOnLoad": true})</script>
+    <link rel="icon" href="../../../../_static/isaac_ros_logo.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="DisplayPort Task-Space Policy Deployment" href="tutorial_displayport_task_space_policy_deployment.html" />
+    <link rel="prev" title="Sim-to-Real Tutorials" href="../tutorial_sim_to_real.html" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2026.09" />
+    <meta name="docbuild:last-update" content="Oct 30, 2026"/>
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/814eb6e9b4e1/launch-4bc07f1e0b0b.min.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../getting_started/index.html">Get Started</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../getting_started/requirements.html">System Requirements</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../getting_started/environment.html">Workspace and Developer Environment</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/compute/preempt_setup.html">PREEMPT_RT Kernel for Jetson</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/compute/jetson_storage.html">Jetson Storage Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../concepts/dev_env/index.html">Use a Source Workspace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../getting_started/install.html">Install Packages and Perception Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../getting_started/simulation.html">Set Up a Simulated Robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../getting_started/real_robot.html">Set Up a Physical Robot</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../getting_started/sensors/index.html">Cameras for Manipulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/sensors/realsense_setup.html">Isaac ROS RealSense Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/sensors/camera_configuration.html">Configure Cameras for DisplayPort Insertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../getting_started/sensors/isaac_for_manipulation_camera_calibration.html">Isaac for Manipulation Camera Calibration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../robots/index.html">Configure Your Robot</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../robots/flexiv/index.html">Flexiv Robots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../troubleshooting/index.html">Troubleshoot Your Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../troubleshooting/dev_env.html">Troubleshoot the Source Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../troubleshooting/hardware_setup.html">Hardware Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup/testing_manipulator.html">Check the DisplayPort Setup</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">DisplayPort Workflows</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../training/index.html">Train in Isaac Lab</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../training/setup_training.html">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../training/repo_structure.html">Repository Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../training/tasks/displayport_insertion.html">Training a DisplayPort Cable Insertion Policy and ROS Deployment</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../setup_guide.html">Isaac for Manipulation Setup Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../setup/setup_with_gripper.html">Set Up Hardware and Software for a Real Robot with Isaac ROS Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup/testing_manipulator.html">Check the DisplayPort Setup</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../tutorials.html">DisplayPort Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="../tutorial_isaac_sim.html">DisplayPort Tutorial in Isaac Sim</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../isaac_sim/tutorial_displayport_task_space_isaac_sim.html">DisplayPort Task-Space Policy Pickup and Insertion in Isaac Sim</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="../tutorial_sim_to_real.html">Sim-to-Real Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorial_displayport_task_space_policy_deployment.html">DisplayPort Task-Space Policy Deployment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorial_displayport_sparr.html">Improve Real-World Performance with SPARR (Experimental)</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="Isaac for Manipulation - Home"/>
+    <img src="../../../../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="Isaac for Manipulation - Home"/>
+  
+  
+    <p class="title logo__title">Isaac for Manipulation</p>
+  
+</a></div>
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">DisplayPort Insertion Workflows</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../tutorials.html" class="nav-link">DisplayPort Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../tutorial_sim_to_real.html" class="nav-link">Sim-to-Real Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="displayport-cable-insertion-with-foundationpose-sam-and-cumotion">
+<h1>DisplayPort Cable Insertion with FoundationPose, SAM, and cuMotion<a class="headerlink" href="#displayport-cable-insertion-with-foundationpose-sam-and-cumotion" title="Link to this heading">#</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>This tutorial runs the complete Isaac for Manipulation DisplayPort cable insertion workflow on a
+Flexiv Rizon 4s with a Grav gripper. The workflow can use FoundationPose with Segment Anything
+(SAM) for plug and socket pose estimation. It uses cuMotion to pick the cable and move to a socket
+hover pose, and then runs the learned DisplayPort insertion policy through Isaac ROS Deploy.</p>
+<p>For the lower-level policy-only path, where the cable is already grasped and you manually
+publish the socket goal pose and switch controllers, refer to <a class="reference internal" href="tutorial_displayport_task_space_policy_deployment.html"><span class="doc">DisplayPort Task-Space
+Policy Deployment</span></a>.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_sim.gif/"><img alt="DisplayPort cable insertion workflow running in simulation" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_sim.gif/" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-text">DisplayPort cable insertion in simulation.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_real_robot.gif/"><img alt="DisplayPort cable insertion workflow running on a Flexiv Rizon 4s robot" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_real_robot.gif/" style="width: 360px;" /></a>
+<figcaption>
+<p><span class="caption-text">DisplayPort cable insertion on the real Flexiv Rizon 4s robot.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The workflow performs the following operations:</p>
+<ol class="arabic simple">
+<li><p>Uses cuMotion to pick up the cable and move it to a hover pose above the socket.</p></li>
+<li><p>Runs the DisplayPort insertion policy while keeping the cable grasped.</p></li>
+</ol>
+<p>The configuration file for this tutorial is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$(ros2 pkg prefix --share isaac_ros_manipulation_bringup)/params/flexiv_rizon4s_grav_displayport_cable_insertion.yaml
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This workflow commands a physical robot. Verify the robot serial number, socket and plug poses,
+Deploy configuration, grasp file, controller configuration, and collision scene before triggering
+the action. Keep the emergency stop accessible and begin with a clear robot workspace.</p>
+</div>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<p>Before following this tutorial:</p>
+<ul class="simple">
+<li><p>Complete <a class="reference internal" href="../../../../getting_started/environment.html"><span class="doc">Workspace and Developer Environment Setup</span></a> on the robot deployment device and the model
+preparation host.</p></li>
+<li><p>Complete <a class="reference internal" href="../setup/setup_with_gripper.html"><span class="doc">Set Up Hardware and Software for a Real Robot with Isaac ROS Manipulation</span></a> for the Flexiv
+Rizon 4s and Grav gripper.</p></li>
+<li><p>Build the <code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_bringup</span></code>,
+<code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_contact_rich_insertion</span></code>, <code class="docutils literal notranslate"><span class="pre">isaac_ros_deploy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">isaac_ros_deploy_reference_applications</span></code>, and Flexiv driver packages.</p></li>
+<li><p>Copy the DisplayPort socket mesh, plug mesh, and Deploy configuration for the insertion policy to
+the paths referenced by the workflow configuration. NVIDIA publishes pre-trained DisplayPort
+insertion policies on NGC, and the manipulation asset setup downloads them, so you do not need to
+train a policy to run this workflow. Refer to <a class="reference internal" href="#use-the-pre-trained-insertion-policy">Use the Pre-Trained Insertion Policy</a>.
+<code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_flexiv_robot_description</span></code> provides the Flexiv Grav grasp YAML, which
+you can replace with setup-specific grasp exports if needed.</p></li>
+<li><p>Secure the DisplayPort socket and place the cable within the robot’s reachable workspace.</p></li>
+</ul>
+</section>
+<section id="configure-the-workflow">
+<h2>Configure the Workflow<a class="headerlink" href="#configure-the-workflow" title="Link to this heading">#</a></h2>
+<p>Open the following file before launching the workflow:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_bringup<span class="k">)</span>/params/flexiv_rizon4s_grav_displayport_cable_insertion.yaml
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have not already done so during robot setup, sync the robot-specific kinematics as
+described in the <a class="reference external" href="../../../../robots/flexiv/index.html#sync-the-robot-specific-kinematics" rel="noreferrer" target="_blank">Flexiv setup guide</a>. In Flexiv
+Elements, confirm that the active tool frame is set to the gripper tool center point (TCP), not
+the flange, before running insertion inference.</p>
+</div>
+<section id="robot-configuration">
+<h3>Robot Configuration<a class="headerlink" href="#robot-configuration" title="Link to this heading">#</a></h3>
+<p>Update the robot-specific values for your setup:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">workflow_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DISPLAYPORT_CABLE_INSERTION</span>
+<span class="nt">robot_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FLEXIV</span>
+<span class="nt">rizon_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rizon4s</span>
+<span class="nt">gripper_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grav</span>
+<span class="nt">robot_ip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.56.1.2</span>
+<span class="nt">robot_sn</span><span class="p">:</span><span class="w"> </span><span class="s">'Rizon4s-063459'</span>
+<span class="nt">rdk_control_mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">joint_impedance</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">robot_sn</span></code> must match the serial number of the connected Rizon robot. Update <code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> if your
+Flexiv network configuration uses a different address. Keep
+<code class="docutils literal notranslate"><span class="pre">workflow_type:</span> <span class="pre">DISPLAYPORT_CABLE_INSERTION</span></code> so bringup selects the DisplayPort workflow.</p>
+</section>
+<section id="use-calibrated-kinematics-with-cumotion">
+<h3>Use Calibrated Kinematics with cuMotion<a class="headerlink" href="#use-calibrated-kinematics-with-cumotion" title="Link to this heading">#</a></h3>
+<p>The kinematics synced during setup drive motion planning as well as the driver. When
+<code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/isaac_ros_assets/&lt;robot_sn&gt;/&lt;robot_sn&gt;_kinematics.yaml</span></code> is present, bringup uses
+it twice:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">flexiv_description</span></code> generates the driver’s robot description from it.</p></li>
+<li><p>Bringup merges the same values into the cuMotion planning description.</p></li>
+</ul>
+<p>Both descriptions represent the same physical arm, so the planner and the published TF agree.</p>
+<p>No configuration change is required: that path is where
+<a class="reference external" href="../../../../robots/flexiv/index.html#sync-the-robot-specific-kinematics" rel="noreferrer" target="_blank">Sync the Robot-Specific Kinematics</a>
+writes the file. Set <code class="docutils literal notranslate"><span class="pre">flexiv_calibrated_kinematics_path</span></code> only if it is stored elsewhere. When the
+file is absent, both descriptions fall back to the nominal model and behavior is unchanged.</p>
+<p>cuMotion needs the merge because it plans from its own description in
+<code class="docutils literal notranslate"><span class="pre">isaac_ros_cumotion_robot_description</span></code> rather than from the driver’s. Only joint <code class="docutils literal notranslate"><span class="pre">&lt;origin&gt;</span></code>
+values are replaced; link names, meshes, joint limits, and the Grav gripper sub-tree come from the
+shipped description, so the XRDF collision spheres and the <code class="docutils literal notranslate"><span class="pre">gripper_frame</span></code> tool frame stay valid.</p>
+<p>To confirm that the calibrated model is in use, check that
+<code class="docutils literal notranslate"><span class="pre">/tmp/flexiv_rizon4s_grav_calibrated.urdf</span></code> exists after launching the workflow.</p>
+</section>
+<section id="use-the-pre-trained-insertion-policy">
+<h3>Use the Pre-Trained Insertion Policy<a class="headerlink" href="#use-the-pre-trained-insertion-policy" title="Link to this heading">#</a></h3>
+<p>NVIDIA publishes two pre-trained DisplayPort insertion policies on NGC as part of the Isaac ROS
+Manipulation assets: the default policy, trained in Isaac Lab with the PhysX simulation backend,
+and a policy trained with the Newton simulation backend. Use either to run this workflow without
+training a policy:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MANIPULATOR_INSTALL_ASSETS</span><span class="o">=</span><span class="m">1</span>
+ros2<span class="w"> </span>run<span class="w"> </span>isaac_ros_manipulation_asset_bringup<span class="w"> </span>setup_perception_models.py<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--models<span class="w"> </span>manipulation
+</pre></div>
+</div>
+<p>The download extracts both policy bundles, each containing the Deploy configuration YAML, the ONNX
+model, and the initial recurrent state:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>find<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-maxdepth<span class="w"> </span><span class="m">2</span><span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort
+</pre></div>
+</div>
+<p>The PhysX-trained policy is under <code class="docutils literal notranslate"><span class="pre">flexiv_policy/</span></code> and the Newton-trained policy is under
+<code class="docutils literal notranslate"><span class="pre">flexiv_policy_newton/</span></code>. Point <code class="docutils literal notranslate"><span class="pre">displayport_insertion_deploy_config_path</span></code> at the YAML from
+whichever bundle you want to run. The PhysX-trained policy is the default used in the example
+configuration in <a class="reference internal" href="#hover-and-insertion-configuration">Hover and Insertion Configuration</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The pre-trained policy was trained against a specific cell layout, so it transfers only if your
+setup matches the conditions it was trained under. Before relying on it, confirm the following:</p>
+<ul class="simple">
+<li><p>The socket and plug poses fall within the ranges seen during training.</p></li>
+<li><p>The plug geometry and grasp convention match the shipped meshes and grasp file.</p></li>
+<li><p>The robot, gripper, and TCP offset match the ones the policy was trained with.</p></li>
+</ul>
+<p>Insertion is a contact-rich, millimeter-scale task, so a cell that differs from the training
+distribution can fail even when every topic is wired correctly. If your setup differs, train a
+policy for it in Isaac Lab as described in <a class="reference internal" href="#train-a-policy-for-your-setup">Train a Policy for Your Setup</a>.</p>
+</div>
+</section>
+<section id="deploy-policy-configuration">
+<h3>Deploy Policy Configuration<a class="headerlink" href="#deploy-policy-configuration" title="Link to this heading">#</a></h3>
+<p>Use a LEAPP-exported Isaac ROS Deploy configuration for the trained DisplayPort insertion policy:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy/DisplayPortTaskSpace.yaml
+</pre></div>
+</div>
+<p>To use the Newton-trained policy instead, point <code class="docutils literal notranslate"><span class="pre">displayport_insertion_deploy_config_path</span></code> to
+the same file under <code class="docutils literal notranslate"><span class="pre">flexiv_policy_newton/</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy_newton/DisplayPortTaskSpace.yaml
+</pre></div>
+</div>
+<p>The Deploy configuration must match the robot, joint order, topic inputs, quaternion convention, and
+action representation used during policy training. The workflow launch accepts this file through
+<code class="docutils literal notranslate"><span class="pre">displayport_insertion_deploy_config_path</span></code>, creates the Deploy controllers, and starts them
+inactive with zero policy authority. During insertion, the orchestrator activates Deploy, ramps the
+SafetyController blend ratio, and publishes the socket goal pose directly.</p>
+</section>
+<section id="train-a-policy-for-your-setup">
+<h3>Train a Policy for Your Setup<a class="headerlink" href="#train-a-policy-for-your-setup" title="Link to this heading">#</a></h3>
+<p>Train a policy when your cell falls outside what the pre-trained policies cover, for example, a
+different plug or socket, a different gripper or TCP offset, or socket and plug poses outside the
+ranges they were trained on. You train policies for this workflow with
+<a class="reference external" href="https://isaac-sim.github.io/IsaacLab/v3.0.0-beta2/source/policy_deployment/index.html" rel="noreferrer" target="_blank">reinforcement learning in Isaac Lab</a>, using
+either the PhysX or Newton simulation backend, and export them for Isaac ROS Deploy with LEAPP.</p>
+<p>Train against a USD asset that matches the physical robot. If you synced the robot’s kinematics as
+described in the <a class="reference external" href="../../../../robots/flexiv/index.html#sync-the-robot-specific-kinematics" rel="noreferrer" target="_blank">Flexiv setup guide</a>,
+generate the USD asset from the calibrated URDF so that the model used for training represents the
+arm the policy runs on.</p>
+</section>
+<section id="mesh-and-grasp-configuration">
+<h3>Mesh and Grasp Configuration<a class="headerlink" href="#mesh-and-grasp-configuration" title="Link to this heading">#</a></h3>
+<p>Verify that the socket mesh, cable mesh, and Grav grasp file exist:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">foundation_pose_mesh_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/dp_socket/dp_socket.obj</span>
+<span class="nt">displayport_insertion_socket_mesh_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/dp_socket/dp_socket.obj</span>
+<span class="nt">displayport_insertion_cable_mesh_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/dp_plug/dp_plug.obj</span>
+<span class="nt">displayport_insertion_cable_grasps_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(ros2 pkg prefix --share isaac_ros_manipulation_flexiv_robot_description)/config/grav_grasps_dp_plug.yaml</span>
+<span class="nt">grasps_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(ros2 pkg prefix --share isaac_ros_manipulation_flexiv_robot_description)/config/grav_grasps_dp_plug.yaml</span>
+<span class="nt">attach_object_mesh_file_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/dp_plug/dp_plug.obj</span>
+</pre></div>
+</div>
+<p>The socket mesh used for insertion must have its origin at the intended insertion target. The
+cable grasp file must use the same plug geometry and Grav grasp convention as the physical setup.</p>
+</section>
+<section id="choose-the-pose-source">
+<h3>Choose the Pose Source<a class="headerlink" href="#choose-the-pose-source" title="Link to this heading">#</a></h3>
+<p>The workflow supports manual poses and perception-derived poses.</p>
+<section id="manual-poses">
+<h4>Manual Poses<a class="headerlink" href="#manual-poses" title="Link to this heading">#</a></h4>
+<p>The supplied configuration uses manual poses:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">displayport_insertion_use_manual_poses</span><span class="p">:</span><span class="w"> </span><span class="s">'true'</span>
+<span class="nt">displayport_insertion_manual_plug_pose</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.484</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-0.07</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.03</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">]</span>
+<span class="nt">displayport_insertion_manual_socket_pose</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.475</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.125</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.07</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">-0.5</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Each pose is <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z,</span> <span class="pre">qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw]</span></code> in the robot base frame. Measure and replace both poses
+for your robot cell.</p>
+<section id="measure-the-socket-pose-with-the-robot">
+<span id="displayport-measure-socket-pose"></span><h5>Measure the Socket Pose with the Robot<a class="headerlink" href="#measure-the-socket-pose-with-the-robot" title="Link to this heading">#</a></h5>
+<p>One way to measure the socket pose is to seat the plug in the socket with the robot and read the
+robot’s pose:</p>
+<ol class="arabic">
+<li><p>Grasp the plug with the Grav gripper the same way the workflow does: the plug centered between the
+fingertips and aligned with the fingers.</p></li>
+<li><p>Switch the robot to floating (free-drive) mode from the teach pendant and guide the arm by hand
+until the plug is fully and squarely seated in the socket.</p></li>
+<li><p>Without moving the arm, read the flange pose in the robot base frame, either on the teach pendant
+or with the Flexiv RDK, which reports it as <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z,</span> <span class="pre">qw,</span> <span class="pre">qx,</span> <span class="pre">qy,</span> <span class="pre">qz]</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">flexivrdk</span>
+
+<span class="n">robot</span> <span class="o">=</span> <span class="n">flexivrdk</span><span class="o">.</span><span class="n">Robot</span><span class="p">(</span><span class="s1">'&lt;ROBOT_SN&gt;'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">states</span><span class="p">()</span><span class="o">.</span><span class="n">flange_pose</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The RDK reports poses in the robot’s world frame. Confirm in Flexiv Elements that it coincides
+with the robot base frame. If you read the TCP pose instead of the flange pose, check that the TCP
+has no rotation relative to the flange.</p>
+</li>
+<li><p>Convert the reading to the socket pose:</p>
+<ul>
+<li><p><strong>x and y:</strong> Use the flange <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>. With the plug seated, the flange sits directly above
+the socket insertion point.</p></li>
+<li><p><strong>Rotation:</strong> The flange and the socket use different axis conventions. The flange <code class="docutils literal notranslate"><span class="pre">z</span></code> axis points
+down into the socket, while the socket frame’s <code class="docutils literal notranslate"><span class="pre">x</span></code> axis is the outward opening normal. Rotate
+the flange orientation by +90° about its own <code class="docutils literal notranslate"><span class="pre">y</span></code> axis, and reorder the RDK quaternion from
+<code class="docutils literal notranslate"><span class="pre">[qw,</span> <span class="pre">qx,</span> <span class="pre">qy,</span> <span class="pre">qz]</span></code> to <code class="docutils literal notranslate"><span class="pre">[qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw]</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rotation</span>
+
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">qw</span><span class="p">,</span> <span class="n">qx</span><span class="p">,</span> <span class="n">qy</span><span class="p">,</span> <span class="n">qz</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">states</span><span class="p">()</span><span class="o">.</span><span class="n">flange_pose</span>
+<span class="n">flange_to_socket</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.70710678</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.70710678</span><span class="p">])</span>
+<span class="n">socket_quat</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">([</span><span class="n">qx</span><span class="p">,</span> <span class="n">qy</span><span class="p">,</span> <span class="n">qz</span><span class="p">,</span> <span class="n">qw</span><span class="p">])</span> <span class="o">*</span> <span class="n">flange_to_socket</span><span class="p">)</span><span class="o">.</span><span class="n">as_quat</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">socket_quat</span><span class="p">)</span>  <span class="c1"># [qx, qy, qz, qw]</span>
+</pre></div>
+</div>
+<p>For example, a flange pointing straight down with orientation <code class="docutils literal notranslate"><span class="pre">[0.7071,</span> <span class="pre">0.7071,</span> <span class="pre">0.0,</span> <span class="pre">0.0]</span></code>
+gives the socket orientation <code class="docutils literal notranslate"><span class="pre">[0.5,</span> <span class="pre">0.5,</span> <span class="pre">0.5,</span> <span class="pre">-0.5]</span></code> used in the supplied configuration. A
+quaternion and its negation describe the same orientation.</p>
+<p>If you read the orientation on the teach pendant instead, it shows Euler angles <code class="docutils literal notranslate"><span class="pre">Rx</span></code>, <code class="docutils literal notranslate"><span class="pre">Ry</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">Rz</span></code> in degrees about the fixed base axes. Convert them with the lowercase <code class="docutils literal notranslate"><span class="pre">'xyz'</span></code> sequence:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">flange</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_euler</span><span class="p">(</span><span class="s1">'xyz'</span><span class="p">,</span> <span class="p">[</span><span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span><span class="p">],</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">socket_quat</span> <span class="o">=</span> <span class="p">(</span><span class="n">flange</span> <span class="o">*</span> <span class="n">flange_to_socket</span><span class="p">)</span><span class="o">.</span><span class="n">as_quat</span><span class="p">()</span>  <span class="c1"># [qx, qy, qz, qw]</span>
+</pre></div>
+</div>
+<p>For example, a pendant reading of <code class="docutils literal notranslate"><span class="pre">Rx</span> <span class="pre">=</span> <span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">Ry</span> <span class="pre">=</span> <span class="pre">-180</span></code>, <code class="docutils literal notranslate"><span class="pre">Rz</span> <span class="pre">=</span> <span class="pre">-90</span></code> gives the socket
+orientation <code class="docutils literal notranslate"><span class="pre">[-0.5,</span> <span class="pre">-0.5,</span> <span class="pre">-0.5,</span> <span class="pre">0.5]</span></code>, the same orientation as <code class="docutils literal notranslate"><span class="pre">[0.5,</span> <span class="pre">0.5,</span> <span class="pre">0.5,</span> <span class="pre">-0.5]</span></code>.</p>
+</li>
+<li><p><strong>z:</strong> The flange height does not give the socket height, because the plug extends below the
+flange. Measure the height of the socket rim, where the plug enters, above the robot base
+mounting surface. A rough measurement is sufficient. As a quick check, expect the socket <code class="docutils literal notranslate"><span class="pre">z</span></code> to
+be about 80 mm below the recorded flange <code class="docutils literal notranslate"><span class="pre">z</span></code>, the approximate distance from the
+flange to the plug tip with the Grav grasp.</p></li>
+</ul>
+</li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">displayport_insertion_manual_socket_pose</span></code> to <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z,</span> <span class="pre">qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw]</span></code> from these values.
+The same pose is the socket insertion keypoint that
+<a class="reference internal" href="tutorial_displayport_task_space_policy_deployment.html"><span class="doc">DisplayPort Task-Space Policy Deployment</span></a> publishes.</p></li>
+</ol>
+</section>
+</section>
+<section id="perception-derived-poses">
+<h4>Perception-Derived Poses<a class="headerlink" href="#perception-derived-poses" title="Link to this heading">#</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Vision-in-the-loop insertion is experimental. Insertion success depends heavily on the
+accuracy of the estimated socket pose. The following table lists the insertion policy’s success
+rates under socket pose observation noise:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Socket pose noise</p></th>
+<th class="head"><p>Success rate</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1 mm</p></td>
+<td><p>93.3%</p></td>
+</tr>
+<tr class="row-odd"><td><p>2 mm</p></td>
+<td><p>63.3%</p></td>
+</tr>
+<tr class="row-even"><td><p>3 mm</p></td>
+<td><p>33.3%</p></td>
+</tr>
+<tr class="row-odd"><td><p>4 mm</p></td>
+<td><p>23.3%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>To improve real-world success rates under pose noise, refer to <a class="reference internal" href="tutorial_displayport_sparr.html"><span class="doc">Improve Real-World Performance with SPARR (Experimental)</span></a>.</p>
+</div>
+<p>To estimate the plug and socket poses with Segment Anything and
+FoundationPose, update the workflow configuration:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">displayport_insertion_use_manual_poses</span><span class="p">:</span><span class="w"> </span><span class="s">'false'</span>
+<span class="nt">displayport_insertion_manual_grasp_mode</span><span class="p">:</span><span class="w"> </span><span class="s">'false'</span>
+<span class="nt">object_detection_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SEGMENT_ANYTHING</span>
+<span class="nt">segmentation_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SEGMENT_ANYTHING</span>
+<span class="nt">segment_anything_input_points_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_points</span>
+<span class="nt">depth_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REALSENSE</span>
+<span class="nt">enable_dnn_depth_in_realsense</span><span class="p">:</span><span class="w"> </span><span class="s">'false'</span>
+<span class="nt">sam_model_repository_paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'$ISAAC_ROS_WS/isaac_ros_assets/models/triton'</span><span class="p p-Indicator">]</span>
+<span class="nt">pose_estimation_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FOUNDATION_POSE</span>
+</pre></div>
+</div>
+<p>Verify that <code class="docutils literal notranslate"><span class="pre">foundation_pose_mesh_file_path</span></code>,
+<code class="docutils literal notranslate"><span class="pre">displayport_insertion_socket_mesh_file_path</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">displayport_insertion_cable_mesh_file_path</span></code> point to the correct socket and plug meshes. Also
+verify that the Segment Anything and FoundationPose model paths in the configuration exist.</p>
+<p>After launching the workflow, start the DisplayPort action as described in <a class="reference internal" href="#trigger-cable-insertion">Trigger Cable
+Insertion</a>. The orchestrator logs when it is ready for each input. In <code class="docutils literal notranslate"><span class="pre">rqt_image_view</span></code>:</p>
+<ol class="arabic">
+<li><p>Select <code class="docutils literal notranslate"><span class="pre">/camera_1/color/image_raw</span></code> as the displayed image.</p></li>
+<li><p>Set the location topic to <code class="docutils literal notranslate"><span class="pre">/input_points_debug</span></code>.</p></li>
+<li><p>When the orchestrator requests the socket input, click the center of the rim of the
+DisplayPort socket. Segment Anything generates the mask and FoundationPose estimates the socket
+pose using the configured socket mesh.</p>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_socket_click.gif/"><img alt="Clicking the center of the DisplayPort socket rim in rqt_image_view" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_socket_click.gif/" style="width: 360px;" /></a>
+<figcaption>
+<p><span class="caption-text">Click the center of the socket rim.</span><a class="headerlink" href="#id3" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</li>
+<li><p>When requested, click the center of the bottom edge of the plug’s black housing, not the
+metal connector or the cable. The same pipeline estimates the plug pose using the configured
+plug mesh.</p>
+<figure class="align-center" id="id4">
+<a class="reference internal image-reference" href="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_plug_click.gif/"><img alt="Clicking the center bottom of the black housing of the DisplayPort plug in rqt_image_view" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-r1/resources/isaac_ros_docs/reference_workflows/isaac_for_manipulation/displayport_plug_click.gif/" style="width: 360px;" /></a>
+<figcaption>
+<p><span class="caption-text">Click the center bottom of the plug’s black housing.</span><a class="headerlink" href="#id4" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</li>
+<li><p>Inspect the estimated poses and planned hover motion. When the orchestrator asks for confirmation
+to start the Deploy policy, click only after confirming that the plug, socket, and approach are
+correct and the workspace is clear.</p></li>
+</ol>
+<p>If <code class="docutils literal notranslate"><span class="pre">rqt_image_view</span></code> is not already running, start it in a sourced terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>run<span class="w"> </span>rqt_image_view<span class="w"> </span>rqt_image_view
+</pre></div>
+</div>
+</section>
+</section>
+<section id="hover-and-insertion-configuration">
+<h3>Hover and Insertion Configuration<a class="headerlink" href="#hover-and-insertion-configuration" title="Link to this heading">#</a></h3>
+<p>Configure the socket-relative hover pose and insertion behavior:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">displayport_insertion_use_joint_state_planner</span><span class="p">:</span><span class="w"> </span><span class="s">'false'</span>
+<span class="nt">displayport_insertion_run_rl_inference</span><span class="p">:</span><span class="w"> </span><span class="s">'true'</span>
+<span class="nt">displayport_insertion_deploy_config_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$ISAAC_ROS_WS/isaac_ros_assets/isaac_ros_manipulation/displayport_insertion/flexiv_policy/DisplayPortTaskSpace.yaml</span>
+<span class="nt">displayport_insertion_goal_pose_topic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/displayport_insertion/goal_pose</span>
+<span class="nt">displayport_insertion_goal_pose_publish_rate_hz</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30.0</span>
+<span class="nt">displayport_insertion_deploy_decimation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nt">displayport_insertion_deploy_inference_controller_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deploy_inference_controller</span>
+<span class="nt">displayport_insertion_deploy_safety_controller_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deploy_safety_controller</span>
+<span class="nt">displayport_insertion_deploy_normal_controller_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rizon_arm_controller</span>
+<span class="nt">displayport_insertion_deploy_controller_switch_timeout_sec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15.0</span>
+<span class="nt">displayport_insertion_deploy_blend_ratio</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="nt">displayport_insertion_deploy_max_blend_ratio_speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="nt">displayport_insertion_deploy_pre_goal_wait_sec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.25</span>
+<span class="nt">displayport_insertion_enable_controller_switching</span><span class="p">:</span><span class="w"> </span><span class="s">'true'</span>
+<span class="nt">displayport_insertion_offset_for_hover_pose</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.24</span>
+<span class="nt">displayport_insertion_hover_pose_orientation</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.7071067811865476</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.7071067811865476</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.0</span><span class="p p-Indicator">]</span>
+<span class="nt">displayport_insertion_timeout_for_insertion_action_call</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.0</span>
+<span class="nt">displayport_insertion_socket_tf_frame</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">displayport_socket_frame</span>
+</pre></div>
+</div>
+<p>Keep <code class="docutils literal notranslate"><span class="pre">displayport_insertion_use_joint_state_planner</span></code> set to <code class="docutils literal notranslate"><span class="pre">false</span></code> because the hover target is
+computed relative to the socket pose. The hover orientation uses <code class="docutils literal notranslate"><span class="pre">[qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw]</span></code> order. Set it
+to <code class="docutils literal notranslate"><span class="pre">[]</span></code> to retain the socket orientation.</p>
+</section>
+</section>
+<section id="launch-the-workflow">
+<h2>Launch the Workflow<a class="headerlink" href="#launch-the-workflow" title="Link to this heading">#</a></h2>
+<p>Assign a <code class="docutils literal notranslate"><span class="pre">ROS_DOMAIN_ID</span></code> to avoid interference from other ROS systems on the network. For
+real-robot setups, use Zenoh, because it supports the GPU-resident message payloads that the
+perception pipelines publish and brings up the robot driver reliably.</p>
+<ol class="arabic">
+<li><p>Power on the Flexiv robot, release the emergency stop, and put the robot in <strong>Auto (Remote)</strong>
+mode.</p></li>
+<li><p>Open a terminal and activate the Isaac ROS environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+</pre></div>
+</div>
+</li>
+<li><p>Source the built workspace. Repeat this in <strong>every</strong> terminal you start, after
+<code class="docutils literal notranslate"><span class="pre">isaac-ros</span> <span class="pre">activate</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/install/setup.bash
+</pre></div>
+</div>
+</li>
+<li><p>Set the ROS domain and middleware in this terminal. Use the same values in every terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span>&lt;ID_NUMBER&gt;
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Zenoh requires a router daemon. Start it once, in its own terminal, before
+launching anything else, and leave it running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">RMW_IMPLEMENTATION</span><span class="o">=</span><span class="n">rmw_zenoh_cpp</span>
+<span class="n">ros2</span> <span class="n">run</span> <span class="n">rmw_zenoh_cpp</span> <span class="n">rmw_zenohd</span>
+</pre></div>
+</div>
+</div>
+</li>
+<li><p>Launch the workflow with the DisplayPort configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_manipulation_bringup<span class="w"> </span>workflows.launch.py<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>manipulator_workflow_config:<span class="o">=</span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_bringup<span class="k">)</span>/params/flexiv_rizon4s_grav_displayport_cable_insertion.yaml
+</pre></div>
+</div>
+<p>This launch command starts the Flexiv driver, cuMotion planning stack, manipulation action server,
+DisplayPort insertion orchestrator, and inactive DisplayPort Deploy controllers. The
+orchestrator activates Deploy, ramps the SafetyController blend ratio, publishes the socket goal
+pose, and then restores the nominal controller during the DisplayPort action.</p>
+</li>
+<li><p>Wait until the robot is connected, the configured controllers are available, and the terminal
+reports that cuMotion is ready for planning queries.</p></li>
+</ol>
+</section>
+<section id="trigger-cable-insertion">
+<h2>Trigger Cable Insertion<a class="headerlink" href="#trigger-cable-insertion" title="Link to this heading">#</a></h2>
+<ol class="arabic">
+<li><p>Open another terminal, activate Isaac ROS, source the workspace, and set the same ROS domain and
+middleware:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
+<span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/install/setup.bash
+<span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span>&lt;ID_NUMBER&gt;
+<span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
+</pre></div>
+</div>
+</li>
+<li><p>Trigger one complete DisplayPort insertion cycle:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>action<span class="w"> </span>send_goal<span class="w"> </span>/displayport_cable_insertion<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>isaac_ros_manipulation_interfaces/action/DisplayPortCableInsertion<span class="w"> </span><span class="o">{}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Observe the robot closely while it picks the cable, moves to the configured hover pose, and runs
+Deploy insertion. Stop the workflow if the plug slips, the approach direction is incorrect,
+or the cable or gripper approaches an unexpected collision.</p></li>
+</ol>
+</section>
+<section id="key-configuration-parameters">
+<h2>Key Configuration Parameters<a class="headerlink" href="#key-configuration-parameters" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table" id="id5">
+<caption><span class="caption-text">DisplayPort workflow parameters</span><a class="headerlink" href="#id5" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 38.0%" />
+<col style="width: 62.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">workflow_type</span></code></p></td>
+<td><p>Must be <code class="docutils literal notranslate"><span class="pre">DISPLAYPORT_CABLE_INSERTION</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">robot_sn</span></code></p></td>
+<td><p>Serial number used by the Flexiv driver and joint-name prefixing.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_deploy_config_path</span></code></p></td>
+<td><p>Path to the LEAPP-exported Isaac ROS Deploy configuration for the insertion policy.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_use_manual_poses</span></code></p></td>
+<td><p>Uses poses from the YAML when <code class="docutils literal notranslate"><span class="pre">true</span></code>. Uses Segment Anything and FoundationPose when
+<code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_manual_plug_pose</span></code></p></td>
+<td><p>Plug pose in the robot base frame as <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z,</span> <span class="pre">qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw]</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_manual_socket_pose</span></code></p></td>
+<td><p>Socket insertion-target pose in the robot base frame using the same format.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_offset_for_hover_pose</span></code></p></td>
+<td><p>Vertical offset in meters applied to the socket pose before policy insertion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_hover_pose_orientation</span></code></p></td>
+<td><p>Fixed hover quaternion in <code class="docutils literal notranslate"><span class="pre">[qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw]</span></code> order, or <code class="docutils literal notranslate"><span class="pre">[]</span></code> to use the socket
+orientation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_run_rl_inference</span></code></p></td>
+<td><p>Runs Deploy insertion after pick-and-hover when <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_goal_pose_publish_rate_hz</span></code></p></td>
+<td><p>Rate at which the orchestrator publishes the insertion goal pose while Deploy runs.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_deploy_decimation</span></code></p></td>
+<td><p>Deploy inference interval in ros2_control update cycles.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_deploy_blend_ratio</span></code></p></td>
+<td><p>Target SafetyController blend ratio for policy command authority.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_deploy_pre_goal_wait_sec</span></code></p></td>
+<td><p>Extra wait after the expected blend-ramp duration before publishing the goal pose.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_policy_home_joint_position</span></code></p></td>
+<td><p>Joint-space policy start pose used by the orchestrator for the insertion approach.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">displayport_insertion_timeout_for_insertion_action_call</span></code></p></td>
+<td><p>Duration for publishing the Deploy insertion goal pose.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
+<section id="workflow-configuration-not-found">
+<h3>Workflow Configuration Not Found<a class="headerlink" href="#workflow-configuration-not-found" title="Link to this heading">#</a></h3>
+<p>Confirm that <code class="docutils literal notranslate"><span class="pre">ISAAC_ROS_WS</span></code> is set and that the command points to
+<code class="docutils literal notranslate"><span class="pre">flexiv_rizon4s_grav_displayport_cable_insertion.yaml</span></code>. Do not split the filename across lines.</p>
+</section>
+<section id="deploy-configuration-not-found-or-cannot-be-loaded">
+<h3>Deploy Configuration Not Found or Cannot Be Loaded<a class="headerlink" href="#deploy-configuration-not-found-or-cannot-be-loaded" title="Link to this heading">#</a></h3>
+<p>Update <code class="docutils literal notranslate"><span class="pre">displayport_insertion_deploy_config_path</span></code> to an existing LEAPP-exported Deploy
+configuration. Confirm that the configuration’s model file, observation names, joint ordering,
+quaternion convention, and action representation match the DisplayPort policy.</p>
+</section>
+<section id="robot-or-controller-does-not-become-ready">
+<h3>Robot or Controller Does Not Become Ready<a class="headerlink" href="#robot-or-controller-does-not-become-ready" title="Link to this heading">#</a></h3>
+<p>Verify <code class="docutils literal notranslate"><span class="pre">robot_sn</span></code>, <code class="docutils literal notranslate"><span class="pre">robot_ip</span></code>, <code class="docutils literal notranslate"><span class="pre">rdk_control_mode:</span> <span class="pre">joint_impedance</span></code>, and the Flexiv network
+connection. Confirm that another driver or controller process is not already controlling the robot.</p>
+</section>
+<section id="manual-pose-produces-an-incorrect-approach">
+<h3>Manual Pose Produces an Incorrect Approach<a class="headerlink" href="#manual-pose-produces-an-incorrect-approach" title="Link to this heading">#</a></h3>
+<p>Re-measure both manual poses in the robot base frame. Confirm that the quaternion is normalized and
+uses <code class="docutils literal notranslate"><span class="pre">[qx,</span> <span class="pre">qy,</span> <span class="pre">qz,</span> <span class="pre">qw]</span></code> order. Verify that the socket pose represents the insertion target rather than an
+unrelated mesh origin.</p>
+</section>
+<section id="cable-pickup-fails">
+<h3>Cable Pickup Fails<a class="headerlink" href="#cable-pickup-fails" title="Link to this heading">#</a></h3>
+<p>Verify that <code class="docutils literal notranslate"><span class="pre">displayport_insertion_cable_grasps_file_path</span></code>, <code class="docutils literal notranslate"><span class="pre">grasps_file_path</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">attach_object_mesh_file_path</span></code> all refer to the same plug geometry. Confirm that the physical plug
+pose and Grav finger placement match the grasp definition.</p>
+</section>
+<section id="insertion-times-out-or-misses-the-socket">
+<h3>Insertion Times Out or Misses the Socket<a class="headerlink" href="#insertion-times-out-or-misses-the-socket" title="Link to this heading">#</a></h3>
+<p>Check the socket target pose, hover offset, hover orientation, and Deploy decimation. Confirm
+that the policy was trained for the same robot, gripper, joint order, controller mode, and
+grasp pose. Also verify that <code class="docutils literal notranslate"><span class="pre">gripper_max_effort</span></code> is high enough to hold the plug tightly, and
+that Flexiv Elements is using the gripper TCP rather than the flange.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At a safe, fixed joint configuration, compare the end-effector pose from nominal URDF forward
+kinematics with the pose reported by the RDK or Flexiv Elements. Use the same base frame, tool frame
+or TCP, units, and orientation convention for both poses. A mismatch indicates that the
+kinematic model used for policy training does not accurately represent the physical robot.</p>
+<p>If the poses do not match, sync the robot-specific kinematics as described in the
+<a class="reference external" href="../../../../robots/flexiv/index.html#sync-the-robot-specific-kinematics" rel="noreferrer" target="_blank">Flexiv setup guide</a>, generate the
+corresponding USD asset from the calibrated URDF, and retrain the insertion policy with that
+asset in Isaac Lab.</p>
+<p>Refer to <a class="reference external" href="https://nvidia-isaac-ros.github.io/v/release-5.0/repositories_and_packages/isaac_ros_deploy/index.html" rel="noreferrer" target="_blank">Isaac ROS Deploy</a> for the
+standalone Deploy runtime and controller configuration.</p>
+</div>
+</section>
+<section id="realsense-camera-issues">
+<h3>RealSense Camera Issues<a class="headerlink" href="#realsense-camera-issues" title="Link to this heading">#</a></h3>
+<p>If the RealSense camera used for perception is not detected, drops frames, or produces noisy
+depth, refer to <a class="reference internal" href="../../../../troubleshooting/hardware_setup.html"><span class="doc">hardware troubleshooting</span></a>.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tutorial_sim_to_real.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Sim-to-Real Tutorials</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tutorial_displayport_task_space_policy_deployment.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">DisplayPort Task-Space Policy Deployment</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configure-the-workflow">Configure the Workflow</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#robot-configuration">Robot Configuration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-calibrated-kinematics-with-cumotion">Use Calibrated Kinematics with cuMotion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-the-pre-trained-insertion-policy">Use the Pre-Trained Insertion Policy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deploy-policy-configuration">Deploy Policy Configuration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#train-a-policy-for-your-setup">Train a Policy for Your Setup</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh-and-grasp-configuration">Mesh and Grasp Configuration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-the-pose-source">Choose the Pose Source</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-poses">Manual Poses</a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#measure-the-socket-pose-with-the-robot">Measure the Socket Pose with the Robot</a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#perception-derived-poses">Perception-Derived Poses</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hover-and-insertion-configuration">Hover and Insertion Configuration</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#launch-the-workflow">Launch the Workflow</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trigger-cable-insertion">Trigger Cable Insertion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-configuration-parameters">Key Configuration Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">Troubleshooting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow-configuration-not-found">Workflow Configuration Not Found</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deploy-configuration-not-found-or-cannot-be-loaded">Deploy Configuration Not Found or Cannot Be Loaded</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#robot-or-controller-does-not-become-ready">Robot or Controller Does Not Become Ready</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-pose-produces-an-incorrect-approach">Manual Pose Produces an Incorrect Approach</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cable-pickup-fails">Cable Pickup Fails</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#insertion-times-out-or-misses-the-socket">Insertion Times Out or Misses the Socket</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#realsense-camera-issues">RealSense Camera Issues</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../../../../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../../../../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Manage My Privacy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/preferences/start/">Do Not Sell or Share My Data</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2023-2026 NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on Oct 30, 2026.
+  <br/>
+</p></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+    if (typeof _satellite !== "undefined") { _satellite.pageBottom(); }
+</script>
+
+  </body>
+</html>
