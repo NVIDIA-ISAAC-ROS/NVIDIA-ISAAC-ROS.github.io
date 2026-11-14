@@ -65,7 +65,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2026.09" />
-    <meta name="docbuild:last-update" content="Oct 30, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 13, 2026"/>
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -487,11 +487,18 @@ the flange, before running insertion inference.</p>
 <span class="nt">robot_ip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.56.1.2</span>
 <span class="nt">robot_sn</span><span class="p">:</span><span class="w"> </span><span class="s">'Rizon4s-063459'</span>
 <span class="nt">rdk_control_mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">joint_impedance</span>
+<span class="nt">displayport_insertion_task_space_cartesian_impedance_service_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/Rizon4s_063459_flexiv_cartesian_config/set_cartesian_impedance</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">robot_sn</span></code> must match the serial number of the connected Rizon robot. Update <code class="docutils literal notranslate"><span class="pre">robot_ip</span></code> if your
 Flexiv network configuration uses a different address. Keep
 <code class="docutils literal notranslate"><span class="pre">workflow_type:</span> <span class="pre">DISPLAYPORT_CABLE_INSERTION</span></code> so bringup selects the DisplayPort workflow.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">Rizon4s_063459</span></code> in <code class="docutils literal notranslate"><span class="pre">displayport_insertion_task_space_cartesian_impedance_service_name</span></code>
+with your robot’s <code class="docutils literal notranslate"><span class="pre">robot_sn</span></code>, using underscores instead of dashes. For example, <code class="docutils literal notranslate"><span class="pre">robot_sn</span></code>
+<code class="docutils literal notranslate"><span class="pre">Rizon4s-063867</span></code> becomes <code class="docutils literal notranslate"><span class="pre">/Rizon4s_063867_flexiv_cartesian_config/set_cartesian_impedance</span></code>.</p>
+</div>
 </section>
 <section id="use-calibrated-kinematics-with-cumotion">
 <h3>Use Calibrated Kinematics with cuMotion<a class="headerlink" href="#use-calibrated-kinematics-with-cumotion" title="Link to this heading">#</a></h3>
@@ -791,9 +798,11 @@ mode.</p></li>
 </pre></div>
 </div>
 </li>
-<li><p>Source the built workspace. Repeat this in <strong>every</strong> terminal you start, after
-<code class="docutils literal notranslate"><span class="pre">isaac-ros</span> <span class="pre">activate</span></code>:</p>
+<li><p>Source the built workspace and add the Flexiv RDK libraries to <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code>, so the
+robot driver loads them from the RDK install folder. Repeat this in <strong>every</strong> terminal you
+start, after <code class="docutils literal notranslate"><span class="pre">isaac-ros</span> <span class="pre">activate</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/install/setup.bash
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/rdk_install/lib:<span class="nv">$LD_LIBRARY_PATH</span>
 </pre></div>
 </div>
 </li>
@@ -833,6 +842,7 @@ reports that cuMotion is ready for planning queries.</p></li>
 middleware:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
 <span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/install/setup.bash
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/rdk_install/lib:<span class="nv">$LD_LIBRARY_PATH</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span>&lt;ID_NUMBER&gt;
 <span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
 </pre></div>
@@ -1147,7 +1157,7 @@ depth, refer to <a class="reference internal" href="../../../../troubleshooting/
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Oct 30, 2026.
+  Last updated on Nov 13, 2026.
   <br/>
 </p></div>
       

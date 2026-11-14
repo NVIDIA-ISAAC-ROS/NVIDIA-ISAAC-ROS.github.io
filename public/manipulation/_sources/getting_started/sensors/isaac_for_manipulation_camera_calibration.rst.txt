@@ -196,11 +196,16 @@ Calibration Procedure
 #.  On the teach pendant, set the robot to **Auto (Remote)** mode. The driver cannot start the robot in
     **Manual** mode.
 
-#.  Inside the container, source the workspace and launch the robot with RViz.
+#.  Inside the container, source the workspace, add the Flexiv RDK libraries to
+    ``LD_LIBRARY_PATH`` so the robot driver loads them from the RDK install folder, and launch the
+    robot with RViz.
 
     .. code:: bash
 
+        cd ${ISAAC_ROS_WS} && \
         source install/setup.bash
+        export LD_LIBRARY_PATH=${ISAAC_ROS_WS}/rdk_install/lib:$LD_LIBRARY_PATH
+        export RMW_IMPLEMENTATION=rmw_zenoh_cpp
         ros2 launch flexiv_bringup rizon_moveit.launch.py robot_sn:=<ROBOT_SN> robot_type:=Rizon4s start_rviz:=true \
             kinematics_params_file:=${ISAAC_ROS_WS}/isaac_ros_assets/<ROBOT_SN>/<ROBOT_SN>_kinematics.yaml
 

@@ -96,10 +96,17 @@ Update the robot-specific values for your setup:
    robot_ip: 192.56.1.2
    robot_sn: 'Rizon4s-063459'
    rdk_control_mode: joint_impedance
+   displayport_insertion_task_space_cartesian_impedance_service_name: /Rizon4s_063459_flexiv_cartesian_config/set_cartesian_impedance
 
 ``robot_sn`` must match the serial number of the connected Rizon robot. Update ``robot_ip`` if your
 Flexiv network configuration uses a different address. Keep
 ``workflow_type: DISPLAYPORT_CABLE_INSERTION`` so bringup selects the DisplayPort workflow.
+
+.. note::
+
+   Replace ``Rizon4s_063459`` in ``displayport_insertion_task_space_cartesian_impedance_service_name``
+   with your robot's ``robot_sn``, using underscores instead of dashes. For example, ``robot_sn``
+   ``Rizon4s-063867`` becomes ``/Rizon4s_063867_flexiv_cartesian_config/set_cartesian_impedance``.
 
 Use Calibrated Kinematics with cuMotion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -437,12 +444,14 @@ perception pipelines publish and brings up the robot driver reliably.
 
       isaac-ros activate
 
-#. Source the built workspace. Repeat this in **every** terminal you start, after
-   ``isaac-ros activate``:
+#. Source the built workspace and add the Flexiv RDK libraries to ``LD_LIBRARY_PATH``, so the
+   robot driver loads them from the RDK install folder. Repeat this in **every** terminal you
+   start, after ``isaac-ros activate``:
 
    .. code:: bash
 
       source ${ISAAC_ROS_WS}/install/setup.bash
+      export LD_LIBRARY_PATH=${ISAAC_ROS_WS}/rdk_install/lib:$LD_LIBRARY_PATH
 
 #. Set the ROS domain and middleware in this terminal. Use the same values in every terminal:
 
@@ -479,6 +488,7 @@ Trigger Cable Insertion
 
       isaac-ros activate
       source ${ISAAC_ROS_WS}/install/setup.bash
+      export LD_LIBRARY_PATH=${ISAAC_ROS_WS}/rdk_install/lib:$LD_LIBRARY_PATH
       export ROS_DOMAIN_ID=<ID_NUMBER>
       export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 
