@@ -65,7 +65,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2026.09" />
-    <meta name="docbuild:last-update" content="Oct 30, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 13, 2026"/>
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -489,8 +489,11 @@ with the robot as described in <a class="reference internal" href="tutorial_disp
 <section id="configure-runtime-values">
 <h2>Configure Runtime Values<a class="headerlink" href="#configure-runtime-values" title="Link to this heading">#</a></h2>
 <p>Run the following commands in <strong>every</strong> terminal you start, after <code class="docutils literal notranslate"><span class="pre">isaac-ros</span> <span class="pre">activate</span></code>. Sourcing the
-built workspace makes the workflow packages available in that terminal:</p>
+built workspace makes the workflow packages available in that terminal, and adding
+<code class="docutils literal notranslate"><span class="pre">${ISAAC_ROS_WS}/rdk_install/lib</span></code> to the front of <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> makes the Flexiv driver
+load the RDK libraries from the RDK install folder:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/install/setup.bash
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/rdk_install/lib:<span class="nv">$LD_LIBRARY_PATH</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ROBOT_SN</span><span class="o">=</span>&lt;ROBOT_SERIAL_NUMBER&gt;
 <span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span>&lt;ID_NUMBER&gt;
 <span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
@@ -525,6 +528,7 @@ ros2<span class="w"> </span>run<span class="w"> </span>rmw_zenoh_cpp<span class=
 <li><p>In the second terminal, activate Isaac ROS, source the workspace, and launch the driver:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
 <span class="nb">source</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/install/setup.bash
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/rdk_install/lib:<span class="nv">$LD_LIBRARY_PATH</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">ROBOT_SN</span><span class="o">=</span>&lt;ROBOT_SERIAL_NUMBER&gt;
 <span class="nb">export</span><span class="w"> </span><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span>&lt;ID_NUMBER&gt;
 <span class="nb">export</span><span class="w"> </span><span class="nv">RMW_IMPLEMENTATION</span><span class="o">=</span>rmw_zenoh_cpp
@@ -576,12 +580,12 @@ sections:</p>
 <span class="w">   </span>adapter_stale_command_timeout_s:<span class="o">=</span><span class="m">0</span>.25<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>set_cartesian_impedance_on_start:<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>cartesian_impedance_stiffness_mode:<span class="o">=</span>nominal_scaled<span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>cartesian_impedance_stiffness_scale:<span class="o">=</span><span class="m">0</span>.01
+<span class="w">   </span>cartesian_impedance_stiffness_scale:<span class="o">=</span><span class="m">0</span>.01<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>cartesian_impedance_service_name:<span class="o">=</span>/<span class="si">${</span><span class="nv">ROBOT_SN</span><span class="p">//-/_</span><span class="si">}</span>_flexiv_cartesian_config/set_cartesian_impedance
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">robot_sn</span></code> supplies the defaults for <code class="docutils literal notranslate"><span class="pre">flange_pose_topic</span></code>, <code class="docutils literal notranslate"><span class="pre">robot_states_topic</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">cartesian_impedance_service_name</span></code>. Override any of them explicitly if your topic or service
-names differ.</p>
+<p><code class="docutils literal notranslate"><span class="pre">robot_sn</span></code> supplies the defaults for <code class="docutils literal notranslate"><span class="pre">flange_pose_topic</span></code> and <code class="docutils literal notranslate"><span class="pre">robot_states_topic</span></code>.
+Override either of them explicitly if your topic names differ.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p><code class="docutils literal notranslate"><span class="pre">tcp_offset</span></code> and <code class="docutils literal notranslate"><span class="pre">adapter_tcp_offset</span></code> are different frames, and you must set both:</p>
@@ -689,7 +693,8 @@ the gate is open. Complete all of the following steps in order.</p>
 <span class="w">   </span>adapter_stale_command_timeout_s:<span class="o">=</span><span class="m">0</span>.25<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>set_cartesian_impedance_on_start:<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>cartesian_impedance_stiffness_mode:<span class="o">=</span>nominal_scaled<span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>cartesian_impedance_stiffness_scale:<span class="o">=</span><span class="m">0</span>.01
+<span class="w">   </span>cartesian_impedance_stiffness_scale:<span class="o">=</span><span class="m">0</span>.01<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>cartesian_impedance_service_name:<span class="o">=</span>/<span class="si">${</span><span class="nv">ROBOT_SN</span><span class="p">//-/_</span><span class="si">}</span>_flexiv_cartesian_config/set_cartesian_impedance
 </pre></div>
 </div>
 <p>Confirm that the graph came up, as described in that section.</p>
@@ -788,9 +793,9 @@ that all model files referenced by that YAML are present on the robot workstatio
 <h3>Cartesian Driver or Flexiv Topics Not Available<a class="headerlink" href="#cartesian-driver-or-flexiv-topics-not-available" title="Link to this heading">#</a></h3>
 <p>Confirm that <code class="docutils literal notranslate"><span class="pre">rizon.launch.py</span></code> is running and that <code class="docutils literal notranslate"><span class="pre">cartesian_motion_controller</span></code>,
 <code class="docutils literal notranslate"><span class="pre">flexiv_robot_states_broadcaster</span></code>, and <code class="docutils literal notranslate"><span class="pre">joint_state_broadcaster</span></code> are active. The task-space
-launch derives <code class="docutils literal notranslate"><span class="pre">flange_pose_topic</span></code>, <code class="docutils literal notranslate"><span class="pre">robot_states_topic</span></code>, and <code class="docutils literal notranslate"><span class="pre">cartesian_impedance_service_name</span></code>
-from <code class="docutils literal notranslate"><span class="pre">robot_sn</span></code>, so a mismatched serial number leaves the graph waiting on topics that never
-publish. Verify with:</p>
+launch derives <code class="docutils literal notranslate"><span class="pre">flange_pose_topic</span></code> and <code class="docutils literal notranslate"><span class="pre">robot_states_topic</span></code> from <code class="docutils literal notranslate"><span class="pre">robot_sn</span></code>, so a mismatched
+serial number leaves the graph waiting on topics that never publish. A wrong <code class="docutils literal notranslate"><span class="pre">ROBOT_SN</span></code> also
+produces a <code class="docutils literal notranslate"><span class="pre">cartesian_impedance_service_name</span></code> that no node advertises. Verify with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>topic<span class="w"> </span>hz<span class="w"> </span>/<span class="si">${</span><span class="nv">ROBOT_SN</span><span class="si">}</span>/flange_pose
 </pre></div>
 </div>
@@ -1015,7 +1020,7 @@ between the flange and TCP pose topics, and that <code class="docutils literal n
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Oct 30, 2026.
+  Last updated on Nov 13, 2026.
   <br/>
 </p></div>
       

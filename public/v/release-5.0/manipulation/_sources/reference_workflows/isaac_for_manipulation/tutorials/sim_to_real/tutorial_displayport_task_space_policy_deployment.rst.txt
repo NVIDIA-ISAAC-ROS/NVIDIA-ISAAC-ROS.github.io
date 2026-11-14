@@ -92,11 +92,14 @@ Configure Runtime Values
 ------------------------
 
 Run the following commands in **every** terminal you start, after ``isaac-ros activate``. Sourcing the
-built workspace makes the workflow packages available in that terminal:
+built workspace makes the workflow packages available in that terminal, and adding
+``${ISAAC_ROS_WS}/rdk_install/lib`` to the front of ``LD_LIBRARY_PATH`` makes the Flexiv driver
+load the RDK libraries from the RDK install folder:
 
 .. code:: bash
 
    source ${ISAAC_ROS_WS}/install/setup.bash
+   export LD_LIBRARY_PATH=${ISAAC_ROS_WS}/rdk_install/lib:$LD_LIBRARY_PATH
    export ROBOT_SN=<ROBOT_SERIAL_NUMBER>
    export ROS_DOMAIN_ID=<ID_NUMBER>
    export RMW_IMPLEMENTATION=rmw_zenoh_cpp
@@ -136,6 +139,7 @@ Cartesian mode.
 
       isaac-ros activate
       source ${ISAAC_ROS_WS}/install/setup.bash
+      export LD_LIBRARY_PATH=${ISAAC_ROS_WS}/rdk_install/lib:$LD_LIBRARY_PATH
       export ROBOT_SN=<ROBOT_SERIAL_NUMBER>
       export ROS_DOMAIN_ID=<ID_NUMBER>
       export RMW_IMPLEMENTATION=rmw_zenoh_cpp
@@ -189,11 +193,11 @@ Start the Task-Space Policy and Passthrough
          adapter_stale_command_timeout_s:=0.25 \
          set_cartesian_impedance_on_start:=true \
          cartesian_impedance_stiffness_mode:=nominal_scaled \
-         cartesian_impedance_stiffness_scale:=0.01
+         cartesian_impedance_stiffness_scale:=0.01 \
+         cartesian_impedance_service_name:=/${ROBOT_SN//-/_}_flexiv_cartesian_config/set_cartesian_impedance
 
-   ``robot_sn`` supplies the defaults for ``flange_pose_topic``, ``robot_states_topic``, and
-   ``cartesian_impedance_service_name``. Override any of them explicitly if your topic or service
-   names differ.
+   ``robot_sn`` supplies the defaults for ``flange_pose_topic`` and ``robot_states_topic``.
+   Override either of them explicitly if your topic names differ.
 
    .. important::
 
@@ -312,7 +316,8 @@ If the policy graph is already running with ``adapter_enabled_on_start:=true``, 
       adapter_stale_command_timeout_s:=0.25 \
       set_cartesian_impedance_on_start:=true \
       cartesian_impedance_stiffness_mode:=nominal_scaled \
-      cartesian_impedance_stiffness_scale:=0.01
+      cartesian_impedance_stiffness_scale:=0.01 \
+      cartesian_impedance_service_name:=/${ROBOT_SN//-/_}_flexiv_cartesian_config/set_cartesian_impedance
 
 Confirm that the graph came up, as described in that section.
 
@@ -428,9 +433,9 @@ Cartesian Driver or Flexiv Topics Not Available
 
 Confirm that ``rizon.launch.py`` is running and that ``cartesian_motion_controller``,
 ``flexiv_robot_states_broadcaster``, and ``joint_state_broadcaster`` are active. The task-space
-launch derives ``flange_pose_topic``, ``robot_states_topic``, and ``cartesian_impedance_service_name``
-from ``robot_sn``, so a mismatched serial number leaves the graph waiting on topics that never
-publish. Verify with:
+launch derives ``flange_pose_topic`` and ``robot_states_topic`` from ``robot_sn``, so a mismatched
+serial number leaves the graph waiting on topics that never publish. A wrong ``ROBOT_SN`` also
+produces a ``cartesian_impedance_service_name`` that no node advertises. Verify with:
 
 .. code:: bash
 
