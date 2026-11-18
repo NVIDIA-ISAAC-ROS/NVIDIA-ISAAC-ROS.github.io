@@ -897,7 +897,7 @@
 <td><p>Dependencies for RealSense cameras.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gr00t_workflow</span></code></p></td>
-<td><p>Dependencies for GR00T Workflow. Isaac ROS Physical AI packages, such as <code class="docutils literal notranslate"><span class="pre">ros-jazzy-isaac-ros-unitree-g1-*</span></code> and <code class="docutils literal notranslate"><span class="pre">ros-jazzy-realsense2-*</span></code></p></td>
+<td><p>Dependencies for GR00T Workflow. Isaac ROS Physical AI packages, such as <code class="docutils literal notranslate"><span class="pre">ros-lyrical-isaac-ros-unitree-g1-*</span></code> and <code class="docutils literal notranslate"><span class="pre">ros-lyrical-realsense2-*</span></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -940,15 +940,15 @@ of your choice:</p>
 <span class="k">FROM</span><span class="w"> </span><span class="s">${BASE_IMAGE}</span>
 
 <span class="k">ARG</span><span class="w"> </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
-<span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_DISTRO</span><span class="o">=</span>jazzy
+<span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_DISTRO</span><span class="o">=</span>lyrical
 <span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_ROOT</span><span class="o">=</span>/opt/ros/<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>
 
 <span class="c"># Install prebuilt packages</span>
 <span class="k">RUN</span><span class="w"> </span>--mount<span class="o">=</span><span class="nv">type</span><span class="o">=</span>cache,target<span class="o">=</span>/var/cache/apt,sharing<span class="o">=</span>locked<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span>ros-jazzy-my-package<span class="w"> </span><span class="se">\</span>
-<span class="w">        </span>ros-jazzy-another-package
+<span class="w">        </span>ros-lyrical-my-package<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>ros-lyrical-another-package
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">ARG</span> <span class="pre">BASE_IMAGE</span></code> / <code class="docutils literal notranslate"><span class="pre">FROM</span> <span class="pre">${BASE_IMAGE}</span></code> pattern is required. The Isaac ROS CLI
@@ -970,7 +970,7 @@ Public Repository</label><div class="sd-tab-content docutils" id="sd-tab-item-0-
 <span class="k">FROM</span><span class="w"> </span><span class="s">${BASE_IMAGE}</span>
 
 <span class="k">ARG</span><span class="w"> </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
-<span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_DISTRO</span><span class="o">=</span>jazzy
+<span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_DISTRO</span><span class="o">=</span>lyrical
 <span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_ROOT</span><span class="o">=</span>/opt/ros/<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>
 
 <span class="c"># Fetch the package.xml and run rosdep to pre-install build dependencies.</span>
@@ -1001,7 +1001,7 @@ your real <code class="docutils literal notranslate"><span class="pre">package.x
 <span class="k">FROM</span><span class="w"> </span><span class="s">${BASE_IMAGE}</span>
 
 <span class="k">ARG</span><span class="w"> </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
-<span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_DISTRO</span><span class="o">=</span>jazzy
+<span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_DISTRO</span><span class="o">=</span>lyrical
 <span class="k">ENV</span><span class="w"> </span><span class="nv">ROS_ROOT</span><span class="o">=</span>/opt/ros/<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>
 
 <span class="c"># Pre-install rosdep dependencies using a shim package.xml.</span>

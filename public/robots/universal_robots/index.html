@@ -924,7 +924,7 @@ Intel<span class="w"> </span>RealSense<span class="w"> </span>D455<span class="w
 </pre></div>
 </div>
 </li>
-<li><p>Copy the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-5.1/isaac_ros_manipulation_bringup/config/sensors/realsense_camera_ids/unspecified.yaml" rel="noreferrer" target="_blank">unspecified.yaml</a> file
+<li><p>Copy the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-r1/isaac_ros_manipulation_bringup/config/sensors/realsense_camera_ids/unspecified.yaml" rel="noreferrer" target="_blank">unspecified.yaml</a> file
 to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in the same folder and fill in the camera serial numbers.</p></li>
 <li><p>Calibrate the cameras with respect to the robot. The <code class="docutils literal notranslate"><span class="pre">calibration.launch.py</span></code>
 output from each calibration process will include a code snippet similar to the following
@@ -975,7 +975,7 @@ def<span class="w"> </span>generate_launch_description<span class="o">()</span><
 </div>
 </div></blockquote>
 </li>
-<li><p>In the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-5.1/isaac_ros_manipulation_bringup/launch/include/static_transforms.launch.py" rel="noreferrer" target="_blank">static_transforms.launch.py</a>
+<li><p>In the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-r1/isaac_ros_manipulation_bringup/launch/include/static_transforms.launch.py" rel="noreferrer" target="_blank">static_transforms.launch.py</a>
 file, duplicate the <code class="docutils literal notranslate"><span class="pre">hubble_test_bench</span></code> item in the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code> dictionary and rename its key to <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code>.</p></li>
 <li><p>Update the transforms in the new <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item with the calibrated pose values found in the calibration step above.</p>
 <div class="admonition note">
@@ -1012,17 +1012,17 @@ only) from the previous point would look as follows:</p>
 <li><p>Modify other appropriate values based on the tutorial:</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">Object Following</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">Pose to Pose</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p>Modify the <code class="docutils literal notranslate"><span class="pre">object_to_grasp_frame</span></code> transform in the <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item of the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code>
-dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-5.1/isaac_ros_manipulation_bringup/launch/include/static_transforms.launch.py" rel="noreferrer" target="_blank">static_transforms.launch.py</a>,
+dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-r1/isaac_ros_manipulation_bringup/launch/include/static_transforms.launch.py" rel="noreferrer" target="_blank">static_transforms.launch.py</a>,
 to a desired grasp pose relative to the detected object. Feel free to leave this as the default for simplicity.</p>
 </div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><p>Update the <code class="docutils literal notranslate"><span class="pre">world_to_target_frame_1</span></code> and <code class="docutils literal notranslate"><span class="pre">world_to_target_frame_2</span></code> transforms in the <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;</span></code> item of the <code class="docutils literal notranslate"><span class="pre">calibrations_dict</span></code>
-dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-5.1/isaac_ros_manipulation_bringup/launch/include/static_transforms.launch.py" rel="noreferrer" target="_blank">static_transforms.launch.py</a>,
+dictionary in <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-r1/isaac_ros_manipulation_bringup/launch/include/static_transforms.launch.py" rel="noreferrer" target="_blank">static_transforms.launch.py</a>,
 to be two distinct poses that are reachable by the robot.</p>
 </div></div>
 </li>
 <li><p>Set the workspace bounds for nvblox:</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">Installation from Source</button><button aria-controls="panel-1-1-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-1-1-1" name="1-1" role="tab" tabindex="-1">Installation from Debian</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><ol class="arabic">
-<li><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-5.1/isaac_ros_manipulation_bringup/config/nvblox/workspace_bounds/hubble_ur5e_test_bench.yaml" rel="noreferrer" target="_blank">hubble_ur5e_test_bench.yaml</a>
+<li><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-r1/isaac_ros_manipulation_bringup/config/nvblox/workspace_bounds/hubble_ur5e_test_bench.yaml" rel="noreferrer" target="_blank">hubble_ur5e_test_bench.yaml</a>
 to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in the same folder and update the workspace bound corners.</p></li>
 <li><p>Rebuild and source the <code class="docutils literal notranslate"><span class="pre">isaac_ros_manipulation_bringup</span></code> package inside the Docker container:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
@@ -1032,13 +1032,13 @@ to a new file named <code class="docutils literal notranslate"><span class="pre"
 </div>
 </li>
 </ol>
-</div><div aria-labelledby="tab-1-1-1" class="sphinx-tabs-panel" hidden="true" id="panel-1-1-1" name="1-1" role="tabpanel" tabindex="0"><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-5.1/isaac_ros_manipulation_bringup/config/nvblox/workspace_bounds/hubble_ur5e_test_bench.yaml" rel="noreferrer" target="_blank">hubble_ur5e_test_bench.yaml</a>
+</div><div aria-labelledby="tab-1-1-1" class="sphinx-tabs-panel" hidden="true" id="panel-1-1-1" name="1-1" role="tabpanel" tabindex="0"><p>Copy <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-r1/isaac_ros_manipulation_bringup/config/nvblox/workspace_bounds/hubble_ur5e_test_bench.yaml" rel="noreferrer" target="_blank">hubble_ur5e_test_bench.yaml</a>
 to a new file named <code class="docutils literal notranslate"><span class="pre">&lt;SETUP_NAME&gt;.yaml</span></code> in
 <code class="docutils literal notranslate"><span class="pre">/opt/ros/lyrical/share/isaac_ros_manipulation_bringup/config/nvblox/workspace_bounds/</span></code>.</p>
 </div><p><strong>How to choose the workspace bounds:</strong></p>
 <ul class="simple">
 <li><p>The workspace bounds define the space that is mapped for obstacle-aware planning and must cover the full space that the robot arm will be operating in.</p></li>
-<li><p>The workspace min and max corners are defined in the nvblox <code class="docutils literal notranslate"><span class="pre">global_frame</span></code> set <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-5.1/isaac_ros_manipulation_bringup/config/nvblox/nvblox_manipulator_base.yaml" rel="noreferrer" target="_blank">here</a>.</p></li>
+<li><p>The workspace min and max corners are defined in the nvblox <code class="docutils literal notranslate"><span class="pre">global_frame</span></code> set <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-r1/isaac_ros_manipulation_bringup/config/nvblox/nvblox_manipulator_base.yaml" rel="noreferrer" target="_blank">here</a>.</p></li>
 <li><p>The workspace bounds will be visualized when running the launch files (as a red bounding box). You can return to this step to adjust them after the system is running and producing visualizations.</p></li>
 <li><p>A larger workspace will result in increased computational demands, which scale with the total number of voxels. The Isaac ROS Manipulation reference workflows have been tested on Jetson AGX Thor with workspace volumes of up to 8 m<sup>3</sup> with 1 cm<sup>3</sup> voxels.  If a larger workspace is desired, the voxel size may be increased proportionally while keeping the total number of voxels fixed.  The trade-off is that larger voxels may increase the likelihood of planning failures or increase motion time in scenarios that require the robot to move in tight proximity to obstacles.</p></li>
 </ul>
@@ -1191,7 +1191,7 @@ for example <code class="docutils literal notranslate"><span class="pre">ur5e_ro
 </ul>
 </li>
 </ol>
-<p>For a complete example configuration, see the sample files in the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-5.1/isaac_ros_manipulation_bringup/params" rel="noreferrer" target="_blank">params</a> directory.</p>
+<p>For a complete example configuration, see the sample files in the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-r1/isaac_ros_manipulation_bringup/params" rel="noreferrer" target="_blank">params</a> directory.</p>
 <p id="run-pre-flight-test-manipulator-on-robot-e2e">To verify that you have setup the Isaac ROS Manipulation correctly, run the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ENABLE_MANIPULATOR_TESTING</span><span class="o">=</span>on_robot
 <span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_TEST_CONFIG</span><span class="o">=</span>&lt;config_file_path_for_your_robot&gt;
