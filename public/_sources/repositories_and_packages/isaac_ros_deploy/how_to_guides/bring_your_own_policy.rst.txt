@@ -3,7 +3,7 @@ How to bring your own policy
 ============================
 
 This guide shows how to deploy a custom policy on a robot that Isaac ROS Deploy
-already supports.
+already supports, such as the Unitree G1.
 
 The policy can be trained with reinforcement learning, imitation learning, or
 similar approaches. The only requirement is that the training setup supports a LEAPP
@@ -25,17 +25,14 @@ First, export your policy with LEAPP. Isaac Lab and GR00T already provide a
 native LEAPP integration. For other training frameworks, you'll have to add the
 LEAPP annotations to your policy yourself.
 
-For example, for an Isaac Lab RSL-RL policy, run the LEAPP export script to
-obtain a LEAPP bundle:
+For Isaac Lab policies, follow the
+`Isaac Lab LEAPP Quick Start
+<https://isaac-sim.github.io/IsaacLab/v3.0.0-EA/source/policy_deployment/05_leapp/exporting_policies_with_leapp.html#quick-start>`__
+to obtain a LEAPP bundle.
 
-.. code-block:: bash
-
-   ./isaaclab.sh -p scripts/reinforcement_learning/leapp/rsl_rl/export.py \
-       --task <TASK_NAME> \
-       --checkpoint <PATH_TO_CHECKPOINT>
-
-``<TASK_NAME>`` is the Isaac Lab task the policy was trained on, and
-``<PATH_TO_CHECKPOINT>`` is the checkpoint that training run produced.
+For a worked example, the AGILE whole-body policy shipped with ``unitree_g1_bringup``
+is exported from the ``Velocity-G1-History-v0`` task. Refer to the
+:doc:`AGILE WBC deployment tutorial <../tutorials/deploy_agile>`.
 
 This produces a LEAPP bundle, which contains:
 
@@ -108,7 +105,8 @@ Run it
       :doc:`bring_your_own_embodiment` for robot integration.
 
       Launch the controller group through the robot's bringup package. Launch
-      arguments vary by robot.
+      arguments vary by robot. For a complete Unitree G1 example, follow the
+      :doc:`AGILE WBC deployment tutorial <../tutorials/deploy_agile>`.
 
       .. note::
 
@@ -163,3 +161,7 @@ Run it
       - ``source_message_type``: overrides a message type where needed, for
         example ``command/body/velocity:geometry_msgs/msg/TwistStamped``.
       - ``output_to_topic``: routes generated commands to your actuation topics.
+
+      For a complete example that uses the ROS2 Node LEAPP Runtime, follow
+      :doc:`Deploy the Fine-Tuned Policy
+      </reference_workflows/isaac_for_physical_ai/tutorials/tutorial_deploy>`.

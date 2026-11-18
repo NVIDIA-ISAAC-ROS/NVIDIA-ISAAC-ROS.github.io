@@ -332,6 +332,9 @@ cuVSLAM map, cuVGL map, and occupancy map.
 
       isaac-ros activate
 
+#. Export the TensorRT engine file as described in
+   :ref:`Export TensorRT Engine Files <export_tensorrt_engine_files>`.
+
 #. Run localization using the generated map folder and the rosbag:
 
    .. code:: bash
@@ -339,11 +342,13 @@ cuVSLAM map, cuVGL map, and occupancy map.
       ros2 launch isaac_mapping_ros localize_r2b.launch.py \
          rosbag:=<PATH_TO_BAG> \
          map_dir:=<PATH_TO_GENERATED_MAP_FOLDER> \
+         vgl_model_dir:=$OUTPUT_MODEL_DIR \
          replay_rate:=0.1
 
    The ``map_dir`` argument must point to the generated map folder that contains
    ``cuvslam_map``, ``cuvgl_map``, ``occupancy_map.yaml``, and
-   ``ground_plane.yaml``.
+   ``ground_plane.yaml``. The ``vgl_model_dir`` argument must point to the
+   directory containing the exported TensorRT engines.
 
    The cuVGL node first computes a global localization pose for cuVSLAM to
    bootstrap localization. After cuVSLAM successfully localizes in the map,

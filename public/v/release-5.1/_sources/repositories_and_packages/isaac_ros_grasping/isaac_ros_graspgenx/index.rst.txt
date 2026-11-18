@@ -1,0 +1,490 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_grasping> <isaac_ros_graspgenx>`
+
+.. _graspgenx-quickstart:
+
+Quickstart
+----------
+
+Set Up Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Download Quickstart Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Download the sample rosbags from NGC:
+
+   :ir_assets:`<isaac_ros_grasping> <quickstart.tar.gz>`
+
+.. _graspgenx-package-installation:
+
+Build |package_name|
+~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian packages:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y \
+               ros-:ir_ros_distro:-isaac-ros-graspgenx \
+               ros-:ir_ros_distro:-isaac-ros-graspgenx-models-install
+
+      #. Source the ROS environment:
+
+         .. code:: bash
+
+            source /opt/ros/:ir_ros_distro:/setup.bash
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_grasping>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install package dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && \
+               rosdep install --from-paths \
+               ${ISAAC_ROS_WS}/src/isaac_ros_grasping/isaac_ros_graspgenx \
+               ${ISAAC_ROS_WS}/src/isaac_ros_grasping/isaac_ros_graspgenx_interfaces \
+               --ignore-src -y
+
+      #. Source the ROS environment:
+
+         .. code:: bash
+
+            source /opt/ros/:ir_ros_distro:/setup.bash
+
+      #. Build GraspGenX and its interfaces from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_graspgenx \
+               --base-paths \
+               ${ISAAC_ROS_WS}/src/isaac_ros_grasping/isaac_ros_graspgenx \
+               ${ISAAC_ROS_WS}/src/isaac_ros_grasping/isaac_ros_graspgenx_interfaces
+
+      #. Source the workspace:
+
+         .. note::
+
+            Repeat this step in every terminal opened in the Isaac ROS environment.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+.. _graspgenx-model-setup:
+
+Set Up the GraspGenX Model
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow :ref:`graspgenx-huggingface-export` to download the checkpoints, export
+ONNX, and build the TensorRT engine and plugin on the target GPU. For the
+**Binary Package** workflow, the model setup package is already installed by
+the quickstart; do not install it again. For **Build from Source**, run the
+model setup scripts directly from the checkout as described in that guide.
+
+.. _graspgenx-runtime-assets:
+
+#. Export the generated asset paths:
+
+   .. code:: bash
+
+      export GRASPGENX_ENGINE_PATH="${ISAAC_ROS_WS}/isaac_ros_assets/models/graspgenx/graspgenx_everything_fp16.engine"
+      export GRASPGENX_PLUGIN_PATH="${ISAAC_ROS_WS}/isaac_ros_assets/models/graspgenx/libgraspgenx_plugins.so"
+
+Use the same GPU and CUDA/TensorRT environment for model setup and inference.
+
+Prepare Input Topics
+~~~~~~~~~~~~~~~~~~~~
+
+The quickstart consumes:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Topic
+     - Interface and content
+   * - ``/camera/depth/image_rect_raw``
+     - ``sensor_msgs/msg/Image`` registered depth in ``16UC1`` millimeters or
+       ``32FC1`` meters
+   * - ``/camera/depth/camera_info``
+     - ``sensor_msgs/msg/CameraInfo`` matching the depth image
+   * - ``/segmentation_mask``
+     - ``sensor_msgs/msg/Image`` in ``mono8``; nonzero pixels select the object
+   * - ``/camera/color/image_raw``
+     - Optional ``sensor_msgs/msg/Image`` shown in the RViz **RGB Scene** panel
+
+Depth and mask images must have matching dimensions and optical frames, with
+timestamps no more than 0.5 seconds apart. Publish camera calibration before the
+depth and mask pair. The selected object must contain at least 100 valid points.
+For batch inference, publish one mask topic per object, each with the
+timestamp of the depth image it was computed from.
+
+The quickstart sets the masked point-cloud builder's ``input_qos`` to ``DEFAULT``
+(Reliable) for depth, camera-info, and mask subscriptions. Configure these input
+publishers with Reliable QoS, including during rosbag playback.
+
+Run Launch File
+~~~~~~~~~~~~~~~
+
+#. Launch GraspGenX:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_graspgenx graspgenx_quickstart.launch.py \
+         engine_file_path:="${GRASPGENX_ENGINE_PATH}" \
+         custom_plugin_lib:="${GRASPGENX_PLUGIN_PATH}" \
+         origin_frame:=camera_depth_optical_frame \
+         depth_topic:=/camera/depth/image_rect_raw \
+         camera_info_topic:=/camera/depth/camera_info \
+         rgb_topic:=/camera/color/image_raw \
+         mask_topic:=/segmentation_mask
+
+   Set ``origin_frame`` to the input optical frame, or publish TF at the image
+   timestamps between the input and origin frames. Set ``launch_rviz:=false``
+   for headless operation. For batch inference, refer to
+   :ref:`graspgenx-batch-sample`.
+
+#. Start the depth, camera-info, and mask publishers.
+
+   For recorded data, launch with ``use_sim_time:=true`` and play a bag that
+   contains those topics:
+
+   .. code:: bash
+
+      ros2 bag play /path/to/depth_mask_bag --clock
+
+The launch file composes the masked point-cloud builder, TensorRT node, and
+GraspGenX action server. It also starts the visualization client and optionally
+RViz. The client requests grasps once for the first available object cloud.
+
+Run a Single Object with the Included Sample Bag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The quickstart assets include a rosbag that contains depth data (from
+FoundationStereo), object-mask data (from SAM), camera calibration information,
+and RGB information.
+
+#. Launch the quickstart with the recording's topics and optical frame:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_graspgenx graspgenx_quickstart.launch.py \
+         depth_topic:=/offline_foundationstereo/depth_image \
+         camera_info_topic:=/offline_foundationstereo/model_camera_info \
+         rgb_topic:=/offline_foundationstereo/model_rgb \
+         mask_topic:=/segmentation_can \
+         origin_frame:=camera_2_infra1_optical_frame \
+         use_sim_time:=true
+
+#. After the components and model have loaded, replay the bag in a second
+   terminal with the same sourced workspace, middleware, and ROS domain:
+
+   .. code:: bash
+
+      ros2 bag play \
+         "${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_graspgenx/rosbags/foundationstereo_sam_can" \
+         --clock --rate 0.5 --delay 3
+
+#. RViz shows the RGB image, the segmented object, and 20 (configured) grasps,
+   colored from red (lowest confidence among the displayed grasps) to green
+   (highest):
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_graspgenx/graspgenx_quickstart_single_object_rviz.png>`
+      :width: 800px
+      :align: center
+
+.. _graspgenx-batch-sample:
+
+Run a Batch of Objects with the Included Sample Bag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: yaml
+
+   mask_topics:
+     - /segmentation_can
+     - /segmentation_box
+
+Batch result ``i`` belongs to ``mask_topics[i]``. The visualization client sends
+one ``GenerateGraspsBatch`` goal for the first complete batch. For other objects,
+copy the file, edit ``mask_topics``, and pass
+``batch_config_file:=/path/to/your_batch.yaml``.
+
+#. Launch the quickstart in batch mode with the default batch config:
+
+   .. code:: bash
+
+      ros2 launch isaac_ros_graspgenx graspgenx_quickstart.launch.py \
+         depth_topic:=/offline_foundationstereo/depth_image \
+         camera_info_topic:=/offline_foundationstereo/model_camera_info \
+         rgb_topic:=/offline_foundationstereo/model_rgb \
+         batch_mode:=true \
+         origin_frame:=camera_2_infra1_optical_frame \
+         use_sim_time:=true
+
+#. After the components and model have loaded, replay the bag in a second
+   terminal:
+
+   .. code:: bash
+
+      ros2 bag play \
+         "${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_graspgenx/rosbags/foundationstereo_sam_can_box" \
+         --clock --rate 0.5 --delay 3
+
+#. RViz shows both segmented objects and 20 (configured) grasps per object,
+   colored by object:
+
+   .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_graspgenx/graspgenx_quickstart_batch_rviz.png>`
+      :width: 800px
+      :align: center
+
+   .. note::
+
+      The grasps in this image also have confidence scores, but they are not
+      color-coded, to keep the image simple.
+
+Visualize Results
+~~~~~~~~~~~~~~~~~
+
+RViz displays the input RGB image in the **RGB Scene** panel, the full scene in
+gray, the segmented objects in blue, and each object's center in yellow.
+Single-object grasps are colored from red to green by increasing confidence,
+relative to the displayed grasps; batch grasps use one color per object. Select **Move Camera** in the toolbar to
+orbit, pan, and zoom the 3D view. To inspect the poses from a single-object
+request:
+
+.. code:: bash
+
+   ros2 topic echo /graspgenx/grasp_candidates geometry_msgs/msg/PoseArray \
+      --qos-durability transient_local --once
+
+Returned poses do not establish reachability or collision-free motion.
+
+Batch Inference with Custom Inputs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To batch clouds from another source, publish a complete
+``SegmentedObjectCloudBatch`` on ``/graspgenx/segmented_object_cloud_batch``
+from a component in the action server's container with intra-process
+communication enabled, so the object clouds keep their CUDA buffers. Run the
+example batch action client:
+
+.. code:: bash
+
+   ros2 run isaac_ros_graspgenx graspgenx_batch_client
+
+The client sends one ``GenerateGraspsBatch`` goal and logs the candidate count
+for each batch position.
+
+Troubleshooting
+---------------
+
+No grasp result
+~~~~~~~~~~~~~~~
+
+Verify that depth, camera-info, and mask topics use the configured names. Check
+their dimensions, timestamps, frame IDs, depth range, and mask overlap. Confirm
+that the action server received a nonempty point cloud with at least 100 points.
+
+TensorRT initialization fails
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Verify that the engine and plugin paths exist and were built for the current
+GPU, CUDA, and TensorRT versions.
+
+TF lookup fails
+~~~~~~~~~~~~~~~
+
+Use the input optical frame as ``origin_frame`` or publish its transform at the
+cloud timestamp. Use simulated time consistently during bag replay.
+
+CPU-backed input is rejected
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Run the masked cloud builder and inference components with compatible CUDA
+buffer transport on the same host and device. Serialized point-cloud playback
+does not preserve device ownership. Object clouds inside a
+``SegmentedObjectCloudBatch`` keep their CUDA buffers only when the batch is
+published in the action server's container with intra-process communication.
+
+Isaac ROS Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For solutions to common Isaac ROS problems, refer to
+:doc:`troubleshooting </troubleshooting/index>`.
+
+API
+---
+
+GenerateGraspNode
+~~~~~~~~~~~~~~~~~
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+   * - ``origin_frame``
+     - ``string``
+     - ``base_link``
+     - Frame used for returned grasp poses
+   * - ``default_gripper_name``
+     - ``string``
+     - ``robotiq_2f_140``
+     - Gripper conditioning selected when an action goal leaves its name empty
+   * - ``inference_timeout_sec``
+     - ``double``
+     - ``60.0``
+     - Deadline for TensorRT component discovery and inference output
+   * - ``min_object_points``
+     - ``int``
+     - ``100``
+     - Minimum input point count
+   * - ``tf_timeout_sec``
+     - ``double``
+     - ``2.0``
+     - Transform lookup timeout at the cloud timestamp
+   * - ``grasp_pose_tool``
+     - ``double[]``
+     - ``[0, 0, 0, 0, 0, 0, 1]``
+     - Translation XYZ and quaternion XYZW applied to model grasp poses
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``/graspgenx/segmented_object_cloud``
+     - ``sensor_msgs/msg/PointCloud2``
+     - Latest single-object CUDA-backed cloud
+   * - ``/graspgenx/segmented_object_cloud_batch``
+     - ``isaac_ros_graspgenx_interfaces/msg/SegmentedObjectCloudBatch``
+     - Latest complete batch of object clouds
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``/graspgenx/grasp_candidates``
+     - ``geometry_msgs/msg/PoseArray``
+     - Retained single-object candidate poses
+
+ROS Actions
+^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Action
+     - Interface
+     - Description
+   * - ``/graspgenx/generate_grasps``
+     - ``isaac_ros_graspgenx_interfaces/action/GenerateGrasps``
+     - Generate grasps for the latest single-object cloud
+   * - ``/graspgenx/generate_grasps_batch``
+     - ``isaac_ros_graspgenx_interfaces/action/GenerateGraspsBatch``
+     - Generate object-scoped results for the latest complete batch
+
+GenerateBatchInputNode
+~~~~~~~~~~~~~~~~~~~~~~
+
+Publishes the batch input for ``GenerateGraspNode`` when the latest cloud on
+every input topic has the same header stamp. Clouds are ordered by input topic.
+Compose it in the action server's container with intra-process communication
+enabled.
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Parameter
+     - Type
+     - Default
+     - Description
+   * - ``input_topics``
+     - ``string[]``
+     - ``[]``
+     - Object cloud topics, one per object; must not be empty
+
+ROS Topics Subscribed
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - Each entry of ``input_topics``
+     - ``sensor_msgs/msg/PointCloud2``
+     - CUDA-backed object cloud
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - ROS Topic
+     - Interface
+     - Description
+   * - ``/graspgenx/segmented_object_cloud_batch``
+     - ``isaac_ros_graspgenx_interfaces/msg/SegmentedObjectCloudBatch``
+     - Object clouds that share one header stamp
+
+.. |package_name| replace:: ``isaac_ros_graspgenx``

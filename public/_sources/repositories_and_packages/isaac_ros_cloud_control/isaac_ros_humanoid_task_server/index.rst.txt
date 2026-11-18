@@ -27,6 +27,14 @@ deploy inference pipeline on the Unitree G1. It provides two nodes:
   alive. If the server cannot open the gate on goal accept, it aborts the goal
   rather than reporting success.
 
+:doc:`isaac_ros_unitree_g1_cloud_control_bringup </repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index>`
+consumes this package and launches both nodes alongside the
+``unitree_g1_bringup`` inference graph and the VDA5050 mission client. The VDA5050 client's ``Gr00tPolicyActionHandler`` dispatches manipulation
+actions arriving over MQTT as VDA5050 Orders
+(``actionType: humanoid_manipulation``) to the ``humanoid_task`` action, which
+in turn drives the gate. For the end-to-end system diagram, refer to
+:doc:`isaac_ros_unitree_g1_cloud_control_bringup </repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index>`.
+
 .. note::
 
    In the current implementation, ``GrootOutputGateNode`` is a pure passthrough

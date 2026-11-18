@@ -1,0 +1,363 @@
+==========================
+|package name|
+==========================
+
+:ir_github:`<isaac_ros_cloud_control> <isaac_ros_humanoid_task_server>`
+
+Overview
+--------
+
+This package bridges VDA5050 cloud-commanded manipulation tasks to the GR00T
+deploy inference pipeline on the Unitree G1. It provides two nodes:
+
+* **GrootOutputGateNode** — a passthrough gate on the GR00T deploy pipeline
+  output. GR00T Triton inference runs continuously, but its joint-command and
+  velocity outputs only reach the live control topics while the gate is open.
+  This keeps the robot balanced by the AGILE locomotion policy whenever no
+  manipulation task is active. When the gate closes it publishes a single zero
+  ``cmd_vel`` to stop the base while holding the last joint command
+  (freeze-in-place). A heartbeat watchdog automatically closes the gate if the
+  controlling action server stops sending heartbeats, so GR00T output cannot
+  keep flowing to the robot if that process dies.
+* **HumanoidTaskActionServer** — a ROS 2 action server implementing the
+  ``HumanoidTask`` action. On goal accept it opens the gate so GR00T output
+  flows to the robot, publishes feedback while the task runs, and closes the
+  gate again when the task ends (timeout, cancel, or abort). While a task runs
+  it publishes a heartbeat to the gate so the watchdog knows the controller is
+  alive. If the server cannot open the gate on goal accept, it aborts the goal
+  rather than reporting success.
+
+:doc:`isaac_ros_unitree_g1_cloud_control_bringup </repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index>`
+consumes this package and launches both nodes alongside the
+``unitree_g1_bringup`` inference graph and the VDA5050 mission client. The VDA5050 client's ``Gr00tPolicyActionHandler`` dispatches manipulation
+actions arriving over MQTT as VDA5050 Orders
+(``actionType: humanoid_manipulation``) to the ``humanoid_task`` action, which
+in turn drives the gate. For the end-to-end system diagram, refer to
+:doc:`isaac_ros_unitree_g1_cloud_control_bringup </repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index>`.
+
+.. note::
+
+   In the current implementation, ``GrootOutputGateNode`` is a pure passthrough
+   gate and ``HumanoidTaskActionServer`` only **gates GR00T output for**
+   ``timeout`` **seconds**. It does not consume ``task_category``, ``task_id``,
+   or ``language_instruction`` to select or condition the policy. The server
+   logs and echoes those fields in action feedback for forward compatibility;
+   the deploy graph ``controller_group`` determines the active policy upstream.
+
+Usage
+-----
+
+The cloud control bringup launch file normally starts both nodes. To
+run them standalone (for testing), launch each node and drive the gate through
+the action server or directly through the gate service:
+
+.. code-block:: bash
+
+   ros2 run isaac_ros_humanoid_task_server groot_output_gate_node
+   ros2 run isaac_ros_humanoid_task_server humanoid_task_action_server
+
+Trigger a task through the action server (the gate opens for the duration of
+the task and closes on completion or cancel):
+
+.. code-block:: bash
+
+   ros2 action send_goal /humanoid_task \
+       isaac_ros_cloud_control_interface/action/HumanoidTask \
+       '{task_category: "manipulation",
+         task_id: "apple_to_plate",
+         language_instruction: "pick up the apple and place it on the plate",
+         timeout: 15.0}'
+
+Or open and close the gate directly (lowest-level test):
+
+.. code-block:: bash
+
+   # Open gate — GR00T output flows to the robot
+   ros2 service call /groot_output_gate_node/set_active std_srvs/srv/SetBool '{data: true}'
+
+   # Close gate — a zero cmd_vel is published, then output is blocked
+   ros2 service call /groot_output_gate_node/set_active std_srvs/srv/SetBool '{data: false}'
+
+.. note::
+
+   ``timeout`` (seconds) controls how long the gate stays open. A value of ``0``
+   or less falls back to the ``default_timeout_s`` parameter (``300.0`` by
+   default) so the gate cannot be left open indefinitely on a physical robot.
+   To opt into a truly unbounded task, set ``default_timeout_s`` to ``0`` (or
+   less) as well, then cancel the action or close the gate manually to stop
+   output. Independently, the gate's own heartbeat watchdog
+   (``watchdog_timeout_sec``) closes the gate if the action server stops
+   publishing heartbeats.
+
+API
+---
+
+``groot_output_gate_node``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Parameters
+""""""""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 34 12 54
+
+   * - Parameter
+     - Type
+     - Description
+   * - ``joint_commands_trajectory_input_topic``
+     - ``string``
+     - Topic carrying GR00T deploy pipeline joint-command trajectories.
+       Default ``/deploy/joint_commands_trajectory``.
+   * - ``joint_commands_trajectory_output_topic``
+     - ``string``
+     - Live control topic the trajectories are republished to when the gate is
+       open. Default ``/joint_commands_trajectory``.
+   * - ``cmd_vel_input_topic``
+     - ``string``
+     - Topic carrying GR00T deploy pipeline velocity commands.
+       Default ``/deploy/cmd_vel``.
+   * - ``cmd_vel_output_topic``
+     - ``string``
+     - Live velocity topic the commands are republished to when the gate is open.
+       Default ``/cmd_vel``.
+   * - ``watchdog_timeout_sec``
+     - ``double``
+     - Deadman window: while the gate is open it auto-closes if no heartbeat
+       arrives on ``~/heartbeat`` within this many seconds. Set to ``0`` or less
+       to disable the watchdog. Default ``1.0``.
+
+ROS Topics
+""""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 12 58
+
+   * - ROS Topic
+     - Direction
+     - Description
+   * - ``/deploy/joint_commands_trajectory``
+     - Subscribed
+     - GR00T joint-command trajectories (input to the gate).
+       Type ``isaac_ros_deploy_interfaces/JointCommandTrajectory``.
+   * - ``/deploy/cmd_vel``
+     - Subscribed
+     - GR00T base velocity commands (input to the gate). Type ``geometry_msgs/Twist``.
+   * - ``~/heartbeat``
+     - Subscribed
+     - Heartbeat from the action server. While the gate is open, the
+       watchdog closes it if no message arrives within ``watchdog_timeout_sec``.
+       Type ``std_msgs/Empty``.
+   * - ``/joint_commands_trajectory``
+     - Published
+     - Joint-command trajectories, forwarded only while the gate is open. On
+       close the last command is held (freeze-in-place) — no command is
+       published here. Type ``isaac_ros_deploy_interfaces/JointCommandTrajectory``.
+   * - ``/cmd_vel``
+     - Published
+     - Base velocity commands, forwarded while open; the node publishes a single
+       zero ``Twist`` when the gate closes (by service request or watchdog
+       timeout). Type ``geometry_msgs/Twist``.
+
+ROS Services
+""""""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 24 54
+
+   * - ROS Service
+     - Interface
+     - Description
+   * - ``~/set_active``
+     - ``std_srvs/SetBool``
+     - Open (``data: true``) or close (``data: false``) the gate. Closing
+       publishes a zero ``cmd_vel`` and holds the last joint command before
+       blocking output. Opening also resets the watchdog heartbeat timer.
+
+``humanoid_task_action_server``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ROS Parameters
+""""""""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 26 12 62
+
+   * - Parameter
+     - Type
+     - Description
+   * - ``action_server_name``
+     - ``string``
+     - Name of the ``HumanoidTask`` action this server exposes. Default
+       ``humanoid_task``.
+   * - ``gate_service``
+     - ``string``
+     - ``SetBool`` service used to open and close the GR00T output gate. Default
+       ``groot_output_gate_node/set_active``.
+   * - ``gate_heartbeat_topic``
+     - ``string``
+     - Topic the server publishes heartbeats to while a task runs,
+       feeding the gate's deadman watchdog. Default
+       ``groot_output_gate_node/heartbeat``.
+   * - ``feedback_rate_hz``
+     - ``double``
+     - Rate at which the server publishes action feedback and sends heartbeats
+       during task execution. Default ``10.0``.
+   * - ``default_timeout_s``
+     - ``double``
+     - Safety bound applied when a goal requests ``timeout <= 0``. The unset
+       timeout falls back to this value so the gate is not left open
+       indefinitely. Set to ``0`` or less to honor a true no-timeout request.
+       Default ``300.0``.
+
+ROS Topics Subscribed
+"""""""""""""""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - ROS Topic
+     - Description
+   * - ``/joint_states``
+     - Latest joint state, forwarded in action feedback and the final result.
+       Type ``sensor_msgs/JointState``.
+
+ROS Topics Published
+""""""""""""""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - ROS Topic
+     - Description
+   * - ``groot_output_gate_node/heartbeat``
+     - Heartbeat published at ``feedback_rate_hz`` while a task runs,
+       keeping the gate's deadman watchdog satisfied. The topic name is set by
+       the ``gate_heartbeat_topic`` parameter. Type ``std_msgs/Empty``.
+
+ROS Service Clients
+"""""""""""""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 22 48
+
+   * - ROS Service
+     - Interface
+     - Description
+   * - ``groot_output_gate_node/set_active``
+     - ``std_srvs/SetBool``
+     - Calls the gate node to open the gate on goal accept and close it when the
+       task ends. The service name is set by the ``gate_service`` parameter.
+
+ROS Actions
+"""""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 18 30 52
+
+   * - ROS Action
+     - Interface
+     - Description
+   * - ``humanoid_task``
+     - ``isaac_ros_cloud_control_interface/HumanoidTask``
+     - Triggers a GR00T manipulation task; opens the output gate for the task
+       duration. Rejects new goals while a task is already executing.
+
+``HumanoidTask`` Action Interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Goal
+""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 26 52
+
+   * - Field
+     - Type
+     - Description
+   * - ``task_category``
+     - ``string``
+     - Task category (for example, ``manipulation``, ``locomanipulation``).
+   * - ``task_id``
+     - ``string``
+     - Task identifier (for example, ``apple_to_plate``, ``pick_and_place``).
+   * - ``locomotion_pose``
+     - ``geometry_msgs/PoseStamped``
+     - Target base pose (optional, for locomotion/locomanipulation tasks).
+   * - ``language_instruction``
+     - ``string``
+     - Natural-language command (optional, for VLA tasks).
+   * - ``timeout``
+     - ``float32``
+     - Task timeout in seconds. ``0`` (or less) falls back to the server's
+       ``default_timeout_s`` parameter rather than running unbounded.
+   * - ``parameters``
+     - ``string``
+     - Flexible JSON string for policy-specific input parameters.
+
+Feedback
+""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 26 52
+
+   * - Field
+     - Type
+     - Description
+   * - ``status``
+     - ``int32``
+     - Execution status: ``IDLE`` (0), ``EXECUTING`` (1), ``COMPLETED`` (2),
+       ``FAILED`` (3), ``CANCELLED`` (4).
+   * - ``current_execution_time``
+     - ``float32``
+     - Seconds elapsed since the task started.
+   * - ``current_base_pose``
+     - ``geometry_msgs/PoseStamped``
+     - Current robot base pose.
+   * - ``current_joint_state``
+     - ``sensor_msgs/JointState``
+     - Most recent joint state observed on ``/joint_states``.
+   * - ``current_instruction``
+     - ``string``
+     - Instruction currently being executed.
+
+Result
+""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 26 52
+
+   * - Field
+     - Type
+     - Description
+   * - ``did_succeed``
+     - ``bool``
+     - ``true`` if the task completed successfully; ``false`` on cancel or on
+       abort (for example, if the server could not open the output gate).
+   * - ``message``
+     - ``string``
+     - Human-readable outcome message.
+   * - ``final_locomotion_pose``
+     - ``geometry_msgs/PoseStamped``
+     - Final robot base pose (if applicable).
+   * - ``final_joint_state``
+     - ``sensor_msgs/JointState``
+     - Final robot joint configuration.
+   * - ``execution_time``
+     - ``float32``
+     - Total task execution time in seconds.
+   * - ``result_data``
+     - ``string``
+     - Additional JSON string for policy-specific result data.
+
+.. |package name| replace:: ``isaac_ros_humanoid_task_server``

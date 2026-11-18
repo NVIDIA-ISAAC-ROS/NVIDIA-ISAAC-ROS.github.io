@@ -20,18 +20,34 @@ launch output.
 Solution
 ~~~~~~~~
 
-Reproduce the expansion by hand to see the error on its own. Inspect the
-controller manager launch file to identify the xacro file and arguments selected
-for the active hardware type, then run the equivalent command:
+Reproduce the expansion by hand to see the error on its own. Each hardware type
+expands a different xacro file with a different set of arguments. For the Unitree
+G1:
 
 .. code:: bash
 
-   xacro /path/to/robot_description.urdf.xacro \
-       argument_name:=argument_value
+   # hardware_type:=mujoco
+   xacro $(ros2 pkg prefix --share unitree_g1_description)/urdf/g1_with_ros2_control_full.urdf.xacro \
+       mujoco_model_path:=<path_to_mjcf> enable_viewer:=true
 
-A successful run prints the expanded URDF to standard output. Run this check
-against each hardware-specific ``ros2_control`` xacro. This is the first of the
-validation steps in
+   # hardware_type:=real
+   xacro $(ros2 pkg prefix --share unitree_g1_description)/urdf/g1_real_hardware.urdf.xacro \
+       network_interface:=<your_interface> mode_machine:=5 with_hands:=true
+
+   # hardware_type:=isaacsim
+   xacro $(ros2 pkg prefix --share unitree_g1_description)/urdf/g1_isaacsim.urdf.xacro \
+       joint_states_topic:=/isaac_sim_joint_states \
+       joint_commands_topic:=/isaac_sim_joint_commands \
+       imu_topic:=/isaac_sim_imu
+
+A successful run prints the expanded URDF to standard output. The xacro files and
+the arguments each one accepts are in
+:ir_github:`<isaac_ros_robots> <unitree_g1/unitree_g1_description>`, and the
+launch file that selects between them is
+:ir_repo:`unitree_g1_controller_manager.launch.py <isaac_ros_robots> <unitree_g1/unitree_g1_bringup/launch/unitree_g1_controller_manager.launch.py>`.
+
+For a custom robot, run the same check against your own ``ros2_control`` xacro.
+This is the first of the validation steps in
 :doc:`How to bring your own embodiment <../how_to_guides/bring_your_own_embodiment>`.
 Passing it is what lets you attribute a later failure to the controller
 configuration rather than to the description.

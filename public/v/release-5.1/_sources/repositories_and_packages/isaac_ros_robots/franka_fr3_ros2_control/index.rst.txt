@@ -1,0 +1,148 @@
+========================
+|package_name|
+========================
+
+:ir_github:`<isaac_ros_robots> <franka_fr3/franka_fr3_ros2_control>`
+
+Overview
+--------
+
+.. include:: _snippets/overview.rst
+
+How it works
+------------
+
+``FrankaFr3SystemInterface`` provides one real-hardware path. It starts a
+dedicated thread in ``on_activate()`` and runs a ``libfranka`` torque-control
+callback at the packet-clocked 1 kHz FCI rate. The host-side servo computes
+
+.. code:: text
+
+   tau = Kp * (q_ref - q) - Kd * LPF(dtheta) + coriolis
+
+and then applies the configured torque envelope and ``libfranka`` torque-rate
+limit.
+
+The non-RT controller-manager runs at 200 Hz. Its ``read()`` and ``write()``
+methods only exchange preallocated snapshots with the FCI thread. Reach
+inference is decimated to 50 Hz; cuMotion IK can update at the full
+controller-manager rate. Bringup applies the selected IK or Reach gains in
+both simulation and real-hardware sessions. The 1 kHz servo independently
+slews the position reference and gains between controller updates.
+
+The FCI thread attempts to configure ``mlockall``, ``SCHED_FIFO`` scheduling,
+
+.. warning::
+
+   The URDF must **not** set ``is_async`` / ``rw_rate``. The async path paces
+   ``read()`` / ``write()`` on a host clock that drifts against the FCI packet
+   clock.
+
+Why not ``franka_ros2`` (``franka_hardware``)?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The implementation uses the official ``libfranka`` library directly, but not
+the pull-based ``franka_hardware`` plugin. With that plugin the complete
+controller-manager must provide every 1 kHz FCI command. That rate is not
+compatible with running neural-network inference in the same loop on the
+stock deployment kernel.
+
+This adapter keeps shared policy and safety controllers at 50--200 Hz while a
+small robot-specific real-time thread owns the 1 kHz FCI session. The shared
+controllers use the same position, velocity, effort, stiffness, and damping
+interface in MuJoCo and on hardware; on the real robot, position is the desired
+``q_ref`` for the torque servo rather than a ``JointPositions`` FCI command.
+
+URDF parameters
+---------------
+
+.. list-table::
+   :widths: 30 25 45
+   :header-rows: 1
+
+   * - Parameter
+     - Default
+     - Notes
+   * - ``robot_ip``
+     - -- (required)
+     - FCI IP of the Control unit. Franka factory default is
+       ``172.16.0.2``.
+   * - ``rt_cpus``
+     - ``6`` from bringup
+     - Isolated CPU core for the FCI thread.
+   * - ``rt_priority``
+     - ``95``
+     - ``SCHED_FIFO`` priority in ``[1, 99]``.
+   * - ``external_fallback_kp`` / ``external_fallback_kd``
+     - cuMotion IK profile
+     - Initial gains and the target profile for invalid commands.
+   * - ``external_max_kp`` / ``external_max_kd``
+     - selected controller-group profile
+     - Absolute gain ceilings. URDF values can tighten but cannot widen the
+       compiled profile.
+   * - ``external_max_position_error``
+     - hardware profile
+     - Maximum proportional position error.
+   * - ``external_max_target_velocity``
+     - hardware profile
+     - 1 kHz reference slew bound.
+   * - ``external_max_torque``
+     - FR3 rated user-torque profile
+     - FR3 user-torque envelope before torque-rate limiting.
+
+Controller gain profiles are defined in
+``franka_fr3_bringup/config/controller_groups.yaml``. Hardware defaults are
+defined in ``franka_fr3_description/urdf/fr3_ros2_control.urdf.xacro`` and
+their absolute bounds are defined in
+``franka_fr3_ros2_control/src/franka_fr3_system_interface.cpp``.
+
+Host setup
+----------
+
+For deterministic 1 kHz operation:
+
+1. Reserve one CPU core at boot. ``franka::Robot::control()`` is
+   single-threaded. For example, add the following GRUB parameters and reboot:
+
+   .. code:: text
+
+      isolcpus=6 nohz_full=6 rcu_nocbs=6
+
+   If SMT is enabled, isolate the selected core's sibling as well, while
+   pinning the FCI thread to only one sibling.
+
+2. Start the container with ``CAP_SYS_NICE``, ``rtprio=99``, and
+   ``memlock=-1``. The FR3 development Docker arguments provide these.
+
+On the robot, enable FCI in Franka Desk and configure the attached tool's mass,
+center of mass, and inertia. The driver intentionally leaves the Desk load
+model unchanged.
+
+Safety
+------
+
+The compiled safety profile bounds position, position error, reference
+velocity, gains, gain slew, desired torque, and torque rate. URDF overrides may
+only tighten the profile. Bringup sets the effective gain maximum to the
+selected controller group's profile while retaining the same torque and
+tracking-error limits.
+
+The 1 kHz servo tracks the latest coherent command snapshot. If
+controller-manager writes stop while FCI remains active, the servo continues
+tracking that command through the same safety envelopes. Non-finite commands
+use measured position and slew toward fallback gains; non-finite robot/model
+state requests zero user torque before final rate limiting, while non-finite
+inputs to that limiter fail the hardware session.
+
+``blend_ratio=0`` holds position but does not scale policy gains. Reach gains
+therefore slew toward their profile after policy activation even before
+position motion is enabled. Per-joint gain settling time is
+``abs(target - current) / configured_slew_rate``. Observe applied gains and
+torque telemetry, and wait for the slew to settle before enabling policy
+motion.
+
+Policy-level blend and target processing remains in
+``isaac_ros_deploy_ros2_control::SafetyController``. MuJoCo tests validate the
+shared policy/controller behavior but not the real ``libfranka`` callback.
+
+.. |package_name| replace:: ``franka_fr3_ros2_control``

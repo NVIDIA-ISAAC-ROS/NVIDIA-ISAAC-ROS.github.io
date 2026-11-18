@@ -7,6 +7,11 @@
 Quickstart
 ----------
 
+.. note::
+
+   These examples may fail to launch with upstream robot vendor packages that
+   have not yet been certified for ROS 2 Lyrical.
+
 Set Up Development Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -17,6 +22,8 @@ Install |package_name| and Examples
 
 .. include:: _snippets/install.rst
 
+
+.. _isaac_ros_cumotion_moveit_set_up_moveit:
 
 Set Up MoveIt 2 with cuMotion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -205,7 +212,7 @@ For a demonstration of collision-aware planning, first add one or more obstacles
 .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_moveit/moveit_planning.gif>`
     :align: center
 
-.. warning::
+.. important::
 
   In normal operation, only a single MoveIt ``move_group`` node should be running at a time.  If the node fails to
   exit cleanly, however, it may result in two nodes running when the graph is next launched.  RViz then connects
@@ -213,8 +220,9 @@ For a demonstration of collision-aware planning, first add one or more obstacles
   at nearly the same time.  The second to arrive preempts the first without waiting for in-flight CUDA operations to
   complete, possibly resulting in "CUDA invalid" errors.
 
-  If such errors are observed, ensure that only a single ``move_group`` node is running.  The cuMotion planner
-  node will be made more robust in a future release.
+  Refer to :ref:`Duplicate move_group nodes cause CUDA invalid errors <isaac_ros_cumotion_moveit_duplicate_move_group>` in Troubleshooting for detection and recovery steps.
+
+  The cuMotion planner node will be made more robust in a future release.
 
 Backend interface
 ~~~~~~~~~~~~~~~~~
@@ -235,6 +243,35 @@ To continue your exploration, check out the following suggested examples:
 
 Troubleshooting
 ---------------
+
+.. _isaac_ros_cumotion_moveit_duplicate_move_group:
+
+Duplicate move_group nodes cause CUDA invalid errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Symptom
+"""""""
+
+Planning with cuMotion in MoveIt fails with CUDA invalid errors. This can occur when more than one ``move_group`` node is running, for example after a previous launch did not exit cleanly.
+
+Solution
+""""""""
+
+#. Check for duplicate nodes:
+
+   .. code-block:: bash
+
+      ros2 node list | grep move_group
+
+   Only one node should be listed.
+
+#. Stop the launch in all terminals, then terminate any stale processes:
+
+   .. code-block:: bash
+
+      pkill -f move_group
+
+#. Relaunch MoveIt and cuMotion one time using the launch commands from :ref:`Set Up MoveIt 2 with cuMotion <isaac_ros_cumotion_moveit_set_up_moveit>` above.
 
 Isaac ROS Troubleshooting
 ~~~~~~~~~~~~~~~~~~~~~~~~~

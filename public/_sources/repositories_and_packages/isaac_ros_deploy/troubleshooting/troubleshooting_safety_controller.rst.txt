@@ -19,9 +19,9 @@ The robot stops accepting policy commands, and the controller manager logs:
 
    Safety emergency latched: <reason>. Requesting emergency controller '<name>'
 
-The reason names the check that failed. For a velocity-threshold detector, it
-reports the joint velocity that exceeded
-``out_of_domain_detection.velocity_threshold.max_velocity`` or
+The reason names the check that failed. For the Unitree G1 the configured
+detector is a velocity threshold, so the reason reports the joint velocity that
+exceeded ``out_of_domain_detection.velocity_threshold.max_velocity`` or
 ``mean_velocity``.
 
 Solution
@@ -43,6 +43,11 @@ documented order: publish a twist command first, and only then raise
    why the robot left the policy's domain before you re-enable it. On hardware,
    put the robot back into a safe pose before relaunching.
 
+For a worked example of this failure on the Unitree G1, including the full
+controller-switch log and how to adjust the threshold when the spike is expected,
+refer to
+:doc:`Unitree G1 Cloud Control </repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index>`.
+
 The Policy Trips the Latch Immediately at Startup
 -------------------------------------------------
 
@@ -60,7 +65,9 @@ policy's first inference in a single step, and the resulting transient can excee
 the velocity threshold.
 
 Publish the first twist command, confirm the controller has activated, and only
-then raise ``blend_ratio``.
+then raise ``blend_ratio``. The
+:doc:`AGILE WBC deployment tutorial <../tutorials/deploy_agile>` gives the exact
+sequence.
 
 The Detector Never Triggers
 ---------------------------
@@ -81,6 +88,6 @@ zero. Leaving the emergency controller empty disables the detector entirely,
 without an error.
 
 Joints matched by ``out_of_domain_detection.velocity_threshold.excluded_joints``
-are zeroed before both checks, so they can never trigger a latch. Exclude joints
-that should not participate in the safety check. Refer to
+are zeroed before both checks, so they can never trigger a latch. The G1
+configuration excludes the hand joints for this reason. Refer to
 :doc:`Safety Controller <../concepts/safety>` for every parameter and its default.

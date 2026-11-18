@@ -6,4 +6,4 @@ Tools for inspecting and validating data sent through graphs containing Isaac RO
 
 ## Latest
 
-Update 2026-09-21: Compatibility and integration updates for the Isaac ROS 5.0.0 release
+Update 2026-11-16: Restored source release of the MCAP-to-LeRobot converter for the GR00T reference architecture

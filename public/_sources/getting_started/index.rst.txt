@@ -225,8 +225,24 @@ Create a Workspace
          * - ``ros_eng``
            - Shared ROS / Isaac ROS engineering tooling. Recommended baseline
              for monorepo development.
+         * - ``gr00t_workflow``
+           - GR00T and Unitree G1 development. Pre-caches dependencies for
+             ``isaac_ros_deploy``, ``isaac_ros_robots``, 
+             ``isaac_ros_learned_policies``, and ``isaac_ros_physical_ai`` 
+             packages
 
-      Add the layers you need to ``additional_image_keys``.
+      Add the layers you need to ``additional_image_keys``. For example, for
+      GR00T and Unitree G1 development:
+
+      .. code:: yaml
+
+         version: 2
+
+         docker:
+           image:
+             additional_image_keys:
+               - ros_eng
+               - gr00t_workflow
 
       See :ref:`concepts/dev_env/index:Docker Mode Configuration` for the
       configuration schema and :ref:`Custom Docker Image Layers
@@ -545,10 +561,12 @@ Optionally, these demos can also be integrated with external data sources, inclu
    - :doc:`StereoLabs ZED <sensors/zed_setup>`
    - :doc:`Leopard Imaging Eagle <sensors/eagle_setup>`
    - :doc:`Leopard Imaging Hawk <sensors/hawk_setup>`
+   - :doc:`Sensing S56C and SHF3L <sensors/sensing_thor_setup>`
 
-   Calibrate your cameras depending on your type of camera and the object it is on:
+   Before using your own camera, calibrate it and configure its driver to publish
+   accurate ``CameraInfo`` messages. For cameras mounted on robots, see the
+   extrinsic calibration guides:
 
-   - :doc:`Monocular Camera <sensors/camera_calibration>`
    - :doc:`Stereo Camera on Mobile Robot <sensors/amr_extrinsic_calibration>`
 
 .. dropdown:: Isaac Sim
@@ -585,14 +603,13 @@ Optionally, these demos can also be integrated with external data sources, inclu
 
       .. note::
 
-         These tutorials were last validated with `Isaac Sim 6.0 <https://docs.isaacsim.omniverse.nvidia.com/6.0.0/overview/release_notes.html>`__ (recommended). They are also compatible with `Isaac Sim 5.0 <https://docs.isaacsim.omniverse.nvidia.com/5.0.0/overview/release_notes.html>`__ and `Isaac Sim 5.1 <https://docs.isaacsim.omniverse.nvidia.com/5.1.0/overview/release_notes.html>`__ releases.
+         These tutorials were last validated with `Isaac Sim 6.0 <https://docs.isaacsim.omniverse.nvidia.com/6.0.0/overview/release_notes.html>`__ (recommended). They are also compatible with Isaac Sim 5.0 and `Isaac Sim 5.1 <https://docs.isaacsim.omniverse.nvidia.com/5.1.0/overview/release_notes.html>`__ releases.
 
       -  :doc:`Tutorial for AprilTag Detection with Isaac Sim </concepts/fiducials/apriltag/tutorial_isaac_sim>`
       -  :doc:`Tutorial for Visual SLAM with Isaac Sim </concepts/visual_slam/cuvslam/tutorial_isaac_sim>`
       -  :doc:`Tutorial for DNN Object Detection with Isaac Sim </concepts/object_detection/detectnet/tutorial_isaac_sim>`
       -  :doc:`Tutorial for SGM Stereo Disparity with Isaac Sim </concepts/stereo_depth/sgm/tutorial_isaac_sim>`
       -  :doc:`Tutorial for DNN Stereo Depth Estimation with Isaac Sim </concepts/stereo_depth/ess/tutorial_isaac_sim>`
-      -  :doc:`Tutorial for Occupancy Grid Localizer with Isaac Sim </concepts/localization/lidar/tutorial_isaac_sim>`
       -  :doc:`Tutorial for DNN Image Segmentation with Isaac Sim </concepts/segmentation/unet/tutorial_isaac_sim>`
       -  :doc:`Tutorial for Isaac ROS Mission Client </repositories_and_packages/isaac_ros_cloud_control/isaac_ros_mission_client/isaac_ros_mission_client>`
       -  :doc:`Tutorial for RT-DETR with Isaac Sim </concepts/object_detection/rtdetr/tutorial_isaac_sim>`

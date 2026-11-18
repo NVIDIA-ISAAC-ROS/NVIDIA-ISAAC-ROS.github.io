@@ -1,0 +1,652 @@
+===============
+Getting Started
+===============
+
+Isaac ROS is a collection of NVIDIA® CUDA®-accelerated computing packages and AI models designed to streamline and expedite the development of advanced AI robotics applications.
+
+NVIDIA Isaac ROS is built on open-source ROS 2. Through Isaac ROS, developers in the ROS community can take advantage of NVIDIA-accelerated libraries and AI models to fast track their AI robot development and deployment workflows.
+
+.. conditional_render:: internal
+
+   .. important::
+
+      NVIDIA internal users developing Isaac ROS packages from the GitLab monorepo should use
+      the :ref:`internal monorepo setup <isaac-ros-internal-monorepo-setup>`
+      below instead of the public multi-repository setup flow.
+
+System Requirements
+-------------------
+
+Supported Platforms
+~~~~~~~~~~~~~~~~~~~
+
+The platforms defined in this table are the only hardware and software combinations that Isaac ROS tests and officially supports.
+
+Users may be able to rely on backward and forward compatibility utilities like ``cuda-compat`` to use Isaac ROS on other platform versions.
+
+.. include:: /_snippets/supported_platforms_table.rst
+
+ROS Support
+~~~~~~~~~~~
+
+All Isaac ROS packages are designed and tested to be compatible with `ROS 2 :ir_ros_distro:`<title>` <https://docs.ros.org/en/:ir_ros_distro:/index.html>`__.
+
+When using Virtual Environment or Bare Metal mode, install ROS 2 Lyrical and its development
+tools by following the :doc:`Isaac ROS Buildfarm instructions <isaac_ros_buildfarm_cdn>`.
+
+Initialize Compute
+------------------
+
+.. tab-set::
+   .. tab-item:: x86 Platforms
+      :sync: x86
+
+      #. Install the latest NVIDIA GPU Driver using the `official instructions <https://ubuntu.com/server/docs/how-to/graphics/install-nvidia-drivers/>`__.
+
+      #. Verify the NVIDIA GPU Driver is installed correctly:
+
+         .. code:: bash
+
+            nvidia-smi
+
+         Confirm that all relevant fields satisfy the :ref:`requirements <getting_started/index:System Requirements>`.
+
+         - Driver Version
+         - CUDA Version
+         - GPU Memory
+
+   .. tab-item:: Jetson Platforms
+      :sync: jetson
+
+      .. tab-set::
+
+         .. tab-item:: Jetson AGX Thor
+            :sync: thor
+
+            #. Complete the `Jetson AGX Thor Quick Start Guide <https://docs.nvidia.com/jetson/agx-thor-devkit/user-guide/latest/quick_start.html>`__.
+
+            #. In the JetPack setup guide, complete only the `Jetson AGX Thor Install all components section <https://docs.nvidia.com/jetson/agx-thor-devkit/user-guide/latest/setup_jetpack.html#install-the-whole-jetpack-components>`__.
+
+            #. After boot, confirm that you have installed the correct version of ``Jetpack`` by
+               running the following command. Confirm that the output has the terms
+               ``R39 (release), REVISION: 2.0``.
+
+               .. code:: bash
+
+                  cat /etc/nv_tegra_release
+
+            #. Set the power mode to ``MAXN`` using the `Jetson Thor guide <https://docs.nvidia.com/jetson/archives/:ir_l4t_version:/DeveloperGuide/SD/PlatformPowerAndPerformance/JetsonThor.html#nvpmodel-gui>`__.
+
+            #. Set the GPU and CPU clock speeds to max using the `Jetson Thor guide <https://docs.nvidia.com/jetson/archives/:ir_l4t_version:/DeveloperGuide/SD/PlatformPowerAndPerformance/JetsonThor.html#maximizing-jetson-thor-performance-only>`__.
+
+            #. Consider the following recommendations for a better experience:
+
+               - :doc:`Jetson Storage Setup </getting_started/compute/jetson_storage>`
+               - :doc:`Preempt Setup </getting_started/compute/preempt_setup>`
+
+         .. tab-item:: Jetson AGX Orin
+            :sync: orin
+
+            #. Complete the `Jetson AGX Orin Quick Start Guide <https://docs.nvidia.com/jetson/agx-orin-devkit/user-guide/latest/quick_start.html>`__.
+               Installing the BSP to an NVMe SSD is recommended when using
+               :ref:`Virtual Environment or Bare Metal modes <getting_started/index:Select Environment Isolation Mode>`.
+
+            #. In the JetPack setup guide, complete only the `Jetson AGX Orin Install via apt section <https://docs.nvidia.com/jetson/agx-orin-devkit/user-guide/latest/setup_jetpack.html#install-via-apt>`__.
+
+            #. After boot, confirm that you have installed the correct version of ``Jetpack`` by
+               running the following command. Confirm that the output has the terms
+               ``R39 (release), REVISION: 2.0``.
+
+               .. code:: bash
+
+                  cat /etc/nv_tegra_release
+
+            #. Set the power mode to ``MAXN`` using the `Jetson Orin guide <https://docs.nvidia.com/jetson/archives/:ir_l4t_version:/DeveloperGuide/SD/PlatformPowerAndPerformance/JetsonOrinNanoSeriesJetsonOrinNxSeriesAndJetsonAgxOrinSeries.html#nvpmodel-gui>`__.
+
+            #. Set the GPU and CPU clock speeds to max using the `Jetson Orin guide <https://docs.nvidia.com/jetson/archives/:ir_l4t_version:/DeveloperGuide/SD/PlatformPowerAndPerformance/JetsonOrinNanoSeriesJetsonOrinNxSeriesAndJetsonAgxOrinSeries.html#maximizing-jetson-orin-series-performance>`__.
+
+            #. Consider the following recommendations for a better experience:
+
+               - :doc:`Jetson Storage Setup </getting_started/compute/jetson_storage>`
+               - :doc:`Preempt Setup </getting_started/compute/preempt_setup>`
+
+   .. tab-item:: DGX Spark Platforms
+      :sync: dgx_spark
+
+      No additional compute initialization is required for DGX Spark in this section.
+      Continue to :ref:`Create a Workspace <getting_started/index:Create a Workspace>`.
+
+Create a Workspace
+------------------
+
+.. tab-set::
+
+   .. tab-item:: x86 Platforms
+      :sync: x86
+
+      Create a ROS 2 workspace for experimenting with Isaac ROS:
+
+      .. code:: bash
+
+         mkdir -p  ~/workspaces/isaac_ros-dev/src
+         echo 'export ISAAC_ROS_WS="${ISAAC_ROS_WS:-${HOME}/workspaces/isaac_ros-dev/}"' >> ~/.bashrc
+         source ~/.bashrc
+
+   .. tab-item:: Jetson Platforms
+      :sync: jetson
+
+      .. tab-set::
+
+         .. tab-item:: Jetson AGX Thor
+            :sync: thor
+
+            Create a ROS 2 workspace for experimenting with Isaac ROS:
+
+            .. code:: bash
+
+               mkdir -p  ~/workspaces/isaac_ros-dev/src
+               echo 'export ISAAC_ROS_WS="${ISAAC_ROS_WS:-${HOME}/workspaces/isaac_ros-dev/}"' >> ~/.bashrc
+               source ~/.bashrc
+
+         .. tab-item:: Jetson AGX Orin
+            :sync: orin
+
+            If the BSP is installed on eMMC rather than NVMe, install an SSD using the
+            :doc:`Jetson Storage Setup </getting_started/compute/jetson_storage>` instructions,
+            then create the workspace on the SSD:
+
+            .. code:: bash
+
+               mkdir -p  /mnt/ssd/workspaces/isaac_ros-dev/src
+               echo 'export ISAAC_ROS_WS="${ISAAC_ROS_WS:-/mnt/ssd/workspaces/isaac_ros-dev/}"' >> ~/.bashrc
+               source ~/.bashrc
+
+            If the BSP is installed on NVMe, create the workspace in your home directory:
+
+            .. code:: bash
+
+               mkdir -p  ~/workspaces/isaac_ros-dev/src
+               echo 'export ISAAC_ROS_WS="${ISAAC_ROS_WS:-${HOME}/workspaces/isaac_ros-dev/}"' >> ~/.bashrc
+               source ~/.bashrc
+
+   .. tab-item:: DGX Spark Platforms
+      :sync: dgx_spark
+
+      Create a ROS 2 workspace for experimenting with Isaac ROS:
+
+      .. code:: bash
+
+         mkdir -p  ~/workspaces/isaac_ros-dev/src
+         echo 'export ISAAC_ROS_WS="${ISAAC_ROS_WS:-${HOME}/workspaces/isaac_ros-dev/}"' >> ~/.bashrc
+         source ~/.bashrc
+
+.. conditional_render:: internal
+
+   .. _isaac-ros-internal-monorepo-setup:
+
+   .. rubric:: NVIDIA Internal Monorepo Setup
+
+   Use this workflow when developing Isaac ROS packages from the internal GitLab monorepo.
+   The public workflow clones one or more GitHub repositories under ``${ISAAC_ROS_WS}/src``
+   and installs dependencies with ``rosdep``. The internal workflow clones the monorepo
+   once and builds the required packages from source.
+
+   #. Clone the Isaac monorepo:
+
+      .. code:: bash
+
+         mkdir -p ~/workspaces
+         cd ~/workspaces
+         git clone --recurse-submodules ssh://git@gitlab-master.nvidia.com:12051/Isaac/isaac.git
+
+   #. Configure ``ISAAC_ROS_WS`` to point at the monorepo ROS workspace:
+
+      .. code:: bash
+
+         echo 'export ISAAC_ROS_WS="${ISAAC_ROS_WS:-${HOME}/workspaces/isaac/}"' >> ~/.bashrc
+         source ~/.bashrc
+
+   #. Configure any additional Isaac ROS CLI Docker image layers needed for your
+      development workflow:
+
+      .. code:: bash
+
+         mkdir -p ~/.config/isaac-ros-cli
+         ${EDITOR:-vi} ~/.config/isaac-ros-cli/config.yaml
+
+      The internal monorepo provides the following prebuilt image keys for
+      common workflows:
+
+      .. list-table::
+         :header-rows: 1
+
+         * - Image Key
+           - Workflow
+         * - ``ros_eng``
+           - Shared ROS / Isaac ROS engineering tooling. Recommended baseline
+             for monorepo development.
+         * - ``gr00t_workflow``
+           - GR00T and Unitree G1 development. Pre-caches dependencies for
+             ``isaac_ros_deploy``, ``isaac_ros_robots``, 
+             ``isaac_ros_learned_policies``, and ``isaac_ros_physical_ai`` 
+             packages
+
+      Add the layers you need to ``additional_image_keys``. For example, for
+      GR00T and Unitree G1 development:
+
+      .. code:: yaml
+
+         version: 2
+
+         docker:
+           image:
+             additional_image_keys:
+               - ros_eng
+               - gr00t_workflow
+
+      See :ref:`concepts/dev_env/index:Docker Mode Configuration` for the
+      configuration schema and :ref:`Custom Docker Image Layers
+      <custom-docker-image-layers>` for instructions on creating new layers.
+
+   #. If you have multiple clones of the monorepo on the same machine and want a
+      different Docker configuration per clone, use a per-repository config file
+      at ``${ISAAC_ROS_WS}/.isaac-ros-cli/config.yaml``. For example, set a unique
+      Docker container name for each clone:
+
+      .. code:: yaml
+
+         version: 2
+
+         docker:
+           run:
+             container_name: isaac_ros_dev_container_<unique_suffix>
+
+      See :ref:`Isaac ROS CLI Configuration Files <isaac-ros-cli-configuration-files>`
+      for the full configuration layering rules and supported scopes.
+
+   #. Authenticate to the internal Docker image registry:
+
+      .. code:: bash
+
+         docker login gitlab-master.nvidia.com:5005
+
+      Create a personal access token from `GitLab personal access tokens
+      <https://gitlab-master.nvidia.com/-/user_settings/personal_access_tokens>`__
+      by clicking **Add new token** and selecting the ``read_registry`` scope.
+      Use your GitLab username and the token as the Docker login password.
+
+   #. Activate the development environment and build the package you are working on:
+
+      .. code:: bash
+
+         isaac-ros activate --build-local
+         cd ${ISAAC_ROS_WS}
+         colcon build --symlink-install --packages-up-to <package_name>
+         source install/setup.bash
+
+AI Agent Skills for Isaac ROS
+-----------------------------
+
+Isaac ROS ships a catalog of AI agent skills that extend AI coding assistants
+(Claude Code, Cursor, Codex, and other tools in the
+`Agent Skills client showcase <https://agentskills.io/#where-can-i-use-agent-skills>`__)
+with ready-made Isaac workflows — activating the Isaac ROS development
+container, bringing up the Mission Control cloud stack, editing its map or
+fleet, and more.
+
+To find orchestration-level skills, browse the catalog at
+`github.com/nvidia/skills <https://github.com/nvidia/skills>`__ — relevant
+skills are listed under the **Physical AI** category. Install any skill
+you're interested in into your assistant with one command:
+
+.. note::
+
+   ``npx`` ships with Node.js, which is not part of the standard Isaac
+   ROS environment. If ``npx`` isn't already on your ``PATH``, install
+   the current Node.js LTS with:
+
+   .. code:: bash
+
+      which npx || (curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs)
+
+.. code:: bash
+
+   npx skills add nvidia/skills --skill <skill-name> --yes
+
+The catalog follows the open Agent Skills format defined at
+`agentskills.io <https://agentskills.io>`__.
+
+Isaac ROS also publishes Isaac ROS-specific skills from this repository.
+Install any of them with:
+
+.. code:: bash
+
+   :ic_skill_repo:`<isaac-ros>` --skill <skill-name> --yes
+
+Configure Isaac ROS Apt Repository
+----------------------------------
+
+The NVIDIA Isaac ROS Apt Repository hosts the following categories of packages for all users:
+
+- Isaac ROS CLI package for managing Isaac ROS development environments
+- Pre-built Isaac ROS packages for currently-supported platforms
+- Auxiliary packages to improve developer experience or to support a legacy OS
+
+To configure the Isaac ROS Apt Repository, follow the steps below:
+
+#. Set the locale on your host system to UTF-8:
+
+   .. code:: bash
+
+      locale  # check for UTF-8
+
+      sudo apt update && sudo apt install locales
+      sudo locale-gen en_US en_US.UTF-8
+      sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+      export LANG=en_US.UTF-8
+
+      locale  # verify settings
+
+#. Install the dependencies:
+
+   .. code:: bash
+
+      sudo apt update && sudo apt install curl gnupg
+      sudo apt install software-properties-common
+      sudo add-apt-repository universe
+
+#. Source the Isaac ROS Apt Repository:
+
+   Select your platform to see the appropriate APT repository sourcing instructions.
+
+   .. apt_platform_tabs::
+
+.. note::
+
+   This repository provides the Isaac ROS CLI and Isaac ROS packages. Virtual Environment and
+   Bare Metal users configure the separate :doc:`Isaac ROS Buildfarm <isaac_ros_buildfarm_cdn>`
+   repository when they
+   :ref:`initialize Isaac ROS CLI <getting_started/index:Initialize Isaac ROS CLI>`.
+
+Select Environment Isolation Mode
+---------------------------------
+
+Based on your use case, decide on an appropriate level of isolation between Isaac ROS and your host system:
+
+.. tip::
+
+   **Docker** is the recommended option for most users. It provides the highest level of isolation from your host system.
+
+   In Virtual Environment or Bare Metal mode, you may need to remove existing packages from your host system to avoid version conflicts with Isaac ROS and its dependencies.
+
+.. important::
+
+   On Jetson AGX Orin, we recommend placing the root filesystem on an NVMe SSD when
+   using Virtual Environment or Bare Metal modes. These modes install
+   Isaac ROS dependencies, including ML frameworks, on the root filesystem and can
+   exceed the default eMMC capacity.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 25 25 25
+
+   * - Mode
+     - Debian packages
+     - Python ``pip`` packages
+     - Isolation
+   * - **Docker (recommended)**
+     - Installed inside the container (host unaffected)
+     - Installed inside the container (host unaffected)
+     - High (full container isolation)
+   * - Virtual Environment
+     - Installed on host via ``apt``
+     - Installed into Isaac ROS virtual environment (isolated from system Python)
+     - Medium
+   * - Bare Metal
+     - Installed on host via ``apt``
+     - Installed into system Python ``site-packages``
+     - None
+
+This selection will inform subsequent steps in the setup process.
+
+Initialize Isaac ROS CLI
+------------------------
+
+#. Install the Isaac ROS CLI:
+
+   .. code:: bash
+
+      sudo apt-get install isaac-ros-cli
+
+#. Configure the environment isolation mode you selected earlier:
+
+   .. tab-set::
+
+      .. tab-item:: Docker
+         :sync: docker
+
+         #. Complete platform-specific Docker setup:
+
+            .. tab-set::
+
+               .. tab-item:: x86 Platforms
+                  :sync: x86
+
+                  #. Complete the Docker Engine setup using the `official Ubuntu instructions <https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository>`__.
+
+                  #. Install and configure ``nvidia-container-toolkit`` for Docker using the official instructions:
+
+                     - `Install NVIDIA Container Toolkit <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#with-apt-ubuntu-debian>`__
+                     - `Configure Docker runtime <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker>`__
+
+                  #. Add your user to the ``docker`` group:
+
+                     .. code:: bash
+
+                        sudo usermod -aG docker $USER
+                        newgrp docker
+
+               .. tab-item:: Jetson Platforms
+                  :sync: jetson
+
+                  #. Complete the `Jetson AGX Thor Docker Setup guide <https://docs.nvidia.com/jetson/agx-thor-devkit/user-guide/latest/setup_docker.html>`__ or `Jetson AGX Orin Docker Setup guide <https://docs.nvidia.com/jetson/agx-orin-devkit/user-guide/latest/setup_docker.html>`__.
+
+               .. tab-item:: DGX Spark Platforms
+                  :sync: dgx_spark
+
+                  #. Docker and NVIDIA Container Toolkit are already configured on DGX Spark. See the `DGX Spark container runtime documentation <https://docs.nvidia.com/dgx/dgx-spark/nvidia-container-runtime-for-docker.html#installation>`__.
+
+                  #. Add your user to the ``docker`` group:
+
+                     .. code:: bash
+
+                        sudo usermod -aG docker $USER
+                        newgrp docker
+
+         #. Restart Docker:
+
+            .. code:: bash
+
+               sudo systemctl daemon-reload && sudo systemctl restart docker
+
+         #. Run Docker pre-flight checks:
+
+            .. code:: bash
+
+               docker info | grep -E "Runtimes|Default Runtime"
+               docker run --rm hello-world
+               docker run --rm --gpus all ubuntu:24.04 bash -lc 'echo "NVIDIA runtime OK"'
+
+            Confirm that Docker lists available runtime entries, ``hello-world`` exits successfully,
+            and the GPU runtime check prints ``NVIDIA runtime OK``.
+
+         #. Initialize the Isaac ROS CLI:
+
+            .. code:: bash
+
+               sudo isaac-ros init docker
+
+         |
+
+         .. dropdown:: Customizing the Docker Image
+
+               The default Isaac ROS Docker image contains a core set of dependencies for basic Isaac ROS usage.
+
+               To add additional dependencies (e.g., RealSense camera support), refer to the :ref:`Docker Mode Configuration <concepts/dev_env/index:Docker Mode Configuration>` documentation.
+
+      .. tab-item:: Virtual Environment
+         :sync: venv
+
+         #. Configure your host environment for Isaac ROS:
+
+            .. include:: _snippets/host_env_setup.rst
+
+         #. Initialize the Isaac ROS CLI:
+
+            .. code:: bash
+
+               sudo isaac-ros init venv
+
+      .. tab-item:: Bare Metal
+         :sync: baremetal
+
+         .. caution::
+
+            The ``baremetal`` mode is only recommended for advanced users.
+
+            This mode installs Isaac ROS packages and their dependencies into your system Python environment.
+
+            Without proper care, this has the potential to **break your host system**.
+
+         #. Configure your host environment for Isaac ROS:
+
+            .. include:: _snippets/host_env_setup.rst
+
+         #. Initialize the Isaac ROS CLI:
+
+            .. code:: bash
+
+               sudo isaac-ros init baremetal
+
+            Acknowledge the prompt, then confirm to continue.
+
+            .. dropdown:: Unattended/Non-Interactive Installation
+
+               In some cases, it may be desirable to skip the prompt when initializing the ``baremetal`` mode.
+
+               To perform a non-interactive installation, use the ``--yes`` flag:
+
+               .. code:: bash
+
+                  sudo isaac-ros init baremetal --yes
+
+.. dropdown:: Configuring the Isaac ROS Development Environment
+
+   The Isaac ROS CLI uses layered configuration files to manage settings across all isolation modes.
+
+   To use these configuration files and customize your development environment, refer to the :doc:`Isaac ROS Development Environment </concepts/dev_env/index>` page.
+
+Integrate External Data Sources (Optional)
+------------------------------------------
+
+Many Isaac ROS demos include pre-recorded rosbag data to help you get started as quickly as possible.
+
+Optionally, these demos can also be integrated with external data sources, including cameras and the Isaac Sim simulation platform.
+
+.. dropdown:: Sensors
+
+   Isaac ROS provides setup instructions for specific camera models from the following product lines:
+
+   - :doc:`RealSense <sensors/realsense_setup>`
+   - :doc:`StereoLabs ZED <sensors/zed_setup>`
+   - :doc:`Leopard Imaging Eagle <sensors/eagle_setup>`
+   - :doc:`Leopard Imaging Hawk <sensors/hawk_setup>`
+   - :doc:`Sensing S56C and SHF3L <sensors/sensing_thor_setup>`
+
+   Before using your own camera, calibrate it and configure its driver to publish
+   accurate ``CameraInfo`` messages. For cameras mounted on robots, see the
+   extrinsic calibration guides:
+
+   - :doc:`Stereo Camera on Mobile Robot <sensors/amr_extrinsic_calibration>`
+
+.. dropdown:: Isaac Sim
+
+   .. _gs_isaac_sim:
+
+   `Isaac Sim <https://developer.nvidia.com/isaac/sim>`__ is NVIDIA's robotics simulation platform powered by Omniverse.
+
+   Isaac Sim can be used to run and test the ROS 2 applications. There are two ways we can configure the system:
+
+   - **Software in the Loop (SIL)** refers to a configuration where the software being tested is not running on the target hardware platform. For example, Isaac ROS packages being tested on x86 before deployment on a Jetson device is SIL.
+
+   - **Hardware in the Loop (HIL)** refers to a configuration where the software is being tested on the target hardware platform. For example, Isaac ROS packages being tested on a Jetson device before deployment is HIL.
+
+   In both the configurations, Isaac Sim runs on a ``x86_64`` machine providing sensor data and world information.
+
+   .. tab-set::
+
+      .. tab-item:: Isaac Sim 6.0
+
+         .. include:: isaac_sim/_snippets/isaac_sim_6_x.rst
+
+      .. tab-item:: Isaac Sim 5.0 and Isaac Sim 5.1
+
+         .. include:: isaac_sim/_snippets/isaac_sim_5_x.rst
+
+   .. dropdown:: Isaac Sim Tutorial Links
+
+      .. _gs_isaac_sim_tutorial_links:
+
+      Isaac ROS includes a number of tutorials that demonstrate integration with Isaac Sim.
+
+      Each of these links takes you to a tutorial that is listed under :doc:`Repositories and Packages </repositories_and_packages/index>`. They are linked here as a reference and to help you find them faster.
+
+      .. note::
+
+         These tutorials were last validated with `Isaac Sim 6.0 <https://docs.isaacsim.omniverse.nvidia.com/6.0.0/overview/release_notes.html>`__ (recommended). They are also compatible with Isaac Sim 5.0 and `Isaac Sim 5.1 <https://docs.isaacsim.omniverse.nvidia.com/5.1.0/overview/release_notes.html>`__ releases.
+
+      -  :doc:`Tutorial for AprilTag Detection with Isaac Sim </concepts/fiducials/apriltag/tutorial_isaac_sim>`
+      -  :doc:`Tutorial for Visual SLAM with Isaac Sim </concepts/visual_slam/cuvslam/tutorial_isaac_sim>`
+      -  :doc:`Tutorial for DNN Object Detection with Isaac Sim </concepts/object_detection/detectnet/tutorial_isaac_sim>`
+      -  :doc:`Tutorial for SGM Stereo Disparity with Isaac Sim </concepts/stereo_depth/sgm/tutorial_isaac_sim>`
+      -  :doc:`Tutorial for DNN Stereo Depth Estimation with Isaac Sim </concepts/stereo_depth/ess/tutorial_isaac_sim>`
+      -  :doc:`Tutorial for DNN Image Segmentation with Isaac Sim </concepts/segmentation/unet/tutorial_isaac_sim>`
+      -  :doc:`Tutorial for Isaac ROS Mission Client </repositories_and_packages/isaac_ros_cloud_control/isaac_ros_mission_client/isaac_ros_mission_client>`
+      -  :doc:`Tutorial for RT-DETR with Isaac Sim </concepts/object_detection/rtdetr/tutorial_isaac_sim>`
+      -  :doc:`Tutorial for FoundationPose with Isaac Sim </concepts/pose_estimation/foundationpose/tutorial_isaac_sim>`
+      -  :doc:`Tutorial for cuMotion MoveIt Plugin with Isaac Sim </concepts/manipulation/cumotion_moveit/tutorial_isaac_sim>`
+
+Run an Isaac ROS Demo
+---------------------
+
+You're now ready to run an Isaac ROS demo!
+
+Navigating the Isaac ROS Site
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Isaac ROS offers a collection of GitHub **Repositories**, each focused on a general robotics problem area. Every repository has its own page under the :doc:`repository index </repositories_and_packages/index>`.
+
+- Isaac ROS repositories are further organized into ROS 2 **Packages**, each focused on a specific solution implementation or use case. Each package has its own page under the repository-level page.
+
+- Most packages contain a **Quickstart**, which is a self-contained example that allows you to quickly test out the package's core functionality. Quickstarts are located on each package's page.
+
+- Additionally, many packages contain more advanced **Tutorials** that dive deeper into the package's functionality. When available, tutorials are listed below the Quickstart on each package's page.
+
+- Package pages also contain **Troubleshooting** and **API** sections to help you use Isaac ROS in your own applications.
+
+- Robotics fundamentals, NVIDIA technology, and other **Concepts** are explained under the :doc:`concepts index </concepts/index>`.
+
+Browse the available Isaac ROS :doc:`Repositories and Packages </repositories_and_packages/index>` to find your first quickstart.
+
+Troubleshooting
+---------------
+
+See the :doc:`troubleshooting </troubleshooting/dev_env>` section for help with setting up your development environment.
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   compute/index
+   sensors/index
+   isaac_ros_buildfarm_cdn

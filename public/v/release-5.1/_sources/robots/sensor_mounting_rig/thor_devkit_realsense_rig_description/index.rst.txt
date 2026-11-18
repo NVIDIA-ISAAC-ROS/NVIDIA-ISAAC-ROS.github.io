@@ -1,0 +1,124 @@
+=========================================
+``thor_devkit_realsense_rig_description``
+=========================================
+
+:ir_github:`<sensor_mounting_rig> <thor_devkit_realsense_rig_description>`
+
+Overview
+--------
+
+The ``thor_devkit_realsense_rig_description`` package provides the URDF description and mesh for the rig that mounts three Intel RealSense cameras (D435/D455) on the Jetson Thor Developer Kit at known nominal positions.
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+Build ``thor_devkit_realsense_rig_description``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-thor-devkit-realsense-rig-description
+
+   .. tab:: Build from Source
+
+      #. Clone the ``sensor_mounting_rig`` repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<sensor_mounting_rig>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/sensor_mounting_rig/thor_devkit_realsense_rig_description --ignore-src -y
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --symlink-install --packages-up-to thor_devkit_realsense_rig_description
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the
+            Isaac ROS environment. Because this package was built from source, the
+            enclosing workspace must be sourced for ROS to be able to find the
+            package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+The nominal camera positions on the rig are described by these xacro files:
+
+- :ir_repo:`thor_devkit_realsense_rig_d455.urdf.xacro <sensor_mounting_rig> <thor_devkit_realsense_rig_description/urdf/thor_devkit_realsense_rig_d455.urdf.xacro>`
+- :ir_repo:`thor_devkit_realsense_rig_d435.urdf.xacro <sensor_mounting_rig> <thor_devkit_realsense_rig_description/urdf/thor_devkit_realsense_rig_d435.urdf.xacro>`
+
+Continuing inside the Isaac ROS environment, load one of them and publish the camera relative positions and orientations by running the :ir_repo:`thor_devkit_realsense_rig_description.launch.py <sensor_mounting_rig> <thor_devkit_realsense_rig_description/launch/thor_devkit_realsense_rig_description.launch.py>` launch file:
+
+.. code:: bash
+
+   ros2 launch thor_devkit_realsense_rig_description thor_devkit_realsense_rig_description.launch.py camera_model:=d455
+
+Launch Arguments
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Type
+     - Default
+     - Description
+
+   * - ``camera_model``
+     - ``string``
+     - ``d455``
+     - RealSense model that selects the nominal rig description. One of ``d435`` or ``d455``.
+
+   * - ``urdf_override_file``
+     - ``string``
+     - ``None``
+     - Path to a URDF file that replaces the nominal rig description.
+
+   * - ``calibrated_urdf_file``
+     - ``string``
+     - ``None``
+     - Path to a calibrated URDF file that overrides the nominal camera poses.
+
+For instructions on building the rig itself, refer to the :doc:`assembly guide </robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly>`.

@@ -1,0 +1,248 @@
+=================
+Safety Controller
+=================
+
+Isaac ROS Deploy includes a ROS 2 Control plugin named ``SafetyController``.
+It sits between an upstream controller and hardware and provides two command
+handling mechanisms:
+
+1. **Command blending**: Blends commands to gradually enable a policy using ``blend_ratio``
+   (0.0 to 1.0).
+2. **Out-of-domain detection**: Compares joint-state velocities with configured
+   thresholds and can request an emergency-controller switch.
+
+.. warning::
+
+   The Safety Controller is meant as a useful tool, but it does not qualify as a
+   functional-safety-certified architecture. Do not rely on it as your sole safety
+   mechanism in safety-critical deployments.
+
+Integration with ROS 2 Control
+------------------------------
+
+The safety controller is a ``ros2_control`` controller that can be chained
+(``ChainableControllerInterface``). Like any controller in a chain, it takes
+reference interfaces as its inputs and exposes command interfaces as its outputs.
+This lets it sit in the middle of a controller chain: an upstream controller writes
+the safety controller's reference interfaces, the safety controller post-processes
+those values, and it writes the result to the hardware command interfaces.
+
+For the full list of ROS 2 control plugins shipped by Isaac ROS Deploy, refer to
+the :doc:`package reference <../reference/package_reference>`.
+
+Because the safety controller's purpose is to post-process the commands produced by
+an upstream controller, it exposes its reference interfaces with a ``_raw`` suffix. The
+upstream controller writes its raw, unprocessed command into the ``*_raw`` reference
+interface, and the safety controller then applies its processing (command blending and
+out-of-domain detection) before writing the final hardware command interface.
+
+Because it chains behind any upstream controller, the safety controller works with both
+LEAPP runtimes:
+
+- With the :doc:`ROS2 Control LEAPP Runtime <ros2_control_runtime>`, chain it directly
+  behind the inference controller:
+
+  .. code-block:: text
+
+     inference_controller → safety_controller → hardware
+
+- With the :doc:`ROS2 Node LEAPP Runtime <ros2_nodes_runtime>`, chain it behind a
+  ``ForwardJointCommandController``. That forwarding controller receives the policy
+  commands over a ROS topic, which the inference graph publishes:
+
+  .. code-block:: text
+
+     inference_graph node → command topic → ForwardJointCommandController
+         → safety_controller → hardware
+
+Command Blending Strategies
+---------------------------
+
+Command blending lets an operator increase the policy command gradually instead
+of enabling it all at once.
+
+This is especially useful the first time a policy is deployed, when an operator is not
+yet sure it will behave as expected.
+
+Command blending is controlled by the ``blend_ratio`` parameter, which sets how much
+the policy commands influence the robot:
+
+- At ``blend_ratio = 0.0``: the policy is completely disabled and inactive. With
+  ``interpolate``, each joint targets its configured ``default_position`` when present,
+  otherwise its measured activation pose.
+- At ``blend_ratio = 1.0``: the policy is fully activated. With ``interpolate``, the
+  target is the policy position command, and ``no_post_processing`` passes the command
+  through.
+
+Two blending strategies are available:
+
+``interpolate`` (default)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use this strategy for hardware bring-up and when you need per-joint slew limits.
+
+This strategy performs a velocity-limited slew from a per-joint base pose toward the
+blended command. The base pose is the configured ``default_position`` when present,
+otherwise the measured activation pose. Each cycle the target is
+
+.. code-block:: text
+
+   target = base_position + (command - base_position) * blend_ratio
+
+and the integrated reference is moved toward it, capped per joint at ``max_velocity * dt``:
+
+.. code-block:: text
+
+   output = reference + clamp(target - reference, -max_velocity * dt, +max_velocity * dt)
+
+At ``blend_ratio = 0``, a joint without ``default_position`` holds its activation pose
+regardless of what the policy commands. A joint with ``default_position`` instead slews from
+its current position toward that configured home pose. The per-joint cap is configured via
+``interpolate_max_velocity`` (see below). Joints with no configured cap slew without limit.
+
+``no_post_processing``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use this strategy in simulation, or when an independent downstream actuation layer
+provides the command limits required by the application.
+
+The name refers to the absence of the ``interpolate`` strategy's velocity and slew
+post-processing, not to the blend ratio. This strategy still applies blend-ratio
+interpolation, so you can ramp a policy in as usual, but it does not limit how fast the
+command changes:
+
+.. code-block:: text
+
+   output = current + (command - current) * blend_ratio
+
+Velocity-threshold out-of-domain detection, when enabled, still runs before blending.
+
+Out-of-Domain Detection
+------------------------
+
+Out-of-domain detection triggers a fallback or emergency controller when a configured
+check fails. It runs before blending. A failed check latches an emergency and requests
+that the controller manager switch to the configured emergency controller. The failed
+cycle does not write new commands to hardware.
+
+We currently provide a single out-of-domain detection implementation, based on velocity
+thresholds.
+
+Velocity Threshold
+~~~~~~~~~~~~~~~~~~
+
+This detector triggers when the maximum or mean velocity of the selected joints exceeds a
+configured threshold. Excluded joints are replaced with zero before both checks:
+
+- ``max_velocity``: fails when any joint exceeds this threshold in rad/s.
+- ``mean_velocity``: fails when the mean across all configured joints, with excluded joints
+  zeroed, exceeds this threshold in rad/s.
+
+The detector is enabled only when ``emergency_controller`` is nonempty and either velocity
+threshold is greater than zero.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Default
+     - Description
+   * - ``out_of_domain_detection.velocity_threshold.max_velocity``
+     - ``double``
+     - ``0.0``
+     - Maximum absolute joint velocity in rad/s. A value less than or equal to zero disables
+       this check.
+   * - ``out_of_domain_detection.velocity_threshold.mean_velocity``
+     - ``double``
+     - ``0.0``
+     - Mean absolute joint velocity in rad/s across all configured joints after excluded
+       joints are zeroed. A value less than or equal to zero disables this check.
+   * - ``out_of_domain_detection.velocity_threshold.excluded_joints``
+     - ``string[]``
+     - ``[]``
+     - Regular expressions that fully match joint names to exclude. Matched joints are set to
+       zero before both velocity checks.
+   * - ``out_of_domain_detection.emergency_controller``
+     - ``string``
+     - ``\"\"``
+     - Controller to activate through ``/controller_manager/switch_controller`` after an OOD
+       failure. An empty value disables the detector.
+   * - ``out_of_domain_detection.switch_timeout``
+     - ``double``
+     - ``2.0``
+     - Timeout, in seconds, supplied to the controller-manager switch request. A zero,
+       negative, or not finite value sends a zero timeout to the service.
+   * - ``out_of_domain_detection.deactivate_controllers``
+     - ``string[]``
+     - ``[]``
+     - Controllers to deactivate in the emergency switch request. With this list empty, the
+       request uses ``FORCE_AUTO``. Otherwise, it uses ``BEST_EFFORT``.
+
+See the Unitree G1 controller configuration
+(:ir_repo:`controller_manager.yaml <isaac_ros_robots> <unitree_g1/unitree_g1_bringup/config/controller_manager.yaml>`)
+for an example of this detector. It enables the detector with a 35.0 rad/s maximum threshold
+and a 10.0 rad/s mean threshold, excludes hand joints, and switches to ``freeze_controller``:
+
+.. code-block:: yaml
+
+   out_of_domain_detection:
+     velocity_threshold:
+       mean_velocity: 10.0
+       max_velocity: 35.0
+       excluded_joints:
+         - "left_hand_.*"
+         - "right_hand_.*"
+     emergency_controller: "freeze_controller"
+     switch_timeout: 2.0
+
+Parameters
+----------
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Type
+     - Default
+     - Description
+   * - ``blend_strategy``
+     - ``string``
+     - ``interpolate``
+     - Blending strategy: ``interpolate`` or ``no_post_processing``.
+   * - ``blend_ratio``
+     - ``double``
+     - ``0.0``
+     - Blending value (0.0 = policy disabled, 1.0 = policy fully enabled). Dynamically
+       adjustable via ``rqt_reconfigure`` or ``ros2 param set``.
+   * - ``max_blend_ratio_speed``
+     - ``double``
+     - ``1.0``
+     - Maximum rate of change for ``blend_ratio`` (units/second). Controls how fast
+       ``blend_ratio`` ramps toward its target.
+   * - ``interpolate_max_velocity``
+     - ``map<string, double>``
+     - ``{}``
+     - Per-joint velocity cap in rad/s for the ``interpolate`` strategy, given as a
+       regex-to-value map (same mechanism as ``kp``/``kd``). Allowlist semantics: only
+       joints matched here are clamped. Any joint left unmatched is unconstrained. A
+       non-positive value also leaves the joint unconstrained (a negative value logs a
+       warning, since it usually signals a config mistake).
+   * - ``default_position``
+     - ``map<string, double>``
+     - Not configured
+     - Optional per-joint home pose for ``interpolate``, given as a regex-to-value map.
+       At a zero blend ratio, matched joints slew toward this pose. Unmatched joints hold
+       their measured activation pose.
+   * - ``default_kp``
+     - ``double``
+     - ``0.0``
+     - Default joint stiffness for unclaimed command interfaces.
+   * - ``default_kd``
+     - ``double``
+     - ``0.0``
+     - Default joint damping for unclaimed command interfaces.
+   * - ``joints``
+     - ``string[]``
+     - ``[]``
+     - List of joints to control (required).

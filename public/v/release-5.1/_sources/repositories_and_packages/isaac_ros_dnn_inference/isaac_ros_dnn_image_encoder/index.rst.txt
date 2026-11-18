@@ -1,0 +1,225 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_dnn_inference> <isaac_ros_dnn_image_encoder>`
+
+.. note::
+
+   This package is launch-only. We recommend including only the preprocessing nodes required by your application.
+   Examples are available in the :ir_repo:`Isaac ROS RT-DETR launch files <isaac_ros_object_detection> <isaac_ros_rtdetr/launch>`.
+   For convenience, ``dnn_image_encoder.launch.py`` combines the nodes commonly used in an image-preprocessing
+   pipeline.
+
+Using the Launch Graph
+----------------------
+
+``dnn_image_encoder.launch.py`` represents a typical sequence of image-preprocessing operations used by many vision
+networks. For example, one model may require resizing and normalization, whereas another may require only resizing.
+This tutorial shows how to include the launch graph in your own launch description.
+
+  #. Import the ``launch`` libraries required to include ``dnn_image_encoder.launch.py``:
+
+     .. code:: python
+
+        from ament_index_python.packages import get_package_share_directory
+        from launch.actions import IncludeLaunchDescription
+        from launch.launch_description_sources import PythonLaunchDescriptionSource
+
+  #. Include the launch graph and configure its inputs, output, namespace, and component-container behavior:
+
+     .. code:: python
+
+        encoder_dir = get_package_share_directory('isaac_ros_dnn_image_encoder')
+        encoder_launch = IncludeLaunchDescription(
+          PythonLaunchDescriptionSource(
+            [os.path.join(encoder_dir, 'launch', 'dnn_image_encoder.launch.py')]
+          ),
+          launch_arguments={
+            'input_image_width': input_image_width,
+            'input_image_height': input_image_height,
+            'network_image_width': network_image_width,
+            'network_image_height': network_image_height,
+            'image_mean': encoder_image_mean,
+            'image_stddev': encoder_image_stddev,
+            'attach_to_shared_component_container': 'True',
+            'component_container_name': 'my_container',
+            'dnn_image_encoder_namespace': 'my_encoder_namespace',
+            'image_input_topic': '/image',
+            'camera_info_input_topic': '/camera_info',
+            'tensor_output_topic': '/tensor_pub',
+          }.items(),
+        )
+
+    The leading ``/`` in each topic name ensures that the topic is not part of the configured namespace. This example
+    attaches the graph to a shared component container named ``my_container``. Pass the container's global name to
+    ``component_container_name``; otherwise, the launch will silently fail.
+
+  #. Add the included launch description to your launch description:
+
+     .. code:: python
+
+        final_launch_container = launch_args + [rclcpp_container, encoder_launch]
+        return LaunchDescription(final_launch_container)
+
+.. note::
+
+   The launch graph expects to subscribe to a CameraInfo topic in addition to an Image topic.
+
+API
+----
+
+``dnn_image_encoder.launch.py``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Launch Arguments
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Argument
+     - Type
+     - Default
+     - Description
+
+   * - ``input_image_width``
+     - ``uint16_t``
+     - ``0``
+     - The input image width.
+
+   * - ``input_image_height``
+     - ``uint16_t``
+     - ``0``
+     - The input image height.
+
+   * - ``network_image_width``
+     - ``uint16_t``
+     - ``0``
+     - The image width that the network expects. This will be used to crop the input ``image`` width.
+
+   * - ``network_image_height``
+     - ``uint16_t``
+     - ``0``
+     - The image height that the network expects. This will be used to crop the input ``image`` height.
+
+   * - ``image_mean``
+     - ``double list``
+     - ``[0.5, 0.5, 0.5]``
+     - The mean of the images per channel that will be used for normalization.
+
+   * - ``image_stddev``
+     - ``double list``
+     - ``[0.5, 0.5, 0.5]``
+     - The standard deviation of the images per channel that will be used for normalization.
+
+   * - ``num_blocks``
+     - ``int``
+     - ``40``
+     - The number of pre-allocated GPU memory blocks
+
+   * - ``enable_padding``
+     - ``bool``
+     - ``true``
+     - Whether to enable padding or not
+
+   * - ``keep_aspect_ratio``
+     - ``bool``
+     - ``true``
+     - Whether to maintain the aspect ratio or not while resizing
+
+   * - ``crop_mode``
+     - ``string``
+     - ``CENTER``
+     - The crop mode to crop the image using
+
+   * - ``encoding_desired``
+     - ``string``
+     - ``rgb8``
+     - The tensor image encoding.
+
+   * - ``input_encoding``
+     - ``string``
+     - ``rgb8``
+     - The desired input image encoding.
+  
+   * - ``tensor_name``
+     - ``string``
+     - ``output_tensor``
+     - The tensor name of the output of the image encoder.
+
+   * - ``final_tensor_name``
+     - ``string``
+     - ``output_tensor``
+     - Alias for ``tensor_name``.
+
+   * - ``dnn_image_encoder_namespace``
+     - ``string``
+     - ``dnn_image_encoder``
+     - The namespace to launch the DNN image encoder under
+
+Launch Configuration Arguments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+
+   * - Launch Configuration
+     - Type
+     - Default
+     - Description
+
+   * - ``image_input_topic``
+     - ``string``
+     - ``image``
+     - The input image topic that the encoder will subscribe to. By default, this will
+       be under the ``dnn_image_encoder_namespace`` unless if a global topic name is given.
+
+   * - ``camera_info_input_topic``
+     - ``string``
+     - ``camera_info``
+     - The input camera_info topic that the encoder will subscribe to. By default, this will
+       be under the ``dnn_image_encoder_namespace`` unless if a global topic name is given.
+
+   * - ``tensor_output_topic``
+     - ``string``
+     - ``encoded_tensor``
+     - The output tensor topic that the encoder will publish to. By default, this will
+       be under the ``dnn_image_encoder_namespace`` unless if a global topic name is given.
+
+   * - ``attach_to_shared_component_container``
+     - ``bool``
+     - ``false``
+     - Whether to attach to an existing shared container or not
+
+   * - ``component_container_name``
+     - ``string``
+     - ``dnn_image_encoder_container``
+     - If ``attach_to_shared_component_container`` is true, the encoder will attach
+       to a shared container with this name. Otherwise, it will launch a container
+       with this name.
+
+Included Nodes
+^^^^^^^^^^^^^^
+
+
+.. list-table::
+   :header-rows: 1
+
+   * - Component Name
+
+   * - :doc:`ResizeNode </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>`
+
+   * - :doc:`CropNode </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>`
+
+   * - :doc:`ImageFormatConverterNode </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>`
+
+   * - :doc:`ImageToTensorNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_proc/index>`
+
+   * - :doc:`ImageTensorNormalizeNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_proc/index>`
+
+   * - :doc:`InterleavedToPlanarNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_proc/index>`
+
+   * - :doc:`ReshapeNode </repositories_and_packages/isaac_ros_dnn_inference/isaac_ros_tensor_proc/index>`
+
+.. |package_name| replace:: ``isaac_ros_dnn_image_encoder``
