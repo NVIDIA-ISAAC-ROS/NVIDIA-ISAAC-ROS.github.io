@@ -1,0 +1,1561 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_sipl_camera> <isaac_ros_sipl_camera>`
+
+Quickstart
+----------
+
+Set Up Development Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: /_snippets/set_up_dev_env.rst
+
+The SIPL headers are expected to be installed on the host with NVIDIA SDK Manager when flashing the JetPack BSP.
+When installing with SDK Manager, select all available optional packages.
+For installation instructions, see the `JetPack Installation Guide <https://developer.nvidia.com/embedded/jetpack/downloads>`__.
+
+If JetPack was installed or updated using an ISO image or with OTA Debian updates, you also need to install or update the SIPL and Multimedia APIs as follows:
+
+.. code:: bash
+
+   wget https://developer.nvidia.com/downloads/embedded/L4T/:ir_l4t_download_release:/release/Jetson_SIPL_API_:ir_l4t_version:`<upper>`.1_aarch64.tbz2
+   wget https://developer.nvidia.com/downloads/embedded/L4T/:ir_l4t_download_release:/release/Jetson_Multimedia_API_:ir_l4t_version:`<upper>`.1_aarch64.tbz2
+   sudo tar xjf Jetson_SIPL_API_:ir_l4t_version:`<upper>`.1_aarch64.tbz2 -C /
+   sudo tar xjf Jetson_Multimedia_API_:ir_l4t_version:`<upper>`.1_aarch64.tbz2 -C /
+
+JetPack 7.2 requires the ``isaac_ros_sipl_camera`` package from Isaac ROS 4.6 or later. For JetPack 7.1, Isaac ROS 4.3 through 4.5 are compatible.
+
+Supported Cameras
+-----------------
+
+This package provides reference configurations for the following camera setups with SIPL drivers.
+
+Each setup guide describes the supported and verified hardware.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Camera
+      - Transport
+      - Host Setup
+    * - `Leopard Imaging Eagle Stereo Camera <https://leopardimaging.com/product/depth-sensing/stereoscopic-cameras/li-vb1940-stxxx-10gige/li-vb1940-vcl-st80-10gige-120h-poe/>`__
+      - Camera-over-Ethernet (CoE)
+      - :doc:`Eagle Stereo Camera Setup </getting_started/sensors/eagle_setup>`
+    * - `Leopard Imaging Hawk Stereo Camera <https://leopardimaging.com/leopard-imaging-hawk-stereo-cameras/>`__
+      - GMSL2
+      - :doc:`Hawk Stereo Camera Setup </getting_started/sensors/hawk_setup>`
+    * - `Sensing S56C Stereo Camera (VB1940) <https://wiki.sensing-world.com/docs/6_1_Camera/Binocular_Camera/S56>`__
+      - GMSL2
+      - :doc:`Sensing S56C and SHF3L Cameras Setup </getting_started/sensors/sensing_thor_setup>`
+    * - `Sensing SHF3L Camera (GW5) <https://wiki.sensing-world.com/docs/6_1_Camera/Monocular_Camera/SHF3L>`__
+      - GMSL2
+      - :doc:`Sensing S56C and SHF3L Cameras Setup </getting_started/sensors/sensing_thor_setup>`
+
+Build |package_name|
+^^^^^^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Install the prebuilt Debian package:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-isaac-ros-sipl-camera
+
+   .. tab:: Build from Source
+
+      #. Install Git LFS:
+
+         .. code:: bash
+
+            sudo apt-get install -y git-lfs && git lfs install
+
+      #. Clone this repository under ``${ISAAC_ROS_WS}/src``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/src && \
+               git clone :ir_clone:`<isaac_ros_sipl_camera>`
+
+      #. Activate the Isaac ROS environment:
+
+         .. code:: bash
+
+            isaac-ros activate
+
+      #. Use ``rosdep`` to install the package's dependencies:
+
+         :ir_apt:
+
+         .. code:: bash
+
+            rosdep update && rosdep install --from-paths ${ISAAC_ROS_WS}/src/isaac_ros_sipl_camera/isaac_ros_sipl_camera --ignore-src -y
+
+      #. (Optional) Replace the mock calibration files if you have the camera's calibration data. See section on `Camera Calibration Overrides`_ for more details. The configuration uses mock calibration files by default.
+
+      #. Build the package from source:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS} && \
+               colcon build --symlink-install --packages-up-to isaac_ros_sipl_camera --base-paths ${ISAAC_ROS_WS}/src/isaac_ros_sipl_camera/isaac_ros_sipl_camera
+
+      #. Source the ROS workspace:
+
+         .. note::
+
+            Make sure to repeat this step in **every** terminal created inside the Isaac ROS environment.
+
+            Because this package was built from source, the enclosing workspace must be sourced for ROS to be able to find the package's contents.
+
+         .. code:: bash
+
+            source install/setup.bash
+
+Run Launch File
+^^^^^^^^^^^^^^^
+
+.. tabs::
+
+   .. tab:: Monocular Camera
+
+      #. Launch the monocular camera node with default native NV12 output:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_sipl_camera sipl_camera.launch.py
+
+   .. tab:: Eagle Stereo Camera
+
+      #. Launch the Eagle stereo camera with default native NV12 output:
+
+         The default parameter file targets the Eagle VB1940 camera with ``eagle_stereo.yaml`` so no argument is needed.
+
+         .. note::
+
+            The SIPL ``VB1940_Stereo`` platform configuration enables synchronized stereo capture. In JetPack 7.2.0, a known bug corrupts the right edge of the image in this configuration. This bug is fixed in the JetPack 7.2.1 driver packages. A separate known issue remains where the left and right frames from the same capture can intermittently report capture timestamps about 18 ms apart, which interferes with stereo pairing. Until this issue is fixed, ``eagle_stereo.yaml`` sets ``platform_config`` to ``VB1940``, which runs the sensors as independent pipelines.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_sipl_camera sipl_stereo_camera.launch.py
+
+   .. tab:: Hawk Stereo Camera
+
+      #. Launch the Hawk stereo camera with default native NV12 output and stereo frame-pair gating enabled:
+
+         The ``hawk_stereo.yaml`` parameter file defaults to ``0x0001``, which assumes the Hawk is connected to **channel 0**. See `GMSL Parameters`_ for more details.
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_sipl_camera sipl_stereo_camera.launch.py \
+                param_file:=$(ros2 pkg prefix isaac_ros_sipl_camera)/share/isaac_ros_sipl_camera/config/hawk_stereo.yaml \
+                enforce_stereo_pairs:=true
+
+   .. tab:: Sensing GMSL2 Cameras
+
+      Complete the :doc:`Sensing Thor GMSL2 Camera Setup
+      </getting_started/sensors/sensing_thor_setup>`, then select the supplied
+      parameter file for the cameras you want to run. Refer to
+      `Sensing S56C and SHF3L`_ for the complete selection table.
+
+      Launch the S56C stereo camera:
+
+      .. code:: bash
+
+         ros2 launch isaac_ros_sipl_camera sipl_stereo_camera.launch.py \
+            param_file:=$(ros2 pkg prefix isaac_ros_sipl_camera)/share/isaac_ros_sipl_camera/config/s56c_stereo.yaml \
+            query_config:=trd1_g2a \
+            enforce_stereo_pairs:=true
+
+      Launch one SHF3L camera on CAM2:
+
+      .. code:: bash
+
+         ros2 launch isaac_ros_sipl_camera sipl_camera.launch.py \
+            param_file:=$(ros2 pkg prefix isaac_ros_sipl_camera)/share/isaac_ros_sipl_camera/config/shf3l_mono.yaml \
+            query_config:=trd1_g2a
+
+      Use ``shf3l_mono_cam3.yaml`` instead to select CAM3.
+
+      Multi-camera capture on Jetson Thor with JetPack 7.2 has been validated in
+      both the default 120W mode and MAXN with clocks locked. For a consistent
+      setup, use MAXN and lock clocks on the Jetson host before launching:
+
+      .. code:: bash
+
+         sudo nvpmodel -m 0
+         sudo jetson_clocks
+
+      Reapply ``sudo jetson_clocks`` after reboot or changing the power mode as this does not persist.
+
+      This avoids a known capture timeout issue when load is high while multiple
+      cameras are streaming.
+
+      Launch the complete mixed-camera rig or a subset described by a copied
+      parameter file:
+
+      .. code:: bash
+
+         ros2 launch isaac_ros_sipl_camera sipl_multi_camera.launch.py \
+            param_file:=$(ros2 pkg prefix isaac_ros_sipl_camera)/share/isaac_ros_sipl_camera/config/s56c_shf3l_mixed.yaml \
+            query_config:=trd1_g2a
+
+      Set ``query_config`` to match your adapter. Refer to
+      `Other Thor GMSL Adapters`_ for the supported configurations.
+
+      .. only:: internal
+
+         .. note::
+
+            Jetson Linux R39.2 requires the YUV422-patched Camera HAL installed by the
+            Sensing driver package. When running an Isaac ROS SIPL launch target with
+            Bazel, pass the patched host HAL to the launched process with
+            ``--run_under``:
+
+            .. code:: bash
+
+               bazel run \
+                  --run_under="env LD_PRELOAD=/usr/lib/aarch64-linux-gnu/nvidia/libnvcamerahal.so" \
+                  --config=jetpack72 \
+                  --config=arm64_native \
+                  //ros_ws/src/isaac_ros_sipl_camera/isaac_ros_sipl_camera:sipl_multi_camera_launch -- \
+                  query_config:=trd1_g2a
+
+            This workaround is no longer needed when the native SIPL camera library supports YUV.
+
+   .. tab:: Eagle Stereo Camera with RGB8 Conversion and Rectification
+
+      #. Launch the stereo camera with RGB8 format conversion and image rectification:
+
+         .. code:: bash
+
+            ros2 launch isaac_ros_sipl_camera sipl_stereo_camera.launch.py \
+                encoding_desired:=rgb8 enable_rectify:=true
+
+Visualize Results
+^^^^^^^^^^^^^^^^^
+
+#. Open a **new** terminal and activate the Isaac ROS environment:
+
+   .. code:: bash
+
+      isaac-ros activate
+
+#. Verify that the camera topics are publishing:
+
+   .. code:: bash
+
+      ros2 topic list
+      ros2 topic hz /left/camera_info
+
+   Example output for Hawk stereo with rectification enabled (``enable_rectify:=true``) and stereo frame pair gating enabled (``enforce_stereo_pairs:=true``):
+
+   .. code:: text
+
+    /left/camera_info
+    /left/camera_info_unsynced
+    /left/camera_info_rect
+    /left/image_converted
+    /left/image_raw
+    /left/image_raw_unsynced
+    /left/image_rect
+    /right/camera_info
+    /right/camera_info_unsynced
+    /right/camera_info_rect
+    /right/image_converted
+    /right/image_raw
+    /right/image_raw_unsynced
+    /right/image_rect
+    /tf_static
+    average rate: 28.127
+    min: 0.000s max: 0.334s std dev: 0.05718s window: 30
+    ...
+
+
+#. Visualize the camera image streams with your preferred tool. The following are examples for a running stereo camera.
+
+   ``rqt_image_view`` requires conversion of native ``NV12`` images to a supported encoding such as RGB. RViz and Foxglove also accept native ``NV12`` images directly.
+   Therefore, the following examples enable conversion with ``encoding_desired:=rgb8`` and subscribe to the ``image_converted`` topics.
+
+   It's recommended to view full-resolution images locally on the Jetson rather than remotely over the network because of the high bandwidth required. For remote viewing, resizing with ``enable_resize:=true`` and subscribing to the ``image_resize`` topics can reduce the bandwidth and latency. If encoding is desired, use ``enable_encoding:=true`` and configure H.264 decoding on the visualizer side for the ``image_compressed`` topics. See `Launch Files`_ for resizing and encoding parameter details.
+
+   .. tab-set::
+
+      .. tab-item:: rqt_image_view
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-rqt-image-view
+            source /opt/ros/:ir_ros_distro:/setup.bash
+            ros2 run rqt_image_view rqt_image_view /left/image_converted
+
+
+      .. tab-item:: Foxglove Studio
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-foxglove-bridge
+            source /opt/ros/:ir_ros_distro:/setup.bash
+            ros2 run foxglove_bridge foxglove_bridge --ros-args \
+              -p port:=9090 \
+              -p send_buffer_limit:=30000000 \
+              -p max_qos_depth:=5 \
+              -p use_compression:=false
+
+         This configuration is recommended for high-rate camera streams:
+         ``max_qos_depth`` bounds per-topic queue growth, and ``send_buffer_limit`` helps avoid dropped
+         messages under burst load.
+
+         Open Foxglove Studio and connect to your ROS 2 bridge following the instructions in
+         `Foxglove Studio ROS 2 Bridge <https://docs.foxglove.dev/docs/getting-started/frameworks/ros2>`__.
+         Then add Image panels for ``/left/image_converted`` and ``/right/image_converted``.
+
+      .. tab-item:: RViz2
+
+         .. code:: bash
+
+            sudo apt-get install -y ros-:ir_ros_distro:-rviz2
+            source /opt/ros/:ir_ros_distro:/setup.bash
+            rviz2
+
+         In RViz2, add **Image** displays and set the topics to
+         ``/left/image_converted`` and ``/right/image_converted``.
+
+Data Flow
+---------
+
+The optional nodes shown below are added by the example launch files based on launch
+arguments. See `Launch Files`_ for details.
+
+.. mermaid::
+
+   flowchart TD
+      Camera["Camera / Stereo Camera"] -->|"GMSL2 or Ethernet (CoE)"| ISP["HW accelerated ISP"]
+      ISP -->|"NvSciBuf (NVMM buffer)"| SiplCameraNode["SiplCameraNode /<br/>SiplStereoCameraNode"]
+      SiplCameraNode -->|"aligned stereo timestamps"| SyncOrDrop["NitrosCameraDropNode<br/>(stereo pair gating, optional)"]
+      SiplCameraNode -.->|"gating disabled"| Raw(["image_raw / camera_info"])
+      SyncOrDrop -->|"complete pairs only"| Raw
+      Raw -->|"CUDA buffer"| Converter["ImageFormatConverterNode<br/>(optional)"]
+      Raw -->|"CUDA buffer"| Encoder["H.264 EncoderNode<br/>(optional, image_compressed)"]
+      Converter -->|"CUDA buffer"| Rectify["RectifyNode<br/>(optional)"]
+      Converter -->|"CUDA buffer"| Downstream["Downstream Nodes<br/>(SLAM, ESS, etc.)"]
+      Rectify -->|"CUDA buffer"| Downstream
+
+Message Timestamps
+^^^^^^^^^^^^^^^^^^
+
+By default, ``use_hw_timestamp`` is set to ``true`` and each image and its matching ``CameraInfo``
+message are stamped with the capture start-of-frame (SOF) timestamp that SIPL APIs provides in the
+Tegra timestamp counter (TSC) time domain.
+
+The node uses a periodically calibrated offset to convert the timestamp from the TSC time domain to
+the time domain of the node's ROS clock.
+
+SOF and EOF in this context denote transport frame boundaries, not sensor exposure boundaries.
+SOF occurs after exposure has started, but its exact relationship to exposure timing depends on the
+sensor, shutter mode, and transport.
+This SOF timestamp marks when the leading part of one transmitted image reaches the Jetson capture
+path before the image payload and ISP processing.
+
+* For GMSL2, the Video Input (VI)/NVCSI path records SOF as the image begins arriving from the
+  deserializer.
+* For CoE, the MGBE/RCE path records SOF as the first Ethernet packet marked as frame start arrives.
+
+If ``use_hw_timestamp`` is ``false``, the node instead stamps with the current ROS clock time after
+receiving the full frame after ISP processing.
+
+For the transport paths, refer to the NVIDIA `GMSL architecture overview
+<https://docs.nvidia.com/jetson/archives/:ir_l4t_version:/DeveloperGuide/SD/CameraDevelopment/SIPLFramework/SIPL-for-L4T/GMSL/GMSL-Architecture-Overview.html>`__
+and `Camera-over-Ethernet overview
+<https://docs.nvidia.com/jetson/archives/:ir_l4t_version:/DeveloperGuide/SD/CameraDevelopment/SIPLFramework/SIPL-for-L4T/CoE/CoE-Solution-Overview.html>`__.
+
+Package Architecture
+--------------------
+
+Nodes
+^^^^^
+
+``SiplCameraNode``
+""""""""""""""""""
+
+Base node for monocular cameras. See `ROS Topics Published`_ and `ROS Parameters`_
+for the full interface specification.
+
+``SiplStereoCameraNode``
+""""""""""""""""""""""""
+
+Stereo camera node that extends ``SiplCameraNode``. See `ROS Topics Published`_ and
+`ROS Parameters`_ for the full interface specification.
+
+``SiplMultiCameraNode``
+"""""""""""""""""""""""
+
+Node for an explicitly selected set of cameras sharing one SIPL platform,
+typically a multi-camera or mixed-sensor rig, also extending ``SiplCameraNode``.
+Instead of the fixed ``left``/``right`` pipelines of the stereo node, it takes an
+ordered ``cameras`` list and a ``camera.<name>.*`` block per camera, and publishes
+each camera under its own ``<name>/`` topic prefix. Any number of the cameras can
+be grouped into synchronized ``stereo_pairs``.
+
+A single node is required rather than one process per camera: SIPL takes exclusive
+ownership of the deserializer, so a second ``SetPlatformCfg()`` in another process
+fails. Only SIPL capture is constrained this way — downstream rectification,
+conversion and encoding nodes can still run in separate containers, fed by the
+per-camera topics.
+
+The multi-camera node can run one camera or one stereo pair, but use
+``SiplCameraNode`` or ``SiplStereoCameraNode`` for those common cases. They select
+their sensors automatically and need no explicit sensor IDs. Use one
+``SiplMultiCameraNode`` for a subset of a shared-deserializer platform or for a
+mixed-sensor rig.
+
+When running launch files, additional topics may be published depending on the launch arguments.
+See the launch files section below for more details.
+
+Camera-Specific Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _sensing_camera_selection:
+
+Sensing S56C and SHF3L
+"""""""""""""""""""""""
+
+Complete the :doc:`Sensing Thor GMSL2 Camera Setup
+</getting_started/sensors/sensing_thor_setup>` before using these configurations.
+Pass ``query_config:=trd1_g2a`` for the Sensing ``SG8A_AGTH_G2Y_A1`` adapter.
+Refer to `Other Thor GMSL Adapters`_ for the other supported adapter configurations.
+
+The package includes ``s56c_shf3l_mixed_trd1_g2a.json`` for convenience. This
+file is an unchanged copy of ``query/trd1_g2a/s56c_shf3l_mixed.json`` from the
+Sensing JetPack 7.2 driver package. Treat the JSON from the downloaded Sensing
+driver package as authoritative.
+
+Update the Bundled Sensing JSON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the vendor JSON differs from the package copy, replace the package copy with
+the vendor file. Set ``SENSING_DRIVER_PACKAGE`` to the downloaded driver package
+directory on the Jetson host.
+
+.. tabs::
+
+   .. tab:: Build from Source
+
+      Replace the source copy on the host, then rebuild the package using the
+      source-build procedure above:
+
+      .. code:: bash
+
+         export SENSING_DRIVER_PACKAGE=/absolute/path/to/TRD1_G2A_AGX_THOR_SIPL_JP7.2_L4TR39.2
+         cp "${SENSING_DRIVER_PACKAGE}/query/trd1_g2a/s56c_shf3l_mixed.json" \
+            "${ISAAC_ROS_WS}/src/isaac_ros_sipl_camera/isaac_ros_sipl_camera/config/s56c_shf3l_mixed_trd1_g2a.json"
+
+   .. tab:: Binary Package
+
+      Stage the vendor JSON in the Isaac ROS workspace on the host before
+      activating the environment:
+
+      .. code:: bash
+
+         export SENSING_DRIVER_PACKAGE=/absolute/path/to/TRD1_G2A_AGX_THOR_SIPL_JP7.2_L4TR39.2
+         cp "${SENSING_DRIVER_PACKAGE}/query/trd1_g2a/s56c_shf3l_mixed.json" \
+            "${ISAAC_ROS_WS}/s56c_shf3l_mixed_trd1_g2a.json"
+
+      Inside the activated environment, replace the installed copy:
+
+      .. code:: bash
+
+         export SIPL_CAMERA_SHARE="$(ros2 pkg prefix isaac_ros_sipl_camera)/share/isaac_ros_sipl_camera"
+         sudo install -m 0644 \
+            "${ISAAC_ROS_WS}/s56c_shf3l_mixed_trd1_g2a.json" \
+            "${SIPL_CAMERA_SHARE}/config/s56c_shf3l_mixed_trd1_g2a.json"
+
+      A package upgrade or development-container recreation replaces this file.
+      Repeat the install command when either occurs if the packaged and vendor
+      versions still differ. The staged workspace copy remains on the host.
+
+The supplied ``S56C_1_SHF3L_2`` platform describes the fixed wiring in the
+Sensing Thor setup guide. Selecting a subset of cameras in that layout requires
+only a YAML parameter-file change. If the physical wiring, virtual channels, or
+sensor IDs differ, add a separately named platform JSON instead of changing the
+vendor file.
+
+Use the node that matches the selection:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Selection
+     - Launch file
+     - Parameter-file template
+   * - S56C stereo camera only
+     - ``sipl_stereo_camera.launch.py``
+     - ``s56c_stereo.yaml``
+   * - One SHF3L camera
+     - ``sipl_camera.launch.py``
+     - ``shf3l_mono.yaml`` or ``shf3l_mono_cam3.yaml``
+   * - Multiple camera modules or a mixed S56C and SHF3L rig
+     - ``sipl_multi_camera.launch.py``
+     - ``s56c_shf3l_mixed.yaml``
+
+``SiplMultiCameraNode`` can also express a single SHF3L or the S56C pair, but the
+monocular and stereo launch files require fewer parameters and publish the
+conventional camera topic names. Run only one SIPL camera process at a time
+because the deserializer has one exclusive SIPL owner.
+
+The ROS ``link_mask`` uses one bit per physical link.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Camera modules
+     - Sensor IDs
+     - ROS ``link_mask``
+   * - S56C only
+     - 0 and 1
+     - ``[0x0000, 0x0001]``
+   * - SHF3L on CAM2 only
+     - 2
+     - ``[0x0000, 0x0004]``
+   * - SHF3L on CAM3 only
+     - 3
+     - ``[0x0000, 0x0008]``
+   * - S56C and CAM2
+     - 0, 1, and 2
+     - ``[0x0000, 0x0005]``
+   * - S56C and CAM3
+     - 0, 1, and 3
+     - ``[0x0000, 0x0009]``
+   * - CAM2 and CAM3
+     - 2 and 3
+     - ``[0x0000, 0x000C]``
+   * - S56C, CAM2, and CAM3
+     - 0, 1, 2, and 3
+     - ``[0x0000, 0x000D]``
+
+For a multi-camera subset, copy ``s56c_shf3l_mixed.yaml`` and keep these fields
+consistent:
+
+#. Set ``link_mask`` from the table.
+#. Set ``cameras`` to the names whose sensor IDs are enabled. The supplied blocks
+   map ``head_left`` and ``head_right`` to S56C sensor IDs 0 and 1,
+   ``wrist_left`` to CAM2 sensor ID 2, and ``wrist_right`` to CAM3 sensor ID 3.
+#. Keep ``stereo_pairs: ["head_left,head_right"]`` and
+   ``align_stereo_timestamps: true`` when the S56C is selected. Use an empty
+   ``stereo_pairs`` list and set ``align_stereo_timestamps: false`` for
+   SHF3L-only selections.
+#. Keep the S56C NITO path when the S56C is selected. Set ``nito_file: ""`` for
+   SHF3L-only selections.
+
+Use the **Sensing GMSL2 Cameras** tab in `Run Launch File`_ to launch the selected
+configuration.
+
+.. _sensing_query_config:
+
+Other Thor GMSL Adapters
+""""""""""""""""""""""""
+
+The Isaac ROS YAML files describe camera selection (``S56C_1_SHF3L_2``), not a
+specific deserializer chip. The launch argument ``query_config`` selects a bundled
+SIPL query JSON (``platform_config_file``) and the matching ``link_mask`` layout:
+
+* ``trd1_g2a`` — two MAX96712 deserializers (CSI-AB and CSI-CD) for the
+  :doc:`Sensing Thor GMSL2 kit </getting_started/sensors/sensing_thor_setup>`
+* ``unitree_h2plus`` — one MAX96712 for the Unitree H2+
+* ``max96724`` — one MAX96724
+
+For the systems that support deserializer-generated frame sync, use ``fsyncMode: osc_manual``.
+Leave ``enable_fsync_restart`` false when the Tegra frame sync block is not wired
+as the source on these adapters.
+
+YUV Capture Pipelines and ISP Bypass
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Most SIPL cameras are RAW sensors processed by the Tegra ISP. YUV cameras such as
+the SHF3L instead have an on-sensor ISP and deliver YUV422 (UYVY) frames, so the
+Tegra ISP is bypassed entirely: frames are taken from the SIPL capture (ICP)
+output and converted to ``nv12`` on the GPU before publishing. Such pipelines
+need no NITO file and no auto-control plugin.
+
+Pipelines select their source automatically from the platform configuration:
+sensors whose capture input format is YUV422 publish from capture, and everything
+else goes through ISP0. Capture pipelines support ``nv12`` only; a capture pipeline
+configured with any other encoding fails at startup rather than per frame.
+
+The camera's 4:2:2 chroma is decimated vertically to 4:2:0 by this conversion. That is
+unavoidable: the sensor cannot emit 4:2:0, SIPL cannot capture it, and ``nv12`` is the
+only encoding both the H.264 encoder and ``ImageFormatConverterNode`` accept for
+multi-planar input.
+
+Launch Files
+^^^^^^^^^^^^
+
+The ``sipl_camera.launch.py``, ``sipl_stereo_camera.launch.py``, and
+``sipl_multi_camera.launch.py`` launch files conditionally add format conversion,
+rectification, H.264 encoding, and (for stereo)
+frame-pair gating nodes based on launch arguments. The format conversion and
+rectification nodes are from the :doc:`isaac_ros_image_proc </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>` package, and the encoder node is from the :doc:`isaac_ros_h264_encoder </repositories_and_packages/isaac_ros_compression/isaac_ros_h264_encoder/index>` package.
+
+When ``encoding_desired`` is set to a non-native format (anything other than
+``nv12`` or ``nv24``), the launch file adds an ``ImageFormatConverterNode`` to
+convert the output.
+
+When ``enable_rectify`` is set to ``true``, the launch file adds a
+``RectifyNode`` and automatically forces ``encoding_desired`` to ``rgb8`` if a
+native format (``nv12``/``nv24``) was specified, because ``RectifyNode``
+requires a standard image encoding.
+
+When ``enable_encoding`` is set to ``true``, the launch file adds an
+``EncoderNode`` that H.264-encodes the camera output and publishes it on
+``image_compressed`` (per eye for stereo). It consumes ``image_raw`` unless
+resizing is also enabled, in which case it consumes ``image_resize``.
+
+For mono, stereo, and multi-camera launches, ``enable_resize:=true`` adds a GPU
+``ResizeNode`` per camera stream without first copying the native image through
+CPU memory. Mono publishes ``image_resize`` and ``camera_info_resize``; stereo
+publishes those topics under ``left/`` and ``right/``; and multi-camera launches
+publish them under each ``<topic_namespace>/``. The output defaults to 640 x 480
+and can be changed with
+``resize_width`` and ``resize_height``. When resizing and encoding are both
+enabled, each encoder consumes ``image_resize`` and publishes
+``image_compressed`` at the resized resolution.
+
+Color Conversion Limitation
+"""""""""""""""""""""""""""
+
+When the launch files convert native ``nv12`` output to a packed RGB or BGR
+format, ``ImageFormatConverterNode`` uses ``yuv_color_spec=bt709``. SIPL ISP
+buffers are allocated with ``NvSciColorStd_REC709_ER``, which is a full-range
+BT.709 color standard. CV-CUDA ``AdvCvtColor`` supports the BT.709 color matrix,
+but does not currently support the full-range ``REC709_ER`` variant. As a
+result, converted images can have slightly different luma contrast than a true
+full-range conversion. Native ``nv12`` and ``nv24`` output is unaffected.
+
+If exact full-range color reproduction is required, subscribe to the native
+camera output and convert it with a pipeline that supports ``REC709_ER``.
+
+``sipl_camera.launch.py``
+"""""""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - Launch Argument
+      - Default
+      - Description
+    * - ``param_file``
+      - ``eagle_mono.yaml``
+      - Path to the YAML parameter file
+    * - ``query_config``
+      - ``""``
+      - Optional bundled SIPL query JSON (``platform_config_file``) and matching
+        ``link_mask`` layout: ``max96724``, ``trd1_g2a``, or ``unitree_h2plus``
+    * - ``encoding_desired``
+      - ``""`` (native)
+      - Output encoding: ``nv12``/``nv24`` (native) or ``rgb8``, ``mono8``, etc. (converted)
+    * - ``target_container``
+      - ``sipl_camera_container``
+      - Component container name
+    * - ``camera_namespace``
+      - ``""`` (root)
+      - ROS namespace applied to every node in this launch file. Use a distinct name to avoid topic or node-name collisions as needed.
+    * - ``enable_rectify``
+      - ``false``
+      - Enable image rectification through ``RectifyNode``
+    * - ``enable_resize``
+      - ``false``
+      - Add a ``ResizeNode``, publishing ``image_resize`` and
+        ``camera_info_resize``
+    * - ``resize_width``
+      - ``640``
+      - Width of the resized image in pixels
+    * - ``resize_height``
+      - ``480``
+      - Height of the resized image in pixels
+    * - ``enable_encoding``
+      - ``false``
+      - Enable H.264 accelerated encoding to ``image_compressed`` through the ``isaac_ros_h264_encoder`` ``EncoderNode``. ``true``/``false``.
+
+**Pipeline variants**:
+
+- **Native output** (default): ``SiplCameraNode``
+- **Format conversion**: ``SiplCameraNode`` → ``ImageFormatConverterNode``
+- **Rectification**: ``SiplCameraNode`` → ``ImageFormatConverterNode`` → ``RectifyNode``
+- **Resize**: ``SiplCameraNode`` → ``ResizeNode``
+- **Encoding**: ``SiplCameraNode`` → ``EncoderNode`` (publishes ``image_compressed``)
+
+``sipl_stereo_camera.launch.py``
+""""""""""""""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - Launch Argument
+      - Default
+      - Description
+    * - ``param_file``
+      - ``eagle_stereo.yaml``
+      - Path to the YAML parameter file
+    * - ``query_config``
+      - ``""``
+      - Optional bundled SIPL query JSON (``platform_config_file``) and matching
+        ``link_mask`` layout: ``max96724``, ``trd1_g2a``, or ``unitree_h2plus``
+    * - ``encoding_desired``
+      - ``""`` (native)
+      - Output encoding: ``nv12``/``nv24`` (native) or ``rgb8``, ``mono8``, etc. (converted)
+    * - ``target_container``
+      - ``sipl_camera_container``
+      - Component container name
+    * - ``camera_namespace``
+      - ``""`` (root)
+      - ROS namespace applied to every node in this launch file. Use a distinct name to avoid topic or node-name collisions as needed.
+    * - ``enable_rectify``
+      - ``false``
+      - Enable image rectification through ``RectifyNode``
+    * - ``enable_resize``
+      - ``false``
+      - Add a ``ResizeNode`` per eye, publishing ``image_resize`` and
+        ``camera_info_resize`` under ``left/`` and ``right/``
+    * - ``resize_width``
+      - ``640``
+      - Width of each resized image in pixels
+    * - ``resize_height``
+      - ``480``
+      - Height of each resized image in pixels
+    * - ``enforce_stereo_pairs``
+      - ``false``
+      - Align left/right capture timestamps and gate stereo frame pairs (drop the pair if one of left/right never arrives). Enables the camera node's ``align_stereo_timestamps`` parameter and toggles the synchronization drop node. ``true``/``false``.
+    * - ``enable_encoding``
+      - ``false``
+      - Enable H.264 accelerated encoding of the left and right images to ``image_compressed`` through the ``isaac_ros_h264_encoder`` ``EncoderNode``. ``true``/``false``.
+
+**Pipeline variants**:
+
+- **Native output** (default): ``SiplStereoCameraNode``
+- **Format conversion**: ``SiplStereoCameraNode`` → ``ImageFormatConverterNode`` (left and right)
+- **Rectification**: ``SiplStereoCameraNode`` → ``ImageFormatConverterNode`` (left and right) → ``RectifyNode`` (left and right)
+- **Resize**: ``SiplStereoCameraNode`` → ``ResizeNode`` (left and right)
+- **Encoding**: ``SiplStereoCameraNode`` → ``EncoderNode`` (left and right, publishes ``image_compressed``)
+
+**Stereo frame-pair gating with enforce_stereo_pairs enabled**:
+
+When ``enforce_stereo_pairs`` is enabled, the launch inserts a ``NitrosCameraDropNode`` (stereo mode)
+that exact-time-synchronizes the aligned left/right ``image_raw`` and ``camera_info`` set and
+republishes only complete pairs. If one of the pair's frames is missing, both are dropped, so only
+matched pairs are published. The camera's raw output is moved to ``*_unsynced`` topics, and the
+synced pair keeps the canonical ``left/image_raw``, ``right/image_raw``, ``left/camera_info``, and
+``right/camera_info`` topic names.
+
+``sipl_multi_camera.launch.py``
+"""""""""""""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - Launch Argument
+      - Default
+      - Description
+    * - ``param_file``
+      - ``s56c_shf3l_mixed.yaml``
+      - Path to the YAML parameter file
+    * - ``query_config``
+      - ``""``
+      - Optional bundled SIPL query JSON (``platform_config_file``) and matching
+        ``link_mask`` layout: ``max96724``, ``trd1_g2a``, or ``unitree_h2plus``
+    * - ``encoding_desired``
+      - ``""`` (native)
+      - Output encoding: ``nv12``/``nv24`` (native) or ``rgb8``, ``mono8``, etc. (converted)
+    * - ``target_container``
+      - ``sipl_multi_camera_container``
+      - Component container name
+    * - ``camera_namespace``
+      - ``""`` (root)
+      - ROS namespace applied to every node in this launch file. Use a distinct name to avoid topic or node-name collisions as needed.
+    * - ``enable_rectify``
+      - ``false``
+      - Add a ``RectifyNode`` per camera
+    * - ``enable_resize``
+      - ``false``
+      - Add a ``ResizeNode`` per camera, publishing ``image_resize`` and
+        ``camera_info_resize`` in each camera's topic namespace
+    * - ``resize_width``
+      - ``640``
+      - Width of each resized image in pixels
+    * - ``resize_height``
+      - ``480``
+      - Height of each resized image in pixels
+    * - ``enable_encoding``
+      - ``false``
+      - Add an H.264 ``EncoderNode`` per camera, publishing
+        ``<topic_namespace>/image_compressed``. Encodes ``image_resize`` when
+        ``enable_resize`` is enabled, otherwise ``image_raw``.
+
+The optional conversion, rectification, resize, and encoding nodes are instantiated
+**per camera**, so cameras of different native resolutions can be mixed in one rig.
+
+TF Frame Tree
+--------------
+
+The default frame names produce the following tree structures.
+
+.. mermaid::
+
+   flowchart TD
+      Camera["camera"] --> CameraOptical["camera_optical"]
+      StereoCamera["stereo_camera"] --> LeftCamera["stereo_camera_left"]
+      LeftCamera --> LeftOptical["stereo_camera_left_optical"]
+      StereoCamera --> RightCamera["stereo_camera_right"]
+      RightCamera --> RightOptical["stereo_camera_right_optical"]
+
+Verifying Stereo Camera Calibration
+------------------------------------
+
+Given the camera's calibration data, you may use the epipolar test :ir_repo:`isaac_ros_rectify_stereo_epipolar_test.py <isaac_ros_image_pipeline> <isaac_ros_image_proc/test/isaac_ros_rectify_stereo_epipolar_test.py>` in
+:doc:`isaac_ros_image_proc </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>`
+package to validate that your stereo camera calibration produces accurately rectified
+images based on epipolar line tests.
+
+Several files are required to run the test and should be placed in the ``rectify_stereo`` test cases directory of the ``isaac_ros_image_proc`` package.
+
+.. code-block:: text
+
+    ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/
+
+
+#. Refer to the quickstart section for the :doc:`isaac_ros_image_proc </repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_proc/index>` package on how to clone and build the package.
+
+#. Capture one left/right raw image pair of PNG files that contains a visible checkerboard pattern. For example, :ir_repo:`image_raw_right.png <isaac_ros_image_pipeline> <isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/image_raw_right.png>`
+
+#. Create test configuration JSON files for the left and right camera respectively: ``image_raw_left.json`` and ``image_raw_right.json``. These files should reference the PNG files and include the checkerboard inner-corner grid size (rows x columns). For example, :ir_repo:`image_raw_right.json <isaac_ros_image_pipeline> <isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/image_raw_right.json>`
+
+   .. note::
+
+      The checkerboard size must use inner-corner counts (for example, a 10x7
+      square grid uses a 9x6 inner-corner size).
+
+#. Create camera info JSON files for left and right camera respectively: ``camera_info_left.json`` and ``camera_info_right.json``. For example, :ir_repo:`camera_info_right.json <isaac_ros_image_pipeline> <isaac_ros_image_proc/test/test_cases/rectify_stereo/stereo_chessboard0/camera_info_right.json>`
+
+#. Place all the PNG and JSON files in the ``rectify_stereo`` test cases directory of the ``isaac_ros_image_proc``
+   package:
+
+   .. code-block:: bash
+
+       # From the workspace root
+       mkdir ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/sipl_stereo_camera
+       cp <your_files> ${ISAAC_ROS_WS}/src/isaac_ros_image_pipeline/isaac_ros_image_proc/test/test_cases/rectify_stereo/sipl_stereo_camera
+
+#. Build the ``isaac_ros_image_proc`` package after placing all the files:
+
+   .. code-block:: bash
+
+       colcon build --packages-up-to isaac_ros_image_proc
+       source install/setup.bash
+
+#. Run the test:
+
+   .. code-block:: bash
+
+       colcon test --packages-select isaac_ros_image_proc \
+           --event-handlers console_direct+ \
+           --ctest-args -R isaac_ros_rectify_stereo_epipolar_test
+
+#. Verify the test results. Passing the test indicates that the calibration accuracy is satisfactory. If the test fails, downstream packages that consume the rectified images may still function, but with degraded performance depending on your application's requirements.
+
+.. note::
+
+    A well-rectified pair has horizontal epipolar lines with sub-pixel mean error (less than 0.5 px) and max error under
+    approximately 1-2 px.
+
+Below are example outputs of the test with the epipolar lines drawn.
+
+.. grid:: 2
+
+    .. grid-item::
+
+        .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/left_image_rect.jpg>`
+            :align: center
+
+            Left Rectified
+
+    .. grid-item::
+
+        .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_sipl_camera/right_image_rect.jpg>`
+            :align: center
+
+            Right Rectified
+
+API
+---
+
+Usage
+^^^^^
+
+.. code:: bash
+
+   ros2 launch isaac_ros_sipl_camera sipl_camera.launch.py param_file:=<path_to_yaml> encoding_desired:=<encoding>
+
+.. code:: bash
+
+   ros2 launch isaac_ros_sipl_camera sipl_stereo_camera.launch.py param_file:=<path_to_yaml> encoding_desired:=<encoding> enable_rectify:=<true|false>
+
+ROS Topics Published
+^^^^^^^^^^^^^^^^^^^^
+
+``SiplCameraNode``
+""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Topic
+      - Interface
+      - Description
+    * - ``image_raw``
+      - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+      - Raw camera image in ``nv12`` or ``nv24`` encoding.
+    * - ``camera_info``
+      - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+      - Camera intrinsic calibration data.
+    * - ``/tf_static``
+      - `tf2_msgs/TFMessage <https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg>`__
+      - Static transform from camera link to optical frame.
+
+``SiplStereoCameraNode``
+""""""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Topic
+      - Interface
+      - Description
+    * - ``left/image_raw``
+      - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+      - Left camera raw image in ``nv12`` or ``nv24`` encoding.
+    * - ``right/image_raw``
+      - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+      - Right camera raw image in ``nv12`` or ``nv24`` encoding.
+    * - ``left/camera_info``
+      - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+      - Left camera intrinsic calibration data.
+    * - ``right/camera_info``
+      - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+      - Right camera intrinsic calibration data.
+    * - ``/tf_static``
+      - `tf2_msgs/TFMessage <https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg>`__
+      - Static transforms from stereo rig base to left/right optical frames.
+
+``SiplMultiCameraNode``
+"""""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Topic
+      - Interface
+      - Description
+    * - ``<name>/image_raw``
+      - `sensor_msgs/Image <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/Image.msg>`__
+      - Raw image for each entry of the ``cameras`` list.
+    * - ``<name>/camera_info``
+      - `sensor_msgs/CameraInfo <https://github.com/ros2/common_interfaces/blob/:ir_ros_distro:/sensor_msgs/msg/CameraInfo.msg>`__
+      - Intrinsic calibration data for each entry of the ``cameras`` list.
+    * - ``/tf_static``
+      - `tf2_msgs/TFMessage <https://github.com/ros2/geometry2/blob/ros2/tf2_msgs/msg/TFMessage.msg>`__
+      - Static transforms from the rig base to each camera's optical frame, plus a
+        derived baseline for each ``stereo_pairs`` entry.
+
+ROS Parameters
+^^^^^^^^^^^^^^
+
+Common Parameters
+"""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``platform_config``
+      - ``string``
+      - *required*
+      - SIPL platform configuration name, for example ``VB1940`` (Eagle CoE),
+        ``AR0234CS_HAWK`` (Hawk GMSL) or ``S56C_1_SHF3L_2``.
+    * - ``platform_config_file``
+      - ``string``
+      - ``""``
+      - Optional platform-config JSON to parse in addition to SIPL's built-in
+        database, for camera configurations the database does not ship. Accepts a
+        ``package://`` URL or a filesystem path. Empty uses the built-in database only.
+    * - ``nito_file``
+      - ``string``
+      - ``""``
+      - Path to the NITO tuning file used to register the ISP auto-control plugin.
+        Required for pipelines that use ISP0. Leave empty only for pipelines that
+        bypass the ISP.
+    * - ``enable_fsync_restart``
+      - ``bool``
+      - ``true``
+      - Restart the Tegra FSYNC generator before capture starts, giving sequentially
+        initialized sensors a common frame trigger. Required for multi-sensor rigs
+        driven by the Tegra FSYNC block (such as Hawk); set ``false`` for rigs that
+        generate frame sync on the deserializer instead. **Applies only to rigs with
+        more than one sensor** — a monocular camera has nothing to align, and
+        restarting a shared group would re-time the other cameras on it.
+    * - ``fsync_group_id``
+      - ``int``
+      - ``0``
+      - FSYNC group to restart when ``enable_fsync_restart`` is ``true``.
+    * - ``hsb_name``
+      - ``string``
+      - ``hsb_0``
+      - Holoscan Sensor Bridge (HSB) name
+    * - ``hsb_id``
+      - ``int``
+      - ``0``
+      - Holoscan Sensor Bridge ID
+    * - ``interface_name``
+      - ``string``
+      - ``mgbe0_0``
+      - Network interface for the CoE camera
+    * - ``ip_address``
+      - ``string``
+      - ``""``
+      - Camera IP override (empty uses the platform default)
+    * - ``mac_address``
+      - ``string``
+      - ``""``
+      - Camera MAC override (empty uses the platform default)
+    * - ``encoding_desired``
+      - ``string``
+      - ``nv12``
+      - Native ISP output encoding: ``nv12`` or ``nv24``
+    * - ``use_hw_timestamp``
+      - ``bool``
+      - ``true``
+      - Use the capture SOF TSC timestamp converted to ROS time. See `Message
+        Timestamps`_. When ``false``, use the ROS clock when the node processes the frame.
+    * - ``expected_fps``
+      - ``double``
+      - ``30.0``
+      - Expected capture frame rate. Used to express the capture-to-publish latency
+        threshold in frame periods and to bound the out-of-sync detection window for
+        stereo timestamp alignment. Does not change the publish rate.
+    * - ``max_capture_to_publish_latency_frame_periods``
+      - ``double``
+      - ``2.0``
+      - Maximum time from the hardware capture SOF timestamp to entry into the ROS
+        publisher, expressed in ``expected_fps`` frame periods. A frame above the
+        threshold increments its camera's violation count and emits a per-camera
+        warning throttled to once per second. Set to ``0`` to disable the guard. The
+        guard requires ``use_hw_timestamp`` but is independent of ``enable_statistics``.
+    * - ``first_frame_timeout_s``
+      - ``double``
+      - ``5.0``
+      - Seconds expected to have received each sensor's first frame after capture starts before timing out and terminating. Set to ``0`` to disable the check.
+    * - ``enable_statistics``
+      - ``bool``
+      - ``false``
+      - Log per-pipeline frame rates and SIPL and application drop counters periodically
+        and after capture stops.
+    * - ``statistics_interval_s``
+      - ``double``
+      - ``60.0``
+      - Statistics reporting interval in seconds. Must be finite and at least ``0.001``.
+    * - ``camera_info_url``
+      - ``string``
+      - ``""``
+      - Path to camera calibration file (left camera in stereo mode)
+    * - ``publish_tf``
+      - ``bool``
+      - ``true``
+      - Broadcast the camera frames on ``/tf_static``. Set ``false`` when the robot's
+        URDF already places them: a rig whose cameras sit on different kinematic
+        branches cannot be described by the single static tree this node emits, and
+        two publishers of the same frame make it ambiguous which parent wins.
+
+Monocular Parameters
+""""""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``camera_link_frame_name``
+      - ``string``
+      - ``camera``
+      - Camera link frame name
+
+Stereo Parameters
+"""""""""""""""""
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``camera_link_frame_name``
+      - ``string``
+      - ``stereo_camera``
+      - Stereo rig base frame
+    * - ``left_camera_frame_name``
+      - ``string``
+      - ``stereo_camera_left``
+      - Left camera frame
+    * - ``right_camera_frame_name``
+      - ``string``
+      - ``stereo_camera_right``
+      - Right camera frame
+    * - ``right_camera_info_url``
+      - ``string``
+      - ``""``
+      - Path to right camera calibration file
+    * - ``align_stereo_timestamps``
+      - ``bool``
+      - ``false``
+      - When ``true``, the timestamp for hardware-synced stereo left/right pairs (capture times within ``max_timestamp_diff_us``) is overridden with the earlier timestamp of the pair in order to stamp with identical timestamps. This is lock-free without blocking. Requires stereo cameras and ``use_hw_timestamp`` true.
+    * - ``max_timestamp_diff_us``
+      - ``double``
+      - ``500.0``
+      - In-sync window (microseconds) for ``align_stereo_timestamps``. Pairs farther apart keep their own timestamps and are deemed out of sync. This should be less than half the frame interval. Camera config and transport dependent threshold.
+
+Multi-Camera Parameters
+"""""""""""""""""""""""
+
+These parameters apply to ``SiplMultiCameraNode`` only. The stereo parameters above
+also apply, except that ``left_camera_frame_name`` / ``right_camera_frame_name`` are
+replaced by the per-camera ``frame_name``.
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``cameras``
+      - ``string[]``
+      - ``[]``
+      - Ordered list of camera names. Each name selects the ``camera.<name>.*``
+        block and is the published topic prefix unless ``topic_namespace`` overrides
+        it. Required and must be non-empty. Names may contain only letters, digits,
+        and underscores.
+    * - ``camera.<name>.sensor_id``
+      - ``int``
+      - *required*
+      - SIPL global sensor id this camera reads from
+    * - ``camera.<name>.frame_name``
+      - ``string``
+      - ``<name>``
+      - TF frame for this camera; its optical frame is ``<frame_name>_optical``
+    * - ``camera.<name>.topic_namespace``
+      - ``string``
+      - ``""``
+      - Namespace for this camera's topics. Empty uses ``<name>``. Set it to publish
+        under a nested namespace, which a camera name cannot express. For example,
+        camera ``head_left`` with ``topic_namespace: head/left`` publishes
+        ``head/left/image_raw``. The namespace is always placed under the node
+        namespace (the ``camera_namespace`` launch argument), and a leading ``/`` is ignored.
+    * - ``camera.<name>.camera_info_url``
+      - ``string``
+      - ``""``
+      - Path to this camera's calibration file
+    * - ``camera.<name>.yuv_color_spec``
+      - ``string``
+      - ``""``
+      - Color space the launch file gives this camera's ``ImageFormatConverterNode``:
+        ``bt709`` for a RAW sensor, ``bt601`` for a YUV422 sensor. Read from the YAML
+        by the launch file only; the node does not use it. Required when
+        ``encoding_desired`` selects a converted encoding, because which value applies
+        depends on the SIPL output the node resolves for that sensor.
+    * - ``stereo_pairs``
+      - ``string[]``
+      - ``[]``
+      - Comma-separated camera-name pairs, for example ``["left,right"]``. Each pair
+        gets its own timestamp aligner and derived stereo baseline transform. A pair is
+        also the only thing that gives a camera a pose under ``camera_link_frame_name``:
+        the left camera defines the rig origin and the right one follows from the
+        calibration. A camera in no pair gets only its optical frame, leaving the robot's
+        URDF to place it.
+
+The following per-camera parameters let a mixed rig pair sensors with different
+needs. Each defaults to the node-level value, so a uniform rig can ignore them.
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``camera.<name>.output``
+      - ``string``
+      - ``auto``
+      - Which SIPL output feeds this camera: ``auto`` resolves ISP0 vs capture from
+        the platform configuration (refer to `YUV Capture Pipelines and ISP Bypass`_); ``isp0`` and
+        ``icp`` force it, for a rig whose platform config misreports its input format.
+    * - ``camera.<name>.raw_output``
+      - ``bool``
+      - ``false``
+      - Also request the capture output alongside ISP0 for this camera.
+    * - ``camera.<name>.encoding``
+      - ``string``
+      - ``""``
+      - Per-camera override of ``encoding_desired``. Capture (ISP-bypass) pipelines
+        accept ``nv12`` only.
+    * - ``camera.<name>.nito_file``
+      - ``string``
+      - ``""``
+      - Per-camera override of ``nito_file``, for a rig mixing RAW modules that need
+        different ISP tuning.
+
+GMSL Parameters
+"""""""""""""""
+
+These parameters apply when the platform configuration uses a GMSL transport (for example, the Hawk stereo camera).
+
+.. list-table::
+    :header-rows: 1
+
+    * - ROS Parameter
+      - Type
+      - Default
+      - Description
+    * - ``link_mask``
+      - ``int`` or ``int[]``
+      - ``0x0001``
+      - Bit ``i`` enables link ``i``: ``0x0001`` = channel 0, ``0x0002`` = channel 1,
+        ``0x0004`` = channel 2, ``0x0008`` = channel 3. A single value covers the
+        usual single-transport rig. A platform configuration loaded from
+        ``platform_config_file`` that declares more than one transport takes a list
+        instead, holding one value per transport in the order reported by SIPL
+        query. Consult the platform-specific camera guide for that order; the node
+        converts each to SIPL's ``EnableMask`` encoding before applying it.
+    * - ``capture_buffer_count``
+      - ``int``
+      - ``4``
+      - Number of registered ICP capture buffers per pipeline. This transport
+        accepts values from ``4`` through ``32``. Other platforms require exactly
+        ``4``.
+
+.. note::
+
+   **Only one SIPL camera node per deserializer can run on the system at a time.** SIPL takes
+   exclusive ownership of a deserializer, so a second user of the same deserializer fails during
+   SIPL platform configuration (``SetPlatformCfg``). Multiple cameras sharing one deserializer
+   must therefore be driven by a single ``SiplMultiCameraNode``. Whether the links can capture
+   concurrently depends on the deserializer driver routing each link to a distinct virtual
+   channel. Where it does not, the additional links report ``NOTIF_ERROR_ICP_CAPTURE_FAILURE``
+   or capture timeouts even though all pipelines initialize successfully.
+
+   Terminate a camera node with ``SIGINT`` rather than ``SIGKILL`` as killing it leaves the
+   deserializer configured, and the next ``SetPlatformCfg`` then fails until the board is reset.
+
+Camera Calibration Overrides
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Provide calibration files using ``package://`` or ``file://`` URLs. Example
+calibration files are available in the package ``config/`` directory for quick
+testing.
+
+The following example shows how to set the calibration file in a YAML
+parameter file:
+
+.. code-block:: yaml
+
+    sipl_camera:
+      ros__parameters:
+        camera_info_url: "package://isaac_ros_sipl_camera/config/mock_mono_camera_info.yaml"
+
+Prerequisites
+^^^^^^^^^^^^^
+
+Environment
+"""""""""""
+
+When you use ``isaac-ros activate``, the environment for SIPL development will be prepared automatically.
+
+If you need to build on the host directly, you may need to also install the SIPL headers ``/usr/src/jetson_sipl_api``. For installation instructions, see the 
+`SIPL Application Development Guide <https://docs.nvidia.com/jetson/archives/:ir_l4t_version:/DeveloperGuide/SD/CameraDevelopment/SIPLFramework/SIPL-for-L4T/SIPL-App-Development-Guide.html#installation>`__.
+
+The following paths and libraries are necessary for building and running SIPL.
+
+.. list-table::
+    :header-rows: 1
+
+    * - Path
+      - Contents
+      - Needed For
+    * - ``/usr/lib/aarch64-linux-gnu/nvidia``
+      - Core SIPL runtime libraries (``libnvsipl*.so``, ``libnvsci*.so``)
+      - Runtime libraries for SIPL
+    * - ``/usr/src/jetson_sipl_api``
+      - SIPL development headers
+      - Compilation
+    * - ``/usr/lib/nvsipl_drv``
+      - Camera sensor driver plugins
+      - Runtime (camera detection)
+    * - ``/usr/lib/nvsipl_uddf``
+      - UDDF driver libraries
+      - Runtime
+    * - ``/var/nvidia/nvcam``
+      - NITO platform configuration files (``.nito`` files)
+      - Runtime (camera ISP initialization)
+    * - ``/dev/coe-chan-*``
+      - CoE device nodes
+      - Runtime (camera device files)
+
+.. list-table::
+    :header-rows: 1
+
+    * - Library
+      - Description
+      - Location (Jetson Thor)
+    * - ``libnvsipl.so``
+      - SIPL camera API
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvsipl_query.so``
+      - SIPL query API
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvsipl_pipeline.so``
+      - SIPL pipeline API
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvscibuf.so``
+      - NvSci buffer
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvscisync.so``
+      - NvSci sync
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+    * - ``libnvscicommon.so``
+      - NvSci common
+      - ``/usr/lib/aarch64-linux-gnu/nvidia/``
+
+Running the Package Tests
+-------------------------
+
+The capture tests need real hardware, so each one is gated on the camera it drives
+and skips with a reason when that camera is not on the bench.
+
+Set ``ISAAC_ROS_SIPL_CAMERAS`` to name the cameras that are wired up. Names are
+matched case-insensitively and may be separated by commas, spaces, or both:
+
+.. code-block:: bash
+
+    ISAAC_ROS_SIPL_CAMERAS=eagle,s56c colcon test --packages-select isaac_ros_sipl_camera
+
+.. list-table::
+    :header-rows: 1
+
+    * - Name
+      - Camera
+      - Gating
+    * - ``eagle``
+      - Eagle stereo (CoE)
+      - Also probed, by pinging the camera over the CoE interface
+    * - ``hawk``
+      - Hawk stereo (GMSL2)
+      - Also probed, through the ``ar0234`` device-tree entry
+    * - ``s56c``
+      - S56C stereo (GMSL2)
+      - Declaration only
+    * - ``shf3l``
+      - SHF3L (GMSL2, YUV422)
+      - Declaration only
+
+When ``ISAAC_ROS_SIPL_CAMERAS`` is unset, ``eagle`` and ``hawk`` are selected and
+``s56c`` and ``shf3l`` are not. When it is set it is an exhaustive allow-list, so an
+empty value skips every camera test.
+
+Troubleshooting
+---------------
+
+Isaac ROS Troubleshooting
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For solutions to problems with Isaac ROS, see :doc:`troubleshooting </troubleshooting/index>`.
+
+Transient Startup Messages
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Immediately after startup, any of the following messages may occur transiently (values in angle brackets vary):
+
+.. code:: text
+
+   [Sipl Notification] ICP bad input stream on sensor <sensor_id>
+   [Sipl Notification] Frame discontinuity on sensor <sensor_id>, frame <frame_number>
+   [<camera>] Abnormal capture SOF-to-publisher latency: <latency> ms exceeds <threshold> ms threshold (<periods> frame periods at <fps> FPS; violation=<count>)
+
+Typically these are transient and will resolve themselves as streaming stabilizes within seconds. Investigate if they persist.
+
+SIPL CoE Camera Not Found
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For any issues with CoE camera detection, see the
+:doc:`Eagle CoE Stereo Camera Setup </getting_started/sensors/eagle_setup>` guide.
+
+.. _sipl_camera_group_permissions:
+
+SIPL Camera Fails to Initialize: Missing Permissions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Permission-related initialization errors include:
+
+.. code:: text
+
+   SIPL permission preflight failed: missing access for device group(s):
+   NvRmMemInitNvmap failed: error Permission denied
+   NvSciBufModuleOpen failed. nvSciStatus: 50
+
+All transports require ``video`` permissions for imaging buffers and ISP access.
+GMSL also requires read/write access to host I2C and GPIO devices.
+The startup preflight requires access for all three device groups for every transport.
+Add your user to these groups on the Jetson host:
+
+.. code:: bash
+
+   sudo usermod -aG video,i2c,gpio "$USER"
+
+Verify the groups inside it with:
+
+.. code:: bash
+
+   id -nG
+
+Log out and back in for the new membership to take effect. The camera process needs these permissions
+in the environment where it runs including in the development container.
+
+SIPL Camera Produces No Frames
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+The SIPL camera node initializes (``SIPL Camera initialized``) but no frames arrive, and after
+``first_frame_timeout_s`` (default 5 s) the node fails with:
+
+.. code:: text
+
+   [FATAL] [sipl_stereo_camera]: [left] No frames from sensor 0 within 5.0s. Verify the camera connection.
+
+Solution
+""""""""
+
+There are many potential reasons the cameras fail to produce frames. Below are some possible reasons:
+
+The Eagle CoE camera may flakily fail to produce frames after initializing but will recover after restarting the node.
+
+Confirm that the GMSL board has 12 V power and that the camera is on the channel corresponding to the ``link_mask`` parameter.
+
+For the Hawk GMSL camera, the Jetson might not be booted with the correct camera device tree.
+Re-run the readiness checks in the :doc:`Hawk GMSL Stereo Camera Setup </getting_started/sensors/hawk_setup>`
+guide and confirm that ``v4l2-ctl --list-devices`` reports ``ar0234``.
+
+HSB fails to initialize with error "Address already in use"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+Unable to bind to initialize HSB and configure the HSB transport driver. You see the following error message:
+
+.. code:: bash
+
+   [HSB] Error configuring driver: bind failed with errno=98: "Address already in use"
+
+Solution
+""""""""
+
+Another Holoscan instance may still be running. Check and stop it:
+
+.. code:: bash
+
+    ps aux | grep hololink
+
+If there is output, kill the process if it is safe to do so:
+
+.. code:: bash
+
+    kill -9 <pid>
+
+SIPL Headers or Libraries Not Found
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+You see the following error message when building the package:
+
+.. code-block:: text
+
+    CMake Error: SIPL headers not found at: /usr/src/jetson_sipl_api/sipl/include
+
+Solution
+""""""""
+
+1. Install the SIPL libraries through NVIDIA SDK Manager.
+
+2. Verify that the SIPL libraries and headers are present:
+
+   .. code-block:: bash
+
+       ls /usr/lib/aarch64-linux-gnu/nvidia/libnvsipl*
+       ls /usr/src/jetson_sipl_api/sipl/include/
+
+Invalid MAC or IP Address Format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+.. code-block:: text
+
+    Invalid MAC address format, expected XX:XX:XX:XX:XX:XX
+    Invalid IP address format, expected XXX.XXX.XXX.XXX
+
+Solution
+""""""""
+
+- Make sure to retrieve the CoE camera's specific MAC and IP addresses. Refer to the :doc:`Eagle CoE Stereo Camera Setup </getting_started/sensors/eagle_setup>` guide for instructions.
+- Use colon-separated hex format for MAC addresses: ``8c:1f:64:6d:70:03``
+- Use dotted decimal format for IP addresses: ``192.168.1.2``
+- Verify that the addresses match the camera documentation or EEPROM data.
+
+HSB ID Mismatch
+^^^^^^^^^^^^^^^
+
+Symptom
+"""""""
+
+.. code-block:: text
+
+    No matching transport found for override: hsb_id=X
+    No matching camera found for override: hsb_id=X
+
+Solution
+""""""""
+
+1. Verify that the ``hsb_id`` parameter matches the platform configuration.
+2. Check the HSB ID in the camera system config.
+3. For VB1940, the default HSB ID is typically ``0``.
+4. Verify that the HSB ID matches across transport and camera configuration.
+
+.. |package_name| replace:: ``isaac_ros_sipl_camera``

@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-new-tab-link.css?v=d87cb1ac" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/isaac.css?v=af4c1f8d" />
   
   <!-- So that users can add custom icons -->
@@ -49,7 +49,7 @@
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=01823362"></script>
-    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -58,13 +58,13 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Calibration File Requirements for Isaac" href="../isaac_urdf_requirements/index.html" />
-    <link rel="prev" title="Sensor Mounting Rig" href="index.html" />
+    <link rel="prev" title="thor_devkit_realsense_rig_description" href="thor_devkit_realsense_rig_description/index.html" />
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Sep 21, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 17, 2026"/>
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -275,7 +275,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/zed_setup.html">Isaac ROS ZED Setup</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/eagle_setup.html">Isaac ROS Eagle CoE Stereo Camera Setup</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/hawk_setup.html">Isaac ROS Hawk GMSL Stereo Camera Setup</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/camera_calibration.html">Monocular Camera Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/sensing_thor_setup.html">Isaac ROS Sensing Thor GMSL2 Camera Setup</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../getting_started/sensors/amr_extrinsic_calibration.html">Extrinsic Calibration for Mobile Robots</a></li>
 </ul>
 </details></li>
@@ -284,6 +284,19 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_workflows/index.html">Reference Workflows</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_workflows/isaac_for_mobility/index.html">Isaac for Mobility</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/index.html">Isaac for Physical AI</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/reference_architecture.html">Reference Architecture</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/tutorials/tutorials.html">GR00T Reference Workflow for Unitree G1</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_teleop.html">Teleoperate the Unitree G1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_record.html">Record Demonstrations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_convert.html">Convert MCAP Bags to a LeRobot Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_finetune.html">Fine-Tune GR00T N</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_leapp_export.html">Export the Policy with LEAPP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference_workflows/isaac_for_physical_ai/tutorials/tutorial_deploy.html">Deploy the Fine-Tuned Policy</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../performance/index.html">Performance Summary</a></li>
@@ -422,10 +435,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_cumotion/isaac_ros_cumotion_robot_segmenter/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">cumotion</span><span class="pre">_</span><wbr/><span class="pre">robot</span><span class="pre">_</span><wbr/><span class="pre">segmenter</span></code></a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_data_tools/index.html">Isaac ROS Data Tools</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_data_tools/index.html">Isaac ROS Data Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_data_tools/isaac_ros_mcap_lerobot_converter/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">mcap</span><span class="pre">_</span><wbr/><span class="pre">lerobot</span><span class="pre">_</span><wbr/><span class="pre">converter</span></code></a></li>
+</ul>
+</details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_deploy/index.html">Isaac ROS Deploy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_deploy/tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_deploy/tutorials/deploy_agile.html">Tutorial: Deploying AGILE WBC on the Unitree G1 in Simulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_deploy/tutorials/deploy_agile.html">Tutorial: Deploying AGILE WBC on the Unitree G1</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_deploy/how_to_guides/index.html">How-to guides</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -478,6 +494,12 @@
 </details></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_grasping/index.html">Isaac ROS Grasping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_grasping/isaac_ros_graspgenx/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">graspgenx</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_grasping/isaac_ros_graspgenx_interfaces/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">graspgenx</span><span class="pre">_</span><wbr/><span class="pre">interfaces</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_grasping/isaac_ros_graspgenx_models_install/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">graspgenx</span><span class="pre">_</span><wbr/><span class="pre">models</span><span class="pre">_</span><wbr/><span class="pre">install</span></code></a></li>
+</ul>
+</details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/index.html">Isaac ROS Image Pipeline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_depth_image_proc/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">depth</span><span class="pre">_</span><wbr/><span class="pre">image</span><span class="pre">_</span><wbr/><span class="pre">proc</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_image_pipeline/isaac_ros_image_pipeline/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">image</span><span class="pre">_</span><wbr/><span class="pre">pipeline</span></code></a></li>
@@ -513,10 +535,7 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/index.html">Isaac ROS Mapping And Localization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_mapping_ros/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">mapping</span><span class="pre">_</span><wbr/><span class="pre">ros</span></code></a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">occupancy</span><span class="pre">_</span><wbr/><span class="pre">grid</span><span class="pre">_</span><wbr/><span class="pre">localizer</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../concepts/localization/lidar/tutorial_isaac_sim.html">Tutorial with Isaac Sim</a></li>
-</ul>
-</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_occupancy_grid_localizer/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">occupancy</span><span class="pre">_</span><wbr/><span class="pre">grid</span><span class="pre">_</span><wbr/><span class="pre">localizer</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_pointcloud_utils/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">pointcloud</span><span class="pre">_</span><wbr/><span class="pre">utils</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_global_localization/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">visual</span><span class="pre">_</span><wbr/><span class="pre">global</span><span class="pre">_</span><wbr/><span class="pre">localization</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_mapping_and_localization/isaac_ros_visual_mapping/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">visual</span><span class="pre">_</span><wbr/><span class="pre">mapping</span></code></a></li>
@@ -557,6 +576,14 @@
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_object_detection/isaac_ros_yolov8/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">yolov8</span></code></a></li>
 </ul>
 </details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_physical_ai/index.html">Isaac ROS Physical AI</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_teleop_bringup/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">unitree</span><span class="pre">_</span><wbr/><span class="pre">g1</span><span class="pre">_</span><wbr/><span class="pre">teleop</span><span class="pre">_</span><wbr/><span class="pre">bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_recorder/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">unitree</span><span class="pre">_</span><wbr/><span class="pre">g1</span><span class="pre">_</span><wbr/><span class="pre">recorder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_gr00t/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">unitree</span><span class="pre">_</span><wbr/><span class="pre">g1</span><span class="pre">_</span><wbr/><span class="pre">gr00t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_physical_ai/isaac_ros_unitree_g1_cloud_control_bringup/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">unitree</span><span class="pre">_</span><wbr/><span class="pre">g1</span><span class="pre">_</span><wbr/><span class="pre">cloud</span><span class="pre">_</span><wbr/><span class="pre">control</span><span class="pre">_</span><wbr/><span class="pre">bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_physical_ai/isaac_ros_data_flywheel/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">data</span><span class="pre">_</span><wbr/><span class="pre">flywheel</span></code></a></li>
+</ul>
+</details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/index.html">Isaac ROS Pose Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_centerpose/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">centerpose</span></code></a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_pose_estimation/isaac_ros_dope/index.html"><code class="package-name docutils literal notranslate"><span class="pre">isaac</span><span class="pre">_</span><wbr/><span class="pre">ros</span><span class="pre">_</span><wbr/><span class="pre">dope</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -579,6 +606,9 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_robots/index.html">Isaac ROS Robots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_robots/franka_fr3_ros2_control/index.html"><code class="package-name docutils literal notranslate"><span class="pre">franka</span><span class="pre">_</span><wbr/><span class="pre">fr3</span><span class="pre">_</span><wbr/><span class="pre">ros2</span><span class="pre">_</span><wbr/><span class="pre">control</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_robots/unitree_g1_bringup/index.html"><code class="package-name docutils literal notranslate"><span class="pre">unitree</span><span class="pre">_</span><wbr/><span class="pre">g1</span><span class="pre">_</span><wbr/><span class="pre">bringup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_robots/unitree_g1_description/index.html"><code class="package-name docutils literal notranslate"><span class="pre">unitree</span><span class="pre">_</span><wbr/><span class="pre">g1</span><span class="pre">_</span><wbr/><span class="pre">description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_robots/unitree_hg_ros2_control/index.html"><code class="package-name docutils literal notranslate"><span class="pre">unitree</span><span class="pre">_</span><wbr/><span class="pre">hg</span><span class="pre">_</span><wbr/><span class="pre">ros2</span><span class="pre">_</span><wbr/><span class="pre">control</span></code></a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../repositories_and_packages/isaac_ros_sipl_camera/index.html">Isaac ROS SIPL Camera</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -604,6 +634,7 @@
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Robots</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Sensor Mounting Rig</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="thor_devkit_realsense_rig_description/index.html"><code class="docutils literal notranslate"><span class="pre">thor_devkit_realsense_rig_description</span></code></a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">Multi-Camera RealSense Hardware Assembly Guide for Jetson Thor Developer Kit</a></li>
 </ul>
 </details></li>
@@ -673,18 +704,19 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../../v/release-3.2/index.html">release-3.2</a></dd>
-        <dd><a href="../../v/release-4.4/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.4</a></dd>
-        <dd><a href="../../v/release-4.5/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.5</a></dd>
-        <dd><a href="../../v/release-4.6/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.6</a></dd>
-        <dd><a href="../../v/release-5.0/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-5.0</a></dd>
+        <dd><a href="../../v/release-5.1/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-5.1</a></dd>
         <dd><a href="thor_devkit_realsense_rig_assembly.html">latest</a></dd>
         <dd><a href="../../v/release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../v/release-3.1/index.html">release-3.1</a></dd>
+        <dd><a href="../../v/release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../v/release-4.0/index.html">release-4.0</a></dd>
         <dd><a href="../../v/release-4.1/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.1</a></dd>
         <dd><a href="../../v/release-4.2/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.2</a></dd>
         <dd><a href="../../v/release-4.3/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.3</a></dd>
+        <dd><a href="../../v/release-4.4/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.4</a></dd>
+        <dd><a href="../../v/release-4.5/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.5</a></dd>
+        <dd><a href="../../v/release-4.6/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-4.6</a></dd>
+        <dd><a href="../../v/release-5.0/robots/sensor_mounting_rig/thor_devkit_realsense_rig_assembly.html">release-5.0</a></dd>
     </dl>
   </div>
 </div></div>
@@ -746,7 +778,7 @@
 <p>This guide shows how to assemble a hardware-synchronized, multi-camera system using
 three RealSense D435/D455 cameras with a Jetson Thor Developer Kit. This will require soldering a few components.</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_3rs.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_3rs.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_3rs.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_3rs.png/" />
 </figure>
 <p>This configuration follows the approach described in RealSense’s official <a class="reference external" href="https://simplecore.intel.com/realsensehub/wp-content/uploads/sites/63/Multiple_Camera_WhitePaper04.pdf" rel="noreferrer" target="_blank">Multicamera Configuration page</a>,
 which explains the additional connections used to enable hardware synchronization where one camera is designated
@@ -798,10 +830,10 @@ as the primary device that provides a sync pulse to the secondary cameras for pr
 </div>
 </li>
 <li><p>Print the camera rig frame.</p>
-<p>Use the STL file <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/sensor_mounting_rig/blob/release-5.0/thor_devkit_realsense_rig_description/meshes/thor_devkit_realsense_rig_frame.stl" rel="noreferrer" target="_blank">thor_devkit_realsense_rig_frame.stl</a>
+<p>Use the STL file <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/sensor_mounting_rig/blob/release-5.1/thor_devkit_realsense_rig_description/meshes/thor_devkit_realsense_rig_frame.stl" rel="noreferrer" target="_blank">thor_devkit_realsense_rig_frame.stl</a>
 to 3D-print the frame:</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3d_printed_rig.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3d_printed_rig.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3d_printed_rig.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3d_printed_rig.png/" />
 </figure>
 <p>The nominal positions for the center, left, and right cameras in the rig coordinate system are provided below:</p>
 <blockquote>
@@ -890,7 +922,7 @@ to 3D-print the frame:</p>
 <li><p>Connect the two wires to JST connectors and create a twisted pair.</p>
 <p>Gently connect the wires to pins 5 and 9 of the JST connectors. Avoid loose wires and twist the wires immediately after the connector across the entire length between connections. The pins are labeled as shown below:</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/rs_connector.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/rs_connector.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/rs_connector.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/rs_connector.png/" />
 </figure>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -901,11 +933,11 @@ after mounting them on the 3D-printed frame.</p>
 <li><p>Assemble the synchronization circuit</p>
 <p>Follow the circuit diagram below and create the camera connections with (recommended) filtering components soldered close to the cameras to minimize noise. Extend the wires with the 28 AWG wire to connect between the cameras as needed.</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/sync_module.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/sync_module.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/sync_module.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/sync_module.png/" />
 </figure>
 <p>The wiring should look similar to:</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3rs_hw_sync_cable.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3rs_hw_sync_cable.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3rs_hw_sync_cable.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/3rs_hw_sync_cable.png/" />
 </figure>
 </li>
 </ol>
@@ -914,14 +946,14 @@ after mounting them on the 3D-printed frame.</p>
 <h2>Hardware Assembly<a class="headerlink" href="#hardware-assembly" title="Link to this heading">#</a></h2>
 <p>Follow the steps below to assemble all prepared components with the Jetson Thor Developer Kit.</p>
 <figure class="align-default">
-<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_guide.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.0/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_guide.png/" />
+<img alt="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_guide.png/" src="https://media.githubusercontent.com/media/NVIDIA-ISAAC-ROS/.github/release-5.1/resources/isaac_ros_docs/robots/multi_realsense_assembly_guide/thor_assembly_guide.png/" />
 </figure>
 <p>After assembly is complete, connect USB 3.x cables to the RealSense cameras and
 the Jetson Thor Developer Kit. For three cameras, use a high-quality wall powered USB 3.x type A hub.</p>
 </section>
 <section id="urdf-files">
 <h2>URDF Files<a class="headerlink" href="#urdf-files" title="Link to this heading">#</a></h2>
-<p>URDF files are provided in the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/sensor_mounting_rig/blob/release-5.0/thor_devkit_realsense_rig_description" rel="noreferrer" target="_blank">thor_devkit_realsense_rig_description</a> package with the camera nominal positions on the rig. The respective launch file to publish the camera’s transformations is <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/sensor_mounting_rig/blob/release-5.0/thor_devkit_realsense_rig_description/launch/thor_devkit_realsense_rig_description.launch.py" rel="noreferrer" target="_blank">thor_devkit_realsense_rig_description.launch.py</a>.</p>
+<p>URDF files are provided in the <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/sensor_mounting_rig/blob/release-5.1/thor_devkit_realsense_rig_description" rel="noreferrer" target="_blank">thor_devkit_realsense_rig_description</a> package with the camera nominal positions on the rig. The respective launch file to publish the camera’s transformations is <a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/sensor_mounting_rig/blob/release-5.1/thor_devkit_realsense_rig_description/launch/thor_devkit_realsense_rig_description.launch.py" rel="noreferrer" target="_blank">thor_devkit_realsense_rig_description.launch.py</a>.</p>
 </section>
 </section>
 
@@ -936,12 +968,12 @@ the Jetson Thor Developer Kit. For three cameras, use a high-quality wall powere
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="index.html"
+       href="thor_devkit_realsense_rig_description/index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Sensor Mounting Rig</p>
+        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">thor_devkit_realsense_rig_description</span></code></p>
       </div>
     </a>
     <a class="right-next"
@@ -1071,7 +1103,7 @@ the Jetson Thor Developer Kit. For three cameras, use a high-quality wall powere
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Sep 21, 2026.
+  Last updated on Nov 17, 2026.
   <br/>
 </p></div>
       

@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-new-tab-link.css?v=d87cb1ac" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/tabs.css?v=a5c4661c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/isaac.css?v=177ef1d8" />
   
@@ -50,7 +50,7 @@
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../../_static/copybutton.js?v=01823362"></script>
-    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../../../_static/design-tabs.js?v=fcb327ea"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script src="../../../../_static/tabs.js?v=3030b3cb"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place';</script>
@@ -66,7 +66,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Sep 21, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 17, 2026"/>
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -762,18 +762,19 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../../../../../release-3.2/index.html">release-3.2</a></dd>
-        <dd><a href="../../../../../release-4.4/reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">release-4.4</a></dd>
-        <dd><a href="../../../../../release-4.5/reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">release-4.5</a></dd>
-        <dd><a href="tutorial_pick_and_place.html">release-4.6</a></dd>
-        <dd><a href="../../../../../release-5.0/index.html">release-5.0</a></dd>
+        <dd><a href="../../../../../release-5.1/index.html">release-5.1</a></dd>
         <dd><a href="../../../../../../index.html">latest</a></dd>
         <dd><a href="../../../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../../../release-3.1/index.html">release-3.1</a></dd>
+        <dd><a href="../../../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../../../release-4.0/reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">release-4.0</a></dd>
         <dd><a href="../../../../../release-4.1/reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">release-4.1</a></dd>
         <dd><a href="../../../../../release-4.2/reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">release-4.2</a></dd>
         <dd><a href="../../../../../release-4.3/reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">release-4.3</a></dd>
+        <dd><a href="../../../../../release-4.4/reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">release-4.4</a></dd>
+        <dd><a href="../../../../../release-4.5/reference_workflows/isaac_for_manipulation/tutorials/pick_and_place/tutorial_pick_and_place.html">release-4.5</a></dd>
+        <dd><a href="tutorial_pick_and_place.html">release-4.6</a></dd>
+        <dd><a href="../../../../../release-5.0/index.html">release-5.0</a></dd>
     </dl>
   </div>
 </div></div>
@@ -877,8 +878,8 @@ The Pick and Place reference workflow has been tested on NVIDIA® Jetson Thor™
 <p>Before editing any configuration files, copy them to the appropriate location and set up environment variables based on your installation method. This section handles <strong>all configuration file preparation</strong> (workflow config, behavior tree parameters, and blackboard parameters) and sets up environment variables for simplified command usage.</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" data-sync-group="installation" data-sync-id="binary" for="sd-tab-item-0">
-Binary Package</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-0-content" class="sd-tab-label" data-sync-group="installation" data-sync-id="binary" for="sd-tab-item-0">
+Binary Package</label><div class="sd-tab-content docutils" id="sd-tab-item-0-content">
 <p>Binary installations have read-only configuration files in system directories. Copy all necessary files to a writable location:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a directory for your custom configuration</span>
 mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config
@@ -887,16 +888,16 @@ mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span
 <p>Copy the workflow configuration file for your robot:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-2">
-UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-2-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-2">
+UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils" id="sd-tab-item-2-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_bringup<span class="k">)</span>/params/ur5e_robotiq_85_mac_and_cheese.yaml<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/my_robot_config.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-3">
-UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-3-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-3">
+UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils" id="sd-tab-item-3-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_bringup<span class="k">)</span>/params/ur10e_robotiq_2f_140_mac_and_cheese.yaml<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/my_robot_config.yaml
 </pre></div>
@@ -907,8 +908,8 @@ UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils">
 </div>
 </div>
 <input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-4">
-Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-4-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-4">
+Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils" id="sd-tab-item-4-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_bringup<span class="k">)</span>/params/flexiv_rizon4s_grav_gear_assembly.yaml<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/my_robot_config.yaml
 </pre></div>
@@ -918,8 +919,8 @@ Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils">
 <p>Copy behavior tree and blackboard parameter files:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-5">
-UR Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-5-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-5">
+UR Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-5-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_pick_and_place<span class="k">)</span>/params/multi_object_pick_and_place_behavior_tree_params.yaml<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/multi_object_pick_and_place_behavior_tree_params.yaml
 
@@ -929,8 +930,8 @@ cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>p
 </div>
 </div>
 <input id="sd-tab-item-6" name="sd-tab-set-2" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-6">
-Flexiv Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-6-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-6">
+Flexiv Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-6-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>--share<span class="w"> </span>isaac_ros_manipulation_pick_and_place<span class="k">)</span>/params/flexiv_pick_and_place_behavior_tree_params.yaml<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/flexiv_pick_and_place_behavior_tree_params.yaml
 
@@ -952,15 +953,15 @@ cp<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>p
 </ul>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-7">
-UR Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-7-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-7">
+UR Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-7-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/multi_object_pick_and_place_behavior_tree_params.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-8" name="sd-tab-set-3" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-8">
-Flexiv Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-8-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-8">
+Flexiv Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-8-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/flexiv_pick_and_place_behavior_tree_params.yaml
 </pre></div>
 </div>
@@ -971,15 +972,15 @@ Flexiv Robot</label><div class="sd-tab-content docutils">
 </ul>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-9" name="sd-tab-set-4" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-9">
-UR Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-9-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-9">
+UR Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-9-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/multi_object_pick_and_place_blackboard_params.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-10" name="sd-tab-set-4" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-10">
-Flexiv Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-10-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-10">
+Flexiv Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-10-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/isaac_ros_manipulation_config/flexiv_pick_and_place_blackboard_params.yaml
 </pre></div>
 </div>
@@ -993,23 +994,23 @@ Flexiv Robot</label><div class="sd-tab-content docutils">
 </div>
 </div>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" data-sync-group="installation" data-sync-id="source" for="sd-tab-item-1">
-Build from Source</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-1-content" class="sd-tab-label" data-sync-group="installation" data-sync-id="source" for="sd-tab-item-1">
+Build from Source</label><div class="sd-tab-content docutils" id="sd-tab-item-1-content">
 <p>When building from source with <code class="docutils literal notranslate"><span class="pre">--symlink-install</span></code>, you can edit configuration files directly in the source directories.</p>
 <p><strong>Files you’ll edit:</strong></p>
 <ul>
 <li><p><strong>Workflow configuration</strong>:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-11" name="sd-tab-set-5" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-11">
-UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-11-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-11">
+UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils" id="sd-tab-item-11-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_bringup/params/ur5e_robotiq_85_mac_and_cheese.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-12" name="sd-tab-set-5" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-12">
-UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-12-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-12">
+UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils" id="sd-tab-item-12-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_bringup/params/ur10e_robotiq_2f_140_mac_and_cheese.yaml
 </pre></div>
 </div>
@@ -1019,8 +1020,8 @@ UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils">
 </div>
 </div>
 <input id="sd-tab-item-13" name="sd-tab-set-5" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-13">
-Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-13-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-13">
+Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils" id="sd-tab-item-13-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_bringup/params/flexiv_rizon4s_grav_gear_assembly.yaml
 </pre></div>
 </div>
@@ -1031,15 +1032,15 @@ Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils">
 </ul>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-14" name="sd-tab-set-6" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-14">
-UR Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-14-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-14">
+UR Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-14-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-15" name="sd-tab-set-6" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-15">
-Flexiv Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-15-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-15">
+Flexiv Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-15-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_pick_and_place/params/flexiv_pick_and_place_behavior_tree_params.yaml
 </pre></div>
 </div>
@@ -1050,15 +1051,15 @@ Flexiv Robot</label><div class="sd-tab-content docutils">
 </ul>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-16" name="sd-tab-set-7" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-16">
-UR Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-16-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-16">
+UR Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-16-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-17" name="sd-tab-set-7" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-17">
-Flexiv Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-17-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-17">
+Flexiv Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-17-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="si">${</span><span class="nv">ISAAC_ROS_WS</span><span class="si">}</span>/src/isaac_ros_manipulation/isaac_ros_manipulation_pick_and_place/params/flexiv_pick_and_place_blackboard_params.yaml
 </pre></div>
 </div>
@@ -1079,18 +1080,18 @@ Flexiv Robot</label><div class="sd-tab-content docutils">
 <p><strong>Reference documentation:</strong></p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-18" name="sd-tab-set-8" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-18">
-UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-18-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-18">
+UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils" id="sd-tab-item-18-content">
 <p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.6/isaac_ros_manipulation_bringup/params/ur5e_robotiq_85_mac_and_cheese.yaml" rel="noreferrer" target="_blank">ur5e_robotiq_85_mac_and_cheese.yaml</a></p>
 </div>
 <input id="sd-tab-item-19" name="sd-tab-set-8" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-19">
-UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-19-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-19">
+UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils" id="sd-tab-item-19-content">
 <p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.6/isaac_ros_manipulation_bringup/params/ur10e_robotiq_2f_140_mac_and_cheese.yaml" rel="noreferrer" target="_blank">ur10e_robotiq_2f_140_mac_and_cheese.yaml</a></p>
 </div>
 <input id="sd-tab-item-20" name="sd-tab-set-8" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-20">
-Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-20-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-20">
+Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils" id="sd-tab-item-20-content">
 <p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.6/isaac_ros_manipulation_bringup/params/flexiv_rizon4s_grav_gear_assembly.yaml" rel="noreferrer" target="_blank">flexiv_rizon4s_grav_gear_assembly.yaml</a></p>
 </div>
 </div>
@@ -1148,16 +1149,16 @@ file.</p>
 <p><strong>Reference documentation:</strong></p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-21" name="sd-tab-set-9" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-21">
-UR Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-21-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-21">
+UR Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-21-content">
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.6/isaac_ros_manipulation_pick_and_place/params/multi_object_pick_and_place_behavior_tree_params.yaml" rel="noreferrer" target="_blank">Behavior Tree Parameters</a></p></li>
 <li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.6/isaac_ros_manipulation_pick_and_place/params/multi_object_pick_and_place_blackboard_params.yaml" rel="noreferrer" target="_blank">Blackboard Parameters</a></p></li>
 </ul>
 </div>
 <input id="sd-tab-item-22" name="sd-tab-set-9" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-22">
-Flexiv Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-22-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-22">
+Flexiv Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-22-content">
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.6/isaac_ros_manipulation_pick_and_place/params/flexiv_pick_and_place_behavior_tree_params.yaml" rel="noreferrer" target="_blank">Behavior Tree Parameters</a></p></li>
 <li><p><a class="reference external" href="https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_manipulation/blob/release-4.6/isaac_ros_manipulation_pick_and_place/params/flexiv_pick_and_place_blackboard_params.yaml" rel="noreferrer" target="_blank">Blackboard Parameters</a></p></li>
@@ -1236,33 +1237,33 @@ Flexiv Robot</label><div class="sd-tab-content docutils">
 <p>Point to your configuration file:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-23" name="sd-tab-set-10" type="radio">
-<label class="sd-tab-label" data-sync-group="installation" data-sync-id="binary" for="sd-tab-item-23">
-Binary Package</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-23-content" class="sd-tab-label" data-sync-group="installation" data-sync-id="binary" for="sd-tab-item-23">
+Binary Package</label><div class="sd-tab-content docutils" id="sd-tab-item-23-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_TEST_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/my_robot_config.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-24" name="sd-tab-set-10" type="radio">
-<label class="sd-tab-label" data-sync-group="installation" data-sync-id="source" for="sd-tab-item-24">
-Build from Source</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-24-content" class="sd-tab-label" data-sync-group="installation" data-sync-id="source" for="sd-tab-item-24">
+Build from Source</label><div class="sd-tab-content docutils" id="sd-tab-item-24-content">
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-25" name="sd-tab-set-11" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-25">
-UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-25-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-25">
+UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils" id="sd-tab-item-25-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_TEST_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/ur5e_robotiq_85_mac_and_cheese.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-26" name="sd-tab-set-11" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-26">
-UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-26-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-26">
+UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils" id="sd-tab-item-26-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_TEST_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/ur10e_robotiq_2f_140_mac_and_cheese.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-27" name="sd-tab-set-11" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-27">
-Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-27-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-27">
+Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils" id="sd-tab-item-27-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ISAAC_ROS_MANIPULATION_TEST_CONFIG</span><span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/flexiv_rizon4s_grav_gear_assembly.yaml
 </pre></div>
 </div>
@@ -1307,13 +1308,13 @@ It is recommended to run the tests manually using <code class="docutils literal 
 <li><p>Prepare the robot for remote control:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-28" name="sd-tab-set-12" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-28">
-UR Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-28-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-28">
+UR Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-28-content">
 <p>On the UR teach pendant, load the <strong>remote program</strong> and ensure that the robot is <strong>paused</strong> or <strong>stopped</strong> for safety purposes.</p>
 </div>
 <input id="sd-tab-item-29" name="sd-tab-set-12" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-29">
-Flexiv Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-29-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-29">
+Flexiv Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-29-content">
 <p>Ensure the Flexiv robot is powered on and the emergency stop is released. Make sure that the robot is in <code class="docutils literal notranslate"><span class="pre">Auto</span> <span class="pre">(Remote)</span></code> mode.</p>
 </div>
 </div>
@@ -1345,36 +1346,36 @@ py-trees-tree-viewer
 <li><p>Launch the workflow using the environment variable set earlier:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-30" name="sd-tab-set-13" type="radio">
-<label class="sd-tab-label" data-sync-group="installation" data-sync-id="binary" for="sd-tab-item-30">
-Binary Package</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-30-content" class="sd-tab-label" data-sync-group="installation" data-sync-id="binary" for="sd-tab-item-30">
+Binary Package</label><div class="sd-tab-content docutils" id="sd-tab-item-30-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_manipulation_bringup<span class="w"> </span>workflows.launch.py<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>manipulator_workflow_config:<span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/my_robot_config.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-31" name="sd-tab-set-13" type="radio">
-<label class="sd-tab-label" data-sync-group="installation" data-sync-id="source" for="sd-tab-item-31">
-Build from Source</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-31-content" class="sd-tab-label" data-sync-group="installation" data-sync-id="source" for="sd-tab-item-31">
+Build from Source</label><div class="sd-tab-content docutils" id="sd-tab-item-31-content">
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-32" name="sd-tab-set-14" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-32">
-UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-32-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-32">
+UR5e with Robotiq 2F-85</label><div class="sd-tab-content docutils" id="sd-tab-item-32-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_manipulation_bringup<span class="w"> </span>workflows.launch.py<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>manipulator_workflow_config:<span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/ur5e_robotiq_85_mac_and_cheese.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-33" name="sd-tab-set-14" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-33">
-UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-33-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur10e" for="sd-tab-item-33">
+UR10e with Robotiq 2F-140</label><div class="sd-tab-content docutils" id="sd-tab-item-33-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_manipulation_bringup<span class="w"> </span>workflows.launch.py<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>manipulator_workflow_config:<span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/ur10e_robotiq_2f_140_mac_and_cheese.yaml
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-34" name="sd-tab-set-14" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-34">
-Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-34-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-34">
+Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils" id="sd-tab-item-34-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>isaac_ros_manipulation_bringup<span class="w"> </span>workflows.launch.py<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>manipulator_workflow_config:<span class="o">=</span><span class="si">${</span><span class="nv">ISAAC_ROS_MANIPULATION_WORKFLOW_CONFIG_DIR</span><span class="si">}</span>/flexiv_rizon4s_grav_gear_assembly.yaml
 </pre></div>
@@ -1393,13 +1394,13 @@ Flexiv Rizon 4s with Grav</label><div class="sd-tab-content docutils">
 <li><p>Enable the robot controller:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-35" name="sd-tab-set-15" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-35">
-UR Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-35-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="ur5e" for="sd-tab-item-35">
+UR Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-35-content">
 <p>On the UR teach pendant, press <strong>play</strong> to enable the robot.</p>
 </div>
 <input id="sd-tab-item-36" name="sd-tab-set-15" type="radio">
-<label class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-36">
-Flexiv Robot</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-36-content" class="sd-tab-label" data-sync-group="robot" data-sync-id="flexiv" for="sd-tab-item-36">
+Flexiv Robot</label><div class="sd-tab-content docutils" id="sd-tab-item-36-content">
 <p>The Flexiv controller is activated automatically by the driver. No manual step is needed.</p>
 </div>
 </div>
@@ -1622,7 +1623,7 @@ The user can experiment with better depth estimation by using the <code class="d
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Sep 21, 2026.
+  Last updated on Nov 17, 2026.
   <br/>
 </p></div>
       

@@ -15,15 +15,22 @@ For more information on the SIPL framework, see:
 Host System Compatibility
 --------------------------
 
-Only the **Jetson AGX Orin Developer Kit** on **JetPack :ir_jetpack_version:.0** (:ir_l4t_version:`<upper>`.0) with a **Leopard Imaging Hawk**
-camera attached over GMSL with a **P3762_A03** GMSL board was validated together with the Isaac ROS ``isaac_ros_sipl_camera`` package. Other platforms may also be compatible.
+This guide is verified with the following host hardware and JetPack configuration:
+
+* **Jetson AGX Orin Developer Kit**.
+* **JetPack :ir_jetpack_version:.1** (:ir_l4t_version:`<upper>`.1).
+
+Jetson Thor systems with GMSL2 inputs such as partner carrier boards with GMSL expansion may
+also work but are not covered in this guide.
 
 Hardware Requirements
 ---------------------
 
-* **Jetson AGX Orin Developer Kit** with JetPack :ir_jetpack_version: installed.
+The following camera hardware is required:
+
 * **Leopard Imaging Hawk stereo camera** (dual AR0234, GMSL2).
-* A **GMSL camera distribution board** for the Orin AGX (e.g. Leopard Imaging ``P3762_A03`` GMSL board. Older revisions of ``P3762`` and ``E3653`` boards are not currently supported.), with a dedicated **12 V power input** and one or more camera channels.
+* **Leopard Imaging** ``P3762_A03`` **GMSL distribution board** with one or more camera channels. Older revisions of ``P3762`` and ``E3653`` boards are not currently supported.
+* A dedicated **12 V power supply** for the GMSL distribution board.
 * The FAKRA/coax cabling that ships with the camera kit.
 
 .. note::
@@ -126,6 +133,9 @@ This section covers problems bringing up the camera hardware and device tree. Fo
 the camera nodes, refer to the troubleshooting section of the
 :doc:`Isaac ROS SIPL Camera </repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index>`
 documentation.
+
+If the cameras fail to initialize, check the ``i2c`` and ``gpio`` group permissions.
+Refer to :ref:`sipl_camera_group_permissions` for the permission setup.
 
 Jetson-IO Cannot Find a Base DTB
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -239,9 +249,9 @@ The log ring buffer can rotate, so an empty grep is not itself proof of a proble
 
 .. note::
 
-   Only single-link GMSL camera capture has been proven to work as of the Jetson Linux (L4T) :ir_l4t_version:`<upper>`
-   release. Select a single link with ``link_mask``. Concurrent multi-link capture is not yet
-   supported by the SIPL framework and driver level.
+   Only a single Hawk GMSL link has been validated to work as of SIPL release in JetPack 7.2.
+   Future releases will support multiple links. Select one link with ``link_mask`` as both Hawk stereo
+   sensors use that link.
 
 Frame Drop / Discontinuity Warnings at Startup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

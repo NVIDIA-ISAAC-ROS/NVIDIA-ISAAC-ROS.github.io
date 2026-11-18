@@ -12,15 +12,18 @@ For more information on the CoE connectivity and the SIPL framework, see the
 Host System Compatibility
 --------------------------
 
-Only **Jetson AGX Thor** on **JetPack :ir_jetpack_version:.0** (:ir_l4t_version:`<upper>`.0) with the **Leopard Imaging Eagle VB1940** camera is validated.
+This guide is verified with the following host hardware and JetPack configuration:
 
-Other host systems supported by Holoscan Sensor Bridge may also be compatible but are not validated.
-To find a list of other supported systems, see the `Holoscan Sensor Bridge setup <https://docs.nvidia.com/holoscan/sensor-bridge/getting-started/host-setup>`__ page.
+* **Jetson AGX Thor Developer Kit**.
+* **JetPack :ir_jetpack_version:.1** (:ir_l4t_version:`<upper>`.1).
+
+CoE camera streaming uses Thor's CoE capture path through its MGBE interface enabled by the SIPL framework.
 
 Hardware Requirements
 ---------------------
 
-* **Jetson AGX Thor Developer Kit** with JetPack :ir_jetpack_version: installed.
+The following camera hardware is required:
+
 * **Leopard Imaging Eagle VB1940 stereo camera** (``LI-VB1940-STXXX-10GIGE``):
   See `Leopard Imaging website <https://leopardimaging.com/product-category/depth-sensing/stereoscopic-cameras/li-vb1940-stxxx-10gige/>`__ for available models.
 * **RJ45 Ethernet cable**: Cat 6 or better.
@@ -104,7 +107,7 @@ This tutorial assumes you have completed the instructions in
 
    This confirms the camera is reachable through the ``mgbe0_0`` network interface at ``192.168.0.2``.
 
-#. Verify that the HSB board firmware version is at least ``0x2510``. Check the ``hsb_ip_version`` field in the
+#. Verify that the HSB board firmware version is at least ``0x2603``. Check the ``hsb_ip_version`` field in the
    ``hololink-enumerate`` output in the previous step.
 
    If a firmware update is required, follow the instructions at

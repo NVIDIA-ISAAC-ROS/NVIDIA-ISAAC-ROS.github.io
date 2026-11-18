@@ -1,0 +1,159 @@
+====================
+MPS GPU Partitioning
+====================
+
+The Isaac ROS GPU Partitioning package configures static streaming multiprocessor (SM)
+partitions with NVIDIA CUDA Multi-Process Service (MPS). Use it when multiple ROS 2
+processes or component containers share one GPU and you need to assign a fixed portion
+of the GPU's SMs to each workload.
+
+The package creates the requested partitions through ``nvidia-cuda-mps-control`` and
+sets the ``CUDA_MPS_SM_PARTITION`` environment variable for each process. It records
+the resulting partition IDs and SM counts in
+``/tmp/nvidia-mps/gpu_partitions.yaml`` so later launch files can reuse the
+configuration.
+
+CUDA MPS SM partitioning controls SM allocation. It does not partition GPU memory or
+provide complete isolation between workloads.
+
+Tutorial
+--------
+
+.. toctree::
+   :maxdepth: 1
+
+   tutorial
+
+How It Works
+------------
+
+Each partition configuration specifies a GPU device and a number of MPS chunks. The
+package queries the MPS server to determine the number of SMs in each available chunk,
+then creates the requested partitions. The number of SMs assigned to a partition is
+the requested chunk count multiplied by the MPS server's SMs per chunk.
+
+Set the ``chunks`` value for a partition to a positive integer. A partition named
+``default`` with ``chunks: 0`` receives all chunks that remain after the explicitly
+sized partitions are created.
+
+Prerequisites
+-------------
+
+Before you configure partitions, ensure that:
+
+* Your system has an NVIDIA GPU and CUDA MPS support for static SM partitioning.
+* The installed ``nvidia-cuda-mps-control`` binary reports version ``13010`` or later.
+* The user that launches the application can run the required ``sudo`` commands. The
+  package uses ``sudo -E nvidia-cuda-mps-control`` to create, remove, start, and stop
+  MPS partitions.
+* The Python environment includes the ``pynvml`` package, which the partition manager
+  uses to identify the GPU.
+* By default, the package assigns ownership of a newly created MPS directory to the
+  user that launches the process. If you set ``mps_user``, the host must contain that
+  account.
+
+Check the MPS control binary version:
+
+.. code-block:: bash
+
+   nvidia-cuda-mps-control -v
+
+Configure Partitions
+--------------------
+
+Create a YAML configuration file with an ``sm_partitions`` list. The current package
+creates partitions on the device specified by the first entry, so use one GPU device
+per configuration. The requested chunks must not exceed the chunks available from the
+MPS server. Number of SMs per chunk is determined by the GPU architecture and CUDA
+driver version.
+
+For example, the following configuration assigns one chunk to the perception process, two chunks
+to the planning process, and the remaining chunks to the default process:
+
+.. code-block:: yaml
+
+   %YAML 1.2
+   ---
+   sm_partitions:
+     - name: perception
+       device: 0
+       chunks: 1
+     - name: planning
+       device: 0
+       chunks: 2
+     - name: default
+       device: 0
+       chunks: 0
+
+Use a Partition in a Launch File
+--------------------------------
+
+Create a ``GpuPartition`` instance before creating the processes that use the GPU.
+Set ``start_server=True`` to start CUDA MPS when it is not already running. Set
+``clear_partitions=True`` only when you intend to remove any existing static MPS
+partitions before applying the new configuration. By default, a newly created MPS
+directory is owned by the launching user. Set ``mps_user`` to assign ownership to a
+different local account.
+
+.. code-block:: python
+
+   from isaac_ros_gpu_partitioning.gpu_partitioning import GpuPartition
+   from launch import LaunchDescription
+   from launch_ros.actions import ComposableNodeContainer
+
+
+   def generate_launch_description():
+       partitions = GpuPartition(
+           config_file='/path/to/partitions.yaml',
+           start_server=True,
+           clear_partitions=False)
+       partition_id, _ = partitions.get_partition_id('perception')
+
+       container = ComposableNodeContainer(
+           name='perception_container',
+           package='rclcpp_components',
+           executable='component_container_mt',
+           composable_node_descriptions=[],
+           additional_env={
+               'CUDA_MPS_SM_PARTITION': str(partition_id),
+           })
+       return LaunchDescription([container])
+
+For multiple processes, call ``get_partition_id`` for each configured partition and
+set the corresponding value in each container's ``additional_env`` dictionary. You
+can also use ``gpu_partition_launch_action`` or
+``gpu_partition_launch_action_group`` to generate launch actions from partition
+names.
+
+Manage the MPS Server
+---------------------
+
+The package uses ``/tmp/nvidia-mps`` as the default CUDA MPS pipe and log directory.
+Use the included scripts when you need to manage the MPS server outside a ROS 2 launch
+file:
+
+.. code-block:: bash
+
+   ros2 run isaac_ros_gpu_partitioning start_cuda_mps.sh
+
+To stop the server, run:
+
+.. code-block:: bash
+
+   ros2 run isaac_ros_gpu_partitioning stop_cuda_mps.sh
+
+Both scripts invoke ``sudo`` and might prompt for your password.
+
+Troubleshooting
+---------------
+
+If partition creation fails, first check that the CUDA MPS server is running and that
+the configured chunk count fits the available MPS chunks:
+
+.. code-block:: bash
+
+   nvidia-cuda-mps-control lspart
+
+If an existing MPS configuration conflicts with the requested configuration, recreate
+the ``GpuPartition`` instance with ``clear_partitions=True``. This removes existing
+static MPS partitions before the package creates the configured partitions.

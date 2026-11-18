@@ -14,7 +14,7 @@ This quickstart has been tested and qualified on **Jetson AGX Thor** and **x86_6
 
 - `PICO 4 Ultra <https://www.picoxr.com/global/products/pico4-ultra>`__ or
   `Meta Quest 3 <https://www.meta.com/quest/quest-3/>`__ headset
--  If no XR headset is available, the emulator provided by `Isaac Teleop Core <https://nvidia.github.io/IsaacTeleop>`__ can be used instead
+-  If no XR headset is available, the emulator provided by `Isaac Teleop Core <https://nvidia.github.io/IsaacCapture/release/1.5.x/index.html>`__ can be used instead
 - A stable network connection meeting the `CloudXR network requirements <https://docs.nvidia.com/cloudxr-sdk/latest/requirement/network_setup.html>`__
 
 Set Up Development Environment
@@ -105,8 +105,8 @@ Run Launch File
 
 #. After the ROS launch command is running, connect the XR headset to the
    teleop server. In your headset's browser, open the
-   `CloudXR web client <https://nvidia.github.io/IsaacTeleop/client/release-1.3.x/#/real/isaacros>`__ and follow the
-   `headset connection guide <https://nvidia.github.io/IsaacTeleop/release/1.3.x/getting_started/quick_start.html#connect-an-xr-headset>`__.
+   `CloudXR web client <https://nvidia.github.io/IsaacCapture/client/release-1.5.x/#/real/isaacros>`__ and follow the
+   `headset connection guide <https://nvidia.github.io/IsaacCapture/release/1.5.x/getting_started/quick_start.html#connect-an-xr-headset>`__.
 
    .. note::
 
@@ -181,6 +181,8 @@ Usage
 Launch Arguments
 ^^^^^^^^^^^^^^^^
 
+This launch uses native OpenXR controllers and the G1 TriHand retargeter.
+
 .. list-table::
    :header-rows: 1
 
@@ -248,13 +250,15 @@ Launch Arguments
      - ``string``
      - ``["left_hand_thumb_0_joint","left_hand_thumb_1_joint","left_hand_thumb_2_joint","left_hand_index_0_joint","left_hand_index_1_joint","left_hand_middle_0_joint","left_hand_middle_1_joint"]``
      - Left-hand finger joint names in TriHand retargeter order: thumb_rotation, thumb_proximal,
-       thumb_distal, index_proximal, index_distal, middle_proximal, middle_distal.
+       thumb_distal, index_proximal, index_distal, middle_proximal, middle_distal. Pass ``[]`` to
+       use the TriHand retargeter's default aliases.
 
    * - ``right_finger_joint_names``
      - ``string``
      - ``["right_hand_thumb_0_joint","right_hand_thumb_1_joint","right_hand_thumb_2_joint","right_hand_index_0_joint","right_hand_index_1_joint","right_hand_middle_0_joint","right_hand_middle_1_joint"]``
      - Right-hand finger joint names in TriHand retargeter order: thumb_rotation, thumb_proximal,
-       thumb_distal, index_proximal, index_distal, middle_proximal, middle_distal.
+       thumb_distal, index_proximal, index_distal, middle_proximal, middle_distal. Pass ``[]`` to
+       use the TriHand retargeter's default aliases.
 
    * - ``transform_rotation``
      - ``string``
@@ -276,6 +280,11 @@ Launch Arguments
      - ``string``
      - empty
      - Optional CloudXR environment config file passed to the in-process launcher.
+
+   * - ``cloudxr_client_route``
+     - ``string``
+     - ``/real/isaacros``
+     - CloudXR WebXR client route.
 
    * - ``cloudxr_accept_eula``
      - ``bool``

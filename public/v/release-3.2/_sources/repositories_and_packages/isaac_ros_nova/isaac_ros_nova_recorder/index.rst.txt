@@ -152,6 +152,9 @@ Run Launch File
 
       .. figure:: :ir_lfs:`<resources/isaac_ros_docs/repositories_and_packages/isaac_ros_nova/isaac_ros_nova_recorder/enable_websocket.png>`
 
+   If Foxsight reports a WebSocket connection failure, refer to
+   :ref:`isaac-ros-nova-recorder-foxsight-connection-fails`.
+
 3. In the data_recorder UI, to start a new recording session, follow these steps:
 
    a. Input Author: Enter the name of the person or entity responsible for the recording.
@@ -294,6 +297,75 @@ Troubleshooting
 | :doc:`Isaac ROS Troubleshooting </troubleshooting/index>`
 | `AWS S3 Troubleshooting <https://docs.aws.amazon.com/AmazonS3/latest/userguide/troubleshooting.html>`__
 
+.. _isaac-ros-nova-recorder-foxsight-connection-fails:
+
+Foxsight WebSocket Connection Fails
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If Foxsight displays a connection failure that references the
+``foxglove.websocket.v1`` protocol, check the installed bridge version:
+
+.. code:: bash
+
+   dpkg-query -W -f='${Package} ${Version}\n' ros-humble-foxglove-bridge
+
+``foxglove_bridge`` version 3.x accepts the ``foxglove.sdk.v1`` WebSocket subprotocol. The
+Foxsight version bundled with this release requests ``foxglove.websocket.v1``. This version
+mismatch prevents Foxsight from connecting even when port ``8765`` is reachable.
+
+As a temporary workaround, build ``foxglove_bridge`` version 0.8.5 in an overlay inside
+the running development container. This workaround was validated with release 3.2 on
+Nova Carter.
+
+.. code:: bash
+
+   mkdir -p ${HOME}/foxglove_legacy_ws/src
+
+   if [ ! -d ${HOME}/foxglove_legacy_ws/src/foxglove_bridge/.git ]; then
+     git clone --depth 1 --branch 0.8.5 \
+       https://github.com/foxglove/ros-foxglove-bridge.git \
+       ${HOME}/foxglove_legacy_ws/src/foxglove_bridge
+   fi
+
+   git -C ${HOME}/foxglove_legacy_ws/src/foxglove_bridge \
+     fetch --depth 1 origin tag 0.8.5
+   git -C ${HOME}/foxglove_legacy_ws/src/foxglove_bridge \
+     checkout --detach 0.8.5
+   git -C ${HOME}/foxglove_legacy_ws/src/foxglove_bridge \
+     describe --tags --exact-match
+
+   sudo rosdep init 2>/dev/null || true
+   rosdep update
+
+   cd ${HOME}/foxglove_legacy_ws
+   source /opt/ros/humble/setup.bash
+
+   rosdep install \
+     --from-paths src \
+     --ignore-src \
+     --rosdistro humble \
+     -r -y
+
+   colcon build \
+     --symlink-install \
+     --packages-select foxglove_bridge
+
+Stop the running Nova Recorder process by pressing ``Ctrl+C`` in its terminal. Source the
+overlay and verify that ROS resolves the legacy bridge:
+
+.. code:: bash
+
+   source /opt/ros/humble/setup.bash
+   source ${HOME}/foxglove_legacy_ws/install/setup.bash
+
+   ros2 pkg prefix foxglove_bridge
+   ros2 pkg xml foxglove_bridge | grep '<version>'
+
+The expected package prefix is ``${HOME}/foxglove_legacy_ws/install/foxglove_bridge``.
+The expected package version is ``0.8.5``.
+Launch Nova Recorder from the same terminal so that it uses the overlay.
+The overlay is stored inside the disposable development container. Rebuild and source it
+after the container is removed.
 
 If the Data Recorder Panel is not visible, click on ``Layouts`` in the left sidebar, right-click on ``Default``, and select ``Revert`` to restore the default layout.
 

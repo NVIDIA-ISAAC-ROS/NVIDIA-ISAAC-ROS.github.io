@@ -51,7 +51,18 @@ Tutorial Walkthrough
 4. Complete :ref:`Set Up Development Environment <mission_client_set_up_env>`
    and :ref:`Build isaac_ros_mission_client <mission_client_build>` to build the packages.
 
-5. Start MQTT broker.
+5. Run the following launch files within the container to spin up ``mission_client`` and Nav2:
+
+    Use the Nova Carter client configuration, which disables the humanoid action handler.
+
+    .. code-block:: bash
+        :name: isaac_mission_client_launch
+
+        ros2 launch isaac_ros_vda5050_client_bringup isaac_ros_vda5050_client_nav2.launch.py \
+            init_pose_x:=-2.0 init_pose_yaw:=3.14159 \
+            config_file:="$(ros2 pkg prefix --share isaac_ros_vda5050_client_bringup)/config/carter_vda5050_client_params.yaml"
+
+6. Start MQTT broker.
 
     The MQTT broker is used for communication between the Mission Dispatch and the robots. There are many ways to run an MQTT broker, including as a system daemon, a standalone application, or a Docker container. The following example uses `mosquitto` as the MQTT broker.
 
@@ -79,13 +90,6 @@ Tutorial Walkthrough
 
         docker run -it --network host -v ~/mosquitto.sh:/mosquitto.sh -d eclipse-mosquitto:latest sh mosquitto.sh 1883 9001
 
-6. Run the following launch files within the container to spin up ``mission_client`` and Nav2:
-
-    .. code-block:: bash
-        :name: isaac_mission_client_launch
-
-        ros2 launch isaac_ros_vda5050_client_bringup isaac_ros_vda5050_client_nav2.launch.py init_pose_x:=-2.0 init_pose_yaw:=3.14159
-
 7. Start `Mission Dispatch <https://github.com/nvidia-isaac/isaac_mission_dispatch#getting-started-with-deployment-recommended>`__ with Docker.
 
     - On the Postgres database:
@@ -112,35 +116,16 @@ Tutorial Walkthrough
 
       Start the API and database server with the official Docker container.
 
-      .. tab-set::
+      .. code-block:: bash
 
-          .. tab-item:: x86_64 (amd64)
+          docker run -it --network host nvcr.io/nvidia/isaac/mission-database:5.0.0
 
-              .. code-block:: bash
-
-                  docker run -it --network host nvcr.io/nvidia/isaac/mission-database:4.3.0-amd64
-
-          .. tab-item:: ARM64
-
-              .. code-block:: bash
-
-                  docker run -it --network host nvcr.io/nvidia/isaac/mission-database:4.3.0-arm64
 
       To see what configuration options are, run:
 
-      .. tab-set::
+      .. code-block:: bash
 
-          .. tab-item:: x86_64 (amd64)
-
-              .. code-block:: bash
-
-                  docker run -it --network host nvcr.io/nvidia/isaac/mission-database:4.3.0-amd64 --help
-
-          .. tab-item:: ARM64
-
-              .. code-block:: bash
-
-                  docker run -it --network host nvcr.io/nvidia/isaac/mission-database:4.3.0-arm64 --help
+          docker run -it --network host nvcr.io/nvidia/isaac/mission-database:5.0.0 --help
 
       # For example, if you want to change the port for the user API from the default 5000 to 5002, add `--port 5002` configuration option in the command.
 
@@ -148,19 +133,9 @@ Tutorial Walkthrough
 
       Start the Mission Dispatch server with the official Docker container.
 
-      .. tab-set::
+      .. code-block:: bash
 
-          .. tab-item:: x86_64 (amd64)
-
-              .. code-block:: bash
-
-                  docker run -it --network host nvcr.io/nvidia/isaac/mission-dispatch:4.3.0-amd64
-
-          .. tab-item:: ARM64
-
-              .. code-block:: bash
-
-                  docker run -it --network host nvcr.io/nvidia/isaac/mission-dispatch:4.3.0-arm64
+          docker run -it --network host nvcr.io/nvidia/isaac/mission-dispatch:5.0.0
 
       # To see what the configuration options are, add --help option after the command.
 

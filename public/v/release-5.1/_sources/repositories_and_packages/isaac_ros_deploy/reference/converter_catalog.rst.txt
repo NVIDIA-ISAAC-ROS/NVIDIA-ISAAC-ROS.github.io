@@ -1,0 +1,147 @@
+=================
+Converter Catalog
+=================
+
+The built-in converters that Isaac ROS Deploy ships, keyed by the ``kind`` string
+each input/output term carries in its LEAPP bundle. For what a converter *is* and
+how the runtime chooses one, refer to :doc:`../concepts/converters`. To add a
+converter for a signal not listed here, refer to
+:doc:`../how_to_guides/add_custom_converter`.
+
+ros2_nodes - input converters (message → tensor)
+------------------------------------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 34 40 26
+
+   * - ``kind``
+     - ROS message type
+     - Notes
+   * - ``state/joint/position``
+     - ``sensor_msgs/msg/JointState``
+     - reordered by ``element_names`` (joint names)
+   * - ``state/joint/velocity``
+     - ``sensor_msgs/msg/JointState``
+     -
+   * - ``state/body/position``
+     - ``geometry_msgs/msg/PoseStamped``
+     - position ``x``, ``y``, ``z``
+   * - ``state/body/rotation``
+     - ``sensor_msgs/msg/Imu`` *(default)* or ``geometry_msgs/msg/PoseStamped``
+     - orientation quaternion; select PoseStamped with ``source_message_type``
+   * - ``state/body/angular_velocity``
+     - ``sensor_msgs/msg/Imu``
+     -
+   * - ``state/body/linear_velocity``
+     - ``nav_msgs/msg/Odometry``
+     -
+   * - ``state/camera/image``
+     - ``sensor_msgs/msg/Image``
+     - ``rgb8``/``bgr8`` only → ``[1, H, W, C]`` float32
+   * - ``command/body/velocity``
+     - ``geometry_msgs/msg/Twist`` *(default)* or ``…/TwistStamped``
+     - select via ``source_message_type``
+   * - ``command/body/velocity_height``
+     - ``geometry_msgs/msg/Twist``
+     -
+   * - ``command/body/rotation``
+     - ``isaac_ros_deploy_interfaces/msg/BodyCommand``
+     -
+   * - ``command/body/target_position``
+     - ``isaac_ros_deploy_interfaces/msg/BodyCommand``
+     -
+   * - ``command/body/target_rotation``
+     - ``isaac_ros_deploy_interfaces/msg/BodyCommand``
+     -
+   * - ``command/joint/position``
+     - ``isaac_ros_deploy_interfaces/msg/JointCommand``
+     -
+   * - ``command/joint/velocity``
+     - ``isaac_ros_deploy_interfaces/msg/JointCommand``
+     -
+
+ros2_nodes - output converters (tensor → message)
+-------------------------------------------------
+
+A 2-D output tensor ``[1, N]`` produces a single-step
+``isaac_ros_deploy_interfaces/msg/JointCommand``. A 3-D output ``[1, H, N]``
+produces an ``…/msg/JointCommandTrajectory`` of ``H`` steps. Several output
+``kind``\ s can target the same message (for example, position + ``kp`` + ``kd`` written
+into one ``JointCommand``).
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - ``kind``
+     - Target message field
+   * - ``joint_pos_targets``, ``target/joint/position``, ``actions``
+     - ``JointCommand.position`` (or ``JointCommandTrajectory.position``)
+   * - ``joint_vel_targets``
+     - ``JointCommand.velocity``
+   * - ``joint_effort_targets``, ``target/joint/effort``
+     - ``JointCommand.effort``
+   * - ``stiffness_targets``, ``kp``
+     - ``JointCommand.kp``
+   * - ``damping_targets``, ``kd``
+     - ``JointCommand.kd``
+   * - ``body_rot_target``, ``body_ang_vel_target``
+     - ``isaac_ros_deploy_interfaces/msg/BodyCommand`` (2-D only)
+   * - ``velocity_command``
+     - ``geometry_msgs/msg/Twist``
+
+ros2_control - state interface converters (interfaces → tensor)
+---------------------------------------------------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - ``kind``
+     - ros2_control state interfaces read
+   * - ``state/joint/position``
+     - ``<joint>/position`` for each joint in ``element_names``
+   * - ``state/joint/velocity``
+     - ``<joint>/velocity`` for each joint in ``element_names``
+   * - ``state/body/rotation``
+     - ``imu/orientation.x``, ``.y``, ``.z``, ``.w``
+   * - ``state/body/angular_velocity``
+     - ``imu/angular_velocity.x``, ``.y``, ``.z``
+
+Any input ``kind`` not in this table is treated as a topic input. The
+controller subscribes to the corresponding ROS topic and uses the matching
+``ros2_nodes`` message-to-tensor converter (for example, ``command/body/velocity`` from
+``/cmd_vel``).
+
+ros2_control - command interface converters (tensor → interfaces)
+-----------------------------------------------------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - ``kind``
+     - ros2_control command interfaces written
+   * - ``target/joint/position``
+     - ``<prefix>/<joint>/position<suffix>``
+   * - ``kp``
+     - ``<prefix>/<joint>/kp<suffix>``
+   * - ``kd``
+     - ``<prefix>/<joint>/kd<suffix>``
+
+(``prefix``/``suffix`` come from the controller's ``command_prefix`` /
+``command_suffix`` parameters, used for controller chaining. Refer to
+:doc:`../concepts/ros2_control_runtime`.)
+
+Feedback and passthrough kinds
+------------------------------
+
+Some ``kind`` values are not converters:
+
+- ``last_actions`` (and other recurrent inputs) are feedback and builder kinds.
+  They are populated by the input builder from a previous output via
+  ``pipeline.feedback_flow``, not by a converter. Do not expect a message or
+  interface for them.
+- An input term with no ``kind`` falls back to a raw ``tensor`` passthrough
+  (it subscribes to a ``TensorList`` topic directly).

@@ -1,0 +1,115 @@
+==============
+|package_name|
+==============
+
+:ir_github:`<isaac_ros_grasping> <isaac_ros_graspgenx_models_install>`
+
+Model setup for the ``isaac_ros_graspgenx`` package.
+
+``install_graspgenx_models.sh`` reads the GraspGenX ONNX model, its external weights,
+and ``model_manifest.json`` from ``${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_graspgenx/model``.
+The script:
+
+#. Verifies each model file against its SHA-256 checksum in ``model_manifest.json``.
+#. Builds the native TensorRT plugin, ``libgraspgenx_plugins.so``, for the target GPU.
+#. Builds the FP16 TensorRT engine with ``trtexec``.
+
+The script writes these files to ``${ISAAC_ROS_WS}/isaac_ros_assets/models/graspgenx``:
+
+.. list-table::
+   :header-rows: 1
+
+   * - File
+     - Content
+   * - ``graspgenx_everything_fp16.engine``
+     - TensorRT engine for the target GPU
+   * - ``libgraspgenx_plugins.so``
+     - TensorRT plugin that the engine requires at runtime
+   * - ``engine_build.json``
+     - Build signature of the model, plugin, script, ``trtexec``, and GPU
+
+Run the installer with ``--eula`` to review and accept the model license before
+building the TensorRT engine.
+
+The script reuses the installed engine when the build signature is unchanged.
+Follow the sequence in :ref:`graspgenx-huggingface-export` below.
+
+.. _graspgenx-huggingface-export:
+
+Using Hugging Face checkpoints
+------------------------------
+
+Download `GraspGenXModel <https://huggingface.co/adithyamurali/GraspGenXModel>`__
+checkpoints and export ONNX using the model code bundled in this package's
+``vendor/`` directory. The exporter automatically downloads both generator and
+discriminator checkpoints and their configurations.
+
+.. code:: bash
+
+   export HF_GGX="${ISAAC_ROS_WS}/isaac_ros_assets/isaac_ros_graspgenx"
+
+The export writes the ONNX model, external weights, and ``model_manifest.json``
+to ``${HF_GGX}/model``, the installer's default input directory. Keep
+``ISAAC_ROS_WS`` unchanged between export and model setup.
+
+Install the export dependencies and run the exporter for your installation method:
+
+.. tabs::
+
+   .. tab:: Binary Package
+
+      Prerequisite: complete package installation and ROS environment sourcing
+      in the **Binary Package** tab of :ref:`graspgenx-package-installation`.
+      If you arrived here from the quickstart, these steps are already complete.
+
+      #. Prepare the export dependencies once per export environment. Skip this
+         step if ``${HF_GGX}/venv`` is already prepared:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_graspgenx_models_install install_graspgenx_models.sh --install-export-deps
+
+         This command only prepares the export environment; it does not build
+         the model or engine.
+
+      #. Download both checkpoints and export them to ONNX:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_graspgenx_models_install export_huggingface_model.sh \
+               --checkpoint-dir "${HF_GGX}/checkpoints" \
+               --output-dir "${HF_GGX}/model"
+
+      #. After the export finishes successfully, review and accept the model
+         EULA when prompted, then build the TensorRT engine and plugin:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_graspgenx_models_install install_graspgenx_models.sh --eula
+
+   .. tab:: Build from Source
+
+      Run the exporter from the checkout before building the model installation
+      package:
+
+      .. code:: bash
+
+         export GGX_PACKAGE="${ISAAC_ROS_WS}/src/isaac_ros_grasping/isaac_ros_graspgenx_models_install"
+         bash "${GGX_PACKAGE}/asset_scripts/install_graspgenx_models.sh" --install-export-deps
+         bash "${GGX_PACKAGE}/asset_scripts/export_huggingface_model.sh" \
+           --checkpoint-dir "${HF_GGX}/checkpoints" \
+           --output-dir "${HF_GGX}/model"
+
+      After the export finishes successfully, review and accept the model
+      EULA when prompted, then build the TensorRT engine and plugin from the
+      checkout:
+
+      .. code:: bash
+
+         bash "${GGX_PACKAGE}/asset_scripts/install_graspgenx_models.sh" --eula
+
+Continue with :ref:`the runtime asset paths <graspgenx-runtime-assets>` in the
+quickstart. Complete the export before building the model installation package
+from source.
+
+.. |package_name| replace:: ``isaac_ros_graspgenx_models_install``

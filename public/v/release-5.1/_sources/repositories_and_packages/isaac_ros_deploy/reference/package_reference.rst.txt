@@ -1,0 +1,86 @@
+=================
+Package Reference
+=================
+
+Isaac ROS Deploy is documented as one suite because its packages form a single
+deployment path. Launch files compose converters, runtime controllers, message
+interfaces, and platform adapters. Splitting those workflows across package
+pages would duplicate the shared configuration. This page records which package
+owns each part of the suite and links to its source.
+
+Packages
+========
+
+.. list-table::
+   :header-rows: 1
+   :widths: 27 53 20
+
+   * - Package
+     - Provides
+     - Source
+   * - ``isaac_ros_deploy``
+     - Metapackage that installs the core Isaac ROS Deploy runtime packages.
+     - :ir_github:`<isaac_ros_deploy> <isaac_ros_deploy>`
+   * - ``isaac_deploy_core``
+     - C++ inference and command-processing primitives shared by the runtimes.
+     - :ir_github:`<isaac_ros_deploy> <isaac_deploy/isaac_deploy_core>`
+   * - ``isaac_ros_deploy_ros2_control``
+     - ROS 2 control plugins for running LEAPP bundles in a controller loop,
+       forwarding topic commands into command interfaces, gating outputs through
+       safety controllers, and broadcasting commanded joint values.
+     - :ir_github:`<isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_ros2_control>`
+   * - ``isaac_ros_deploy_converters``
+     - Message and interface converters plus composable nodes for the ROS 2 node
+       runtime.
+     - :ir_github:`<isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_converters>`
+   * - ``isaac_ros_deploy_bringup``
+     - Launch files for the ROS 2 node inference pipeline.
+     - :ir_github:`<isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_bringup>`
+   * - ``isaac_ros_deploy_interfaces``
+     - ROS 2 message definitions used by Isaac ROS Deploy converters and
+       debugging tools.
+     - :ir_github:`<isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_interfaces>`
+   * - ``isaac_ros_deploy_isaac_sim_extension``
+     - Isaac Sim extension and helper scripts for topic-based deployment with
+       simulated robots.
+     - :ir_github:`<isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_isaac_sim_extension>`
+   * - ``isaac_ros_deploy_reference_applications``
+     - Reference applications demonstrating Isaac ROS Deploy integrations.
+     - :ir_github:`<isaac_ros_deploy> <isaac_deploy/isaac_ros_deploy_reference_applications>`
+   * - ``isaac_ros_inverse_dynamics``
+     - Inverse-dynamics utilities used by deploy examples.
+     - :ir_github:`<isaac_ros_deploy> <isaac_deploy/isaac_ros_inverse_dynamics>`
+   * - ``reference_motion``
+     - C++ library for loading and sampling reference motions.
+     - :ir_github:`<isaac_ros_deploy> <utils/reference_motion>`
+   * - ``reference_motion_ros``
+     - ROS 2 lifecycle wrapper and visualization interfaces for reference
+       motions.
+     - :ir_github:`<isaac_ros_deploy> <utils/reference_motion_ros>`
+
+ROS 2 Control Plugins
+=====================
+
+The ``isaac_ros_deploy_ros2_control`` package exports these controller plugins
+for controller-manager configuration:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 44 56
+
+   * - Plugin
+     - Purpose
+   * - ``isaac_ros_deploy_ros2_control/InferenceController``
+     - Runs a LEAPP bundle in the ``ros2_control`` update loop.
+   * - ``isaac_ros_deploy_ros2_control/SafetyController``
+     - Controller that can be chained to blend policy output and apply
+       out-of-domain checks before commands reach hardware.
+   * - ``isaac_ros_deploy_ros2_control/ForwardJointCommandController``
+     - Forwards ``JointCommand`` or ``JointState`` topic data into hardware
+       command interfaces.
+   * - ``isaac_ros_deploy_ros2_control/FreezeController``
+     - Holds joints at their activation positions using impedance commands.
+   * - ``isaac_ros_deploy_ros2_control/DisableController``
+     - Sets joint stiffness and damping commands to zero.
+   * - ``isaac_ros_deploy_ros2_control/JointCommandBroadcaster``
+     - Publishes commanded joint values for recording and inspection.

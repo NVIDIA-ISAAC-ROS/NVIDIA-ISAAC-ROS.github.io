@@ -1,10 +1,10 @@
-=============================================================
-Tutorial: Deploying AGILE WBC on the Unitree G1 in Simulation
-=============================================================
+===============================================
+Tutorial: Deploying AGILE WBC on the Unitree G1
+===============================================
 
 This tutorial will guide you through deploying the AGILE Whole-Body Control
-policy on a simulated Unitree G1 using Isaac ROS Deploy. It covers deployment
-in MuJoCo.
+policy on a Unitree G1 using Isaac ROS Deploy. It will cover deployment on both
+real robots and simulated robots.
 
 .. note::
 
@@ -32,6 +32,11 @@ Install and Build
 
 Choose the installation method that matches your deployment.
 
+.. note::
+
+   If you plan to deploy in Isaac Sim, follow the **Build from Source** path
+   because the Isaac Sim extension is released as source only.
+
 .. tabs::
 
    .. tab:: Binary Package
@@ -54,15 +59,14 @@ Choose the installation method that matches your deployment.
 
    .. tab:: Build from Source
 
-      #. Clone the ``isaac_ros_deploy``, ``isaac_ros_robots``, and
-         ``isaac_ros_learned_policies`` repositories under ``${ISAAC_ROS_WS}/src``:
+      #. Clone the ``isaac_ros_deploy`` and ``isaac_ros_robots`` repositories
+         under ``${ISAAC_ROS_WS}/src``:
 
          .. code:: bash
 
             cd ${ISAAC_ROS_WS}/src && \
                git clone :ir_clone:`<isaac_ros_deploy>` && \
-               git clone :ir_clone:`<isaac_ros_robots>` && \
-               git clone :ir_clone:`<isaac_ros_learned_policies>`
+               git clone :ir_clone:`<isaac_ros_robots>`
 
       #. Activate the Isaac ROS environment:
 
@@ -78,8 +82,7 @@ Choose the installation method that matches your deployment.
 
             rosdep update && rosdep install --from-paths \
                ${ISAAC_ROS_WS}/src/isaac_ros_deploy \
-               ${ISAAC_ROS_WS}/src/isaac_ros_robots \
-               ${ISAAC_ROS_WS}/src/isaac_ros_learned_policies --ignore-src -y
+               ${ISAAC_ROS_WS}/src/isaac_ros_robots --ignore-src -y
 
       #. Build the G1 bringup and its source dependencies:
 
@@ -97,22 +100,141 @@ Choose the installation method that matches your deployment.
 Deploy
 ------
 
-Validate the Isaac ROS Deploy runtime with the AGILE policy in MuJoCo.
+We recommend validating in simulation before deploying to the real robot.
 
-#. Launch the controller manager with MuJoCo and the AGILE policy:
+.. tabs::
 
-   .. code:: bash
+   .. tab:: MuJoCo
 
-      ros2 launch unitree_g1_bringup unitree_g1_controller_manager.launch.py \
-          hardware_type:=mujoco \
-          initial_controller_group:=agile_velocity
+      #. Launch the controller manager with MuJoCo and the AGILE policy:
 
-   This will open a MuJoCo viewer. A virtual gantry will hold the robot
-   upright during startup; press ``G`` to toggle it, ``[`` / ``]`` to
-   shorten / lengthen the rope.
+         .. code:: bash
 
-   The controller waits for its first reference twist command before it
-   activates. Continue with :ref:`agile-send-velocity-commands`.
+            ros2 launch unitree_g1_bringup unitree_g1_controller_manager.launch.py \
+                hardware_type:=mujoco \
+                initial_controller_group:=agile_velocity
+
+         This will open a MuJoCo viewer. A virtual gantry will hold the robot
+         upright during startup; press ``G`` to toggle it, ``[`` / ``]`` to
+         shorten / lengthen the rope.
+
+         The controller waits for its first reference twist command before it
+         activates. Continue with :ref:`agile-send-velocity-commands`.
+
+   .. tab:: Isaac Sim
+
+      .. note::
+
+         This deployment path requires the **Build from Source** installation
+         above because ``isaac_ros_deploy_isaac_sim_extension`` is source-only.
+
+      We will first have to bake a deploy USD for the G1, then launch Isaac Sim
+      with the deploy extension, and then launch the controller manager with
+      AGILE WBC. Refer to the Isaac Sim section of
+      :doc:`../how_to_guides/bring_your_own_embodiment` for more details on the
+      bake step.
+
+      #. Build the deploy extension without ``--symlink-install``:
+
+         .. code:: bash
+
+            cd ${ISAAC_ROS_WS}/ && \
+               colcon build --packages-up-to isaac_ros_deploy_isaac_sim_extension
+            source install/setup.bash
+
+         .. note::
+
+            A ``--symlink-install`` build leaves only an ``.egg-link`` in
+            ``site-packages``, so Isaac Sim cannot find the extension. When the
+            workspace is built inside the Isaac ROS container, the symlinks also
+            point to ``/workspaces/isaac_ros-dev/...`` paths that do not exist on
+            the host where Isaac Sim runs.
+
+      #. Bake the G1 deploy USD:
+
+         .. code:: bash
+
+            export PYTHONPATH=${ISAAC_ROS_WS}/src/isaac_ros_deploy/isaac_deploy/isaac_ros_deploy_isaac_sim_extension:$PYTHONPATH
+            export LD_LIBRARY_PATH=$ISAAC_PATH/exts/isaacsim.ros2.core/jazzy/lib:$LD_LIBRARY_PATH
+            export ROS_DISTRO=jazzy
+            export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+            PKG=isaac_ros_deploy_isaac_sim_extension.scripts
+
+            # The multiphysics G1 USD, on the Isaac assets server:
+            $ISAAC_PATH/python.sh -m $PKG.add_newton_actuators_to_robot \
+                --usd https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots_Multiphysics/Unitree/G1/g1.usda \
+                --out ${ISAAC_ROS_WS}/g1_actuators.usd
+            $ISAAC_PATH/python.sh -m $PKG.add_ros2_bridge_to_robot \
+                --usd ${ISAAC_ROS_WS}/g1_actuators.usd --out ${ISAAC_ROS_WS}/g1_deploy.usd
+
+      #. Launch Isaac Sim with the deploy extension and the baked USD, then
+         press **Play**. Point ``--ext-folder`` at the extension's installed
+         ``site-packages`` directory, created by the build above:
+
+         .. code:: bash
+
+            $ISAAC_PATH/isaac-sim.sh \
+                --ext-folder ${ISAAC_ROS_WS}/install/isaac_ros_deploy_isaac_sim_extension/lib/python3*/site-packages \
+                --enable isaac_ros_deploy_isaac_sim_extension \
+                --/exts/isaac_ros_deploy_isaac_sim_extension/usd=${ISAAC_ROS_WS}/g1_deploy.usd
+
+      #. In the Isaac ROS environment, bring up the AGILE controllers bound to
+         the Isaac Sim topics:
+
+         .. code:: bash
+
+            ros2 launch unitree_g1_bringup unitree_g1_controller_manager.launch.py \
+                hardware_type:=isaacsim \
+                initial_controller_group:=agile_velocity
+
+         ``hardware_type:=isaacsim`` binds the hardware interface to the
+         ``/isaac_sim_*`` topics, runs the controllers on Isaac Sim's clock, and
+         selects the stock ``controller_manager`` node.
+
+         The controller waits for its first reference twist command before it
+         activates. Continue with :ref:`agile-send-velocity-commands`.
+
+   .. tab:: Real Robot
+
+      .. warning::
+
+         Before operating on real hardware:
+
+         #. Ensure the working area is clear of people and other hazards.
+         #. Be prepared to quickly disable the robot by setting the
+            ``blend_ratio`` to ``0.0`` if something goes wrong.
+
+      #. Set up the host network on the machine physically connected to the G1.
+         Run the network setup command in the environment where
+         ``isaac_ros_robots_tools`` is installed:
+
+         .. code:: bash
+
+            ros2 run isaac_ros_robots_tools setup_network.py
+
+         The script interactively guides you through network setup. Select the
+         network interface physically connected to the G1.
+
+         .. note::
+
+            If multiple people or robots are working on the same network, set a
+            unique ``ROS_DOMAIN_ID`` in every terminal before launching.
+            Otherwise, DDS cross-talk may cause unexpected robot behavior. For
+            this and other known failure modes, refer to
+            :doc:`Troubleshooting <../troubleshooting/index>`.
+
+      #. Launch the AGILE policy on hardware. Replace ``<your_interface>`` with
+         the interface selected in the previous step:
+
+         .. code:: bash
+
+            ros2 launch unitree_g1_bringup unitree_g1_controller_manager.launch.py \
+                hardware_type:=real \
+                network_interface:=<your_interface> \
+                initial_controller_group:=agile_velocity
+
+         The controller waits for its first reference twist command before it
+         activates. Continue with :ref:`agile-send-velocity-commands`.
 
 .. _agile-send-velocity-commands:
 

@@ -17,10 +17,12 @@ Tutorial Walkthrough
 --------------------
 
 #. Complete the :ref:`Isaac ROS AprilTag Quickstart section <repositories_and_packages/isaac_ros_apriltag/isaac_ros_apriltag/index:quickstart>`.
-#. Calibrate the camera following instructions in the
-   :doc:`camera calibration tutorial </getting_started/sensors/camera_calibration>`.
-   For step 11, use ``isaac_ros_apriltag`` in place of
-   ``<isaac_ros_package>``
+#. Calibrate your USB camera before starting this tutorial. In the activated
+   Isaac ROS environment, save the resulting calibration YAML as
+   ``${ISAAC_ROS_WS}/camera_info.yaml``. The launch command below loads this
+   file for both binary packages and source builds. The package's bundled
+   ``config/camera_info.yaml`` is only an example calibration.
+
 #. Install the ROS 2 ``usb_cam`` package
 
    .. code:: bash
@@ -37,11 +39,14 @@ Tutorial Walkthrough
 
    .. warning::
 
-      Make sure to set the ``camera_width`` and ``camera_height`` arguments based on your camera's resolution.
+      Set ``camera_width`` and ``camera_height`` to the resolution used for camera calibration.
+      The camera must support this resolution.
 
    .. code:: bash
 
-      ros2 launch isaac_ros_apriltag isaac_ros_apriltag_usb_cam.launch.py camera_width:=1280 camera_height:=720
+      ros2 launch isaac_ros_apriltag isaac_ros_apriltag_usb_cam.launch.py \
+        camera_width:=1280 camera_height:=720 \
+        camera_info_url:=file://${ISAAC_ROS_WS}/camera_info.yaml
 
 #. Launch a second terminal inside the container
 
@@ -72,5 +77,5 @@ Tutorial Walkthrough
 
    If you are using a different camera driver
    package ensure that the camera stream publishes ``Image`` and
-   ``CameraInfo`` pairs to the topics ``/image`` and ``/camera_info``,
+   ``CameraInfo`` pairs to the topics ``/image_raw`` and ``/camera_info``,
    respectively.

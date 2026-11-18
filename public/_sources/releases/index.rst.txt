@@ -2,6 +2,40 @@
 Release Notes
 =============
 
+Isaac ROS 5.1.0 :ir_release_date:`<5.1.0>`
+------------------------------------------
+
+What's New
+~~~~~~~~~~
+
+Updates including:
+
+- Added support for JetPack 7.2.1 and DeepStream 9.1
+- ``isaac_ros_physical_ai``: Restored the :doc:`GR00T reference architecture </reference_workflows/isaac_for_physical_ai/index>` for Unitree G1 on ROS 2 Lyrical Luth, covering teleoperation, data collection, policy fine-tuning, and deployment
+- ``isaac_ros_grasping``: New package for GraspGenX grasp generation from segmented point clouds, with single-object and batch inference
+- ``isaac_ros_sipl_camera``: Added support for flexible multiple camera capture, image resizing with scaled ``CameraInfo``, and reference guide for Sensing S56C stereo and SHF3L YUV422 cameras on GMSL adapted Jetson Thor.
+- ``isaac_ros_deploy``: Added support for setting input publish rates and output trajectory timing from LEAPP bundle metadata
+
+Issues Addressed
+~~~~~~~~~~~~~~~~
+
+This release has fixed the following known issues:
+
+- ``isaac_ros_stereo_image_proc``: Fixed ``VPI_ERROR_INVALID_OPERATION`` errors with ``backend:=JETSON`` and RGB8/BGR8 input. `(nvbugs/6798204)`
+- ``isaac_ros_h264_encoder``: Fixed the VPI shutdown crash on Jetson Thor; ``LD_PRELOAD`` is no longer required. `(nvbugs/6798205)`
+- ``isaac_ros_triton``: Restored the PyTorch backend in source builds on ``x86_64`` and ``aarch64``. `(nvbugs/6803691, nvbugs/6879490, nvbugs/6894029)`
+
+Limitations
+~~~~~~~~~~~
+
+This release has the following known limitations:
+
+- ``isaac_ros_sipl_camera``: Eagle VB1940 CoE camera stereo pair frames timestamps differ by ~18ms intermittently although frames arrived together. For more details, see the :doc:`ISAAC ROS SIPL Camera </repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index>` documentation. `(nvbugs/6854954)`
+- ``isaac_ros_sipl_camera``: S56C VB1940 GMSL camera in stereo mode has one sensor's frames arriving several frame periods older than the other sensor's frames in the pair although frames arrived together. For more details, see the :doc:`ISAAC ROS SIPL Camera </repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index>` documentation. `(nvbugs/6350031)`
+- ``isaac_ros_apriltag``: On DGX Spark, AprilTag detection may fail to publish messages on ``/tag_detections`` when using the ``cuAprilTags`` (CUDA) backend or running rosbag playback with the CPU backend. `(nvbugs/6830365)`
+- ``isaac_ros_nvblox``: With ``foxglove_bridge`` 3.4.3 and ``rmw_fastrtps_cpp`` 9.4.9, the RealSense D455 example on Jetson Thor may log repeated ``Invalid topic name`` errors. Use ``run_foxglove:=False run_rviz:=True`` to visualize with RViz.
+- ``isaac_ros_h264_decoder``: The RealSense H.264 workflow may fail to create the decoder subscription with ``failed to create accelerated channel topic`` due to a middleware topic-creation race when the encoder is already publishing in the same process. Starting the decoder before starting the encoder could serve as a workaround to avoid this race. `(nvbugs/6982682)`
+
 Isaac ROS 5.0.0 :ir_release_date:`<5.0.0>`
 ------------------------------------------
 
@@ -13,6 +47,7 @@ What's New
 Updates including:
 
 - Migrated to `ROS 2 Lyrical Luth <https://docs.ros.org/en/lyrical/Releases/Release-Lyrical-Luth.html>`__ as the supported ROS 2 distribution
+- ``isaac_ros_occupancy_grid_localizer``: Removed the Isaac Sim Nav2 navigation example and tutorial. The standalone localizer and rosbag quickstart remain available
 - Added Isaac ROS Buildfarm apt repository with ROS 2 Lyrical ecosystem packages for Ubuntu 24.04 (Noble)
 - Rebuilt NITROS natively with ROS 2 Lyrical ``rosidl::Buffer`` and the CUDA buffer backend enabling accelerated nodes to exchange standard ROS messages with array fields optionally backed by GPU cache memory.
 - Removed the NITROS packages, including ``isaac_ros_nitros``, ``isaac_ros_managed_nitros``, ``isaac_ros_pynitros``, ``isaac_ros_nitros_topic_tools``, and the ``isaac_ros_nitros_type`` packages. Code that calls NITROS APIs or types directly requires a source-level migration; refer to :doc:`From NITROS to rosidl::Buffer </concepts/rosidl_buffer/nitros_migration>`. ``isaac_ros_nitros_bridge_ros2`` is retained and deprecated, and will be removed in a future Isaac ROS release
@@ -36,7 +71,6 @@ Limitations
 
 This release has the following known limitations, with workarounds available in the troubleshooting section:
 
-- ``isaac_ros_occupancy_grid_localizer``: The Isaac Sim occupancy grid localizer tutorial may fail to load the Nova Carter scene on DGX Spark with Isaac Sim 6.0.1 because the RTX lidar sensor model cannot be created. `(nvbugs/6762998)`
 - RealSense cameras are supported only in Docker mode. Virtual Environment and Bare Metal modes are not supported. `(nvbugs/6635538)`
 - ``isaac_ros_stereo_image_proc``: On Jetson AGX Orin, selecting ``backend:=JETSON`` with RGB8/BGR8 input can cause a ``VPI_ERROR_INVALID_OPERATION`` error and terminate the node before disparity output is produced. As a workaround, use ``backend:=CUDA``, the default. `(nvbugs/6798204)`
 - ``isaac_ros_h264_encoder``: On Jetson Thor with VPI 4.1.4, the encoder may segfault during shutdown after encoding has completed. As a workaround, set ``LD_PRELOAD=/opt/nvidia/vpi4/lib/aarch64-linux-gnu/libnvvpi.so.4`` for the encoder launch. `(nvbugs/6798205)`
@@ -77,7 +111,6 @@ This release has the following known limitations:
 - ``isaac_ros_stereo_image_proc``: The RealSense SGM workflow using the Jetson VPI backend may fail on Jetson Orin or Thor with a VPI backend error, causing the component container to exit and preventing disparity or point cloud output. `(nvbugs/6377079, nvbugs/6526628)`
 - ``isaac_ros_manipulation``: The ``RTDETR`` object following workflow shows detections not being stable.
 - ``isaac_ros_manipulation``: The reach policy fails due to a checkpoint load error.
-- ``isaac_ros_manipulation``: The Gear Assembly tutorial pose-estimation accuracy test may fail to launch on Debian installs due to an outdated call to ``parse_joint_state_from_yaml()`` missing the required ``joint_names`` argument. This prevents the robot from moving above the peg stand for the visual pose-error check. `(nvbugs/6568375)`
 - ``isaac_ros_manipulation``: In the multi-object pick-and-place workflow, a stalled goal may not respond to cancellation or shutdown, and subsequent goals may be rejected because the action server remains occupied. `(nvbugs/6573697)`
 - ``isaac_ros_manipulation``: In the simulated UR10e pick-and-place workflow, grasp planning for the ``mac_and_cheese`` object may fail with ``TRAJECTORY_OPTIMIZATION_FAILURE``, causing the goal to abort or report partial success. `(nvbugs/6573468)`
 

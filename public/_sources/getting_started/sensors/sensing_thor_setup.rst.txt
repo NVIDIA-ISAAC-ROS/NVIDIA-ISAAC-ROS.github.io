@@ -1,0 +1,152 @@
+=========================================
+Isaac ROS Sensing Thor GMSL2 Camera Setup
+=========================================
+
+This guide shows how to use the **Sensing TRD1 G2A Thor kit** to run ``S56C`` stereo camera
+and ``SHF3L`` monocular cameras from Sensing through NVIDIA's Sensor Interface Processing
+Library (SIPL). The kit extends a Jetson AGX Thor Developer Kit with eight-port GMSL2
+camera connectivity.
+
+Host System Compatibility
+-------------------------
+
+This guide is verified with the following hardware and software:
+
+* **Sensing TRD1 G2A Thor kit**: The kit combines a Jetson AGX Thor
+  Developer Kit, Sensing GMSL2 camera expansion hardware, and a dedicated power supply.
+* **JetPack 7.2.x**.
+
+For the GMSL adapter overview and assembly details, refer to the
+`Sensing TRD1 G2A guide
+<https://wiki.sensing-world.com/docs/2_4_NVIDIA_Jetson_AGX_Thor/Getting_Started/TRD1_G2A>`_.
+
+For Sensing driver and Jetson host prerequisites for JetPack 7.2, refer to the
+`Sensing driver package README
+<https://github.com/SENSING-Technology/nvidia-jetson-camera-drivers/blob/main/Jetson%20AGX%20Thor%20Devkit/TRD1_G2A/JetPack7.2/TRD1_G2A_AGX_THOR_SIPL_JP7.2_L4TR39.2/Readme.md>`_.
+
+.. important::
+
+   Sensing's package includes boot loader pin-multiplexing files that must be applied
+   when JetPack is installed for their ``Sensing TRD1 G2A Thor``. A stock JetPack installation does
+   not configure every I2C and power-control pin required by the adapter. Complete the flashing step in
+   the `Sensing driver package README`_ before continuing. This guide starts
+   after that installation is complete.
+
+Hardware Requirements
+---------------------
+
+The following camera hardware is used in this guide:
+
+* One `Sensing Astra S56C <https://wiki.sensing-world.com/docs/6_1_Camera/Binocular_Camera/S56>`__ GMSL2 stereo camera.
+* Two `Sensing SHF3L <https://wiki.sensing-world.com/docs/6_1_Camera/Monocular_Camera/SHF3L>`__ GMSL2 cameras.
+* A dedicated **12 V power supply** for the GMSL distribution board.
+* FAKRA/coax cables for the cameras.
+
+Connect the Cameras
+-------------------
+
+#. Power off the Jetson and GMSL board.
+
+#. Follow the first connection layout in the
+   `Sensing S56C and SHF3L mixed-camera guide
+   <https://github.com/SENSING-Technology/nvidia-jetson-camera-drivers/blob/main/Jetson%20AGX%20Thor%20Devkit/TRD1_G2A/JetPack7.2/TRD1_G2A_AGX_THOR_SIPL_JP7.2_L4TR39.2/docs/s56c_shf3l_mixed.md>`_.
+   Connect the ``S56C`` to ``CAM0`` and the two ``SHF3L`` cameras to ``CAM2`` and ``CAM3`` as labeled in the `Sensing TRD1 G2A Thor hardware guide <https://wiki.sensing-world.com/docs/2_4_NVIDIA_Jetson_AGX_Thor/Getting_Started/TRD1_G2A#hardware-overview>`__. The link mask in this guide and the ``isaac_ros_sipl_camera`` package configuration files assume this connection layout.
+
+#. Connect the kit power supply, then power on the Jetson.
+
+Install the Sensing SIPL Drivers
+--------------------------------
+
+#. Verify the installed Jetson Linux release:
+
+   .. code:: bash
+
+      head -n 1 /etc/nv_tegra_release
+
+   Confirm that the release and revision match the Jetson Linux version targeted by the Sensing
+   driver package. For example, the package name encodes the Jetson Linux version as ``L4TR39.2``.
+
+#. Download the Sensing driver package for the installed Jetson Linux version as described in
+   the `Sensing driver package README`_.
+
+#. From the driver package directory, install the Sensing SIPL camera drivers, libraries, tools,
+   and NITO file:
+
+   .. code:: bash
+
+      chmod a+x install.sh
+      ./install.sh
+
+   If the Jetson ``nvidia-l4t-camera`` package is ever updated later, install this Sensing driver
+   package again as they share installation directories and override each other.
+
+#. Add the new camera drivers and NITO file to the Jetson container-runtime manifest. This block
+   verifies that the manifest and each referenced file exist. It is idempotent
+   and appends each entry only if the exact line is not already present:
+
+   .. code:: bash
+
+      csv=/etc/nvidia-container-runtime/host-files-for-container.d/drivers.csv
+      test -f "${csv}" || { echo "Missing: ${csv}"; exit 1; }
+      for file in \
+         /usr/lib/nvsipl_drv/libnvuddf_s56c_cameramodule_library.so \
+         /usr/lib/nvsipl_drv/libnvuddf_sgx_yuv_gmsl2_cameramodule_library.so \
+         /var/nvidia/nvcam/settings/sipl/S56C.nito; do
+         test -f "${file}" || { echo "Missing: ${file}"; exit 1; }
+         entry="lib, ${file}"
+         grep -qxF "${entry}" "${csv}" || printf '%s\n' "${entry}" | \
+            sudo tee -a "${csv}" > /dev/null
+      done
+
+   The NVIDIA container runtime reads this manifest when it creates a container and exposes these
+   files to containers that use the NVIDIA runtime.
+
+#. When using these cameras, apply the following every boot to set ``MAXN`` power mode and lock the clocks to improve capture stability when under load:
+
+   .. code:: bash
+
+      sudo nvpmodel -m 0
+      sudo jetson_clocks
+
+   Reapply after changing the power mode or rebooting the Jetson.
+
+Verify Sensing Streams in Native SIPL Capture
+---------------------------------------------
+
+#. Go to the Sensing driver package directory:
+
+   .. code:: bash
+
+      cd <driver-package-directory>
+
+#. Run a 40-second capture test of the ``S56C`` and both ``SHF3L`` cameras. The command displays
+   the complete output, saves it to a log, and then prints a summary of frame rates and errors:
+
+   .. code:: bash
+
+      SENSING_LOG=/tmp/sensing_native_capture.log
+      sudo ./bin/nvsipl_camera \
+         -t query/trd1_g2a/s56c_shf3l_mixed.json \
+         -c S56C_1_SHF3L_2 \
+         -m "0x0000 0x1101" \
+         --enable-camera-hal -s -Z --mixed-yuv-output -r 40 </dev/null 2>&1 | \
+         tee "${SENSING_LOG}"
+      echo "Return code ${PIPESTATUS[0]}"
+      grep -aE 'Frame rate|Frame captured|ERROR|FAIL' "${SENSING_LOG}"
+
+   Confirm that the output shows frames or frame rates for all four configured
+   streams and no ``ERROR`` or ``FAIL`` messages.
+
+   This build of ``nvsipl_camera`` is provided by Sensing, not by NVIDIA.
+
+Run the Cameras with Isaac ROS
+------------------------------
+
+To build and run the cameras with Isaac ROS, refer to the
+:doc:`Isaac ROS SIPL Camera documentation </repositories_and_packages/isaac_ros_sipl_camera/isaac_ros_sipl_camera/index>`.
+
+Troubleshooting
+---------------
+
+If the cameras fail to initialize, check the ``i2c`` and ``gpio`` group permissions.
+Refer to :ref:`sipl_camera_group_permissions` for the permission setup.

@@ -1,0 +1,73 @@
+===================
+Conversion Packages
+===================
+
+A conversion package is the recommended interface for most applications that
+use buffer-backed messages. It translates between a standard ROS message and
+the object an application or framework already uses, while leaving storage and
+transport to the registered ``rosidl::Buffer`` backend.
+
+For example, an application should generally ask a tensor conversion library
+for a framework-native tensor instead of retrieving a CUDA pointer and
+reconstructing tensor metadata itself.
+
+What a Conversion Package Provides
+----------------------------------
+
+A conversion package can own the data-model-specific work, including:
+
+* choosing or defining a ROS message with the required metadata;
+* allocating and sizing buffer-backed message fields;
+* validating dimensions, element types, strides, encodings, and offsets;
+* converting input messages to framework-native objects;
+* converting framework-native outputs to publishable messages; and
+* coordinating safe access without requiring callers to depend directly on a
+  particular buffer backend.
+
+This division keeps application code focused on images, tensors, point clouds,
+or another domain model. The same conversion API can use accelerated storage
+when a compatible backend is active and CPU storage otherwise.
+
+Using a Conversion Package
+--------------------------
+
+The usual application flow is:
+
+#. Subscribe to or create the standard ROS message selected by the conversion
+   package.
+#. Use the conversion package to obtain a domain-native input object or create
+   a domain-native output object.
+#. Run the application or framework operation.
+#. Convert or publish the output through the conversion package.
+
+The conversion package documentation defines ownership, mutability, and
+lifetime rules. Those rules remain important even when backend details are
+hidden from the application.
+
+PyTorch Example
+---------------
+
+The upstream `torch_conversions
+<https://github.com/ros2/rosidl_buffer_backends/tree/main/torch_conversions>`__
+package demonstrates this pattern. It converts between the DLPack-aligned
+``tensor_msgs/msg/ExperimentalTensor`` message and ``at::Tensor``. The
+message's data field uses ``rosidl::Buffer``, so the conversion API can operate
+over CUDA-backed storage when the CUDA backend is active or CPU storage when
+it is not.
+
+.. note::
+
+   ``tensor_msgs/msg/ExperimentalTensor`` and ``torch_conversions`` are
+   experimental upstream interfaces and may change before stabilization.
+
+Isaac ROS will provide additional conversion packages for common accelerated
+data types. Use those package-level APIs when available instead of adding a
+direct CUDA buffer backend dependency to application code.
+
+When to Use a Backend Directly
+------------------------------
+
+Use :doc:`the CUDA buffer backend directly <cuda_buffer_backend>` when a
+conversion package does not support the required data model, or when custom
+CUDA kernels need explicit control over pointers, streams, synchronization,
+and allocation lifetime.

@@ -1,0 +1,121 @@
+=================================
+From NITROS to ``rosidl::Buffer``
+=================================
+
+Isaac ROS is deprecating NITROS, including CUDA with NITROS and PyNITROS.
+NITROS will be removed in a future Isaac ROS release. Isaac ROS nodes that
+previously relied on NITROS now use ROS 2 messages with ``rosidl::Buffer``
+fields and the CUDA buffer backend.
+
+Why Isaac ROS Moved Away from NITROS
+------------------------------------
+
+NITROS provided NVIDIA-specific type adaptation, type negotiation, and
+GPU-aware transport before ROS 2 offered a common container and backend model
+for accelerator memory.
+
+ROS 2 Lyrical introduces ``rosidl::Buffer`` and buffer backend plugins as
+native ROS 2 features.
+This upstream architecture lets ROS messages retain their standard definitions
+while their primitive array fields use CPU, CUDA, or another backend's storage.
+Moving Isaac ROS to ``rosidl::Buffer``:
+
+* aligns accelerated Isaac ROS nodes with the broader ROS 2 ecosystem;
+* removes the need for an Isaac ROS-specific transport API;
+* allows conversion libraries and applications outside Isaac ROS to use the
+  same accelerated message storage; and
+* concentrates future interoperability and performance work in shared ROS 2
+  infrastructure.
+
+Refer to :doc:`rosidl::Buffer and Buffer Backends <index>` for an overview and the
+upstream `ROS 2 buffer backend concepts
+<https://docs.ros.org/en/lyrical/Concepts/Intermediate/About-Buffer-Backends.html>`__
+for the complete architecture.
+
+What Is Being Removed
+---------------------
+
+The deprecation covers the NITROS framework and NITROS-specific developer
+interfaces, including:
+
+* NITROS type adaptation, negotiation, and graph transport infrastructure;
+* NITROS-specific types and message representations;
+* Managed NITROS publishers and subscribers;
+* NITROS builders and views;
+* CUDA with NITROS APIs;
+* PyNITROS; and
+* NITROS Bridge APIs and message types.
+
+Node-Level Compatibility
+------------------------
+
+Isaac ROS maintains node-level compatibility for nodes migrated from NITROS
+to ROS 2 buffer backends. Applications that use supported Isaac ROS node
+interfaces do not need to redesign their graphs solely because the underlying
+transport changed.
+
+This compatibility does not extend to custom code that directly uses NITROS
+APIs or types. That code requires a source-level migration.
+
+Choose a Migration Interface
+----------------------------
+
+For most applications, migrate to a :doc:`conversion package
+<conversion_packages>`. Conversion packages expose images, tensors, point
+clouds, or other domain objects and keep allocation, metadata, and backend
+details out of application code. Isaac ROS will add conversion packages for
+additional common data types.
+
+Use the :doc:`CUDA buffer backend directly <cuda_buffer_backend>` only when
+custom CUDA code must access device pointers or explicitly control CUDA
+streams, synchronization, allocation, and lifetime.
+
+Migration Is Not a One-to-One API Replacement
+---------------------------------------------
+
+The new architecture preserves the performance goal of avoiding unnecessary
+CPU copies, but its APIs and data model differ from NITROS. Do not mechanically
+rename NITROS classes or assume that a NITROS-specific type has a
+field-for-field equivalent.
+
+.. list-table::
+   :header-rows: 1
+
+   * - NITROS integration
+     - Migration direction
+   * - Managed NITROS publisher or subscriber
+     - Standard ROS 2 publisher or subscription using a buffer-backed message,
+       preferably through a conversion package
+   * - NITROS builders and views
+     - Conversion-package objects, or CUDA read and write handles for advanced
+       direct-backend use
+   * - NITROS-specific adapted types
+     - Standard ROS messages with ``rosidl::Buffer`` fields and separate
+       domain conversion APIs
+   * - NITROS type negotiation
+     - Buffer-backend selection and fallback in the ROS middleware; this is a
+       different abstraction, not a direct API equivalent
+   * - PyNITROS
+     - A supported framework conversion package when available
+
+Migration Checklist
+-------------------
+
+#. Identify direct dependencies on NITROS packages, publishers, subscribers,
+   builders, views, bridge messages, and adapted types.
+#. Select the standard ROS message and conversion package for the data model.
+   Use the CUDA backend directly only if a conversion package cannot meet the
+   application's requirements.
+#. Replace Managed NITROS publishers and subscribers with standard ROS 2
+   publishers and subscriptions.
+#. Replace NITROS-specific message construction and access with conversion
+   APIs or, for advanced CUDA code, CUDA buffer read and write handles.
+#. Update build and runtime dependencies to the selected ROS message,
+   conversion, and backend packages.
+#. Validate message semantics, mutability, ownership, buffer lifetime, and
+   CUDA stream synchronization.
+#. Test both the accelerated path and CPU fallback behavior.
+
+Although custom integrations require deliberate engineering work, migrating
+places them on the common ROS 2 accelerator-memory architecture and avoids
+continued dependence on an Isaac ROS-specific transport stack.

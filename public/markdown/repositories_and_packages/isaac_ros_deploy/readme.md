@@ -31,5 +31,4 @@ Please visit the [Isaac ROS Documentation](https://nvidia-isaac-ros.github.io/re
 
 ## Latest
 
-Update 2026-09-21: Added optional InferenceController debug topics for flattened model inputs and the selected output tensor, and added LEAPP runtime, robot description, ROS communication, and safety controller troubleshooting guides.
-Isaac Sim deployment support is not included in this release.
+Update 2026-11-16: Added support for setting input publish rates and output trajectory timing from LEAPP bundle metadata

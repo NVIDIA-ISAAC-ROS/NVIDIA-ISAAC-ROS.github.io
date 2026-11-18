@@ -1,0 +1,76 @@
+===================
+CUDA Buffer Backend
+===================
+
+The `ROS 2 CUDA buffer backend
+<https://github.com/ros2/rosidl_buffer_backends/tree/main/cuda_buffer_backend>`__
+builds on the native ``rosidl::Buffer`` feature in ROS 2 Lyrical. It is a
+``rosidl::BufferBackend`` implementation that provides CUDA memory storage and
+transport. It uses CUDA Virtual Memory Management and inter-process
+communication to share GPU memory between compatible publishers and
+subscribers on the same host.
+
+This is an advanced interface. Prefer a :doc:`conversion package
+<conversion_packages>` when one supports the application's data model.
+
+Core API Concepts
+-----------------
+
+The CUDA buffer backend exposes four main operations:
+
+``allocate_buffer``
+  Allocates a ``rosidl::Buffer<uint8_t>`` backed by CUDA memory.
+
+``from_output_buffer``
+  Acquires exclusive write access to a mutable buffer and returns a write
+  handle. The handle provides a writable device pointer and records completion
+  on the supplied CUDA stream.
+
+``from_input_buffer``
+  Returns a read handle for a received buffer. The handle waits for the
+  publisher's write event before exposing a read-only device pointer.
+
+``to_buffer``
+  Copies bytes from an existing host or device pointer into an already
+  allocated output buffer.
+
+A publisher allocates the message field, writes through a write handle, and
+then publishes the ordinary ROS message. A subscriber obtains a read handle
+from the received message and passes the read-only pointer to its CUDA work.
+Standard ROS 2 publishers and subscriptions remain the communication API.
+
+Ownership and Synchronization
+-----------------------------
+
+Read and write handles are part of the synchronization and lifetime contract;
+they are not only pointer wrappers. Code using the backend directly must:
+
+* keep each handle alive until work submitted to its CUDA stream is recorded;
+* avoid retaining a raw pointer beyond the handle or message lifetime;
+* treat subscriber pointers as read-only;
+* acquire output write access only as allowed by the backend; and
+* account for promoted or fallback buffers when the input is not CUDA-backed.
+
+Communication and Fallback
+--------------------------
+
+The backend currently provides CUDA VMM zero-copy transport when endpoints
+are on the same host, use the same GPU and user, and support the required VMM
+features. For other connections, it falls back to CPU transport. Applications
+must remain correct on both paths even when the accelerated path is expected
+in production.
+
+When Direct Use Is Appropriate
+------------------------------
+
+Use the CUDA buffer backend directly for custom CUDA nodes that must:
+
+* launch kernels against message storage without an intermediate data model;
+* integrate an unsupported CUDA library or message representation;
+* control the CUDA stream used for reads and writes; or
+* explicitly manage allocation reuse and buffer lifetime.
+
+Refer to the upstream `CUDA buffer backend documentation
+<https://github.com/ros2/rosidl_buffer_backends/tree/main/cuda_buffer_backend>`__
+for current build requirements, API signatures, examples, and the complete
+transport support matrix.

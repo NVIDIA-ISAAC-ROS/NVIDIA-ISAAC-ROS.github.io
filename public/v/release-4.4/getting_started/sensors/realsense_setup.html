@@ -35,7 +35,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/nvidia-sphinx-theme.css?v=df3ac72c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-new-tab-link.css?v=d87cb1ac" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/isaac.css?v=177ef1d8" />
   
   <!-- So that users can add custom icons -->
@@ -49,7 +49,7 @@
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=01823362"></script>
-    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started/sensors/realsense_setup';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
@@ -64,7 +64,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Sep 21, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 17, 2026"/>
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -708,18 +708,19 @@
     class="version-switcher__menu dropdown-menu list-group-flush py-0"
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <dl>
-        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
-        <dd><a href="realsense_setup.html">release-4.4</a></dd>
-        <dd><a href="../../../release-4.5/getting_started/sensors/realsense_setup.html">release-4.5</a></dd>
-        <dd><a href="../../../release-4.6/getting_started/sensors/realsense_setup.html">release-4.6</a></dd>
-        <dd><a href="../../../release-5.0/getting_started/sensors/realsense_setup.html">release-5.0</a></dd>
+        <dd><a href="../../../release-5.1/getting_started/sensors/realsense_setup.html">release-5.1</a></dd>
         <dd><a href="../../../../getting_started/sensors/realsense_setup.html">latest</a></dd>
         <dd><a href="../../../release-2.1/index.html">release-2.1</a></dd>
         <dd><a href="../../../release-3.1/index.html">release-3.1</a></dd>
+        <dd><a href="../../../release-3.2/index.html">release-3.2</a></dd>
         <dd><a href="../../../release-4.0/getting_started/sensors/realsense_setup.html">release-4.0</a></dd>
         <dd><a href="../../../release-4.1/getting_started/sensors/realsense_setup.html">release-4.1</a></dd>
         <dd><a href="../../../release-4.2/getting_started/sensors/realsense_setup.html">release-4.2</a></dd>
         <dd><a href="../../../release-4.3/getting_started/sensors/realsense_setup.html">release-4.3</a></dd>
+        <dd><a href="realsense_setup.html">release-4.4</a></dd>
+        <dd><a href="../../../release-4.5/getting_started/sensors/realsense_setup.html">release-4.5</a></dd>
+        <dd><a href="../../../release-4.6/getting_started/sensors/realsense_setup.html">release-4.6</a></dd>
+        <dd><a href="../../../release-5.0/getting_started/sensors/realsense_setup.html">release-5.0</a></dd>
     </dl>
   </div>
 </div></div>
@@ -825,8 +826,8 @@ sudo<span class="w"> </span>udevadm<span class="w"> </span>control<span class="w
 <li><p>Configure the Isaac ROS environment to include <code class="docutils literal notranslate"><span class="pre">librealsense</span> <span class="pre">SDK</span></code> and <code class="docutils literal notranslate"><span class="pre">realsense-ros</span></code>:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" data-sync-group="tab" data-sync-id="docker" for="sd-tab-item-0">
-Docker</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-0-content" class="sd-tab-label" data-sync-group="tab" data-sync-id="docker" for="sd-tab-item-0">
+Docker</label><div class="sd-tab-content docutils" id="sd-tab-item-0-content">
 <p>Create a file called <code class="docutils literal notranslate"><span class="pre">~/.config/isaac-ros-cli/config.yaml</span></code> with the following content:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.config/isaac-ros-cli
 touch<span class="w"> </span>~/.config/isaac-ros-cli/config.yaml
@@ -840,8 +841,8 @@ touch<span class="w"> </span>~/.config/isaac-ros-cli/config.yaml
 </div>
 </div>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" data-sync-group="tab" data-sync-id="venv" for="sd-tab-item-1">
-Virtual Environment</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-1-content" class="sd-tab-label" data-sync-group="tab" data-sync-id="venv" for="sd-tab-item-1">
+Virtual Environment</label><div class="sd-tab-content docutils" id="sd-tab-item-1-content">
 <ol class="arabic">
 <li><p>Define the following configuration variables to specify the versions used for the installation:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">LIBREALSENSE_VERSION</span><span class="o">=</span>v2.56.3
@@ -927,8 +928,8 @@ rm<span class="w"> </span>-rf<span class="w"> </span>/tmp/realsense-setup
 </ol>
 </div>
 <input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" data-sync-group="tab" data-sync-id="baremetal" for="sd-tab-item-2">
-Bare Metal</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-2-content" class="sd-tab-label" data-sync-group="tab" data-sync-id="baremetal" for="sd-tab-item-2">
+Bare Metal</label><div class="sd-tab-content docutils" id="sd-tab-item-2-content">
 <ol class="arabic">
 <li><p>Define the following configuration variables to specify the versions used for the installation:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">LIBREALSENSE_VERSION</span><span class="o">=</span>v2.56.3
@@ -1019,8 +1020,8 @@ rm<span class="w"> </span>-rf<span class="w"> </span>/tmp/realsense-setup
 <li><p>Activate the Isaac ROS environment:</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="tab" data-sync-id="docker" for="sd-tab-item-3">
-Docker</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-3-content" class="sd-tab-label" data-sync-group="tab" data-sync-id="docker" for="sd-tab-item-3">
+Docker</label><div class="sd-tab-content docutils" id="sd-tab-item-3-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate<span class="w"> </span>--build-local
 </pre></div>
 </div>
@@ -1028,15 +1029,15 @@ Docker</label><div class="sd-tab-content docutils">
 <p>After the image has been built once, you can use <code class="docutils literal notranslate"><span class="pre">isaac-ros</span> <span class="pre">activate</span></code> to launch the container without rebuilding the image.</p>
 </div>
 <input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="tab" data-sync-id="venv" for="sd-tab-item-4">
-Virtual Environment</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-4-content" class="sd-tab-label" data-sync-group="tab" data-sync-id="venv" for="sd-tab-item-4">
+Virtual Environment</label><div class="sd-tab-content docutils" id="sd-tab-item-4-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-5" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="tab" data-sync-id="baremetal" for="sd-tab-item-5">
-Bare Metal</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-5-content" class="sd-tab-label" data-sync-group="tab" data-sync-id="baremetal" for="sd-tab-item-5">
+Bare Metal</label><div class="sd-tab-content docutils" id="sd-tab-item-5-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isaac-ros<span class="w"> </span>activate
 </pre></div>
 </div>
@@ -1209,7 +1210,7 @@ Bare Metal</label><div class="sd-tab-content docutils">
 </div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on Sep 21, 2026.
+  Last updated on Nov 17, 2026.
   <br/>
 </p></div>
       

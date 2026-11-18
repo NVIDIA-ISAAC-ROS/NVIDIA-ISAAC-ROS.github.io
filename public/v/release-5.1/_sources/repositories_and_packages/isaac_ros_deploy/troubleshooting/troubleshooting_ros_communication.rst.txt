@@ -1,0 +1,86 @@
+==========================
+ROS 2 Communication Issues
+==========================
+
+Isaac ROS Deploy runs the controller manager, the robot state publisher, and any
+command source as separate ROS 2 nodes that discover each other over DDS. When
+discovery goes wrong the stack still starts cleanly, so the symptom is a robot
+that ignores your commands or reacts to commands you did not send.
+
+The Robot Reacts to Commands You Did Not Send
+---------------------------------------------
+
+By default every ROS 2 node on the same network joins the same DDS domain. If
+another person or another robot is running a policy on that network, their twist
+commands and parameter updates reach your controllers as well.
+
+Symptom
+~~~~~~~
+
+The robot moves without you publishing anything, or responds to a twist command
+at the same moment a colleague sends one. A terminal that was started without the
+export sees none of your controllers, so the policy appears never to activate.
+
+Solution
+~~~~~~~~
+
+Set a unique ``ROS_DOMAIN_ID`` in **every** terminal before launching, including
+the terminal you use to publish twist commands and the one you use to set
+``blend_ratio``:
+
+.. code:: bash
+
+   export ROS_DOMAIN_ID=<your_id>
+
+Every terminal that participates must use the same value. A terminal that misses
+this export lands in the default domain instead.
+
+Commands Have No Effect After Restarting the Stack
+--------------------------------------------------
+
+Stopping the ``ros2 launch`` process does not always stop the ``ros2_control_node``
+it started. A surviving controller manager keeps its controllers and its topic
+subscriptions alive, and the next launch then competes with it for the same
+topics and the same hardware.
+
+Symptom
+~~~~~~~
+
+The stack reports controllers as active and ``/joint_states`` keeps publishing at
+the expected rate, but the robot does not move and joint velocities read
+approximately zero. This looks very much like a policy that is simply not
+producing output.
+
+Solution
+~~~~~~~~
+
+Check for a surviving controller manager before relaunching:
+
+.. code:: bash
+
+   pgrep -af ros2_control_node
+
+If anything is listed, terminate it, then relaunch:
+
+.. code:: bash
+
+   pkill -f ros2_control_node
+
+The same applies to the other nodes the launch file starts, such as
+``robot_state_publisher`` and ``foxglove_bridge``.
+
+Messages Are Dropped Under Load
+-------------------------------
+
+Symptom
+~~~~~~~
+
+Message delivery becomes unreliable when many nodes run at once. Topics arrive
+intermittently or discovery takes an unusually long time.
+
+Solution
+~~~~~~~~
+
+Refer to the
+`DDS tuning guide <https://docs.ros.org/en/:ir_ros_distro:/How-To-Guides/DDS-tuning.html>`__
+for the receive-buffer and discovery settings to adjust.
